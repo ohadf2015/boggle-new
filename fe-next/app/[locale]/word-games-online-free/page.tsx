@@ -1,5 +1,16 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import {
+  CtaBand,
+  FaqList,
+  LandingButton,
+  LandingHero,
+  LandingPage,
+  Mark,
+  Section,
+  TileGrid,
+} from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 
 interface PageProps {
@@ -76,113 +87,68 @@ export default async function WordGamesOnlineFreePage({ params }: PageProps) {
   const { locale } = await params;
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/quick-play`, label: 'Play Free — Solo Mode' }}>
       {/* JSON-LD structured data for FAQ rich results — static content only, no user input */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: faqJsonLd }}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
+
+      <LandingHero
+        title={
+          <>
+            Word Games Online <Mark>Free</Mark> — Play Instantly
+          </>
+        }
+        lead="Looking for free word games you can play online right now? LexiClash has 7+ word game modes — all free, no download, no signup. Play solo against AI, challenge friends in real-time multiplayer, or try daily puzzles. Available in 6 languages on any device."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/quick-play`}>Play Free — Solo Mode</LandingButton>
+            <LandingButton href={`/${locale}/multiplayer`} variant="secondary">
+              Multiplayer With Friends
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.wheel('A LexiClash mascot spinning a wheel of letter tiles')}
+        artTone="lime"
+      >
+        <Link href={`/${locale}/daily`} className="font-bold text-neo-cyan underline underline-offset-4">
+          Daily Challenges →
+        </Link>
+      </LandingHero>
+
+      <Section title="7+ Free Word Games to Play">
+        <TileGrid
+          items={[
+            { title: 'Classic Word Battle', body: 'Find words on a grid — solo or multiplayer. Like Boggle but better.' },
+            { title: 'Daily Word Wheel', body: 'A new puzzle every day. Find words from a wheel of letters. Chase the world record.' },
+            { title: 'Word Hunt', body: 'Find specific target words hidden in the grid before time runs out.' },
+            { title: 'Blast Mode', body: 'Chain combos for explosive scores. Rapid-fire word finding at its best.' },
+            { title: 'Adventure Mode', body: 'Boss battles, upgrades, and quests. An RPG word game experience.' },
+            { title: 'Brain Training', body: '5 drill types to sharpen pattern recognition, memory, and speed.' },
+          ]}
+        />
+      </Section>
+
+      <Section title="Frequently Asked Questions">
+        <FaqList items={faqs} />
+      </Section>
+
+      <Section title="Explore More Word Games">
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: `/${locale}/free-multiplayer-word-game`, title: 'Multiplayer Word Game Online', body: 'Real-time Scrabble alternative — play live against friends' },
+            { href: `/${locale}/online-word-games-with-friends`, title: 'Word Games With Friends', body: 'Create a room, share the link, play together' },
+            { href: `/${locale}/play-boggle-online-free`, title: 'Play Boggle Free', body: 'No download, instant browser play' },
+          ]}
+        />
+      </Section>
+
+      <CtaBand
+        tone="cyan"
+        title="Start Playing Free Word Games Now"
+        body="No more searching for word games online free — LexiClash has everything. Multiplayer word battles, daily puzzles, brain training, adventure mode, and more. All completely free in your browser."
+        actions={<LandingButton href={`/${locale}/quick-play`}>Play Free Word Games Now</LandingButton>}
+        art={LANDING_ART.trophy('')}
       />
-
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Word Games Online Free — Play Instantly
-        </h1>
-
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Looking for free word games you can play online right now? LexiClash has 7+ word game modes — all free,
-          no download, no signup. Play solo against AI, challenge friends in real-time multiplayer, or try
-          daily puzzles. Available in 6 languages on any device.
-        </p>
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link
-            href={`/${locale}/quick-play`}
-            className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
-          >
-            Play Free — Solo Mode
-          </Link>
-          <Link
-            href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4"
-          >
-            Multiplayer With Friends
-          </Link>
-          <Link
-            href={`/${locale}/daily`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
-          >
-            Daily Challenges
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">7+ Free Word Games to Play</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              { title: 'Classic Word Battle', desc: 'Find words on a grid — solo or multiplayer. Like Boggle but better.' },
-              { title: 'Daily Word Wheel', desc: 'A new puzzle every day. Find words from a wheel of letters. Chase the world record.' },
-              { title: 'Word Hunt', desc: 'Find specific target words hidden in the grid before time runs out.' },
-              { title: 'Blast Mode', desc: 'Chain combos for explosive scores. Rapid-fire word finding at its best.' },
-              { title: 'Adventure Mode', desc: 'Boss battles, upgrades, and quests. An RPG word game experience.' },
-              { title: 'Brain Training', desc: '5 drill types to sharpen pattern recognition, memory, and speed.' },
-            ].map((game) => (
-              <div key={game.title} className="rounded-neo border-3 border-neo-cyan bg-neo-navy/50 p-5 shadow-hard">
-                <h3 className="mb-2 font-neo-display text-lg font-bold text-neo-cyan">{game.title}</h3>
-                <p className="text-sm text-neo-gray-200">{game.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}-${faq.q}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">&#9660;</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Explore More Word Games</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/free-multiplayer-word-game`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-lime">Multiplayer Word Game Online</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Real-time Scrabble alternative — play live against friends</p>
-            </Link>
-            <Link href={`/${locale}/online-word-games-with-friends`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
-              <h3 className="font-bold text-neo-cyan">Word Games With Friends</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Create a room, share the link, play together</p>
-            </Link>
-            <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink/40">
-              <h3 className="font-bold text-neo-pink">Play Boggle Free</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">No download, instant browser play</p>
-            </Link>
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Start Playing Free Word Games Now</h2>
-          <p className="mt-4 text-neo-gray-200">
-            No more searching for word games online free — LexiClash has everything. Multiplayer word battles,
-            daily puzzles, brain training, adventure mode, and more. All completely free in your browser.
-          </p>
-          <div className="mt-6">
-            <Link
-              href={`/${locale}/quick-play`}
-              className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg"
-            >
-              Play Free Word Games Now
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+    </LandingPage>
   );
 }

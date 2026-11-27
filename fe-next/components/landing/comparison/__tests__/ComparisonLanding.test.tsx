@@ -3,13 +3,14 @@ import { render, screen } from '@testing-library/react';
 import { ComparisonLanding, type ComparisonLandingProps } from '../ComparisonLanding';
 
 vi.mock('next/link', () => ({
-  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
+  default: ({ children, href, className }: { children: React.ReactNode; href: string; className?: string }) => (
+    <a href={href} className={className}>{children}</a>
   ),
 }));
 
-vi.mock('@/components/navigation/TopBackLink', () => ({
-  TopBackLink: () => <span data-testid="top-back-link">back</span>,
+vi.mock('next/image', () => ({
+  // eslint-disable-next-line @next/next/no-img-element
+  default: ({ alt }: { alt: string }) => <img alt={alt} />,
 }));
 
 function baseProps(overrides: Partial<ComparisonLandingProps> = {}): ComparisonLandingProps {
@@ -74,16 +75,15 @@ describe('ComparisonLanding', () => {
 
   it('renders the final CTA as a link with the correct href and label', () => {
     render(<ComparisonLanding {...baseProps()} />);
-    const cta = screen.getByRole('link', { name: 'Play Now' });
+    const cta = screen.getAllByRole('link', { name: 'Play Now' })[0];
     expect(cta).toHaveAttribute('href', '/en/singleplayer');
   });
 
   it('renders all quick CTA buttons with their hrefs', () => {
     render(<ComparisonLanding {...baseProps()} />);
-    expect(screen.getByRole('link', { name: 'Play Solo' })).toHaveAttribute(
-      'href',
-      '/en/singleplayer',
-    );
+    for (const link of screen.getAllByRole('link', { name: 'Play Solo' })) {
+      expect(link).toHaveAttribute('href', '/en/singleplayer');
+    }
     expect(screen.getByRole('link', { name: 'Daily Challenge' })).toHaveAttribute(
       'href',
       '/en/daily',
@@ -92,11 +92,10 @@ describe('ComparisonLanding', () => {
 
   // --- brand-correctness (the design contract, not just "it renders") ---
 
-  it('frames the scoreboard with the canonical thick black border, never the off-brand gray border', () => {
+  it('frames the scoreboard with a solid black border, never the off-brand gray border', () => {
     const { container } = render(<ComparisonLanding {...baseProps()} />);
-    const frame = container.querySelector('[data-testid="scoreboard-frame"]');
-    expect(frame).not.toBeNull();
-    expect(frame?.className).toMatch(/border-neo-thick/);
+    const frame = container.querySelector('[data-testid="scoreboard-frame"] table')?.parentElement;
+    expect(frame?.className).toMatch(/border-neo-black/);
     // the old vs-pages used border-neo-gray-400 on the table — must be gone
     expect(container.innerHTML).not.toMatch(/border-neo-gray/);
   });
@@ -106,13 +105,13 @@ describe('ComparisonLanding', () => {
     expect(container.innerHTML).not.toMatch(/border-[\w-]+\/40/);
   });
 
-  it('marks the LexiClash column as the winner with the cyan accent, and mutes the competitor column', () => {
+  it('marks the LexiClash column as the winner and leaves the competitor column plain', () => {
     const { container } = render(<ComparisonLanding {...baseProps()} />);
-    const winner = container.querySelector('[data-testid="winner-col-header"]');
-    const loser = container.querySelector('[data-testid="competitor-col-header"]');
+    const [, winner, loser] = Array.from(container.querySelectorAll('thead th'));
     expect(winner?.textContent).toMatch(/LexiClash/);
-    expect(winner?.className).toMatch(/neo-cyan/);
+    expect(winner?.className).toMatch(/neo-lime/);
     expect(loser?.textContent).toMatch(/Wordle/);
+    expect(loser?.className).not.toMatch(/neo-lime/);
   });
 
   it('applies a muted, struck-through treatment when featuresStyle is "pain"', () => {
@@ -140,10 +139,14 @@ describe('ComparisonLanding', () => {
     expect(screen.getByText('Grid vs Rack')).toBeInTheDocument();
   });
 
-  it('shows the back link only when showBackLink is set', () => {
-    const { rerender } = render(<ComparisonLanding {...baseProps()} />);
-    expect(screen.queryByTestId('top-back-link')).toBeNull();
-    rerender(<ComparisonLanding {...baseProps({ showBackLink: true })} />);
-    expect(screen.getByTestId('top-back-link')).toBeInTheDocument();
+  it('offers one lime primary and one cream secondary in the hero, extra CTAs as plain pills', () => {
+    const { container } = render(
+      <ComparisonLanding
+        {...baseProps({ quickCtas: [...baseProps().quickCtas, { href: '/en/multiplayer', label: 'Friends' }] })}
+      />,
+    );
+    const heroButtons = Array.from(container.querySelectorAll('header a.min-h-14'));
+    expect(heroButtons.map((a) => a.className.match(/bg-neo-(lime|cream)/)?.[1])).toEqual(['lime', 'cream']);
+    expect(screen.getByRole('link', { name: 'Friends' })).toHaveAttribute('href', '/en/multiplayer');
   });
 });

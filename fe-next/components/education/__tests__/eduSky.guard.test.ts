@@ -231,7 +231,7 @@ describe('files a dark page imports', () => {
   it('walks the real import graph (guard against a vacuous pass)', () => {
     expect(reachable.length).toBeGreaterThan(1000);
     expect(reachable).toContain('components/education/HomeEducationCard.tsx');
-    expect(reachable).toContain('components/education/EducationRelatedLinks.tsx');
+    expect(reachable).toContain('components/landing/education/EducationKitRelated.tsx');
     expect(reachable).toContain('components/teacher/pro/ProBanner.tsx');
     expect(reachable).toContain('host/components/tv-broadcast/notifications/MinimalToastLayout.tsx');
     expect(reachable).not.toContain('app/[locale]/teacher/layout.tsx');

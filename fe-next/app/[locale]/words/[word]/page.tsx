@@ -11,7 +11,7 @@ import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 import { Stagger } from '@/components/motion/PopIn';
 import { PressGroup } from '../_components/PressGroup';
 import { HeroBand } from '../_components/HeroBand';
-import { PRIMARY_CTA, CHIP, SECTION_LABEL } from '../_components/wordStyles';
+import { PRIMARY_CTA, CHIP, PAPER_CARD, SECTION_LABEL } from '../_components/wordStyles';
 
 // /words/{n}-letter-words (e.g. 3-letter-words) is served by THIS dynamic route and
 // delegated to NLetterWordsView. It used to be a sibling [n]-letter-words route, but two
@@ -200,17 +200,17 @@ export default async function WordExplorerPage({ params }: PageParams) {
         <HeroBand className="max-w-2xl">
           <TopBackLink className="mb-4" />
 
-          <h1 className="text-5xl font-neo-display font-black text-neo-yellow tracking-wider">
+          <h1 className="font-neo-display text-5xl font-bold tracking-wide sm:text-6xl">
             {displayWord}
           </h1>
           <div className="flex items-center gap-3 mt-2">
-            <span className={`inline-block px-3 py-1 rounded-neo border-2 border-neo-black text-sm font-bold ${isValid ? 'bg-neo-lime text-neo-black' : 'bg-neo-red text-neo-white'}`}>
+            <span className={`inline-block rounded-full border-2 border-neo-black px-3 py-1 text-sm font-bold shadow-hard-sm ${isValid ? 'bg-neo-lime text-neo-black' : 'bg-neo-red text-neo-white'}`}>
               {isValid ? 'Valid' : 'Not Valid'}
             </span>
-            <span className="text-neo-cream/70">
+            <span className="text-neo-white/75">
               {word.length} letters
             </span>
-            <span className="text-neo-cyan font-bold">
+            <span className="rounded-full border-2 border-neo-black bg-neo-cyan px-3 py-1 text-sm font-bold text-neo-black">
               {points} pts
             </span>
           </div>
@@ -219,14 +219,14 @@ export default async function WordExplorerPage({ params }: PageParams) {
             {displayWord.split('').map((letter, i) => (
               <div
                 key={`${letter}-${i}`}
-                className="w-12 h-12 bg-neo-navy-light border-2 border-neo-black rounded-neo flex items-center justify-center font-neo-display font-black text-xl text-neo-yellow shadow-[0_3px_0_0] shadow-neo-cream/20"
+                className="flex h-12 w-12 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream font-neo-display text-xl font-bold text-neo-black shadow-hard-sm sm:h-14 sm:w-14 sm:text-2xl"
               >
                 {letter}
               </div>
             ))}
           </Stagger>
           {letterFreq.some(l => l.count > 1) && (
-            <p className="mt-2 text-xs text-neo-cream/60">
+            <p className="mt-2 text-xs text-neo-white/70">
               Repeated: {letterFreq.filter(l => l.count > 1).map(l => `${l.letter} ×${l.count}`).join(', ')}
             </p>
           )}
@@ -235,56 +235,56 @@ export default async function WordExplorerPage({ params }: PageParams) {
             <Link href={`/${locale}/quick-play`} data-press data-primary-cta className={PRIMARY_CTA}>
               Play Now →
             </Link>
-            <p className="text-neo-cream/60 text-xs mt-3">
+            <p className="mt-3 text-sm text-neo-white/70">
               Can you find this word on the grid?
             </p>
           </div>
         </HeroBand>
 
-        <div className="max-w-2xl mx-auto px-4 pb-10">
-          <section className="border-2 border-neo-black rounded-neo bg-neo-navy-light/50 p-4 mb-8">
-            <h2 className={`${SECTION_LABEL} mb-3`}>Scoring</h2>
+        <div className="mx-auto flex max-w-2xl flex-col gap-10 px-4 pb-20 pt-4">
+          <section className={`${PAPER_CARD} p-5 sm:p-6`}>
+            <h2 className="mb-3 font-neo-display text-2xl font-bold">Scoring</h2>
             <div className="space-y-2">
               {scoringTiers.map(tier => (
                 <div key={tier.combo} className="flex items-center justify-between text-sm">
-                  <span className="text-neo-cream/70">{tier.label}</span>
-                  <span className="font-bold text-neo-white">{tier.score} pts</span>
+                  <span>{tier.label}</span>
+                  <span className="font-bold">{tier.score} pts</span>
                 </div>
               ))}
-              <div className="flex items-center justify-between text-sm border-t border-neo-cream/15 pt-2">
-                <span className="text-neo-cream/70">Fire Round (2x)</span>
-                <span className="font-bold text-neo-orange">{points * 2} pts</span>
+              <div className="flex items-center justify-between border-t-2 border-neo-black/15 pt-2 text-sm">
+                <span>Fire Round (2x)</span>
+                <span className="rounded bg-neo-orange px-1.5 font-bold">{points * 2} pts</span>
               </div>
             </div>
           </section>
 
-          <InlineBannerAd webZone="content-page" className="mb-8" />
+          <InlineBannerAd webZone="content-page" />
 
-          <section className="mb-8">
-            <h2 className={`${SECTION_LABEL} mb-3`}>Word Facts</h2>
-            <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-neo-cream/70">Length</dt>
-                <dd className="font-bold">{word.length} letters</dd>
+          <section>
+            <h2 className={`${SECTION_LABEL} mb-4`}>Word Facts</h2>
+            <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="flex flex-col-reverse justify-end rounded-neo-lg border-3 border-neo-black bg-neo-lime p-3 text-neo-black shadow-hard-lg">
+                <dt className="text-sm font-bold">Length</dt>
+                <dd className="font-neo-display text-2xl font-bold">{word.length} letters</dd>
               </div>
-              <div className="flex justify-between">
-                <dt className="text-neo-cream/70">Unique Letters</dt>
-                <dd className="font-bold">{letterFreq.length}</dd>
+              <div className="flex flex-col-reverse justify-end rounded-neo-lg border-3 border-neo-black bg-neo-cyan p-3 text-neo-black shadow-hard-lg">
+                <dt className="text-sm font-bold">Unique Letters</dt>
+                <dd className="font-neo-display text-2xl font-bold">{letterFreq.length}</dd>
               </div>
-              <div className="flex justify-between">
-                <dt className="text-neo-cream/70">Starts With</dt>
-                <dd className="font-bold">{word[0].toUpperCase()}</dd>
+              <div className="flex flex-col-reverse justify-end rounded-neo-lg border-3 border-neo-black bg-neo-pink p-3 text-neo-black shadow-hard-lg">
+                <dt className="text-sm font-bold">Starts With</dt>
+                <dd className="font-neo-display text-2xl font-bold">{word[0].toUpperCase()}</dd>
               </div>
-              <div className="flex justify-between">
-                <dt className="text-neo-cream/70">Ends With</dt>
-                <dd className="font-bold">{word[word.length - 1].toUpperCase()}</dd>
+              <div className="flex flex-col-reverse justify-end rounded-neo-lg border-3 border-neo-black bg-neo-yellow p-3 text-neo-black shadow-hard-lg">
+                <dt className="text-sm font-bold">Ends With</dt>
+                <dd className="font-neo-display text-2xl font-bold">{word[word.length - 1].toUpperCase()}</dd>
               </div>
             </dl>
           </section>
 
           {/* Related searches — internal linking for SEO */}
           <section>
-            <h2 className={`${SECTION_LABEL} mb-3`}>Explore More</h2>
+            <h2 className={`${SECTION_LABEL} mb-4`}>Explore More</h2>
             <div className="flex flex-wrap gap-2">
               {[
                 [`/${locale}/tools/word-solver?length=${word.length}`, `${word.length}-letter words`],
@@ -292,7 +292,7 @@ export default async function WordExplorerPage({ params }: PageParams) {
                 [`/${locale}/daily`, 'Daily Challenge'],
                 [`/${locale}/tools/word-solver`, 'Word Solver'],
               ].map(([href, label]) => (
-                <Link key={href} href={href} data-press className={`${CHIP} text-sm px-3 py-1.5`}>
+                <Link key={href} href={href} data-press className={`${CHIP} rounded-full px-4 py-2 text-sm font-bold`}>
                   {label}
                 </Link>
               ))}

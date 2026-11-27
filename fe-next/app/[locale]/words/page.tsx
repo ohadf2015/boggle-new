@@ -12,7 +12,13 @@ import { withBodyLocales } from '@/lib/seo/bodyLocales';
 import { PressGroup } from './_components/PressGroup';
 import { VALID_LETTERS } from './_utils/wordListData';
 import { HeroBand } from './_components/HeroBand';
+import Image from 'next/image';
+import { cn } from '@/lib/utils';
+import { LANDING_ART } from '@/components/landing/kit/art';
 import { PRIMARY_CTA, CHIP, SECTION_LABEL } from './_components/wordStyles';
+
+const LENGTH_TONES = ['bg-neo-lime', 'bg-neo-cyan', 'bg-neo-pink', 'bg-neo-yellow', 'bg-neo-orange', 'bg-neo-purple'];
+const heroArt = LANDING_ART.reading('');
 
 export const dynamic = 'force-dynamic';
 
@@ -78,7 +84,8 @@ export default async function WordsHubPage({ params }: PageParams) {
   return (
     <PressGroup className="min-h-screen bg-neo-navy text-neo-white">
       <Header />
-      <HeroBand className="max-w-3xl">
+      <HeroBand className="grid max-w-6xl items-center gap-6 sm:px-6 lg:grid-cols-[1.2fr_1fr] lg:gap-x-12">
+        <div>
         <nav className="mb-6 text-sm text-neo-cream/60">
           <Link href={`/${locale}`} className="hover:text-neo-cyan transition-colors">
             Home
@@ -87,42 +94,48 @@ export default async function WordsHubPage({ params }: PageParams) {
           <span className="text-neo-white">Words</span>
         </nav>
 
-        <h1 className="text-4xl sm:text-5xl font-neo-display font-black text-neo-yellow tracking-wider mb-6">
+        <h1 className="mb-6 font-neo-display text-[2rem] font-bold leading-[1.1] text-balance sm:text-5xl lg:text-[3.25rem]">
           LexiClash Word Dictionary
         </h1>
 
         <Link href={`/${locale}/tools/word-solver`} data-press data-primary-cta className={PRIMARY_CTA}>
           Open Word Solver
         </Link>
-        <p className="text-neo-cream/60 text-sm mt-2">
+        <p className="mt-3 text-lg leading-relaxed text-neo-white/85">
           Search for any word and check if it scores in LexiClash
         </p>
+        </div>
+        <div className="hidden justify-center lg:flex">
+          <div className="-rotate-1 rounded-neo-lg border-3 border-neo-black bg-neo-yellow p-8 shadow-hard-xl">
+            <Image src={heroArt.src} alt={heroArt.alt} width={heroArt.width} height={heroArt.height} priority sizes="384px" className="h-80 w-auto" />
+          </div>
+        </div>
       </HeroBand>
 
-      <div className="max-w-3xl mx-auto px-4 pb-10">
-        <section className="mb-10">
-          <h2 className={`${SECTION_LABEL} text-lg mb-4`}>
+      <div className="mx-auto flex max-w-6xl flex-col gap-14 px-4 pb-20 pt-6 sm:px-6">
+        <section>
+          <h2 className={`${SECTION_LABEL} mb-5`}>
             Browse by Word Length
           </h2>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
             {WORD_LENGTHS.map(n => (
               <Link
                 key={n}
                 href={`/${locale}/words/${n}-letter-words`}
                 data-press
-                className={`${CHIP} p-3 text-center`}
+                className={cn(CHIP, 'p-4 text-center', LENGTH_TONES[n % LENGTH_TONES.length])}
               >
-                <span className="text-2xl font-neo-display font-black text-neo-yellow">
+                <span className="font-neo-display text-4xl font-bold">
                   {n}
                 </span>
-                <span className="block text-sm text-neo-cream/70">letter words</span>
+                <span className="block text-sm font-bold">letter words</span>
               </Link>
             ))}
           </div>
         </section>
 
-        <section className="mb-10">
-          <h2 className={`${SECTION_LABEL} text-lg mb-4`}>
+        <section>
+          <h2 className={`${SECTION_LABEL} mb-5`}>
             Browse by Starting Letter
           </h2>
           <div className="grid grid-cols-6 sm:grid-cols-9 md:grid-cols-13 gap-2">
@@ -139,13 +152,13 @@ export default async function WordsHubPage({ params }: PageParams) {
           </div>
         </section>
 
-        <InlineBannerAd webZone="content-page" className="my-6" />
+        <InlineBannerAd webZone="content-page" />
 
-        <section className="mb-10">
-          <h2 className="text-lg font-bold text-neo-pink uppercase tracking-wider mb-1">
+        <section>
+          <h2 className={`${SECTION_LABEL} mb-2`}>
             Popular Anagram Lookups
           </h2>
-          <p className="text-neo-cream/60 text-sm mb-4">
+          <p className="mb-5 text-neo-white/80">
             Find every word you can form from these letters — instant results, no signup.
           </p>
           <div className="flex flex-wrap gap-2">
@@ -154,7 +167,7 @@ export default async function WordsHubPage({ params }: PageParams) {
                 key={letters}
                 href={`/${locale}/anagram/${letters}`}
                 data-press
-                className={`${CHIP} px-3 py-1.5 text-sm font-neo-display font-bold uppercase`}
+                className={cn(CHIP, 'rounded-full px-4 py-2 text-sm font-bold uppercase')}
               >
                 {letters}
               </Link>
@@ -167,7 +180,7 @@ export default async function WordsHubPage({ params }: PageParams) {
         <EnBoggleCrossLink locale={locale} anchorVariant="words" />
         <HeScrabbleCrossLink locale={locale} anchorVariant="words" />
 
-        <div className="text-neo-cream/75 text-base leading-relaxed space-y-4 border-t-2 border-neo-cream/15 pt-8">
+        <div className="max-w-3xl space-y-4 rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-base leading-relaxed text-neo-black shadow-hard-xl sm:p-8">
           <p>
             Welcome to the LexiClash word dictionary, your go-to resource for finding valid words
             across every game mode. Whether you are warming up for a Daily Challenge, hunting for

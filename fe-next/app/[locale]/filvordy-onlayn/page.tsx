@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
-import { RuLandingLinks } from '@/components/landing/RuLandingLinks';
+import { RuLanding } from '@/components/landing/ru/RuLanding';
+import { Section, Steps, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const revalidate = 86400;
 
@@ -101,99 +101,64 @@ export default async function Page({ params }: PageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
-      <script id="ld-filvordy-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script id="ld-filvordy-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
-
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Филворды онлайн — ищи слова из букв в реальном времени
-        </h1>
-
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          LexiClash — это <strong>филворды онлайн бесплатно и без регистрации</strong>. Находите слова из букв на общем
-          поле, соединяя соседние буквы, и соревнуйтесь с друзьями, случайными соперниками или ботами. Все ищут слова
-          одновременно, счёт обновляется в прямом эфире. <strong>Реклама не прерывает раунд</strong> — посреди игры
-          ничего не всплывает и ничто не закрывает игровое поле. Играйте прямо в браузере на телефоне или компьютере.
-        </p>
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
-            Играть в филворды бесплатно
-          </Link>
-          <Link href={`/${locale}/daily`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-            Слово дня
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Чем отличается от других филвордов</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              { t: 'Реклама не прерывает раунд', d: 'Ничто не закрывает игровое поле и не всплывает посреди игры. Раунд идёт до конца.' },
-              { t: 'Боты играют честно', d: 'У ботов тот же словарь, что и у вас. Никаких «несуществующих» слов от соперника.' },
-              { t: 'Не приняло слово? Оспорьте', d: 'Кнопка «Апелляция» на экране результатов отправляет слово на проверку и пополнение словаря.' },
-              { t: 'Вход за секунду', d: 'Без регистрации и без скачивания. Открыли браузер — играете.' },
-              { t: 'Больше миллиона словоформ', d: 'Русский словарь регулярно пополняется, в том числе по апелляциям игроков.' },
-              { t: 'Щадящий режим анимаций', d: 'Системная настройка «Уменьшить движение» отключает вспышки и анимации автоматически.' },
-            ].map((item) => (
-              <div key={item.t} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-lime">{item.t}</h3>
-                <p className="text-sm text-neo-gray-200">{item.d}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Как играть в филворды</h2>
-          <ol className="space-y-3 text-neo-gray-200">
-            {[
-              'Откройте поле — это сетка из букв, общая для всех игроков раунда.',
-              'Соединяйте соседние буквы, чтобы составить слово. Буквы могут идти в любом направлении.',
-              'Чем длиннее и реже слово, тем больше очков. Серия быстрых слов даёт комбо-множитель.',
-              'В конце раунда смотрите разбор: какие слова вы нашли, какие пропустили и какие можно оспорить.',
-            ].map((step, idx) => (
-              <li key={step} className="flex gap-3 rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard">
-                <span className="font-neo-display font-bold text-neo-lime">{idx + 1}</span>
-                <span>{step}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Частые вопросы</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <RuLandingLinks locale={locale} current="filvordy-onlayn" />
-
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Начни искать слова прямо сейчас</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Открой LexiClash в браузере и начни находить слова из букв за пару секунд. Без установки, без регистрации,
-            и без рекламы, прерывающей раунд.
+    <RuLanding
+      locale={locale}
+      slug="filvordy-onlayn"
+      jsonLd={[
+        { id: 'ld-filvordy-faq', data: faqJsonLd },
+        { id: 'ld-filvordy-breadcrumb', data: breadcrumbJsonLd },
+      ]}
+      hero={{
+        title: 'Филворды онлайн — ищи слова из букв в реальном времени',
+        lead: (
+          <>
+            LexiClash — это <strong>филворды онлайн бесплатно и без регистрации</strong>.
+          </>
+        ),
+        more: (
+          <p>
+            Находите слова из букв на общем поле, соединяя соседние буквы, и соревнуйтесь с друзьями, случайными соперниками
+            или ботами. Все ищут слова одновременно, счёт обновляется в прямом эфире. <strong>Реклама не прерывает раунд</strong>{' '}
+            — посреди игры ничего не всплывает и ничто не закрывает игровое поле. Играйте прямо в браузере на телефоне или
+            компьютере.
           </p>
-          <div className="mt-6">
-            <Link href={`/${locale}/multiplayer`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-              Играть в филворды бесплатно
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+        ),
+        art: LANDING_ART.solver('Маскот LexiClash с лупой ищет слова'),
+        artTone: 'cyan',
+        cta: { href: `/${locale}/multiplayer`, label: 'Играть в филворды бесплатно' },
+        secondary: { href: `/${locale}/daily`, label: 'Слово дня' },
+      }}
+      faqs={faqs}
+      final={{
+        title: 'Начни искать слова прямо сейчас',
+        body: 'Открой LexiClash в браузере и начни находить слова из букв за пару секунд. Без установки, без регистрации, и без рекламы, прерывающей раунд.',
+        cta: { href: `/${locale}/multiplayer`, label: 'Играть в филворды бесплатно' },
+      }}
+    >
+      <Section title="Чем отличается от других филвордов">
+        <TileGrid
+          variant="paper"
+          items={[
+            { t: 'Реклама не прерывает раунд', d: 'Ничто не закрывает игровое поле и не всплывает посреди игры. Раунд идёт до конца.' },
+            { t: 'Боты играют честно', d: 'У ботов тот же словарь, что и у вас. Никаких «несуществующих» слов от соперника.' },
+            { t: 'Не приняло слово? Оспорьте', d: 'Кнопка «Апелляция» на экране результатов отправляет слово на проверку и пополнение словаря.' },
+            { t: 'Вход за секунду', d: 'Без регистрации и без скачивания. Открыли браузер — играете.' },
+            { t: 'Больше миллиона словоформ', d: 'Русский словарь регулярно пополняется, в том числе по апелляциям игроков.' },
+            { t: 'Щадящий режим анимаций', d: 'Системная настройка «Уменьшить движение» отключает вспышки и анимации автоматически.' },
+          ].map((item) => ({ title: item.t, body: item.d }))}
+        />
+      </Section>
+
+      <Section title="Как играть в филворды">
+        <Steps
+          items={[
+            'Откройте поле — это сетка из букв, общая для всех игроков раунда.',
+            'Соединяйте соседние буквы, чтобы составить слово. Буквы могут идти в любом направлении.',
+            'Чем длиннее и реже слово, тем больше очков. Серия быстрых слов даёт комбо-множитель.',
+            'В конце раунда смотрите разбор: какие слова вы нашли, какие пропустили и какие можно оспорить.',
+          ].map((step) => ({ title: step }))}
+        />
+      </Section>
+    </RuLanding>
   );
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
-import { RuLandingLinks } from '@/components/landing/RuLandingLinks';
+import { RuLanding } from '@/components/landing/ru/RuLanding';
+import { Prose, Section, Steps, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const revalidate = 86400;
 
@@ -196,100 +196,82 @@ export default async function Page({ params }: PageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
-      <script id="ld-assotsiatsii-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script id="ld-assotsiatsii-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <script id="ld-assotsiatsii-game" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(gameJsonLd) }} />
+    <RuLanding
+      locale={locale}
+      slug="igra-v-assotsiatsii-onlayn"
+      jsonLd={[
+        { id: 'ld-assotsiatsii-faq', data: faqJsonLd },
+        { id: 'ld-assotsiatsii-breadcrumb', data: breadcrumbJsonLd },
+        { id: 'ld-assotsiatsii-game', data: gameJsonLd },
+      ]}
+      hero={{
+        title: 'Игра в ассоциации онлайн — найди слово, которое связывает',
+        lead: (
+          <>
+            «Мост слов» — это <strong>игра в ассоциации онлайн, бесплатно и без регистрации</strong>.
+          </>
+        ),
+        more: (
+          <>
+            <p>
+              Вам показывают два слова, слева и справа, а вы ищете третье — то, которое встаёт между ними и превращает обе
+              половины в нормальные русские словосочетания. КРУГЛЫЙ … ПЕРЕГОВОРОВ? СТОЛ. АНГЛИЙСКИЙ … ЖЕСТОВ? ЯЗЫК. Одна
+              загадка занимает около полуминуты.
+            </p>
+            <p>
+              Загадки собраны не на редких словах, а на устойчивых сочетаниях, которые вы слышите каждый день и обычно не
+              замечаете: «львиная доля», «час пик», «яблоко раздора». Поэтому играть можно без словаря — всё нужное вы уже
+              знаете, вопрос только в том, как быстро это достанется из памяти. <strong>Реклама не прерывает загадку</strong>:
+              посреди хода ничего не всплывает и ничто не закрывает поле.
+            </p>
+          </>
+        ),
+        art: LANDING_ART.brain('Маскот LexiClash с мозгом из букв'),
+        artTone: 'yellow',
+        cta: { href: `/${locale}/connections`, label: 'Играть в ассоциации бесплатно' },
+        secondary: { href: `/${locale}/connections/daily`, label: 'Ежедневный вызов' },
+      }}
+      faqs={faqs}
+      final={{
+        title: 'Попробуйте прямо сейчас',
+        body: 'Первая загадка займёт полминуты, и этого обычно хватает, чтобы понять, ваше это или нет. Без установки, без регистрации и без рекламы, которая лезет посреди хода.',
+        cta: { href: `/${locale}/connections`, label: 'Играть в ассоциации бесплатно' },
+      }}
+    >
+      <Section
+        title="Пять загадок с разбором"
+        intro="Это настоящие загадки из русского пула, а не придуманные для витрины. Посмотрите, как устроен ход мысли — дальше будет легче."
+      >
+        <ul className="grid gap-4 lg:grid-cols-2">
+          {examples.map((ex) => (
+            <li key={ex.bridge} className="rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-xl">
+              <p className="flex flex-wrap items-center gap-2 font-neo-display text-base font-bold sm:text-lg">
+                <span>{ex.left}</span>{' '}
+                <span className="rounded-neo border-3 border-neo-black bg-neo-lime px-2 py-0.5 shadow-hard-sm">→ {ex.bridge} →</span>{' '}
+                <span>{ex.right}</span>
+              </p>
+              <p className="mt-3 text-[15px] leading-relaxed">{ex.note}</p>
+            </li>
+          ))}
+        </ul>
+      </Section>
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
-
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Игра в ассоциации онлайн — найди слово, которое связывает
-        </h1>
-
-        <p className="mb-6 text-lg leading-relaxed text-neo-gray-200">
-          «Мост слов» — это <strong>игра в ассоциации онлайн, бесплатно и без регистрации</strong>. Вам
-          показывают два слова, слева и справа, а вы ищете третье — то, которое встаёт между ними и
-          превращает обе половины в нормальные русские словосочетания. КРУГЛЫЙ … ПЕРЕГОВОРОВ? СТОЛ.
-          АНГЛИЙСКИЙ … ЖЕСТОВ? ЯЗЫК. Одна загадка занимает около полуминуты.
-        </p>
-
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Загадки собраны не на редких словах, а на устойчивых сочетаниях, которые вы слышите каждый
-          день и обычно не замечаете: «львиная доля», «час пик», «яблоко раздора». Поэтому играть можно
-          без словаря — всё нужное вы уже знаете, вопрос только в том, как быстро это достанется из
-          памяти. <strong>Реклама не прерывает загадку</strong>: посреди хода ничего не всплывает и ничто
-          не закрывает поле.
-        </p>
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link
-            href={`/${locale}/connections`}
-            className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
-          >
-            Играть в ассоциации бесплатно
-          </Link>
-          <Link
-            href={`/${locale}/connections/daily`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
-          >
-            Ежедневный вызов
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-3 font-neo-display text-2xl font-bold sm:text-3xl">
-            Пять загадок с разбором
-          </h2>
-          <p className="mb-6 text-neo-gray-200">
-            Это настоящие загадки из русского пула, а не придуманные для витрины. Посмотрите, как
-            устроен ход мысли — дальше будет легче.
-          </p>
-          <div className="space-y-4">
-            {examples.map((ex) => (
-              <div
-                key={ex.bridge}
-                className="rounded-neo border-3 border-neo-cyan/40 bg-neo-navy/50 p-4 shadow-hard"
-              >
-                <p className="font-neo-display text-lg font-bold">
-                  <span className="text-neo-gray-200">{ex.left}</span>{' '}
-                  <span className="text-neo-lime">→ {ex.bridge} →</span>{' '}
-                  <span className="text-neo-gray-200">{ex.right}</span>
-                </p>
-                <p className="mt-2 text-sm text-neo-gray-200">{ex.note}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Как играть</h2>
-          <ol className="space-y-3 text-neo-gray-200">
-            {[
+      <Section title="Как играть">
+        <Steps
+          items={[
               'Открывается загадка: два слова по краям и пустая клетка посередине.',
               'Введите слово, которое подходит к обоим. Проверяются обе пары сразу — если работает только одна, ответ не засчитается.',
               'Не получается — откройте подсказку. Она даёт направление, но не называет ответ.',
               'Ошиблись — ничего страшного: попытки свои у каждой загадки, промах в одной не закрывает остальные.',
               'В ежедневном вызове пять мостов подряд, одинаковых для всех, и общая таблица результатов.',
-            ].map((step, idx) => (
-              <li
-                key={step}
-                className="flex gap-3 rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard"
-              >
-                <span className="font-neo-display font-bold text-neo-lime">{idx + 1}</span>
-                <span>{step}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
+          ].map((step) => ({ title: step }))}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            Чем отличается от других игр в слова
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
+      <Section title="Чем отличается от других игр в слова">
+        <TileGrid
+          variant="paper"
+          items={[
               {
                 t: 'Реклама не прерывает загадку',
                 d: 'Ничто не всплывает посреди хода и не закрывает поле. Ролик — только по вашему желанию, ради подсказки.',
@@ -314,112 +296,53 @@ export default async function Page({ params }: PageProps) {
                 t: 'Вход за секунду',
                 d: 'Без регистрации и без скачивания. Открыли браузер на телефоне или компьютере — играете.',
               },
-            ].map((item) => (
-              <div
-                key={item.t}
-                className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard"
-              >
-                <h3 className="mb-1 font-bold text-neo-lime">{item.t}</h3>
-                <p className="text-sm text-neo-gray-200">{item.d}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+          ].map((item) => ({ title: item.t, body: item.d }))}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-3 font-neo-display text-2xl font-bold sm:text-3xl">
-            Три уровня сложности
-          </h2>
-          <p className="mb-6 text-neo-gray-200">
-            Сложность здесь — это не длина слова, а расстояние между двумя смыслами связующего.
-          </p>
-          <div className="space-y-4 text-neo-gray-200">
-            <div className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard">
-              <h3 className="mb-1 font-bold text-neo-lime">Легко</h3>
-              <p className="text-sm">
-                Слово работает в прямом значении с обеих сторон. ВЫСШАЯ … ЖИЗНИ → ШКОЛА, ЗОЛОТОЙ …
-                МУДРОСТИ → ЗУБ. Такие обычно берутся с первой попытки.
-              </p>
-            </div>
-            <div className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard">
-              <h3 className="mb-1 font-bold text-neo-lime">Средне</h3>
-              <p className="text-sm">
-                Одна сторона прямая, другая переносная. ЧЁРНЫЙ … ПАНДОРЫ → ЯЩИК: сначала прибор в
-                самолёте, потом миф. Нужно переключить регистр мышления.
-              </p>
-            </div>
-            <div className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard">
-              <h3 className="mb-1 font-bold text-neo-lime">Сложно</h3>
-              <p className="text-sm">
-                Обе стороны переносные, или решает ударение. ВОЗДУШНЫЙ … ЗАЖИГАНИЯ → ЗАМОК, ЛЕБЕДИНАЯ …
-                ГОДА → ПЕСНЯ. Здесь подсказка обычно себя окупает.
-              </p>
-            </div>
-          </div>
-        </section>
+      <Section title="Три уровня сложности" intro="Сложность здесь — это не длина слова, а расстояние между двумя смыслами связующего.">
+        <TileGrid
+          items={[
+            {
+              tone: 'lime',
+              title: 'Легко',
+              body: 'Слово работает в прямом значении с обеих сторон. ВЫСШАЯ … ЖИЗНИ → ШКОЛА, ЗОЛОТОЙ … МУДРОСТИ → ЗУБ. Такие обычно берутся с первой попытки.',
+            },
+            {
+              tone: 'yellow',
+              title: 'Средне',
+              body: 'Одна сторона прямая, другая переносная. ЧЁРНЫЙ … ПАНДОРЫ → ЯЩИК: сначала прибор в самолёте, потом миф. Нужно переключить регистр мышления.',
+            },
+            {
+              tone: 'pink',
+              title: 'Сложно',
+              body: 'Обе стороны переносные, или решает ударение. ВОЗДУШНЫЙ … ЗАЖИГАНИЯ → ЗАМОК, ЛЕБЕДИНАЯ … ГОДА → ПЕСНЯ. Здесь подсказка обычно себя окупает.',
+            },
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-3 font-neo-display text-2xl font-bold sm:text-3xl">
-            Чем полезна игра в ассоциации
-          </h2>
-          <p className="mb-4 text-neo-gray-200">
-            Поиск связующего слова задействует сразу две вещи: припоминание и ассоциацию. Это тот же
-            механизм, который выручает, когда слово вертится на языке и никак не даётся. Регулярная
-            практика переводит пассивный словарь — то, что вы узнаёте, но сами не употребляете, — в
-            активный.
+      <Section title="Чем полезна игра в ассоциации">
+        <Prose paper>
+          <p>
+            Поиск связующего слова задействует сразу две вещи: припоминание и ассоциацию. Это тот же механизм, который
+            выручает, когда слово вертится на языке и никак не даётся. Регулярная практика переводит пассивный словарь — то,
+            что вы узнаёте, но сами не употребляете, — в активный.
           </p>
-          <p className="mb-4 text-neo-gray-200">
-            Второй эффект — гибкость. Первое слово, которое приходит в голову, в этой игре почти всегда
-            неверное: оно подходит к левой половине и разваливает правую. Приходится перебирать
-            варианты, отбрасывать и заходить с другой стороны. Именно это в психологии называют боковым
-            мышлением, и тренируется оно только на задачах без единственного очевидного пути.
+          <p>
+            Второй эффект — гибкость. Первое слово, которое приходит в голову, в этой игре почти всегда неверное: оно подходит
+            к левой половине и разваливает правую. Приходится перебирать варианты, отбрасывать и заходить с другой стороны.
+            Именно это в психологии называют боковым мышлением, и тренируется оно только на задачах без единственного
+            очевидного пути.
           </p>
-          <p className="text-neo-gray-200">
-            Третье — фразеология. Русские устойчивые сочетания обычно осваиваются пассивно, «на слух», и
-            редко разбираются осознанно. Здесь вы каждый раз видите сочетание в разобранном виде: вот
-            «мёртвая точка», вот «точка зрения», а вот общее слово между ними. Это заметно помогает тем,
-            кто учит русский как иностранный, — и неожиданно многое объясняет носителям.
+          <p>
+            Третье — фразеология. Русские устойчивые сочетания обычно осваиваются пассивно, «на слух», и редко разбираются
+            осознанно. Здесь вы каждый раз видите сочетание в разобранном виде: вот «мёртвая точка», вот «точка зрения», а
+            вот общее слово между ними. Это заметно помогает тем, кто учит русский как иностранный, — и неожиданно многое
+            объясняет носителям.
           </p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Частые вопросы</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details
-                key={`faq-${idx}`}
-                className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard"
-              >
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <RuLandingLinks locale={locale} current="igra-v-assotsiatsii-onlayn" />
-
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">
-            Попробуйте прямо сейчас
-          </h2>
-          <p className="mt-4 text-neo-gray-200">
-            Первая загадка займёт полминуты, и этого обычно хватает, чтобы понять, ваше это или нет.
-            Без установки, без регистрации и без рекламы, которая лезет посреди хода.
-          </p>
-          <div className="mt-6">
-            <Link
-              href={`/${locale}/connections`}
-              className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg"
-            >
-              Играть в ассоциации бесплатно
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+        </Prose>
+      </Section>
+    </RuLanding>
   );
 }

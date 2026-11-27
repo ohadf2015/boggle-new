@@ -1,12 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { NoAccountCta } from '@/components/education/NoAccountCta';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { getForSchoolsContent, EDUCATION_LOCALES, type EducationLocale } from './content';
-import { ForSchoolsPackages } from '@/components/education/EducationPackages';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { hreflangAlternates } from '@/lib/seo/hreflang';
 import {
   educationBreadcrumbJsonLd,
@@ -14,7 +11,23 @@ import {
   educationProviderNode,
 } from '@/lib/seo/educationLanding';
 import { educationPageLabel } from '@/lib/seo/educationPageLinks';
-import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
+import {
+  CompareTable,
+  CtaBand,
+  FaqList,
+  LandingButton,
+  LandingHero,
+  LandingPage,
+  Mark,
+  Section,
+  TileGrid,
+  landingButtonClass,
+} from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
+import { splitLead } from '@/components/landing/splitLead';
+import { EducationKitRelated } from '@/components/landing/education/EducationKitRelated';
+import { ForSchoolsLead } from '@/components/landing/education/ForSchoolsLead';
+import { NoAccountCard } from '@/components/landing/education/NoAccountCard';
 
 export const revalidate = 3600;
 
@@ -88,133 +101,87 @@ export default async function Page({ params }: PageProps) {
     current: educationPageLabel(SLUG, locale),
   });
 
+  const [lead, rest] = splitLead(c.heroSubtitle);
+  const play = { href: `/${locale}/education/classroom-game`, label: c.heroCta1 };
+
   return (
-    <main className="relative min-h-dvh overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
+    <LandingPage locale={locale}>
       <JsonLd data={faqJsonLd} />
       <JsonLd data={orgJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
 
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-        <TopBackLink className="mb-4" />
+      <LandingHero
+        eyebrow={c.heroTag}
+        title={
+          <>
+            {c.heroH1} <Mark>{c.heroHighlight}</Mark>
+          </>
+        }
+        lead={lead}
+        actions={
+          <>
+            <LandingButton href={play.href} data-ph-capture-attribute-cta="hero_free_game">
+              {c.heroCta1}
+            </LandingButton>
+            <a href="#lead" data-ph-capture-attribute-cta="hero_tell_us" className={landingButtonClass('secondary')}>
+              {c.heroCta2}
+            </a>
+          </>
+        }
+        art={LANDING_ART.trophy('')}
+        artTone="cyan"
+        more={
+          <>
+            {rest && <p>{rest}</p>}
+            <h2>{c.freeForeverTitle}</h2>
+            <p>{c.freeForeverBody}</p>
+          </>
+        }
+      />
 
-        {/* Hero */}
-        <section className="grid items-center gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
-              {c.heroTag}
-            </span>
-            <h1 className="mt-5 font-neo-display text-5xl font-black leading-[0.95] tracking-tight sm:text-6xl">
-              {c.heroH1}{' '}
-              <span className="inline-block rotate-[-2deg] bg-neo-lime px-3 text-neo-navy shadow-hard">{c.heroHighlight}</span>
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">{c.heroSubtitle}</p>
+      <NoAccountCard locale={locale} />
 
-            {/* The one CTA here that asks for nothing. */}
-            <NoAccountCta locale={locale} className="mt-7" />
+      <Section title={c.whyTitle}>
+        <TileGrid columns={2} items={c.why.map((w) => ({ title: w.title, body: w.body }))} />
+      </Section>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href={`/${locale}/education/classroom-game`} data-ph-capture-attribute-cta="hero_free_game" className="rounded-neo border-4 border-neo-black bg-neo-lime px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
-                {c.heroCta1}
-              </Link>
-              <a href="#lead" data-ph-capture-attribute-cta="hero_tell_us" className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
-                {c.heroCta2}
-              </a>
-            </div>
-          </div>
-          <div className="lg:col-span-5">
-            <div className="rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-xl">
-              <h2 className="font-neo-display text-xl font-black text-neo-lime">{c.freeForeverTitle}</h2>
-              <p className="mt-3 text-neo-gray-200">{c.freeForeverBody}</p>
-            </div>
-          </div>
-        </section>
+      <Section title={c.compareTitle} intro={c.compareIntro}>
+        <CompareTable
+          columns={[c.compareHeaders.tool, c.compareHeaders.theirFreeTier, 'LexiClash']}
+          rows={c.compareRows.map((r) => [r.competitor, r.freeTierLimit, r.lexiclash])}
+          highlight={2}
+        />
+        <p className="text-sm text-neo-white/80">
+          {c.compareBreakdownPrompt}{' '}
+          <Link href={`/${locale}/lexiclash-vs-kahoot`} className="inline-flex items-center gap-1 font-bold text-neo-cyan underline underline-offset-2">
+            <span>{c.compareBreakdownCta}</span>
+            <DirectionalIcon icon={ArrowRight} className="inline size-4" />
+          </Link>
+        </p>
+      </Section>
 
-        {/* Why schools choose us */}
-        <section className="mt-16">
-          <h2 className="font-neo-display text-3xl font-black sm:text-4xl">{c.whyTitle}</h2>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            {c.why.map((w) => (
-              <div key={w.title} className="rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-xl p-5">
-                <h3 className="font-neo-display text-lg font-bold text-neo-cyan">{w.title}</h3>
-                <p className="mt-2 text-neo-gray-200">{w.body}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      <Section title={c.comingTitle} intro={c.comingIntro}>
+        <TileGrid variant="paper" columns={2} items={c.coming.map((w) => ({ title: w.title, body: w.body }))} />
+      </Section>
 
-        {/* Honest free-tier comparison */}
-        <section className="mt-16">
-          <h2 className="font-neo-display text-3xl font-black sm:text-4xl">{c.compareTitle}</h2>
-          <p className="mt-3 max-w-3xl text-neo-gray-200">{c.compareIntro}</p>
-          <div className="mt-6 overflow-x-auto rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-xl p-4">
-            <table className="w-full border-collapse text-start text-sm">
-              <thead>
-                <tr className="border-b-2 border-neo-cream/30 font-neo-display">
-                  <th className="p-3">{c.compareHeaders.tool}</th>
-                  <th className="p-3">{c.compareHeaders.theirFreeTier}</th>
-                  <th className="p-3 text-neo-lime">LexiClash</th>
-                </tr>
-              </thead>
-              <tbody>
-                {c.compareRows.map((r) => (
-                  <tr key={r.competitor} className="border-b border-neo-white/15">
-                    <td className="p-3 font-bold">{r.competitor}</td>
-                    <td className="p-3 text-neo-gray-200">{r.freeTierLimit}</td>
-                    <td className="p-3 text-neo-lime">{r.lexiclash}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-3 text-xs text-neo-gray-300">
-            {c.compareBreakdownPrompt}{' '}
-            <Link href={`/${locale}/lexiclash-vs-kahoot`} className="inline-flex items-center gap-1 text-neo-cyan underline underline-offset-2 hover:text-neo-lime focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
-              <span>{c.compareBreakdownCta}</span>
-              <DirectionalIcon icon={ArrowRight} className="inline size-4" />
-            </Link>
-          </p>
-        </section>
+      <ForSchoolsLead locale={locale} leadTitle={c.leadTitle} leadIntro={c.leadIntro} />
 
-        {/* What's coming for schools */}
-        <section className="mt-16">
-          <h2 className="font-neo-display text-3xl font-black sm:text-4xl">{c.comingTitle}</h2>
-          <p className="mt-3 max-w-3xl text-neo-gray-200">{c.comingIntro}</p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            {c.coming.map((w) => (
-              <div key={w.title} className="rounded-neo-lg border-[3px] border-dashed border-neo-cream/50 bg-neo-navy-light p-5 shadow-hard-xl">
-                <h3 className="font-neo-display text-lg font-bold text-neo-purple">{w.title}</h3>
-                <p className="mt-2 text-neo-gray-200">{w.body}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      <Section title={c.faqTitle}>
+        <FaqList items={c.faqs} />
+      </Section>
 
-        <ForSchoolsPackages locale={locale} leadTitle={c.leadTitle} leadIntro={c.leadIntro} />
-
-        {/* FAQ (GEO-citable) */}
-        <section className="mt-16">
-          <h2 className="font-neo-display text-3xl font-black sm:text-4xl">{c.faqTitle}</h2>
-          <div className="mt-6 space-y-4">
-            {c.faqs.map((f) => (
-              <details key={f.q} className="rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-xl p-4">
-                <summary className="cursor-pointer font-neo-display font-bold text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">{f.q}</summary>
-                <p className="mt-2 text-neo-gray-200">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        {/* Closing CTA — don't dead-end a high-intent reader who scrolled the whole page */}
-        <section className="mt-16 text-center">
-          <h2 className="font-neo-display text-2xl font-black sm:text-3xl">{c.closingTitle}</h2>
-          <a href="#lead" className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-pink px-8 py-4 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
+      <CtaBand
+        tone="pink"
+        title={c.closingTitle}
+        actions={
+          <a href="#lead" className={landingButtonClass('primary')}>
             {c.closingCta}
           </a>
-        </section>
+        }
+        art={LANDING_ART.trophy('')}
+      />
 
-        {/* This page had no outbound internal links at all — a crawl dead end. */}
-        <EducationRelatedLinks locale={locale} slug={SLUG} />
-      </div>
-    </main>
+      <EducationKitRelated locale={locale} slug={SLUG} />
+    </LandingPage>
   );
 }

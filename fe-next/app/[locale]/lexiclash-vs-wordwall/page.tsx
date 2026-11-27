@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
+import { CompareTable, CtaBand, FaqList, LandingButton, LandingHero, LandingPage, LinkPills, Prose, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const dynamic = 'force-dynamic';
 
@@ -100,156 +101,106 @@ export default async function Page({ params }: PageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/education/classroom-game`, label: 'Try LexiClash Free' }}>
       <script id="ld-vs-wordwall-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script id="ld-vs-wordwall-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Wordwall&apos;s template library is huge. LexiClash goes deeper on word games.
-        </h1>
+      <LandingHero
+        eyebrow="LexiClash vs Wordwall"
+        title="Wordwall's template library is huge. LexiClash goes deeper on word games."
+        lead="Wordwall is the swiss-army knife of classroom activities — 50+ templates, fill-in-the-blanks, balloon pops, quiz games, the works."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/education/classroom-game`}>Try LexiClash Free</LandingButton>
+            <LandingButton href={`/${locale}/education/vocabulary-games-classroom`} variant="secondary">
+              Classroom Games
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.solver('A LexiClash mascot hunting for words with a magnifying glass')}
+        artTone="cyan"
+        more={
+          <p>
+            Great breadth. But for vocabulary teachers who specifically want word-formation gameplay (find words on a grid,
+            build anagrams, spin word wheels), Wordwall&apos;s anagram template is shallow compared to a purpose-built
+            word-game platform. LexiClash trades template variety for depth in the one category teachers reach for most: word
+            games. Whole class free, no Wordwall subscription, no student signup, six languages with native dictionaries.
+          </p>
+        }
+      >
+        <LinkPills items={[{ href: `/${locale}/education/games-for-teachers`, label: 'For Teachers' }]} />
+      </LandingHero>
 
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Wordwall is the swiss-army knife of classroom activities — 50+ templates, fill-in-the-blanks, balloon pops,
-          quiz games, the works. Great breadth. But for vocabulary teachers who specifically want word-formation
-          gameplay (find words on a grid, build anagrams, spin word wheels), Wordwall&apos;s anagram template is
-          shallow compared to a purpose-built word-game platform. LexiClash trades template variety for depth in
-          the one category teachers reach for most: word games. Whole class free, no Wordwall subscription, no student
-          signup, six languages with native dictionaries.
-        </p>
+      <div className="min-w-0">
+        <TeacherProCompareCheckoutStrip locale={locale} />
+      </div>
 
-      <TeacherProCompareCheckoutStrip locale={locale} />
+      <Section title="Side-by-side, no spin">
+        <CompareTable
+          columns={['Feature', 'LexiClash', 'Wordwall']}
+          rows={compareRows.map((row) => [...row])}
+          caption="Wordwall pricing as of 2026: free tier limited to 5 active activities; Wordwall Pro £4-9/month, Plus £15/month per teacher."
+        />
+      </Section>
 
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
-            Try LexiClash Free
-          </Link>
-          <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-            Classroom Games
-          </Link>
-          <Link href={`/${locale}/education/games-for-teachers`} className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4">
-            For Teachers
-          </Link>
-        </section>
+      <Section title="When LexiClash beats Wordwall">
+        <TileGrid
+          variant="paper"
+          items={[
+            { title: 'Word-formation depth', desc: 'Wordwall\'s anagram template scrambles letters; that\'s it. LexiClash has Boggle-style grids, multi-letter word wheels with center-letter rules, and proper anagram puzzles — actual word-game mechanics.' },
+            { title: 'Real-time multiplayer in free tier', desc: 'Wordwall\'s live multiplayer modes are mostly Pro features. LexiClash classroom multiplayer is free, full-featured, and supports up to 30 students.' },
+            { title: '6 native-dictionary languages', desc: 'For ESL, Hebrew immersion, Spanish bilingual — LexiClash has full dictionaries in EN/HE/ES/SV/JA. Wordwall is text-only multilingual, no language-game depth.' },
+            { title: '1v1 vocabulary duels', desc: 'Pair students for head-to-head 2-3 minute word battles. Wordwall doesn\'t have a paired-student game format.' },
+            { title: 'No 5-activity limit', desc: 'Wordwall\'s free tier caps you at 5 active activities. LexiClash has no activity cap — make as many word lists as you want, at no cost — custom lists are a free-tier feature.' },
+            { title: 'Faster setup for word games', desc: 'Wordwall: pick template, paste words, configure. LexiClash: pick a list, share the code. Under 60 seconds vs 2-5 minutes per activity.' },
+          ].map((item) => ({ title: item.title, body: item.desc }))}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Side-by-side, no spin</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse rounded-neo border-3 border-neo-gray-400 text-sm sm:text-base">
-              <thead>
-                <tr className="border-b-3 border-neo-gray-400 bg-neo-navy/80">
-                  <th className="px-4 py-3 text-left font-bold text-neo-lime">Feature</th>
-                  <th className="px-4 py-3 text-center font-bold text-neo-cyan">LexiClash</th>
-                  <th className="px-4 py-3 text-center text-neo-gray-300">Wordwall</th>
-                </tr>
-              </thead>
-              <tbody>
-                {compareRows.map(([feature, lexi, wordwall]) => (
-                  <tr key={feature} className="border-b border-neo-gray-400/50">
-                    <td className="px-4 py-3 font-medium">{feature}</td>
-                    <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
-                    <td className="px-4 py-3 text-center text-neo-gray-300">{wordwall}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-3 text-xs text-neo-gray-300">Wordwall pricing as of 2026: free tier limited to 5 active activities; Wordwall Pro £4-9/month, Plus £15/month per teacher.</p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">When LexiClash beats Wordwall</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              { title: 'Word-formation depth', desc: 'Wordwall\'s anagram template scrambles letters; that\'s it. LexiClash has Boggle-style grids, multi-letter word wheels with center-letter rules, and proper anagram puzzles — actual word-game mechanics.' },
-              { title: 'Real-time multiplayer in free tier', desc: 'Wordwall\'s live multiplayer modes are mostly Pro features. LexiClash classroom multiplayer is free, full-featured, and supports up to 30 students.' },
-              { title: '6 native-dictionary languages', desc: 'For ESL, Hebrew immersion, Spanish bilingual — LexiClash has full dictionaries in EN/HE/ES/SV/JA. Wordwall is text-only multilingual, no language-game depth.' },
-              { title: '1v1 vocabulary duels', desc: 'Pair students for head-to-head 2-3 minute word battles. Wordwall doesn\'t have a paired-student game format.' },
-              { title: 'No 5-activity limit', desc: 'Wordwall\'s free tier caps you at 5 active activities. LexiClash has no activity cap — make as many word lists as you want, at no cost — custom lists are a free-tier feature.' },
-              { title: 'Faster setup for word games', desc: 'Wordwall: pick template, paste words, configure. LexiClash: pick a list, share the code. Under 60 seconds vs 2-5 minutes per activity.' },
-            ].map((item) => (
-              <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-lime">{item.title}</h3>
-                <p className="text-sm text-neo-gray-200">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">When Wordwall still wins</h2>
-          <p className="text-neo-gray-200">
+      <Section title="When Wordwall still wins">
+        <Prose paper>
+          <p>
             Wordwall&apos;s breadth is unmatched. If you need quiz games, fill-in-the-blanks, image-matching, balloon
             pops, sorting activities, or any of 40+ non-word-game templates, Wordwall is the right tool. LexiClash
             is purpose-built for word-formation games specifically — if that&apos;s your need, the depth wins; if you
             need a Swiss-army knife of activity formats, Wordwall is the better pick. Many teachers use both: Wordwall
             for varied activity formats, LexiClash for vocabulary and word-game review.
           </p>
-        </section>
+        </Prose>
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Other Wordwall alternatives, by what you need</h2>
-          <p className="mb-6 text-neo-gray-200">
-            Most Wordwall alternatives are quiz platforms: you bring the questions and the tool turns them into an
-            activity, the way Wordwall does with its templates. LexiClash is the odd one out, since students make the
-            words themselves instead of answering questions. Pick by what you want the lesson to do.
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {wordwallAlternatives.map((alt) => (
-              <Link key={alt.href} href={`/${locale}${alt.href}`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-                <h3 className="font-bold text-neo-cyan">{alt.name}</h3>
-                <p className="mt-1 text-sm text-neo-gray-200">{alt.desc}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
+      <Section
+        title="Other Wordwall alternatives, by what you need"
+        intro="Most Wordwall alternatives are quiz platforms: you bring the questions and the tool turns them into an activity, the way Wordwall does with its templates. LexiClash is the odd one out, since students make the words themselves instead of answering questions. Pick by what you want the lesson to do."
+      >
+        <TileGrid
+          columns={2}
+          items={wordwallAlternatives.map((alt) => ({ href: `/${locale}${alt.href}`, title: alt.name, body: alt.desc }))}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently asked questions</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+      <Section title="Frequently asked questions">
+        <FaqList items={faqs} />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More comparisons</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/lexiclash-vs-quizlet`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Quizlet</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Word games vs flashcards.</p>
-            </Link>
-            <Link href={`/${locale}/lexiclash-vs-kahoot`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Kahoot</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Word games vs quizzes.</p>
-            </Link>
-            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">Best Word Games 2026</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Complete comparison guide</p>
-            </Link>
-          </div>
-        </section>
+      <Section title="More comparisons">
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: `/${locale}/lexiclash-vs-quizlet`, title: 'LexiClash vs Quizlet', body: 'Word games vs flashcards.' },
+            { href: `/${locale}/lexiclash-vs-kahoot`, title: 'LexiClash vs Kahoot', body: 'Word games vs quizzes.' },
+            { href: `/${locale}/best-online-word-games`, title: 'Best Word Games 2026', body: 'Complete comparison guide' },
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Try it before next class</h2>
-          <p className="mt-4 text-neo-gray-200">
-            5-minute slot, vocabulary list ready, code on the projector. If word-game depth matters more than template
-            variety for your classroom, LexiClash is built for that. Class play stays free with no student signup. Teacher Pro ($9/mo) is optional and only unlocks teacher tools: class analytics, printable reports, and calm-mode pressure dials.
-          </p>
-          <div className="mt-6">
-            <Link href={`/${locale}/education/classroom-game`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-              Start a Classroom Game Free
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+      <CtaBand
+        tone="pink"
+        title="Try it before next class"
+        body="5-minute slot, vocabulary list ready, code on the projector. If word-game depth matters more than template variety for your classroom, LexiClash is built for that. Class play stays free with no student signup. Teacher Pro ($9/mo) is optional and only unlocks teacher tools: class analytics, printable reports, and calm-mode pressure dials."
+        actions={<LandingButton href={`/${locale}/education/classroom-game`}>Start a Classroom Game Free</LandingButton>}
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

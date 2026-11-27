@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { EducationLandingTemplate } from '@/components/education/EducationLandingTemplate';
+import { EducationKitLanding } from '@/components/landing/education/EducationKitLanding';
 import { buildEducationLandingMetadata } from '@/lib/seo/educationLanding';
 import { getSightWordsLanding } from './landing';
 
@@ -19,5 +19,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  return <EducationLandingTemplate locale={locale} path={PATH} content={getSightWordsLanding(locale)} />;
+  return <EducationKitLanding locale={locale} path={PATH} content={getSightWordsLanding(locale)} />;
 }

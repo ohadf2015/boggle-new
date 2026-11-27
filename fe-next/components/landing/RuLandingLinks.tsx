@@ -1,8 +1,6 @@
-import Link from 'next/link';
+import { LinkPills, Section } from '@/components/landing/kit';
 
-// Internal cross-links between the Russian keyword landing pages. Improves crawl
-// discovery + reinforces the ru landing cluster for search. `current` excludes
-// the page rendering it. Russian-only pages, so always rendered under /ru.
+// Internal cross-links between the Russian keyword landing pages. Russian-only pages, so always rendered under /ru.
 export const RU_LANDINGS: { slug: string; label: string }[] = [
   { slug: 'igry-v-slova-onlayn', label: 'Игры в слова онлайн' },
   { slug: 'igra-v-assotsiatsii-onlayn', label: 'Игра в ассоциации онлайн' },
@@ -13,22 +11,11 @@ export const RU_LANDINGS: { slug: string; label: string }[] = [
   { slug: 'sostav-slova-iz-bukv', label: 'Составь слова из букв' },
 ];
 
-export function RuLandingLinks({ locale, current }: { locale: string; current: string }) {
+export function RuLandingLinks({ locale, current, className = 'mb-12' }: { locale: string; current: string; className?: string }) {
   const others = RU_LANDINGS.filter((l) => l.slug !== current);
   return (
-    <section className="mb-12">
-      <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Другие игры в слова</h2>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {others.map((l) => (
-          <Link
-            key={l.slug}
-            href={`/${locale}/${l.slug}`}
-            className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition hover:border-neo-lime/40"
-          >
-            <h3 className="font-bold text-neo-cyan">{l.label}</h3>
-          </Link>
-        ))}
-      </div>
-    </section>
+    <Section title="Другие игры в слова" className={className}>
+      <LinkPills items={others.map((l) => ({ href: `/${locale}/${l.slug}`, label: <h3 className="text-sm font-bold">{l.label}</h3> }))} />
+    </Section>
   );
 }

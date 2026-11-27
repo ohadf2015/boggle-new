@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
-import { RuLandingLinks } from '@/components/landing/RuLandingLinks';
+import { RuLanding } from '@/components/landing/ru/RuLanding';
+import { Section, Steps } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const revalidate = 86400;
 
@@ -75,82 +75,50 @@ export default async function Page({ params }: PageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
-      <script id="ld-sostav-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script id="ld-sostav-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
-
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Составь слова из букв — собери как можно больше и набери очки
-        </h1>
-
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          В LexiClash вам даётся набор букв — <strong>составляйте из них как можно больше слов</strong> и зарабатывайте
-          очки. Бесплатно, без регистрации и скачивания: соединяйте буквы свайпом или печатайте на клавиатуре. Каждое
-          слово проверяется по русскому словарю, а чем оно длиннее и реже — тем больше баллов. Играйте в реальном времени
-          с друзьями, соперниками или против ИИ прямо в браузере.
-        </p>
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
-            Играть бесплатно
-          </Link>
-          <Link href={`/${locale}/tools/word-solver`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-            Решатель слов
-          </Link>
-          <Link href={`/${locale}/daily`} className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4">
-            Слово дня
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Как это работает</h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { n: '1', t: 'Получи буквы', d: 'На поле или в колесе появляется набор букв — одинаковый для всех игроков.' },
-              { n: '2', t: 'Составляй слова', d: 'Соединяй буквы и собирай настоящие слова, пока не вышло время.' },
-              { n: '3', t: 'Набирай очки', d: 'Длинные и редкие слова приносят больше баллов. Побеждает тот, кто собрал больше.' },
-            ].map((s) => (
-              <div key={s.n} className="rounded-neo border-3 border-neo-cyan/40 bg-neo-navy/50 p-5 shadow-hard">
-                <div className="mb-2 grid h-9 w-9 place-items-center rounded-neo border-3 border-neo-black bg-neo-cyan font-bold text-neo-navy">{s.n}</div>
-                <h3 className="mb-1 font-bold text-neo-cyan">{s.t}</h3>
-                <p className="text-sm text-neo-gray-200">{s.d}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Частые вопросы</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <RuLandingLinks locale={locale} current="sostav-slova-iz-bukv" />
-
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Собери первое слово прямо сейчас</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Открой LexiClash и начни составлять слова из букв за пару секунд. Без установки, без регистрации, бесплатно.
+    <RuLanding
+      locale={locale}
+      slug="sostav-slova-iz-bukv"
+      jsonLd={[
+        { id: 'ld-sostav-faq', data: faqJsonLd },
+        { id: 'ld-sostav-breadcrumb', data: breadcrumbJsonLd },
+      ]}
+      hero={{
+        title: 'Составь слова из букв — собери как можно больше и набери очки',
+        lead: (
+          <>
+            В LexiClash вам даётся набор букв — <strong>составляйте из них как можно больше слов</strong> и зарабатывайте
+            очки.
+          </>
+        ),
+        more: (
+          <p>
+            Бесплатно, без регистрации и скачивания: соединяйте буквы свайпом или печатайте на клавиатуре. Каждое слово
+            проверяется по русскому словарю, а чем оно длиннее и реже — тем больше баллов. Играйте в реальном времени с
+            друзьями, соперниками или против ИИ прямо в браузере.
           </p>
-          <div className="mt-6">
-            <Link href={`/${locale}/multiplayer`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-              Составить слова бесплатно
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+        ),
+        art: LANDING_ART.reading('Маскот LexiClash читает книгу'),
+        artTone: 'pink',
+        cta: { href: `/${locale}/multiplayer`, label: 'Играть бесплатно' },
+        secondary: { href: `/${locale}/tools/word-solver`, label: 'Решатель слов' },
+        extra: [{ href: `/${locale}/daily`, label: 'Слово дня' }],
+      }}
+      faqs={faqs}
+      final={{
+        title: 'Собери первое слово прямо сейчас',
+        body: 'Открой LexiClash и начни составлять слова из букв за пару секунд. Без установки, без регистрации, бесплатно.',
+        cta: { href: `/${locale}/multiplayer`, label: 'Составить слова бесплатно' },
+      }}
+    >
+      <Section title="Как это работает">
+        <Steps
+          items={[
+            { title: 'Получи буквы', body: 'На поле или в колесе появляется набор букв — одинаковый для всех игроков.' },
+            { title: 'Составляй слова', body: 'Соединяй буквы и собирай настоящие слова, пока не вышло время.' },
+            { title: 'Набирай очки', body: 'Длинные и редкие слова приносят больше баллов. Побеждает тот, кто собрал больше.' },
+          ]}
+        />
+      </Section>
+    </RuLanding>
   );
 }

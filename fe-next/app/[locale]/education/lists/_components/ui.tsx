@@ -4,6 +4,7 @@ import { serializeJsonLd, type Crumb } from '@/lib/seo/wordLists/jsonLd';
 import { playableWord, type ListLang, type WordList } from '@/lib/seo/wordLists/model';
 import { listPath, pickLocale } from '@/lib/seo/wordLists/paths';
 import { displayTitle, gradeLabel, tr } from '@/lib/seo/wordLists/i18n';
+import { LandingPage } from '@/components/landing/kit';
 
 export const LANG_ACCENT: Record<ListLang, { fill: string; text: string }> = {
   en: { fill: 'bg-neo-lime', text: 'text-neo-lime' },
@@ -25,13 +26,13 @@ export function ListsFrame({
   children: ReactNode;
 }) {
   return (
-    <main className="relative min-h-dvh overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
+    <LandingPage locale={locale}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(graph) }} />
-      <div className="mx-auto max-w-6xl px-4 pb-20 pt-6 sm:px-6 sm:pt-10 lg:px-8">
+      <div className="min-w-0">
         <Breadcrumbs locale={locale} crumbs={crumbs} />
         {children}
       </div>
-    </main>
+    </LandingPage>
   );
 }
 
@@ -70,7 +71,7 @@ function Breadcrumbs({ locale, crumbs }: { locale: string; crumbs: Crumb[] }) {
 
 export function SectionTitle({ children, id }: { children: ReactNode; id?: string }) {
   return (
-    <h2 id={id} className="font-neo-display text-2xl font-black uppercase leading-tight tracking-wide sm:text-3xl">
+    <h2 id={id} className="font-neo-display text-2xl font-bold leading-tight text-balance sm:text-3xl">
       {children}
     </h2>
   );
@@ -81,9 +82,9 @@ export function ChipLink({ href, children, active = false }: { href: string; chi
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
-      className={`inline-flex min-h-[44px] items-center gap-2 rounded-neo border-3 px-4 py-2 text-sm font-black shadow-hard transition-transform duration-150 hover:-translate-y-0.5 ${
-        active ? 'border-neo-black bg-neo-white text-neo-navy' : 'border-neo-cream/40 bg-neo-navy-light text-neo-white'
-      } focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan`}
+      className={`inline-flex min-h-11 items-center gap-2 rounded-full border-3 border-neo-black px-4 py-1.5 text-sm font-bold text-neo-black shadow-hard-lg motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 ${
+        active ? 'bg-neo-lime' : 'bg-neo-cream'
+      } focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-white`}
     >
       {children}
     </Link>
@@ -91,10 +92,10 @@ export function ChipLink({ href, children, active = false }: { href: string; chi
 }
 
 /** The first word as board tiles: the list's card art is the game it turns into. */
-function WordTiles({ word, lang }: { word: string; lang: ListLang }) {
+function WordTiles({ word, lang, className = '' }: { word: string; lang: ListLang; className?: string }) {
   const letters = [...playableWord(word).replace(/\s+/g, '')].slice(0, 6);
   return (
-    <div className="flex gap-1" dir={lang === 'he' ? 'rtl' : 'ltr'} aria-hidden>
+    <div className={`flex gap-1 ${className}`} dir={lang === 'he' ? 'rtl' : 'ltr'} aria-hidden>
       {letters.map((ch, i) => (
         <span
           key={`${ch}-${i}`}
@@ -109,7 +110,8 @@ function WordTiles({ word, lang }: { word: string; lang: ListLang }) {
   );
 }
 
-export function ListCard({ list, locale }: { list: WordList; locale: string }) {
+/** `compact` drops the tile art on phones, where a long grid of cards would run screens deep. */
+export function ListCard({ list, locale, compact = false }: { list: WordList; locale: string; compact?: boolean }) {
   const target = pickLocale(list.locales, locale);
   const { title } = displayTitle(list, locale);
   const accent = LANG_ACCENT[list.lang];
@@ -117,10 +119,10 @@ export function ListCard({ list, locale }: { list: WordList; locale: string }) {
     <Link
       data-list-card
       href={`/${target}${listPath(list)}`}
-      className="group flex h-full flex-col rounded-neo border-3 border-neo-black bg-neo-cream p-4 text-neo-navy shadow-hard-lg transition-transform duration-150 hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white"
+      className="group flex h-full flex-col rounded-neo-lg border-3 border-neo-black bg-neo-cream p-4 text-neo-black shadow-hard-xl motion-safe:transition-transform motion-safe:hover:-translate-y-1 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-white"
     >
-      <WordTiles word={list.words[0].word} lang={list.lang} />
-      <h3 className="mt-4 font-neo-display text-lg font-black leading-tight" dir="auto">
+      <WordTiles word={list.words[0].word} lang={list.lang} className={compact ? 'max-sm:hidden' : ''} />
+      <h3 className={`font-neo-display text-lg font-bold leading-tight ${compact ? 'sm:mt-4' : 'mt-4'}`} dir="auto">
         {title}
       </h3>
       <p className="mt-2 line-clamp-2 text-sm text-neo-navy/70" dir="auto" lang={list.lang}>
@@ -142,12 +144,19 @@ export function ListCard({ list, locale }: { list: WordList; locale: string }) {
   );
 }
 
-export function CardGrid({ lists, locale }: { lists: WordList[]; locale: string }) {
+/** `rail` scrolls sideways on phones, for short previews that would otherwise stack screens deep. */
+export function CardGrid({ lists, locale, rail = false }: { lists: WordList[]; locale: string; rail?: boolean }) {
   return (
-    <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <ul
+      className={
+        rail
+          ? 'relative -mx-4 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3'
+          : 'mt-5 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3'
+      }
+    >
       {lists.map((l) => (
-        <li key={l.id}>
-          <ListCard list={l} locale={locale} />
+        <li key={l.id} className={rail ? 'w-[78%] shrink-0 snap-start sm:w-auto' : undefined}>
+          <ListCard list={l} locale={locale} compact={!rail} />
         </li>
       ))}
     </ul>
@@ -171,20 +180,17 @@ export function PageHeader({
     <header className="max-w-4xl">
       <div className="flex flex-wrap items-center gap-2">{eyebrow}</div>
       {/* No entrance tween: the H1 is the LCP element (pitfalls Class 5). */}
-      <h1
-        className="mt-5 font-neo-display text-[clamp(2.25rem,8vw,4.5rem)] font-black leading-[0.95] tracking-[-0.02em]"
-        dir="auto"
-      >
-        <span className={`inline decoration-clone ${accent} px-2 text-neo-navy shadow-hard-lg [box-decoration-break:clone]`}>
+      <h1 className="mt-4 font-neo-display text-[2rem] font-bold leading-[1.1] text-balance sm:text-5xl" dir="auto">
+        <span className={`inline rounded-neo px-2 text-neo-black [box-decoration-break:clone] ${accent}`}>
           {title}
         </span>
       </h1>
       {subtitle && (
-        <p className="mt-4 font-neo-display text-xl font-black text-neo-white/70">
+        <p className="mt-3 font-neo-display text-xl font-bold text-neo-white/70">
           <bdi>{subtitle}</bdi>
         </p>
       )}
-      <p className="mt-6 max-w-[65ch] text-lg leading-relaxed text-neo-white/85">{intro}</p>
+      <p className="mt-4 max-w-[65ch] text-base leading-relaxed text-neo-white/85 sm:text-lg">{intro}</p>
     </header>
   );
 }

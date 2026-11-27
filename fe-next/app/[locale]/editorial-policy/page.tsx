@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { LandingButton, LandingPage, Prose } from '@/components/landing/kit';
 import { withBodyLocales } from '@/lib/seo/bodyLocales';
 
 export const dynamic = 'force-dynamic';
@@ -36,14 +37,17 @@ export default async function EditorialPolicyPage({ params }: PageProps) {
   const { locale } = await params;
 
   return (
-    <main className="min-h-screen bg-neo-navy px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl text-neo-white font-neo-body">
-        <h1 className="font-neo-display text-3xl sm:text-4xl font-bold mb-2">
+    <LandingPage locale={locale} className="max-w-3xl gap-8 sm:gap-10">
+      <header className="flex flex-col items-start gap-4 lg:pt-6">
+        <h1 className="font-neo-display text-[2rem] font-bold leading-[1.1] text-balance sm:text-5xl">
           Editorial Policy &amp; Standards
         </h1>
-        <p className="text-sm text-gray-400 mb-10">
+        <p className="rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-1 text-xs font-bold text-neo-black shadow-hard-sm">
           Last updated: March 26, 2026 · Owned by the LexiClash Editorial Team
         </p>
+      </header>
+
+      <Prose paper className="max-w-none space-y-8">
 
         <Section title="Our Mission">
           <p>
@@ -57,7 +61,7 @@ export default async function EditorialPolicyPage({ params }: PageProps) {
         <Section title="Who Writes for LexiClash">
           <p>
             Articles are authored by{' '}
-            <Link href={`/${locale}/about/ohad-fisher`} className="underline text-neo-lime">
+            <Link href={`/${locale}/about/ohad-fisher`}>
               Ohad Fisher
             </Link>
             , founder and editor-in-chief of LexiClash, with eight-plus years of hands-on word-game
@@ -73,7 +77,7 @@ export default async function EditorialPolicyPage({ params }: PageProps) {
         </Section>
 
         <Section title="How We Research">
-          <ol className="list-decimal pl-5 space-y-2">
+          <ol>
             <li>
               <strong>Primary play.</strong> Every game we cover is played for at least ten hours by
               the writer before any review or comparison is published. Screenshots and gameplay notes
@@ -135,7 +139,7 @@ export default async function EditorialPolicyPage({ params }: PageProps) {
         <Section title="Corrections Policy">
           <p>
             If you find an error, email{' '}
-            <a href="mailto:editor@lexiclash.live" className="underline text-neo-lime">
+            <a href="mailto:editor@lexiclash.live">
               editor@lexiclash.live
             </a>{' '}
             with the article URL and the issue. We respond within five business days. Confirmed errors
@@ -157,38 +161,36 @@ export default async function EditorialPolicyPage({ params }: PageProps) {
         <Section title="Contact the Editorial Team">
           <p>
             Editor-in-chief:{' '}
-            <a href="mailto:editor@lexiclash.live" className="underline text-neo-lime">
+            <a href="mailto:editor@lexiclash.live">
               editor@lexiclash.live
             </a>
             <br />
             General contact:{' '}
-            <Link href={`/${locale}/contact`} className="underline text-neo-lime">
+            <Link href={`/${locale}/contact`}>
               /contact
             </Link>
             <br />
             Author profile:{' '}
-            <Link href={`/${locale}/about/ohad-fisher`} className="underline text-neo-lime">
+            <Link href={`/${locale}/about/ohad-fisher`}>
               Ohad Fisher
             </Link>
           </p>
         </Section>
 
-        <Link
-          href={`/${locale}/about`}
-          className="inline-block mt-6 rounded-neo border-3 border-black bg-neo-lime px-4 py-2 font-bold text-black shadow-hard-sm hover:shadow-hard"
-        >
-          &larr; Back to About
-        </Link>
-      </div>
-    </main>
+      </Prose>
+
+      <LandingButton href={`/${locale}/about`} variant="secondary" className="self-start">
+        &larr; Back to About
+      </LandingButton>
+    </LandingPage>
   );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="mb-8 rounded-neo border-3 border-black bg-neo-navy/80 p-6 shadow-hard">
-      <h2 className="font-neo-display text-xl font-bold mb-3">{title}</h2>
-      <div className="space-y-3 text-gray-300 leading-relaxed">{children}</div>
+    <section>
+      <h2 className="mb-3">{title}</h2>
+      <div className="space-y-3">{children}</div>
     </section>
   );
 }

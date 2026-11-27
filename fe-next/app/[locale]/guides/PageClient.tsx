@@ -1,13 +1,12 @@
 'use client';
 
-import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
 import { BookOpen, Zap, Target } from 'lucide-react';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { InlineBannerAd } from '@/components/ads';
+import { LandingHero, LandingPage, LinkPills, Prose, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 const guidesContent: Record<string, {
   title: string;
@@ -213,159 +212,70 @@ const iconMap = {
   wordHunt: Target,
 };
 
-const colorMap = {
-  classic: 'bg-neo-lime',
-  blast: 'bg-neo-orange',
-  wordHunt: 'bg-neo-cyan',
-};
 
-export default function GuidesIndexPageClient(): React.ReactElement {
+const TONE = { classic: 'lime', blast: 'orange', wordHunt: 'cyan' } as const;
+
+export default function GuidesIndexPageClient({ children }: { children?: React.ReactNode }): React.ReactElement {
   const { language } = useLanguage();
-  const { theme } = useTheme();
   const params = useParams();
   const locale = (params.locale as string) || language;
-  const isDarkMode = theme === 'dark';
   const content = guidesContent[locale] || guidesContent.en;
 
   return (
-    <div className={cn(
-      'min-h-screen flex flex-col',
-      isDarkMode ? 'bg-neo-navy' : 'bg-linear-to-br from-neo-cream via-white to-neo-cream'
-    )}>
+    <div className="flex min-h-screen flex-col bg-neo-navy">
       <AutoHideHeader />
 
-      <main className="max-w-4xl mx-auto px-4 py-8 page-content-safe">
-        <header className="mb-10 text-center">
-          <h1 className={cn(
-            'text-3xl md:text-4xl font-black mb-4',
-            isDarkMode ? 'text-white' : 'text-neo-black'
-          )}>
-            {content.title}
-          </h1>
-          <p className={cn('text-lg', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-            {content.subtitle}
-          </p>
-          <p className={cn('text-sm mt-4 max-w-2xl mx-auto leading-relaxed', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-            {content.quickStart}
-          </p>
-        </header>
+      <LandingPage locale={locale} topBar={false}>
+        <LandingHero
+          title={content.title}
+          lead={content.subtitle}
+          art={LANDING_ART.trophy('')}
+          artTone="yellow"
+          more={<p>{content.quickStart}</p>}
+        />
 
-        <div className="grid gap-6 md:grid-cols-3">
-          {content.guides.map((guide) => {
+        <TileGrid
+          headingLevel={2}
+          items={content.guides.map((guide) => {
             const Icon = iconMap[guide.icon];
-            const bgColor = colorMap[guide.icon];
-            return (
-              <Link key={guide.slug} href={`/${locale}/guides/${guide.slug}`}>
-                <div className={cn(
-                  'h-full p-6 rounded-neo border-3 border-neo-black shadow-hard transition-transform hover:-translate-y-1 hover:shadow-hard-lg',
-                  isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
-                )}>
-                  <div className={cn(
-                    'w-12 h-12 rounded-neo border-2 border-neo-black flex items-center justify-center mb-4',
-                    bgColor
-                  )}>
-                    <Icon className="w-6 h-6 text-neo-black" />
-                  </div>
-                  <h2 className={cn(
-                    'text-lg font-bold mb-2',
-                    isDarkMode ? 'text-white' : 'text-neo-black'
-                  )}>
-                    {guide.title}
-                  </h2>
-                  <p className={cn(
-                    'text-sm leading-relaxed',
-                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                  )}>
-                    {guide.description}
-                  </p>
-                </div>
-              </Link>
-            );
+            return {
+              href: `/${locale}/guides/${guide.slug}`,
+              icon: <Icon aria-hidden className="h-8 w-8" strokeWidth={2.5} />,
+              title: guide.title,
+              body: guide.description,
+              tone: TONE[guide.icon],
+            };
           })}
-        </div>
+        />
 
-        <p className={cn(
-          'mt-8 text-sm leading-relaxed max-w-2xl mx-auto text-center',
-          isDarkMode ? 'text-gray-400' : 'text-gray-600'
-        )}>
-          {content.generalTips}
-        </p>
+        <Prose>
+          <p>{content.generalTips}</p>
+        </Prose>
 
-        <section className="mt-10 max-w-2xl mx-auto">
-          <h2 className={cn(
-            'text-xl font-bold mb-5',
-            isDarkMode ? 'text-white' : 'text-neo-black'
-          )}>
-            {content.faqHeading}
-          </h2>
-          <dl className="space-y-4">
+        <Section title={content.faqHeading}>
+          <dl className="grid gap-4 lg:grid-cols-2">
             {content.faq.map((item) => (
-              <div key={item.question} className={cn(
-                'p-4 rounded-neo border-2 border-neo-black',
-                isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
-              )}>
-                <dt className={cn('font-semibold mb-1', isDarkMode ? 'text-neo-cream' : 'text-neo-black')}>
-                  {item.question}
-                </dt>
-                <dd className={cn('text-sm leading-relaxed', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-                  {item.answer}
-                </dd>
+              <div key={item.question} className="rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-lg">
+                <dt className="mb-1 font-neo-display text-lg font-bold">{item.question}</dt>
+                <dd className="text-[15px] leading-relaxed">{item.answer}</dd>
               </div>
             ))}
           </dl>
-        </section>
+        </Section>
 
-        <section className={cn(
-          'mt-10 max-w-2xl mx-auto p-6 rounded-neo border-2 border-neo-black',
-          isDarkMode ? 'bg-neo-navy-light' : 'bg-neo-lime/10'
-        )}>
-          <h2 className={cn('text-lg font-bold mb-2', isDarkMode ? 'text-neo-lime' : 'text-neo-black')}>
-            {content.educationCta.heading}
-          </h2>
-          <p className={cn('text-sm leading-relaxed mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-            {content.educationCta.body}
-          </p>
-          <ul className="flex flex-wrap gap-3">
-            {content.educationCta.links.map((link) => (
-              <li key={link.path}>
-                <Link
-                  href={`/${locale}/${link.path}`}
-                  className={cn(
-                    'text-sm font-semibold underline underline-offset-2',
-                    isDarkMode ? 'text-neo-cyan hover:text-neo-cyan/80' : 'text-neo-black hover:opacity-70'
-                  )}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <Section title={content.educationCta.heading} intro={content.educationCta.body}>
+          <LinkPills items={content.educationCta.links.map((link) => ({ href: `/${locale}/${link.path}`, label: link.label }))} />
+        </Section>
 
         {content.relatedReading && (
-          <section className="mt-8 max-w-2xl mx-auto">
-            <h2 className={cn('text-base font-semibold mb-3', isDarkMode ? 'text-neo-gray-200' : 'text-gray-700')}>
-              {content.relatedReading.heading}
-            </h2>
-            <ul className="flex flex-wrap gap-3">
-              {content.relatedReading.links.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className={cn(
-                      'text-sm font-medium underline underline-offset-2',
-                      isDarkMode ? 'text-neo-cyan hover:text-neo-cyan/80' : 'text-neo-black hover:opacity-70'
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
+          <Section title={content.relatedReading.heading}>
+            <LinkPills items={content.relatedReading.links.map((link) => ({ href: link.href, label: link.label }))} />
+          </Section>
         )}
-        <InlineBannerAd webZone="content-page" className="mt-8" />
-      </main>
+
+        <InlineBannerAd webZone="content-page" />
+        {children}
+      </LandingPage>
     </div>
   );
 }

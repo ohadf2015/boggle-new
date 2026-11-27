@@ -108,20 +108,23 @@ export default function GameplayPanel({ mode, isRTL }: { mode: Mode; isRTL: bool
   }, []);
 
   return (
-    <div ref={root} className={`grid items-center gap-8 lg:grid-cols-2 lg:gap-12 ${mode.side === 'right' ? 'lg:[&>*:first-child]:order-2' : ''}`}>
-      <div className="max-w-md">
-        <span className={`s3-pcopy inline-block rounded-neo border-neo-thick border-black px-3 py-1 font-neo-display text-sm font-bold text-black shadow-hard ${mode.accent}`}>
+    <div
+      ref={root}
+      className={`grid items-center gap-6 overflow-hidden rounded-neo-lg border-3 border-neo-black p-5 text-neo-black shadow-hard-xl sm:p-8 lg:gap-10 ${mode.accent} ${mode.side === 'right' ? 'lg:grid-cols-[3fr_2fr] lg:[&>*:first-child]:order-2' : 'lg:grid-cols-[2fr_3fr]'}`}
+    >
+      <div>
+        <span className="s3-pcopy inline-block rounded-full border-2 border-neo-black bg-neo-cream px-3 py-1 text-xs font-bold uppercase tracking-wide">
           {mode.tag}
         </span>
-        <h3 className="s3-pcopy mt-4 font-neo-display text-3xl font-bold leading-tight text-neo-white sm:text-4xl">{mode.title}</h3>
-        <p className="s3-pcopy mt-3 max-w-[42ch] font-neo-body text-lg text-neo-white">{mode.body}</p>
+        <h3 className="s3-pcopy mt-4 font-neo-display text-3xl font-bold leading-tight sm:text-4xl">{mode.title}</h3>
+        <p className="s3-pcopy mt-3 max-w-[42ch] text-lg leading-relaxed">{mode.body}</p>
       </div>
 
-      <div className="grid place-items-center" style={{ perspective: 1100 }}>
-        <div ref={wrap} className="relative inline-grid">
-          <div ref={shadow} aria-hidden className="[grid-area:1/1] rounded-neo-xl bg-[rgb(10,10,18)]" style={{ transform: `translate(${sign * 10}px, 10px)` }} />
-          <div ref={frame} className="relative z-10 [grid-area:1/1] overflow-hidden rounded-neo-xl border-neo-thick border-black bg-neo-navy-light p-2">
-            <video ref={vid} className="block w-full rounded-neo border-neo border-black object-cover" src={mode.video} poster={mode.poster} muted loop playsInline preload="metadata" />
+      <div style={{ perspective: 1100 }}>
+        <div ref={wrap} className="relative grid">
+          <div ref={shadow} aria-hidden className="[grid-area:1/1] rounded-neo-lg bg-neo-black" style={{ transform: `translate(${sign * 10}px, 10px)` }} />
+          <div ref={frame} className="relative z-10 aspect-[16/9] overflow-hidden rounded-neo-lg border-3 border-neo-black bg-neo-navy [grid-area:1/1]">
+            <video ref={vid} className="absolute inset-0 h-full w-full object-contain" src={mode.video} poster={mode.poster} muted loop playsInline preload="metadata" />
           </div>
         </div>
       </div>

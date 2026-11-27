@@ -1,6 +1,19 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import Image from 'next/image';
+import {
+  CompareTable,
+  CtaBand,
+  FaqList,
+  LandingButton,
+  LandingHero,
+  LandingPage,
+  Mark,
+  Section,
+  StatStrip,
+  Steps,
+  TileGrid,
+} from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -166,10 +179,10 @@ const breadcrumbJsonLd = JSON.stringify({
 const stickerBadges = ['NO DOWNLOAD', 'NO SIGNUP', 'REAL-TIME', '2-20 PLAYERS', '6 LANGUAGES', 'NO PAY-TO-WIN', 'PLAY IN 30s', '8 GAME MODES'];
 
 const stats = [
-  { value: '8', label: 'Game Modes', color: 'text-neo-lime' },
-  { value: '5', label: 'Languages', color: 'text-neo-cyan' },
-  { value: '20', label: 'Max Players/Room', color: 'text-neo-pink' },
-  { value: '2-3min', label: 'Avg Match', color: 'text-neo-yellow' },
+  { value: '8', label: 'Game Modes' },
+  { value: '6', label: 'Languages' },
+  { value: '20', label: 'Max Players/Room' },
+  { value: '2-3min', label: 'Avg Match' },
 ];
 
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
@@ -178,7 +191,7 @@ const compareRows: ReadonlyArray<readonly [string, string, string]> = [
   ['Players per room', '2-20+', '2 only'],
   ['Price', 'Free, no pay-to-win', 'Free with ads + paid boosts'],
   ['App download', 'No (browser)', 'Yes (app store install)'],
-  ['Languages', '5 (EN · HE · SV · JA · ES)', '1 (English)'],
+  ['Languages', '6 (EN · HE · SV · JA · ES · RU)', '1 (English)'],
   ['Daily challenges', 'Yes (Word Wheel + Word Hunt)', 'No'],
   ['Adventure / story mode', 'Yes (boss battles)', 'No'],
   ['Group / party mode', 'Yes (20+ players, classrooms)', 'No'],
@@ -198,20 +211,6 @@ const gameModes = [
   { mode: 'Party Games', tag: 'PARTY', desc: 'TV + phone hybrid. Wheel Rush, Connections, Codenames-style group games.', href: 'multiplayer', mascot: '/mascot/celebration.webp', accent: 'cyan' },
 ] as const;
 
-const accentBorder = {
-  pink: 'border-neo-pink text-neo-pink',
-  cyan: 'border-neo-cyan text-neo-cyan',
-  lime: 'border-neo-lime text-neo-lime',
-  purple: 'border-neo-purple text-neo-purple',
-} as const;
-
-const accentChip = {
-  pink: 'bg-neo-pink text-neo-white',
-  cyan: 'bg-neo-cyan text-neo-navy',
-  lime: 'bg-neo-lime text-neo-navy',
-  purple: 'bg-neo-purple text-neo-white',
-} as const;
-
 const bestForBuckets = [
   { tag: 'PARTIES', title: 'Best for parties & groups', desc: '20+ players in one room. Share a QR, everyone plays at once. No app, no setup.', cta: 'Start a party room', href: 'multiplayer', color: 'pink' },
   { tag: 'CLASSROOMS', title: 'Best for classrooms', desc: 'Vocabulary duels, custom word lists, teacher dashboard. Free, no student accounts needed.', cta: 'Open Education', href: 'education', color: 'lime' },
@@ -230,323 +229,184 @@ const whySwitch = [
   { title: '8 game modes, not 1', desc: 'Grid battles, Wordle survival, word wheel, adventure, blast, brain drills, duels, party games.' },
 ];
 
+const TAG = 'rounded-full border-2 border-neo-black bg-neo-cream px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide';
+
 export default async function WordsWithFriendsAlternativePage({ params }: PageProps) {
   const { locale } = await params;
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
+    <LandingPage locale={locale} play={{ href: `/${locale}/multiplayer`, label: 'Play Multiplayer Free' }}>
       <script id="ld-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
       <script id="ld-videogame" type="application/ld+json" dangerouslySetInnerHTML={{ __html: videoGameJsonLd }} />
       <script id="ld-software" type="application/ld+json" dangerouslySetInnerHTML={{ __html: softwareAppJsonLd }} />
       <script id="ld-howto" type="application/ld+json" dangerouslySetInnerHTML={{ __html: howToJsonLd }} />
       <script id="ld-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
 
-      {/* STICKER MARQUEE */}
-      <div className="border-y-3 border-neo-black bg-neo-pink overflow-hidden">
-        <div className="flex animate-[scroll_30s_linear_infinite] gap-6 whitespace-nowrap py-2 font-neo-display text-sm font-black uppercase tracking-widest text-neo-white sm:text-base">
-          {[...stickerBadges, ...stickerBadges, ...stickerBadges].map((b, i) => (
-            <span key={`b-${i}`} className="inline-flex items-center gap-3">
-              <span>★</span>
-              <span>{b}</span>
-            </span>
+      <LandingHero
+        eyebrow="★ Free · Real-Time · 8 Modes ★"
+        title={
+          <>
+            The free <Mark tone="pink">Words</Mark>
+            <br />
+            <Mark>With Friends</Mark>
+            <br />
+            alternative — live.
+          </>
+        }
+        lead={
+          <>
+            Stop waiting for turns. LexiClash is the browser-based word game where 2-20+ friends play the same grid
+            <em className="not-italic font-bold text-neo-lime"> at the same time</em>. Real-time, real-fast, really free.
+            Eight game modes, six languages, zero downloads.
+          </>
+        }
+        actions={
+          <>
+            <LandingButton href={`/${locale}/multiplayer`}>▶ Play Multiplayer Free</LandingButton>
+            <LandingButton href={`/${locale}/daily`} variant="secondary">
+              ★ Daily Challenge
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.friends('Two LexiClash mascots high-fiving over a pile of letter tiles')}
+      >
+        <p className="text-xs font-bold uppercase tracking-wide text-neo-white/70">
+          No download · No signup · 30 sec · 5 min · Streak rewards · <span className="text-neo-lime">● live now</span> · 8 game modes · 6 languages · 20+ players/room
+        </p>
+        <ul className="flex flex-wrap gap-2">
+          {stickerBadges.map((b) => (
+            <li key={b} className={`${TAG} text-neo-black`}>
+              {b}
+            </li>
           ))}
-        </div>
-      </div>
+        </ul>
+      </LandingHero>
 
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+      <StatStrip items={stats} />
 
-        {/* HERO */}
-        <section className="relative grid items-center gap-10 lg:grid-cols-12">
-          <div className="relative lg:col-span-7">
-            <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
-              ★ Free · Real-Time · 8 Modes ★
-            </span>
-            <h1 className="mt-5 font-neo-display text-5xl font-black leading-[0.92] tracking-tight sm:text-6xl lg:text-7xl">
-              The free <span className="inline-block rotate-[-2deg] bg-neo-pink px-3 text-neo-white shadow-hard">Words</span>
-              <br />
-              <span className="inline-block rotate-[1deg] bg-neo-lime px-3 text-neo-navy shadow-hard">With Friends</span>
-              <br />
-              alternative — <span className="text-neo-cyan">live</span>.
-            </h1>
+      <Section
+        title="LexiClash vs Words With Friends"
+        intro="Side-by-side. Honest. Both are good — they're just built for different things."
+      >
+        <CompareTable columns={['Feature', 'LexiClash', 'Words With Friends']} rows={compareRows.map((r) => [...r])} />
+      </Section>
 
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
-              Stop waiting for turns. LexiClash is the browser-based word game where 2-20+ friends play the same grid
-              <em className="not-italic font-bold text-neo-lime"> at the same time</em>. Real-time, real-fast, really free.
-              Eight game modes, six languages, zero downloads.
-            </p>
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-              <Link
-                href={`/${locale}/multiplayer`}
-                className="group rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
-              >
-                <span className="block text-base sm:text-lg">▶ Play Multiplayer Free</span>
-                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-80">No download · No signup · 30 sec</span>
-              </Link>
-              <Link
-                href={`/${locale}/daily`}
-                className="rounded-neo border-4 border-neo-black bg-neo-lime px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:px-7"
-              >
-                <span className="block text-base sm:text-lg">★ Daily Challenge</span>
-                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">5 min · Streak rewards</span>
-              </Link>
-            </div>
-
-            <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs uppercase tracking-widest text-neo-gray-200">
-              <span className="inline-flex items-center gap-2"><span className="text-neo-lime">●</span> live now</span>
-              <span>8 game modes</span>
-              <span className="text-neo-yellow">6 languages</span>
-              <span>20+ players/room</span>
-            </div>
-          </div>
-
-          <div className="relative lg:col-span-5">
-            <div className="relative mx-auto aspect-square w-full max-w-md rotate-[-2deg] rounded-neo border-4 border-neo-black bg-neo-navy-light p-6 shadow-hard-xl sm:max-w-none">
-              <div className="absolute inset-3 grid grid-cols-4 gap-2 rounded-neo border-3 border-neo-black bg-neo-navy p-3">
-                {['L','E','X','I','C','L','A','S','H','W','O','R','D','S','U','P'].map((ch, i) => (
-                  <div
-                    key={`${ch}-${i}`}
-                    className={`grid place-items-center rounded border-2 border-neo-black font-neo-display text-2xl font-black shadow-hard-sm ${i % 5 === 0 ? 'bg-neo-lime text-neo-navy' : i % 4 === 0 ? 'bg-neo-pink text-neo-white' : i % 3 === 0 ? 'bg-neo-cyan text-neo-navy' : 'bg-neo-cream text-neo-navy'}`}
-                    style={{ transform: `rotate(${(i % 3) - 1}deg)` }}
-                  >{ch}</div>
-                ))}
-              </div>
-              <span className="absolute -left-3 -top-3 inline-block rotate-[-12deg] border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-sm font-black uppercase text-neo-navy shadow-hard">FREE!</span>
-              <span className="absolute -bottom-3 -right-3 inline-block rotate-[8deg] border-3 border-neo-black bg-neo-pink px-3 py-1 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard">2-20 PLAYERS</span>
-              <div className="absolute -right-4 top-1/3 hidden h-20 w-20 lg:block">
-                <Image src="/mascot/dj.webp" alt="" fill sizes="80px" className="object-contain" />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* STATS STRIP */}
-        <section className="relative mt-16 overflow-hidden rounded-neo border-4 border-neo-black bg-neo-navy-light shadow-hard-lg">
-          <div className="absolute inset-0 texture-halftone-comic-light opacity-60" aria-hidden="true" />
-          <div className="relative grid grid-cols-2 gap-4 p-6 sm:grid-cols-4 sm:p-8">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <div className={`font-neo-display text-4xl font-black sm:text-5xl ${s.color}`}>{s.value}</div>
-                <div className="mt-1 text-xs font-bold uppercase tracking-widest text-neo-gray-200">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* COMPARISON TABLE */}
-        <section className="mt-20">
-          <h2 className="mb-2 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            LexiClash <span className="text-neo-pink">vs</span> Words With Friends
-          </h2>
-          <p className="mb-6 text-sm text-neo-gray-300 sm:text-base">Side-by-side. Honest. Both are good — they&apos;re just built for different things.</p>
-          <div className="overflow-x-auto rounded-neo border-4 border-neo-black bg-neo-navy-light shadow-hard-lg">
-            <table className="w-full border-collapse text-sm sm:text-base">
-              <thead>
-                <tr className="border-b-3 border-neo-black bg-neo-navy">
-                  <th className="px-4 py-4 text-left font-neo-display font-black uppercase tracking-wider text-neo-yellow">Feature</th>
-                  <th className="px-4 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime">LexiClash</th>
-                  <th className="px-4 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-gray-300">Words With Friends</th>
-                </tr>
-              </thead>
-              <tbody>
-                {compareRows.map((row, i) => (
-                  <tr key={row[0]} className={`border-b border-neo-gray-400/20 ${i % 2 ? 'bg-neo-navy/30' : ''}`}>
-                    <td className="px-4 py-3 font-bold">{row[0]}</td>
-                    <td className="px-4 py-3 text-center font-bold text-neo-lime">{row[1]}</td>
-                    <td className="px-4 py-3 text-center text-neo-gray-300">{row[2]}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* 8 GAME MODES */}
-        <section className="mt-20">
-          <div className="mb-8 flex items-end justify-between">
-            <h2 className="font-neo-display text-3xl font-black uppercase leading-tight sm:text-4xl">
-              <span className="text-neo-cyan">8 modes</span>, not 1.
-            </h2>
-            <span className="hidden font-mono text-xs uppercase tracking-widest text-neo-gray-300 sm:inline">{'// way more than tile-placement'}</span>
-          </div>
-          <p className="mb-8 max-w-2xl text-neo-gray-200">Words With Friends gives you one mode: turn-based tile placement. LexiClash gives you eight — pick the format that fits the moment.</p>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {gameModes.map((m, i) => (
-              <Link
-                key={m.mode}
-                href={`/${locale}/${m.href}`}
-                className={`group relative flex flex-col gap-3 rounded-neo border-4 border-neo-black bg-neo-navy-light p-5 shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl ${accentBorder[m.accent]}`}
-                style={{ transform: `rotate(${(i % 3) - 1}deg)` }}
-              >
-                <span className={`absolute -right-2 -top-3 inline-block rotate-[6deg] rounded border-3 border-neo-black px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest shadow-hard ${accentChip[m.accent]}`}>
-                  {m.tag}
+      <Section
+        title="8 modes, not 1."
+        intro={
+          <>
+            <span className="mb-1 block font-mono text-xs uppercase tracking-wide text-neo-white/60">{'// way more than tile-placement'}</span>
+            Words With Friends gives you one mode: turn-based tile placement. LexiClash gives you eight — pick the format that fits the moment.
+          </>
+        }
+      >
+        <TileGrid
+          columns={4}
+          items={gameModes.map((m) => ({
+            href: `/${locale}/${m.href}`,
+            tone: m.accent,
+            icon: (
+              <span className="mb-1 flex items-center justify-between gap-2">
+                <span className="relative block h-14 w-14">
+                  <Image src={m.mascot} alt="" fill sizes="56px" className="object-contain" />
                 </span>
-                <div className="relative h-16 w-16">
-                  <Image src={m.mascot} alt="" fill sizes="64px" className="object-contain" />
-                </div>
-                <h3 className="font-neo-display text-lg font-black leading-tight">{m.mode}</h3>
-                <p className="text-xs text-neo-gray-200">{m.desc}</p>
-                <span className="mt-auto inline-flex items-center gap-1 text-xs font-bold uppercase tracking-widest">
-                  Play <span className="transition-transform group-hover:translate-x-1">→</span>
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
+                <span className={TAG}>{m.tag}</span>
+              </span>
+            ),
+            title: m.mode,
+            body: (
+              <>
+                {m.desc}
+                <span className="mt-3 block font-neo-display font-bold">Play →</span>
+              </>
+            ),
+          }))}
+        />
+      </Section>
 
-        {/* BEST FOR BUCKETS */}
-        <section className="mt-20">
-          <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            Best for <span className="text-neo-yellow">your moment</span>.
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {bestForBuckets.map((b, i) => (
-              <div
-                key={b.title}
-                className={`relative rounded-neo border-4 border-neo-black bg-neo-navy-light p-5 shadow-hard-lg ${accentBorder[b.color]}`}
-                style={{ transform: i % 2 === 0 ? 'rotate(-0.5deg)' : 'rotate(0.5deg)' }}
-              >
-                <span className={`absolute -top-3 left-4 rotate-[-3deg] rounded border-3 border-neo-black px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest shadow-hard ${accentChip[b.color]}`}>{b.tag}</span>
-                <h3 className="mt-3 font-neo-display text-lg font-black leading-tight">{b.title}</h3>
-                <p className="mt-2 text-sm text-neo-gray-200">{b.desc}</p>
-                <Link href={`/${locale}/${b.href}`} className="mt-4 inline-flex items-center gap-1 font-neo-display text-xs font-black uppercase tracking-widest">
-                  {b.cta} →
-                </Link>
-              </div>
-            ))}
-          </div>
-        </section>
+      <Section title="Best for your moment.">
+        <TileGrid
+          variant="paper"
+          items={bestForBuckets.map((b) => ({
+            href: `/${locale}/${b.href}`,
+            tone: b.color,
+            icon: <span className="text-xs font-bold uppercase tracking-wide text-neo-black/60">{b.tag}</span>,
+            title: b.title,
+            body: (
+              <>
+                {b.desc}
+                <span className="mt-3 block font-neo-display font-bold">{b.cta} →</span>
+              </>
+            ),
+          }))}
+        />
+      </Section>
 
-        {/* WHY SWITCH */}
-        <section className="mt-20">
-          <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            Why players <span className="text-neo-pink">switch</span>.
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {whySwitch.map((item, i) => (
-              <div
-                key={item.title}
-                className="rounded-neo border-3 border-neo-black bg-neo-pink p-5 text-neo-white shadow-hard"
-                style={{ transform: i % 3 === 0 ? 'rotate(-0.5deg)' : i % 3 === 1 ? 'rotate(0.5deg)' : 'rotate(0deg)' }}
-              >
-                <h3 className="mb-2 font-neo-display font-black uppercase">{item.title}</h3>
-                <p className="text-sm">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      <section className="flex flex-col gap-6 rounded-neo-lg border-3 border-neo-black bg-neo-pink p-6 text-neo-black shadow-hard-xl sm:p-10">
+        <h2 className="font-neo-display text-2xl font-bold leading-tight sm:text-3xl">Why players switch.</h2>
+        <ul className="grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
+          {whySwitch.map((item) => (
+            <li key={item.title} className="flex flex-col gap-1 border-t-3 border-neo-black pt-3">
+              <h3 className="font-neo-display text-lg font-bold">{item.title}</h3>
+              <p className="leading-relaxed">{item.desc}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-        {/* HOW TO PLAY */}
-        <section className="mt-20">
-          <h2 className="mb-2 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            <span className="text-neo-lime">30 seconds</span> to your first match.
-          </h2>
-          <p className="mb-8 max-w-2xl text-neo-gray-200">No signup. No app store. No tutorial wall.</p>
-          <ol className="grid gap-5 sm:grid-cols-3">
-            {[
-              { n: '01', title: 'Open lexiclash.live', desc: 'Any browser, any device. No download. No account.', mascot: '/mascot/explorer.webp', tint: 'border-neo-cyan' },
-              { n: '02', title: 'Create or join', desc: 'Get a 6-character room code. Share via link or QR. Friends drop in instantly.', mascot: '/mascot/dj.webp', tint: 'border-neo-pink' },
-              { n: '03', title: 'Find words. Win.', desc: 'Same grid for everyone. Race the clock and friends. Highest score wins.', mascot: '/mascot/flexing.webp', tint: 'border-neo-lime' },
-            ].map((s) => (
-              <li key={s.n} className={`relative rounded-neo border-4 ${s.tint} bg-neo-navy-light p-6 shadow-hard`}>
-                <span className="absolute -top-4 left-4 inline-block rotate-[-4deg] border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-sm font-black text-neo-navy shadow-hard">
-                  STEP {s.n}
-                </span>
-                <div className="mt-3 flex items-start gap-4">
-                  <div className="relative h-16 w-16 shrink-0">
-                    <Image src={s.mascot} alt="" fill sizes="64px" className="object-contain" />
-                  </div>
-                  <div>
-                    <h3 className="font-neo-display text-xl font-black">{s.title}</h3>
-                    <p className="mt-1 text-sm text-neo-gray-200">{s.desc}</p>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
+      <Section title="30 seconds to your first match." intro="No signup. No app store. No tutorial wall.">
+        <Steps
+          items={[
+            { title: 'Open lexiclash.live', body: 'Any browser, any device. No download. No account.' },
+            { title: 'Create or join', body: 'Get a 6-character room code. Share via link or QR. Friends drop in instantly.' },
+            { title: 'Find words. Win.', body: 'Same grid for everyone. Race the clock and friends. Highest score wins.' },
+          ]}
+        />
+      </Section>
 
-        {/* FAQ */}
-        <section className="mt-20">
-          <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            Quick <span className="text-neo-cyan">questions</span>.
-          </h2>
-          <div className="space-y-3">
-            {faqs.map((faq, idx) => (
-              <details
-                key={`faq-${idx}-${faq.q}`}
-                className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard transition-[box-shadow] open:shadow-hard-lg"
-              >
-                <summary className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-neo-display font-black uppercase tracking-wide sm:px-6">
-                  <span>{faq.q}</span>
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded border-2 border-neo-black bg-neo-yellow text-neo-navy transition-transform group-open:rotate-45">+</span>
-                </summary>
-                <div className="border-t-3 border-neo-black bg-neo-navy/40 px-5 py-4 text-sm text-neo-gray-200 sm:px-6 sm:text-base">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+      <Section title="Quick questions.">
+        <FaqList items={faqs} />
+      </Section>
 
-        {/* CROSS-LINKS */}
-        <section className="mt-20">
-          <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">More word games to compare.</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { href: 'best-online-word-games', tag: 'GUIDE', title: 'Best Word Games 2026', desc: '9 games ranked, honest pros & cons', accent: 'border-neo-yellow text-neo-yellow' },
-              { href: 'scrabble-alternative-online', tag: 'ALT', title: 'Scrabble Alternative Online', desc: 'Real-time, browser, 2-20 players', accent: 'border-neo-lime text-neo-lime' },
-              { href: 'lexiclash-vs-wordle', tag: 'VS', title: 'LexiClash vs Wordle', desc: 'Unlimited play vs 1 puzzle/day', accent: 'border-neo-cyan text-neo-cyan' },
-              { href: 'lexiclash-vs-scrabble', tag: 'VS', title: 'LexiClash vs Scrabble', desc: 'Real-time vs turn-based', accent: 'border-neo-pink text-neo-pink' },
-              { href: 'play-boggle-online-free', tag: 'PLAY', title: 'Free Boggle Online', desc: 'No download, instant play', accent: 'border-neo-lime text-neo-lime' },
-            ].map((c) => (
-              <Link
-                key={c.href}
-                href={`/${locale}/${c.href}`}
-                className={`relative rounded-neo border-3 ${c.accent} bg-neo-navy-light p-4 shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg`}
-              >
-                <span className="absolute -top-3 left-3 border-2 border-neo-black bg-neo-navy px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest">{c.tag}</span>
-                <h3 className="mt-2 font-neo-display text-base font-black">{c.title}</h3>
-                <p className="mt-1 text-xs text-neo-gray-200">{c.desc}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
+      <Section title="More word games to compare.">
+        <TileGrid
+          variant="paper"
+          columns={4}
+          items={[
+            { href: 'best-online-word-games', tag: 'GUIDE', title: 'Best Word Games 2026', desc: '9 games ranked, honest pros & cons' },
+            { href: 'scrabble-alternative-online', tag: 'ALT', title: 'Scrabble Alternative Online', desc: 'Real-time, browser, 2-20 players' },
+            { href: 'lexiclash-vs-wordle', tag: 'VS', title: 'LexiClash vs Wordle', desc: 'Unlimited play vs 1 puzzle/day' },
+            { href: 'lexiclash-vs-scrabble', tag: 'VS', title: 'LexiClash vs Scrabble', desc: 'Real-time vs turn-based' },
+            { href: 'play-boggle-online-free', tag: 'PLAY', title: 'Free Boggle Online', desc: 'No download, instant play' },
+          ].map((c) => ({
+            href: `/${locale}/${c.href}`,
+            icon: <span className="text-xs font-bold uppercase tracking-wide text-neo-black/60">{c.tag}</span>,
+            title: c.title,
+            body: c.desc,
+          }))}
+        />
+      </Section>
 
-        {/* FINAL CTA */}
-        <section className="relative mt-20 mb-12 overflow-hidden rounded-neo border-4 border-neo-black bg-neo-yellow p-8 text-neo-navy shadow-hard-xl sm:p-12">
-          <div className="absolute inset-0 texture-halftone-comic opacity-30" aria-hidden="true" />
-          <div className="relative grid items-center gap-8 lg:grid-cols-[1fr_auto]">
-            <div>
-              <h2 className="font-neo-display text-4xl font-black leading-[0.95] sm:text-5xl">
-                Stop waiting for turns.<br />
-                <span className="bg-neo-navy px-3 text-neo-yellow">Start playing.</span>
-              </h2>
-              <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">
-                Open the browser. Send a link. Friends join. Game starts in 30 seconds. The free Words With Friends alternative
-                you actually finish before bedtime.
-              </p>
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href={`/${locale}/multiplayer`}
-                  className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg"
-                >
-                  ▶ Play Multiplayer Free
-                </Link>
-                <Link
-                  href={`/${locale}/daily`}
-                  className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg"
-                >
-                  ★ Daily Challenge
-                </Link>
-              </div>
-            </div>
-            <div className="relative hidden h-44 w-44 lg:block">
-              <Image src="/mascot/winner.webp" alt="" fill sizes="176px" className="object-contain" />
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <style>{`@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-33.333%)}}`}</style>
-    </main>
+      <CtaBand
+        tone="yellow"
+        title={
+          <>
+            Stop waiting for turns.
+            <br />
+            Start playing.
+          </>
+        }
+        body="Open the browser. Send a link. Friends join. Game starts in 30 seconds. The free Words With Friends alternative you actually finish before bedtime."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/multiplayer`}>▶ Play Multiplayer Free</LandingButton>
+            <LandingButton href={`/${locale}/daily`} variant="secondary">
+              ★ Daily Challenge
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

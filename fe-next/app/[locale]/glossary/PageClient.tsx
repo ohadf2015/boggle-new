@@ -3,22 +3,19 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
 import { safeLocaleCompare } from '@/utils/bcp47Locale';
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { LandingHero, LandingPage } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { InlineBannerAd } from '@/components/ads';
 import { contentByLocale } from './content';
 
-export default function GlossaryPageClient(): React.ReactElement {
+export default function GlossaryPageClient({ children }: { children?: React.ReactNode }): React.ReactElement {
   const { language } = useLanguage();
-  const { theme } = useTheme();
   const params = useParams();
   const locale = (params.locale as string) || language;
-  const isDarkMode = theme === 'dark';
   const content = contentByLocale[locale] || contentByLocale.en;
 
   const sortedTerms = useMemo(() =>
@@ -32,120 +29,63 @@ export default function GlossaryPageClient(): React.ReactElement {
   }, [sortedTerms, locale]);
 
   return (
-    <div className={cn(
-      'min-h-screen flex flex-col',
-      isDarkMode ? 'bg-neo-navy' : 'bg-linear-to-br from-neo-cream via-white to-neo-cream'
-    )}>
+    <div className="flex min-h-screen flex-col bg-neo-navy">
       <AutoHideHeader />
 
-      <main className="max-w-3xl mx-auto px-4 py-8 page-content-safe">
-        <Link href={`/${locale}`}>
-          <Button
-            variant="outline"
-            size="sm"
-            className={cn(
-              'mb-6 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-neo-navy-light text-white hover:bg-neo-navy-elevated' : 'bg-white text-neo-black hover:bg-neo-cream'
-            )}
+      <LandingPage locale={locale} topBar={false} className="gap-10 sm:gap-14">
+        <div className="flex flex-col gap-6">
+          <Link
+            href={`/${locale}`}
+            className="inline-flex min-h-11 items-center gap-1.5 self-start rounded-full border-2 border-neo-white/25 px-4 text-sm font-bold text-neo-white/85 hover:border-neo-white/60 hover:text-neo-white"
           >
-            <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
+            <ArrowLeft aria-hidden className="h-4 w-4 rtl:rotate-180" />
             Home
-          </Button>
-        </Link>
+          </Link>
+          <LandingHero title={content.title} lead={content.subtitle} art={LANDING_ART.reading('')} artTone="pink" />
+        </div>
 
-        <header className="mb-8 text-center">
-          <h1 className={cn(
-            'text-3xl md:text-4xl font-black mb-4',
-            isDarkMode ? 'text-white' : 'text-neo-black'
-          )}>
-            {content.title}
-          </h1>
-          <p className={cn('text-lg', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-            {content.subtitle}
-          </p>
-        </header>
-
-        {/* A-Z Navigation */}
-        <nav
-          className={cn(
-            'mb-8 p-4 rounded-neo border-3 border-neo-black shadow-hard flex flex-wrap gap-2 justify-center',
-            isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
-          )}
-          aria-label="Alphabetical navigation"
-        >
-          {letters.map(letter => (
+        <nav className="flex flex-wrap gap-2" aria-label="Alphabetical navigation">
+          {letters.map((letter) => (
             <a
               key={letter}
               href={`#letter-${letter}`}
-              className={cn(
-                'w-8 h-8 flex items-center justify-center rounded font-bold text-sm',
-                'border-2 border-neo-black transition-colors',
-                isDarkMode
-                  ? 'bg-neo-navy-elevated text-white hover:bg-neo-yellow hover:text-neo-black'
-                  : 'bg-neo-cream text-neo-black hover:bg-neo-yellow'
-              )}
+              className="flex h-11 w-11 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream font-neo-display text-lg font-bold text-neo-black shadow-hard-sm hover:bg-neo-yellow"
             >
               {letter}
             </a>
           ))}
         </nav>
 
-        <InlineBannerAd webZone="content-page" className="my-6" />
+        <InlineBannerAd webZone="content-page" />
 
-        {/* Glossary Terms as Definition List */}
-        <div data-speakable="true">
+        <div data-speakable="true" className="flex flex-col gap-10">
           {letters.map((letter, li) => {
-            const termsForLetter = sortedTerms.filter(
-              t => t.term.charAt(0).toUpperCase() === letter
-            );
+            const termsForLetter = sortedTerms.filter((t) => t.term.charAt(0).toUpperCase() === letter);
             return (
-              <section key={letter} id={`letter-${letter}`} className="mb-8">
-                <h2 className={cn(
-                  'text-2xl font-black mb-4 pb-2 border-b-3 border-neo-black',
-                  isDarkMode ? 'text-neo-yellow' : 'text-neo-black'
-                )}>
+              <section key={letter} id={`letter-${letter}`} className="grid scroll-mt-24 gap-4 md:grid-cols-[4.5rem_1fr]">
+                <h2 className="flex h-14 w-14 -rotate-3 items-center justify-center rounded-neo-lg border-3 border-neo-black bg-neo-yellow font-neo-display text-3xl font-bold text-neo-black shadow-hard-lg md:sticky md:top-24">
                   {letter}
                 </h2>
-                <dl className="space-y-4">
-                  {termsForLetter.map(item => (
-                    <div
-                      key={item.term}
-                      className={cn(
-                        'p-4 rounded-neo border-3 border-neo-black shadow-hard',
-                        isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
-                      )}
-                    >
-                      <dt className={cn(
-                        'text-lg font-bold mb-1',
-                        isDarkMode ? 'text-white' : 'text-neo-black'
-                      )}>
-                        {item.term}
-                      </dt>
-                      <dd className={cn(
-                        'leading-relaxed',
-                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                      )}>
-                        {item.definition}
-                      </dd>
+                <dl className="grid gap-4 lg:grid-cols-2">
+                  {termsForLetter.map((item) => (
+                    <div key={item.term} className="rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-lg">
+                      <dt className="mb-1 font-neo-display text-lg font-bold">{item.term}</dt>
+                      <dd className="text-[15px] leading-relaxed">{item.definition}</dd>
                       {item.related && item.related.length > 0 && (
-                        <dd className={cn(
-                          'mt-2 text-xs',
-                          isDarkMode ? 'text-gray-500' : 'text-gray-500'
-                        )}>
-                          Related: {item.related.join(', ')}
-                        </dd>
+                        <dd className="mt-2 text-xs text-neo-black/65">Related: {item.related.join(', ')}</dd>
                       )}
                     </div>
                   ))}
                 </dl>
-                {li === 2 && <InlineBannerAd webZone="content-page" className="mt-6" />}
+                {li === 2 && <InlineBannerAd webZone="content-page" className="md:col-span-2" />}
               </section>
             );
           })}
         </div>
 
-        <InlineBannerAd webZone="content-page" className="my-6" />
-      </main>
+        <InlineBannerAd webZone="content-page" />
+        {children}
+      </LandingPage>
     </div>
   );
 }

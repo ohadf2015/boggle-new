@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
+import { CompareTable, CtaBand, FaqList, LandingButton, LandingHero, LandingPage, Mark, Section, TileGrid, type LandingTone } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -69,11 +70,11 @@ const cols: { key: Tool; name: string; highlight?: boolean }[] = [
   { key: 'quizlet', name: 'Quizlet' },
 ];
 
-const verdicts = [
-  { name: 'LexiClash', accent: 'bg-neo-lime', when: 'כשרוצים משחק אוצר מילים תחרותי וחי לכל הכיתה — בעברית מלאה (RTL), בלי חשבונות לתלמידים ובלי פרסומות. מעלים רשימת מילים משלכם ומשחקים תוך דקה, בלי הכנה.' },
-  { name: 'Wordwall', accent: 'bg-neo-cyan', when: 'כשצריך מגוון רחב של תבניות פעילות (התאמה, גרירה, חיפוש מילים) או דפי עבודה להדפסה. ספריית הקהילה עצומה — אבל את כל משחק בונים לבד מראש.' },
-  { name: 'Kahoot', accent: 'bg-neo-pink', when: 'כשרוצים אנרגיית "שעשועון" מהירה לחזרה בשאלות רב-ברירה. מוכר, קליל ומלא חיים — אבל המיקוד הוא בחידון, לא במשחק בניית מילים לאוצר מילים.' },
-  { name: 'Quizlet', accent: 'bg-neo-purple', when: 'כשצריך ספריית כרטיסיות אדירה ולמידה עצמית לקראת מבחן. חזק לשינון אישי — אבל Quizlet Live דורש חשבונות, והגרסה החינמית כוללת פרסומות.' },
+const verdicts: { name: string; tone: LandingTone; when: string }[] = [
+  { name: 'LexiClash', tone: 'lime', when: 'כשרוצים משחק אוצר מילים תחרותי וחי לכל הכיתה — בעברית מלאה (RTL), בלי חשבונות לתלמידים ובלי פרסומות. מעלים רשימת מילים משלכם ומשחקים תוך דקה, בלי הכנה.' },
+  { name: 'Wordwall', tone: 'cyan', when: 'כשצריך מגוון רחב של תבניות פעילות (התאמה, גרירה, חיפוש מילים) או דפי עבודה להדפסה. ספריית הקהילה עצומה — אבל את כל משחק בונים לבד מראש.' },
+  { name: 'Kahoot', tone: 'pink', when: 'כשרוצים אנרגיית "שעשועון" מהירה לחזרה בשאלות רב-ברירה. מוכר, קליל ומלא חיים — אבל המיקוד הוא בחידון, לא במשחק בניית מילים לאוצר מילים.' },
+  { name: 'Quizlet', tone: 'purple', when: 'כשצריך ספריית כרטיסיות אדירה ולמידה עצמית לקראת מבחן. חזק לשינון אישי — אבל Quizlet Live דורש חשבונות, והגרסה החינמית כוללת פרסומות.' },
 ];
 
 const faqs = [
@@ -114,114 +115,77 @@ export default async function Page({ params }: PageProps) {
     );
 
   return (
-    <main dir="rtl" className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
-      <script id="ld-he-vs-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script id="ld-he-vs-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+    <div dir="rtl">
+      <LandingPage locale={locale} play={{ href: `/${locale}/education/classroom-game`, label: '▶ התחילו משחק כיתתי' }}>
+        <script id="ld-he-vs-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+        <script id="ld-he-vs-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <LandingHero
+          eyebrow="★ השוואה כנה · למורים ★"
+          title={
+            <>
+              LexiClash מול <Mark tone="cyan">Wordwall</Mark>, Kahoot ו-Quizlet
+            </>
+          }
+          lead="כל הכלים האלה טובים — אבל לכל אחד נקודת חוזק אחרת."
+          actions={
+            <>
+              <LandingButton href={`/${locale}/education/classroom-game`} className="flex-col gap-0">
+                <span className="block">▶ התחילו משחק כיתתי</span>
+                <span className="block text-xs font-bold opacity-70">חינם · ללא הרשמה לתלמידים</span>
+              </LandingButton>
+              <LandingButton href={`/${locale}/hebrew-classroom-vocabulary-games`} variant="secondary">
+                מדריך משחקי המילים לכיתה →
+              </LandingButton>
+            </>
+          }
+          art={LANDING_ART.duel('שני קמעות של LexiClash בדו-קרב מילים')}
+          artTone="cyan"
+          more={
+            <p>
+              הנה השוואה כנה למורים שמחפשים <strong>משחקי מילים לכיתה בעברית</strong>: מה כל כלי עושה הכי טוב, ואיפה LexiClash שונה — משחק אוצר מילים חי, בעברית מלאה, בלי חשבונות לתלמידים ובלי פרסומות.
+            </p>
+          }
+        />
 
-        <section className="max-w-3xl">
-          <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
-            ★ השוואה כנה · למורים ★
-          </span>
-          <h1 className="mt-5 font-neo-display text-4xl font-black leading-[0.95] tracking-tight sm:text-5xl lg:text-6xl">
-            LexiClash מול <span className="inline-block rotate-[-2deg] bg-neo-cyan px-3 text-neo-navy shadow-hard">Wordwall</span>, Kahoot ו-Quizlet
-          </h1>
-          <p className="mt-6 text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
-            כל הכלים האלה טובים — אבל לכל אחד נקודת חוזק אחרת. הנה השוואה כנה למורים שמחפשים <strong className="text-neo-white">משחקי מילים לכיתה בעברית</strong>: מה כל כלי עושה הכי טוב, ואיפה LexiClash שונה — משחק אוצר מילים חי, בעברית מלאה, בלי חשבונות לתלמידים ובלי פרסומות.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-            <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
-              <span className="block text-base sm:text-lg">▶ התחילו משחק כיתתי</span>
-              <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">חינם · ללא הרשמה לתלמידים</span>
-            </Link>
-            <Link href={`/${locale}/hebrew-classroom-vocabulary-games`} className="rounded-neo border-4 border-neo-black bg-neo-navy-light px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
-              מדריך משחקי המילים לכיתה →
-            </Link>
-          </div>
-        </section>
+        <div className="min-w-0">
+          <TeacherProCompareCheckoutStrip locale={locale} />
+        </div>
 
-      <TeacherProCompareCheckoutStrip locale={locale} />
+        <Section title="טבלת השוואה.">
+          <CompareTable
+            columns={[' ', ...cols.map((c) => c.name)]}
+            highlight={cols.findIndex((c) => c.highlight) + 1}
+            rows={rows.map((r) => [r.label, ...cols.map((c) => <span key={c.key} className="flex justify-center">{cell(r.marks[c.key])}</span>)])}
+            caption="נכון ליוני 2026. כלים מתעדכנים — שווה לבדוק את האתר של כל מוצר."
+          />
+        </Section>
 
-        <section className="mt-16 sm:mt-20">
-          <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            טבלת <span className="text-neo-lime">השוואה</span>.
-          </h2>
-          <div className="overflow-x-auto rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard">
-            <table className="w-full min-w-[560px] border-collapse text-right">
-              <thead>
-                <tr className="border-b-3 border-neo-black">
-                  <th className="p-4 text-sm font-black sm:text-base" scope="col"> </th>
-                  {cols.map((c) => (
-                    <th key={c.key} scope="col" className={`p-3 text-center font-neo-display text-sm font-black sm:text-base ${c.highlight ? 'bg-neo-lime/15 text-neo-lime' : ''}`}>
-                      {c.name}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r, i) => (
-                  <tr key={r.label} className={i % 2 ? 'bg-neo-navy/30' : ''}>
-                    <th scope="row" className="p-4 text-sm font-bold sm:text-base">{r.label}</th>
-                    {cols.map((c) => (
-                      <td key={c.key} className={`p-3 ${c.highlight ? 'bg-neo-lime/10' : ''}`}>
-                        <span className="flex justify-center">{cell(r.marks[c.key])}</span>
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-3 text-xs text-neo-gray-200/70">נכון ליוני 2026. כלים מתעדכנים — שווה לבדוק את האתר של כל מוצר.</p>
-        </section>
+        <Section title="מתי לבחור כל כלי.">
+          <TileGrid
+            columns={2}
+            variant="paper"
+            items={verdicts.map((v) => ({ title: v.name, body: v.when, tone: v.tone }))}
+          />
+        </Section>
 
-        <section className="mt-16 sm:mt-20">
-          <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            מתי לבחור <span className="text-neo-cyan">כל כלי</span>.
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {verdicts.map((v) => (
-              <div key={v.name} className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard">
-                <span className={`inline-block rounded border-2 border-neo-black ${v.accent} px-3 py-1 font-neo-display text-sm font-black text-neo-navy`}>{v.name}</span>
-                <p className="mt-3 text-sm leading-relaxed text-neo-gray-200 sm:text-base">{v.when}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        <Section title="שאלות נפוצות.">
+          <FaqList items={faqs} />
+        </Section>
 
-        <section className="mt-16 sm:mt-20">
-          <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            שאלות <span className="text-neo-cyan">נפוצות</span>.
-          </h2>
-          <div className="space-y-3">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard transition-[box-shadow] open:shadow-hard-lg">
-                <summary className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-neo-display font-black uppercase tracking-wide sm:px-6">
-                  <span>{faq.q}</span>
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded border-2 border-neo-black bg-neo-yellow text-neo-navy transition-transform group-open:rotate-45">+</span>
-                </summary>
-                <div className="border-t-3 border-neo-black bg-neo-navy/40 px-5 py-4 text-sm text-neo-gray-200 sm:px-6 sm:text-base">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-16 mb-12 rounded-neo border-4 border-neo-black bg-neo-lime p-8 text-neo-navy shadow-hard-xl sm:mt-20 sm:p-12">
-          <h2 className="font-neo-display text-3xl font-black leading-[0.95] sm:text-4xl">
-            הדרך היחידה לדעת — לשחק סיבוב אחד.
-          </h2>
-          <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">בוחרים רשימת מילים, מציגים קוד לכיתה, ומשחקים. חמש דקות, בלי הרשמה לתלמידים.</p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
-              ▶ התחילו משחק כיתתי
-            </Link>
-            <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-black bg-neo-navy-light px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg">
-              למרכז החינוך
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+        <CtaBand
+          tone="cyan"
+          title="הדרך היחידה לדעת — לשחק סיבוב אחד."
+          body="בוחרים רשימת מילים, מציגים קוד לכיתה, ומשחקים. חמש דקות, בלי הרשמה לתלמידים."
+          actions={
+            <>
+              <LandingButton href={`/${locale}/education/classroom-game`}>▶ התחילו משחק כיתתי</LandingButton>
+              <LandingButton href={`/${locale}/education`} variant="secondary">למרכז החינוך</LandingButton>
+            </>
+          }
+          art={LANDING_ART.trophy('')}
+        />
+      </LandingPage>
+    </div>
   );
 }

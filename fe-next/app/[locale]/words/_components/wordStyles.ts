@@ -3,21 +3,20 @@ import { neoChunkyPress } from '@/components/ui/neoStyles';
 
 // Each link carries `data-press` so the page's PressGroup can sink it.
 export const PRIMARY_CTA = cn(
-  'inline-flex min-h-14 w-full items-center justify-center rounded-neo border-3 border-neo-black bg-neo-lime px-8 font-neo-display text-xl font-black text-neo-black sm:w-auto',
+  'inline-flex min-h-14 w-full items-center justify-center rounded-neo-lg border-3 border-neo-black bg-neo-lime px-8 font-neo-display text-lg font-bold text-neo-black sm:w-auto',
   neoChunkyPress(4),
-  'shadow-neo-lime-dark',
 );
 
 export const SECONDARY_CTA = cn(
-  'inline-flex min-h-12 items-center justify-center rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-5 font-bold text-neo-cream',
+  'inline-flex min-h-12 items-center justify-center rounded-neo-lg border-3 border-neo-black bg-neo-cream px-5 font-bold text-neo-black',
   neoChunkyPress(2),
-  'shadow-neo-cream/25',
 );
 
 export const CHIP = cn(
-  'rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-cream hover:border-neo-cyan',
+  'rounded-neo-lg border-3 border-neo-black bg-neo-cream text-neo-black hover:bg-neo-yellow',
   neoChunkyPress(2),
-  'shadow-neo-cream/20',
 );
 
-export const SECTION_LABEL = 'text-sm font-bold uppercase tracking-wider text-neo-cyan';
+export const SECTION_LABEL = 'font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl';
+
+export const PAPER_CARD = 'rounded-neo-lg border-3 border-neo-black bg-neo-cream text-neo-black shadow-hard-xl';

@@ -1,11 +1,23 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { EducationIntentCta } from '@/components/education/EducationIntentCta';
 import { ApalabradosSinDescargarLink } from '@/components/seo/ApalabradosSinDescargarLink';
 import { BoggleAppFreeLink } from '@/components/seo/BoggleAppFreeLink';
 import { AnagramSolverLink } from '@/components/seo/AnagramSolverLink';
 import { DescargarScrabblePcLink } from '@/components/seo/DescargarScrabblePcLink';
+import {
+  CtaBand,
+  FaqList,
+  LandingButton,
+  LandingHero,
+  LandingPage,
+  Mark,
+  Prose,
+  Section,
+  Steps,
+  TileGrid,
+} from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 
 interface PageProps {
@@ -13,6 +25,7 @@ interface PageProps {
 }
 
 const BASE_URL = 'https://www.lexiclash.live';
+const LINK_LINE = 'font-neo-body text-sm leading-relaxed text-neo-white';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
@@ -90,190 +103,121 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
   const { locale } = await params;
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/multiplayer`, label: 'Play free' }}>
       {/* JSON-LD structured data for FAQ rich results — static content only, no user input */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqJsonLd }}
       />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Play Words With Friends Online — Free, Real-Time, No App
-        </h1>
-
-        <p className="mb-6 text-lg leading-relaxed text-neo-gray-200">
-          Looking for Words With Friends online, without the app and without the waiting? Here&apos;s the
-          catch with the classic: you take a turn, then wait hours — sometimes days — for your friend to
-          notice. LexiClash is that same itch scratched at full speed: everyone plays the same letter grid
-          at the same time, live, and the bragging rights settle in 3 minutes instead of 3 weeks.
-        </p>
-        <section className="mb-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link
-            href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-pink bg-neo-pink px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
-          >
-            Create a Room — Play With Friends
-          </Link>
-          <Link
-            href={`/${locale}/quick-play`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
-          >
-            Practice Solo First
-          </Link>
-        </section>
-
-        <figure className="relative mx-auto mb-10 aspect-[16/9] w-full max-w-2xl rotate-[-1.5deg] rounded-neo border-4 border-neo-black bg-neo-navy-light shadow-hard-xl">
-          <Image
-            src="/landing/play-boggle-multiplayer.webp"
-            alt="Three LexiClash mascots racing to find words on the same letter grid"
-            fill
-            priority
-            sizes="(min-width: 768px) 672px, 100vw"
-            className="rounded-neo object-cover"
-          />
-          <span className="absolute -left-3 -top-3 rotate-[-10deg] border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-sm font-black uppercase text-neo-navy shadow-hard">
-            Live
-          </span>
-          <span className="absolute -bottom-3 -right-3 rotate-[7deg] border-3 border-neo-black bg-neo-pink px-3 py-1 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard">
-            Up to 50 friends
-          </span>
-        </figure>
-
-        <p className="mb-12 text-lg leading-relaxed text-neo-gray-200">
-          Create a room, share one link, and up to 50 friends join instantly from any browser — phone,
-          laptop, whatever they&apos;re holding. No download, no account, no &quot;your move... eventually.&quot;{' '}
-          If the game you wanted is Boggle, you can{' '}
-          <Link href={`/${locale}/play-boggle-online-free`} className="text-neo-cyan underline">
-            play Boggle with friends online
-          </Link>{' '}
-          the same way: a room code, a QR, or the share button.
-        </p>
-
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">How to Play With Friends</h2>
-          <div className="space-y-4">
-            {[
-              { step: '1', title: 'Create a room', desc: 'Tap "Create Room" and customize your game — grid size, time limit, and game mode.' },
-              { step: '2', title: 'Share the link', desc: 'Send the room link or QR code to friends via WhatsApp, Discord, text, or any messenger.' },
-              { step: '3', title: 'Play together', desc: 'Everyone sees the same grid and races to find words in real-time. Longest words and fastest fingers win!' },
-              { step: '4', title: 'See results', desc: 'After time runs out, see who found the most words, scored the highest, and discovered the rarest finds.' },
-            ].map((item) => (
-              <div key={item.step} className="flex gap-4 rounded-neo border-3 border-neo-pink bg-neo-navy/50 p-5 shadow-hard">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-3 border-neo-pink font-neo-display text-lg font-bold text-neo-pink">
-                  {item.step}
-                </span>
-                <div>
-                  <h3 className="font-neo-display font-bold text-neo-pink">{item.title}</h3>
-                  <p className="text-sm text-neo-gray-200">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Why Real-Time Beats Turn-Based</h2>
-          <div className="space-y-4 text-lg leading-relaxed text-neo-gray-200">
+      <LandingHero
+        eyebrow="Live · Up to 50 friends"
+        title={
+          <>
+            Play Words With Friends Online — <Mark>Free</Mark>, Real-Time, No App
+          </>
+        }
+        lead="Looking for Words With Friends online, without the app and without the waiting?"
+        actions={
+          <>
+            <LandingButton href={`/${locale}/multiplayer`}>Create a Room — Play With Friends</LandingButton>
+            <LandingButton href={`/${locale}/quick-play`} variant="secondary">Practice Solo First</LandingButton>
+          </>
+        }
+        art={LANDING_ART.friends('Two LexiClash mascots high-fiving over a pile of letter tiles')}
+        more={
+          <>
             <p>
-              Turn-based word games have a dirty secret: most matches never finish. Someone forgets, the
-              notification gets buried, and three weeks later you&apos;re both pretending the game doesn&apos;t
-              exist. Real-time flips that — a LexiClash round is 2–3 minutes of everyone shouting at the
-              same grid, and it always ends with a winner.
+              Here&apos;s the catch with the classic: you take a turn, then wait hours — sometimes days — for
+              your friend to notice. LexiClash is that same itch scratched at full speed: everyone plays the
+              same letter grid at the same time, live, and the bragging rights settle in 3 minutes instead of
+              3 weeks.
             </p>
             <p>
-              It also changes who you can play with. Async games work for two patient people. A live room
-              works for a party: project the grid on a TV, everyone plays from their phone, and suddenly
-              it&apos;s a game night — not a notification thread.
+              Create a room, share one link, and up to 50 friends join instantly from any browser — phone,
+              laptop, whatever they&apos;re holding. No download, no account, no &quot;your move... eventually.&quot;{' '}
+              If the game you wanted is Boggle, you can{' '}
+              <Link href={`/${locale}/play-boggle-online-free`}>play Boggle with friends online</Link> the same
+              way: a room code, a QR, or the share button.
             </p>
-          </div>
-        </section>
+          </>
+        }
+      />
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Multiplayer Game Modes</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              { title: 'Classic Battle', desc: 'Find words on a grid. Highest score wins. The original word battle experience.' },
-              { title: 'Word Hunt', desc: 'Find specific target words before your opponents. Strategy meets speed.' },
-              { title: 'Blast Mode', desc: 'Chain words into combos for massive scores. Fast and furious word finding.' },
-              { title: 'Daily Challenge', desc: 'Everyone plays the same puzzle. Compare scores with friends and the world.' },
-            ].map((mode) => (
-              <div key={mode.title} className="rounded-neo border-3 border-neo-pink bg-neo-navy/50 p-5 shadow-hard">
-                <h3 className="mb-2 font-neo-display text-lg font-bold text-neo-pink">{mode.title}</h3>
-                <p className="text-sm text-neo-gray-200">{mode.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      <Section title="How to Play With Friends">
+        <Steps
+          items={[
+            { title: 'Create a room', body: 'Tap "Create Room" and customize your game — grid size, time limit, and game mode.' },
+            { title: 'Share the link', body: 'Send the room link or QR code to friends via WhatsApp, Discord, text, or any messenger.' },
+            { title: 'Play together', body: 'Everyone sees the same grid and races to find words in real-time. Longest words and fastest fingers win!' },
+            { title: 'See results', body: 'After time runs out, see who found the most words, scored the highest, and discovered the rarest finds.' },
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            {faqs.map((faq) => (
-              <details key={faq.q} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-pink transition-transform group-open:rotate-180">&#9660;</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More Ways to Play</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-lime">Daily Word Wheel</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Play the daily puzzle and compare scores with friends</p>
-            </Link>
-            <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
-              <h3 className="font-bold text-neo-cyan">Free Boggle Online</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">No download, no signup required</p>
-            </Link>
-            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink/40">
-              <h3 className="font-bold text-neo-pink">Best Word Games 2026</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Complete comparison guide</p>
-            </Link>
-            <Link href={`/${locale}/free-multiplayer-word-game`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-lime">Multiplayer Word Game Online</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Real-time Scrabble alternative — play live</p>
-            </Link>
-            <Link href={`/${locale}/scrabble-alternative-online`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink/40">
-              <h3 className="font-bold text-neo-pink">Online Multiplayer Scrabble Alternative</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">One live grid for the whole group, in the browser</p>
-            </Link>
-            <Link href={`/${locale}/word-games-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
-              <h3 className="font-bold text-neo-cyan">Word Games Online Free</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">7+ free modes — no download, no signup</p>
-            </Link>
-          </div>
-        </section>
-
-        <EducationIntentCta locale={locale} variant="teachers" />
-        <BoggleAppFreeLink lead="The no-download page for a" />
-        <AnagramSolverLink lead="Stuck mid-game? Unscramble any rack with the free" />
-        <ApalabradosSinDescargarLink />
-        <DescargarScrabblePcLink lead="En español, para el PC sin instalar nada:" />
-
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Ready to Play With Friends?</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Create a room in seconds and invite friends to join. No downloads, no accounts, no hassle.
-            Just real-time word battles with the people you want to play with.
+      <Section title="Why Real-Time Beats Turn-Based">
+        <Prose>
+          <p>
+            Turn-based word games have a dirty secret: most matches never finish. Someone forgets, the
+            notification gets buried, and three weeks later you&apos;re both pretending the game doesn&apos;t
+            exist. Real-time flips that — a LexiClash round is 2–3 minutes of everyone shouting at the same
+            grid, and it always ends with a winner.
           </p>
-          <div className="mt-6">
-            <Link
-              href={`/${locale}/multiplayer`}
-              className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg"
-            >
-              Play With Friends Now — Free
-            </Link>
-          </div>
-        </section>
+          <p>
+            It also changes who you can play with. Async games work for two patient people. A live room works
+            for a party: project the grid on a TV, everyone plays from their phone, and suddenly it&apos;s a
+            game night — not a notification thread.
+          </p>
+        </Prose>
+      </Section>
+
+      <Section title="Multiplayer Game Modes">
+        <TileGrid
+          columns={4}
+          items={[
+            { title: 'Classic Battle', body: 'Find words on a grid. Highest score wins. The original word battle experience.' },
+            { title: 'Word Hunt', body: 'Find specific target words before your opponents. Strategy meets speed.' },
+            { title: 'Blast Mode', body: 'Chain words into combos for massive scores. Fast and furious word finding.' },
+            { title: 'Daily Challenge', body: 'Everyone plays the same puzzle. Compare scores with friends and the world.' },
+          ]}
+        />
+      </Section>
+
+      <Section title="Frequently Asked Questions">
+        <FaqList items={faqs} />
+      </Section>
+
+      <Section title="More Ways to Play">
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: `/${locale}/daily-word-wheel`, title: 'Daily Word Wheel', body: 'Play the daily puzzle and compare scores with friends' },
+            { href: `/${locale}/play-boggle-online-free`, title: 'Free Boggle Online', body: 'No download, no signup required' },
+            { href: `/${locale}/best-online-word-games`, title: 'Best Word Games 2026', body: 'Complete comparison guide' },
+            { href: `/${locale}/free-multiplayer-word-game`, title: 'Multiplayer Word Game Online', body: 'Real-time Scrabble alternative — play live' },
+            { href: `/${locale}/scrabble-alternative-online`, title: 'Online Multiplayer Scrabble Alternative', body: 'One live grid for the whole group, in the browser' },
+            { href: `/${locale}/word-games-online-free`, title: 'Word Games Online Free', body: '7+ free modes — no download, no signup' },
+          ]}
+        />
+      </Section>
+
+      <div>
+        <EducationIntentCta locale={locale} variant="teachers" />
+        <div className="flex flex-col gap-1">
+          <BoggleAppFreeLink lead="The no-download page for a" className={LINK_LINE} />
+          <AnagramSolverLink lead="Stuck mid-game? Unscramble any rack with the free" className={LINK_LINE} />
+          <ApalabradosSinDescargarLink className={LINK_LINE} />
+          <DescargarScrabblePcLink lead="En español, para el PC sin instalar nada:" className={LINK_LINE} />
+        </div>
       </div>
-    </main>
+
+      <CtaBand
+        tone="pink"
+        title="Ready to Play With Friends?"
+        body="Create a room in seconds and invite friends to join. No downloads, no accounts, no hassle. Just real-time word battles with the people you want to play with."
+        actions={<LandingButton href={`/${locale}/multiplayer`}>Play With Friends Now — Free</LandingButton>}
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

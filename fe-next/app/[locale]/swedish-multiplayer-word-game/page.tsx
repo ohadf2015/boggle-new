@@ -1,7 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import NativePageEnhancements from "@/components/landing/NativePageEnhancements";
-import { TopBackLink } from '@/components/navigation/TopBackLink';
+import NativePageEnhancements from '@/components/landing/NativePageEnhancements';
+import {
+  CheckList,
+  FaqList,
+  LandingButton,
+  LandingHero,
+  LandingPage,
+  Mark,
+  Prose,
+  Section,
+  TileGrid,
+} from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
+import { SCRABBLE_SV_ANSWER, SCRABBLE_SV_QUESTION, SV_DICT_FLOOR } from './content';
 
 
 interface PageProps {
@@ -15,15 +27,6 @@ const SV_TITLE = 'Spela Scrabble Svenska Gratis Online — Alfapet | LexiClash';
 /** Adds Alfapet-alternativ signal for "alfapet online" searches; tightened to 136 chars. */
 const SV_DESCRIPTION =
   'Spela scrabble på svenska gratis online — Alfapet-alternativ utan app eller konto. Tävla i realtid med upp till 50 spelare. Starta nu! →';
-
-/**
- * Growth Radar rec 2718: Bing grounds "scrabble på svenska" (111 AI groundings) but cites other
- * domains. A visible, self-contained answer with real numbers: 50 = MAX_PLAYERS_PER_ROOM,
- * 90 s = DEFAULT_TIMER, ~246k words in the loaded Swedish dictionary.
- */
-const SCRABBLE_SV_QUESTION = 'Hur spelar man Scrabble på svenska online gratis?';
-const SCRABBLE_SV_ANSWER =
-  'LexiClash är ett gratis ordspel för dig som vill spela Scrabble på svenska online: öppna lexiclash.live/sv, skapa ett rum och dela länken. Upp till 50 spelare bildar ord på samma bokstavsrutnät samtidigt, en runda tar 90 sekunder och över 240 000 svenska ord godkänns. Till skillnad från Alfapet och Wordfeud väntar ingen på sin tur. Ingen app, ingen registrering.';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
@@ -108,7 +111,7 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
     },
     {
       q: 'Hur många svenska ord innehåller LexiClash?',
-      a: 'LexiClash innehåller över 10 000 svenska ord. Vår ordbok uppdateras kontinuerligt.',
+      a: `LexiClash innehåller över ${SV_DICT_FLOOR} svenska ord. Vår ordbok uppdateras kontinuerligt.`,
     },
     {
       q: 'Vilka spellägen finns?',
@@ -116,12 +119,12 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
     },
     {
       q: 'Hur bildar man ord av bokstäver i LexiClash?',
-      a: 'I LexiClash ser alla spelare samma rutnät av bokstäver. Klicka eller dra för att bilda ord — ju längre ord, desto fler poäng. Spelet stödjer 10 000+ svenska ord inklusive flerordsformer och dialektord.',
+      a: `I LexiClash ser alla spelare samma rutnät av bokstäver. Klicka eller dra för att bilda ord — ju längre ord, desto fler poäng. Spelet stödjer över ${SV_DICT_FLOOR} svenska ord inklusive flerordsformer och dialektord.`,
     },
   ];
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/multiplayer`, label: 'Spela gratis nu' }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -152,70 +155,41 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
         }}
       />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Multiplayer Ordspel Online - Spela Boggle & Scrabble på Svenska
-        </h1>
+      <LandingHero
+        title={
+          <>
+            Multiplayer Ordspel Online - Spela Boggle & Scrabble på <Mark>Svenska</Mark>
+          </>
+        }
+        lead={
+          <span data-speakable="true">
+            Spela Alfapet på svenska gratis i webbläsaren — inget konto, ingen app. LexiClash är ett
+            realtids-alternativ till Wordfeud: skapa ett rum, skicka länken, och upp till 50 spelare tävlar
+            på samma bokstavsrutnät. Över {SV_DICT_FLOOR} svenska ord, matcher på 2–3 minuter. Starta direkt.
+          </span>
+        }
+        actions={
+          <>
+            <LandingButton href={`/${locale}/multiplayer`}>▶ Spela gratis nu</LandingButton>
+            <LandingButton href={`/${locale}/daily/word-wheel`} variant="secondary">
+              ★ Dagens ordhjul
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.languages('LexiClash-maskotar med bokstavsbrickor på olika språk')}
+        artTone="cyan"
+      />
 
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200" data-speakable="true">
-          Spela Alfapet på svenska gratis i webbläsaren — inget konto, ingen app. LexiClash är ett
-          realtids-alternativ till Wordfeud: skapa ett rum, skicka länken, och upp till 50 spelare tävlar
-          på samma bokstavsrutnät. Över 10 000 svenska ord, matcher på 2–3 minuter. Starta direkt.
-        </p>
-
-        <div className="mb-12 flex flex-col gap-3 sm:flex-row">
-          <Link
-            href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl"
-          >
-            ▶ Spela gratis nu
-          </Link>
-          <Link
-            href={`/${locale}/daily/word-wheel`}
-            className="rounded-neo border-4 border-neo-lime px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
-          >
-            ★ Dagens ordhjul
-          </Link>
-        </div>
-
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">{SCRABBLE_SV_QUESTION}</h2>
-          <p className="mb-4 leading-relaxed text-neo-gray-200" data-speakable="true">{SCRABBLE_SV_ANSWER}</p>
-          <Link href={`/${locale}/multiplayer`} className="font-bold text-neo-yellow hover:underline">
+      <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-12">
+        <section className="flex flex-col gap-4 rounded-neo-lg border-3 border-neo-black bg-neo-cream p-6 text-neo-black shadow-hard-xl sm:p-8">
+          <h2 className="font-neo-display text-2xl font-bold leading-tight">{SCRABBLE_SV_QUESTION}</h2>
+          <p className="leading-relaxed" data-speakable="true">{SCRABBLE_SV_ANSWER}</p>
+          <Link href={`/${locale}/multiplayer`} className="font-bold underline decoration-neo-pink decoration-2 underline-offset-2">
             Skapa ett rum och spela nu →
           </Link>
         </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            Varför spela LexiClash Multiplayer?
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              'Realtids multiplayer-kamper med omedelbar poängåterkoppling',
-              'Skapa rum och bjud in vänner via delbar länk',
-              '10 000+ svenska ord i ordförrådet',
-              'Flera spellägen (Boggle, Ordhjul, Letare, Blast)',
-              'Dagliga utmaningar med poängtabeller',
-              'Bosskamper med unika vändningar',
-              'Helt gratis, ingen nedladdning behövs',
-              'Spela på 6 språk (EN, HE, SV, JA, ES, RU)',
-            ].map((feature) => (
-              <div
-                key={feature}
-                className="flex gap-3 rounded-neo border-3 border-neo-yellow bg-neo-navy/50 p-4 shadow-hard"
-              >
-                <span className="text-neo-yellow">✓</span>
-                <p className="text-sm sm:text-base">{feature}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12 max-w-none">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Bilda ord av bokstäver — så funkar det</h2>
-          <div className="space-y-4 text-neo-gray-200">
+        <Section title="Bilda ord av bokstäver — så funkar det">
+          <Prose>
             <p>
               På ytan är det enkelt: du får ett rutnät med slumpade bokstäver och ska bilda ord av
               bokstäverna genom att koppla ihop intilliggande rutor. Men det är tempot som gör det
@@ -227,86 +201,68 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
               listan med ord som gömde sig i rutnätet — ett förvånansvärt roligt sätt att bygga ut sitt
               svenska ordförråd mellan matcherna.
             </p>
-          </div>
-        </section>
+          </Prose>
+        </Section>
+      </div>
 
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link
-            href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-yellow bg-neo-yellow px-6 py-3 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
-          >
-            Börja Spela Multiplayer
-          </Link>
-          <Link
-            href={`/${locale}/quick-play`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
-          >
-            Spela Ensam
-          </Link>
-          <Link
-            href={`/${locale}/daily`}
-            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4"
-          >
-            Daglig Utmaning
-          </Link>
-        </section>
+      <Section title="Varför spela LexiClash Multiplayer?">
+        <CheckList
+          items={[
+            'Realtids multiplayer-kamper med omedelbar poängåterkoppling',
+            'Skapa rum och bjud in vänner via delbar länk',
+            `Över ${SV_DICT_FLOOR} svenska ord i ordförrådet`,
+            'Flera spellägen (Boggle, Ordhjul, Letare, Blast)',
+            'Dagliga utmaningar med poängtabeller',
+            'Bosskamper med unika vändningar',
+            'Helt gratis, ingen nedladdning behövs',
+            'Spela på 6 språk (EN, HE, SV, JA, ES, RU)',
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Vanliga Frågor</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details
-                key={`faq-${idx}-${faq.q}`}
-                className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard"
-              >
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-yellow transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+      <TileGrid
+        items={[
+          { href: `/${locale}/multiplayer`, title: 'Börja Spela Multiplayer →', tone: 'yellow' },
+          { href: `/${locale}/quick-play`, title: 'Spela Ensam →', tone: 'cyan' },
+          { href: `/${locale}/daily`, title: 'Daglig Utmaning →', tone: 'pink' },
+        ]}
+      />
 
-        <section className="mb-12 max-w-none">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Om LexiClash Multiplayer</h2>
-          <p className="mt-4 text-neo-gray-200">
+      <Section title="Vanliga Frågor">
+        <FaqList items={faqs} />
+      </Section>
+
+      <Section title="Om LexiClash Multiplayer">
+        <Prose>
+          <p>
             LexiClash tar det strategiska djupet från Scrabble, tempot från Boggle och pusselglädjen från
             Wordle — och blandar allt i en enda realtidsduell. Det är byggt för alla som någonsin bråkat
             om ett ord faktiskt finns: ordnördar, söndagsspelare och renodlade tävlingsmänniskor.
           </p>
-          <p className="mt-4 text-neo-gray-200">
+          <p>
             Spela multiplayer ordspel online med vänner, familj eller främlingar världen över. Oavsett om du vill ha en
-            snabb 15-minuters match eller en längre tävlingssession, LexiClash passar alla spelstillar. Det intuitiva
+            snabb 15-minuters match eller en längre tävlingssession, LexiClash passar alla spelstilar. Det intuitiva
             gränssnittet fungerar på både dator och mobil, så att du kan spela ordspel var som helst, när som helst.
           </p>
-          <p className="mt-4 text-neo-gray-200">
+          <p>
             Tävla på globala poängtabeller, tjäna prestationer och lås upp specialspellägen. Våra bosskamper lägger till
             en unik PvE-vändning där spelare samarbetar mot AI-motståndare. Dagliga utmaningar erbjuder nya pussel
             varje dag med exklusiva belöningar.
           </p>
-          <p className="mt-4 text-neo-gray-200">
-            Utöver multiplayer hittar du{' '}
-            <Link href={`/${locale}/daily-word-wheel`} className="text-neo-cyan hover:underline">
-              dagligt ordhjul
-            </Link>
-            {' '}— snurra hjulet och hitta alla ord — och{' '}
-            <Link href={`/${locale}/daily`} className="text-neo-cyan hover:underline">
-              Ordjakt
-            </Link>
-            {' '}— gissa det dolda ordet på 10 försök. Båda är gratis, nya pussel varje dag.
+          <p>
+            Utöver multiplayer hittar du <Link href={`/${locale}/daily-word-wheel`}>dagligt ordhjul</Link> — snurra
+            hjulet och hitta alla ord — och <Link href={`/${locale}/daily`}>Ordjakt</Link> — gissa det dolda ordet på
+            10 försök. Båda är gratis, nya pussel varje dag.
           </p>
-          <p className="mt-4 text-neo-gray-200">
+          <p>
             Kör du fast på dina brickor kan du{' '}
-            <Link href={`/${locale}/tools/word-solver`} className="text-neo-cyan hover:underline">
-              bilda ord av bokstäver
-            </Link>
-            {' '}med vår ordlösare: skriv in bokstäverna och se alla ord de räcker till.
+            <Link href={`/${locale}/tools/word-solver`}>bilda ord av bokstäver</Link> med vår ordlösare: skriv in
+            bokstäverna och se alla ord de räcker till.
           </p>
-        </section>
-        <NativePageEnhancements locale={locale} />
-      </div>
-    </main>
+        </Prose>
+      </Section>
+
+      <NativePageEnhancements locale={locale} />
+    </LandingPage>
   );
 }

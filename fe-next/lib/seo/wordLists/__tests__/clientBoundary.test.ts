@@ -3,7 +3,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const ROOT = join(__dirname, '..', '..', '..', '..');
-const SERVER_ONLY = /wordLists\/(catalog|rail|sitemapRoutes)|wordLists\.generated\.json|EducationRelatedLinks|EducationLandingTemplate/;
+const SERVER_ONLY = /wordLists\/(catalog|rail|sitemapRoutes)|wordLists\.generated\.json|EducationRelatedLinks|EducationLandingTemplate|EducationKitRelated|EducationKitLanding/;
 
 function walk(dir: string, out: string[] = []): string[] {
   for (const name of readdirSync(dir)) {

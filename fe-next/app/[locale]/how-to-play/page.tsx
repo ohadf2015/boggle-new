@@ -2,7 +2,7 @@ import HowToPlayPageClient from './PageClient';
 import { getHowToPlayContent } from './content';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { SeoKitBlock } from '@/components/landing/SeoKitBlock';
 import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
 import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
@@ -213,16 +213,19 @@ export default async function HowToPlayPage({ params }: PageParams) {
       <>
         <BreadcrumbJsonLd items={breadcrumbItems} />
         <FaqPageJsonLd faqs={content.faq.map(({ question, answer }) => ({ q: question, a: answer }))} />
-        <HowToPlayPageClient locale={locale} />
-        <EsScrabbleCrossLink locale={locale} anchorVariant="query" />
-        <GuidesCalloutLink locale={locale} />
-        <EducationCalloutLink locale={locale} />
-        <GamePageSeoContent
-          title={content.title}
-          description={content.description}
-          features={content.features}
-          faq={content.faq}
-        />
+        <HowToPlayPageClient locale={locale}>
+          <div className="flex flex-col gap-4 empty:hidden">
+            <EsScrabbleCrossLink locale={locale} anchorVariant="query" />
+            <GuidesCalloutLink locale={locale} />
+            <EducationCalloutLink locale={locale} />
+          </div>
+          <SeoKitBlock
+            title={content.title}
+            description={content.description}
+            features={content.features}
+            faq={content.faq}
+          />
+        </HowToPlayPageClient>
       </>
     );
 }

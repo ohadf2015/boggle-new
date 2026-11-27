@@ -54,8 +54,7 @@ describe('SerpGapSections — competitor heading gaps + unique round table', () 
 
   it('renders the length-scoring table from Classic rules', () => {
     render(<SerpGapSections locale="es" />);
-    const tables = screen.getAllByRole('table');
-    const scoring = tables[1];
+    const scoring = screen.getByRole('table', { name: /puntos por longitud/i });
     LENGTH_SCORES.forEach((row) => {
       expect(within(scoring).getByRole('rowheader', { name: row.letters })).toBeInTheDocument();
     });

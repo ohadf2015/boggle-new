@@ -49,17 +49,17 @@ export function GuidesCalloutLink({ locale }: Props) {
   const lang = (locale in CONTENT ? locale : 'en') as LocaleKey;
   const { title, tagline, cta } = CONTENT[lang];
   return (
-    <aside className="my-8 rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard">
-      <h3 className="font-neo-display text-lg font-black text-neo-lime">
+    <aside className="my-8 rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-xl">
+      <h3 className="font-neo-display text-lg font-black text-neo-black">
         {title}
       </h3>
-      <p className="mt-2 text-sm text-slate-300">{tagline}</p>
+      <p className="mt-2 text-sm text-neo-black/80">{tagline}</p>
       <ul className="mt-3 flex flex-wrap gap-2" role="list">
         {STRATEGY_GUIDES.map(({ href, label }) => (
           <li key={href}>
             <Link
               href={href}
-              className="inline-block rounded border border-neo-black bg-neo-navy px-3 py-1 font-neo-display text-xs font-bold text-neo-lime underline-offset-2 hover:bg-neo-lime hover:text-neo-black transition-colors"
+              className="inline-flex min-h-11 items-center rounded-full border-2 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-xs font-bold text-neo-black shadow-hard-lg motion-safe:transition-transform motion-safe:hover:-translate-y-0.5"
             >
               {label[lang]}
             </Link>
@@ -68,7 +68,7 @@ export function GuidesCalloutLink({ locale }: Props) {
       </ul>
       <Link
         href={`/${locale}/guides`}
-        className="mt-3 inline-block font-neo-display text-xs font-black uppercase tracking-widest text-slate-400 hover:text-neo-white transition-colors"
+        className="mt-3 inline-block font-neo-display text-xs font-black uppercase tracking-widest text-neo-black underline decoration-neo-pink decoration-2 underline-offset-4"
       >
         {cta}
       </Link>

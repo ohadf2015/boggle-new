@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { BlooketGapsSetHonestyStrip } from '@/components/education/BlooketGapsSetHonestyStrip';
 import { BlooketFreeTierHonestyStrip } from '@/components/education/BlooketFreeTierHonestyStrip';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
+import { CompareTable, CtaBand, FaqList, LandingButton, LandingHero, LandingPage, LinkPills, Prose, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const revalidate = 86400;
 
@@ -94,143 +94,102 @@ export default async function Page({ params }: PageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/education/classroom-game`, label: 'Try LexiClash Free' }}>
       <script id="ld-vs-blooket-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script id="ld-vs-blooket-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
+      <LandingHero
+        eyebrow="LexiClash vs Blooket"
+        title="Blooket makes you build the game. LexiClash already is one."
+        lead="Blooket turned quiz review into an arcade, and students love the game modes."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/education/classroom-game`}>Try LexiClash Free</LandingButton>
+            <LandingButton href={`/${locale}/education/vocabulary-games-classroom`} variant="secondary">
+              Classroom Games
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.duel('Two LexiClash mascots facing off in a word duel')}
+        artTone="pink"
+        more={
+          <p>
+            But every Blooket session starts the same way: you write a question set. For teachers running{' '}
+            <strong>vocabulary and word review</strong>, that&apos;s a lot of authoring for a game that still rewards
+            multiple-choice clicking over actually producing words. LexiClash is the opposite — pre-built word-formation
+            gameplay (Boggle grids, anagrams, word wheels), no question-writing, no student signup, six languages. Same
+            competitive energy, zero prep.
+          </p>
+        }
+      >
+        <LinkPills items={[{ href: `/${locale}/education/duels`, label: 'Vocabulary Duels' }]} />
+      </LandingHero>
 
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Blooket makes you build the game. LexiClash already is one.
-        </h1>
+      <div className="min-w-0">
+        <TeacherProCompareCheckoutStrip locale={locale} />
+      </div>
 
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Blooket turned quiz review into an arcade, and students love the game modes. But every Blooket session
-          starts the same way: you write a question set. For teachers running <strong>vocabulary and word review</strong>,
-          that&apos;s a lot of authoring for a game that still rewards multiple-choice clicking over actually producing
-          words. LexiClash is the opposite — pre-built word-formation gameplay (Boggle grids, anagrams, word wheels),
-          no question-writing, no student signup, six languages. Same competitive energy, zero prep.
-        </p>
+      <Section title="Side-by-side, no spin">
+        <CompareTable
+          columns={['Feature', 'LexiClash', 'Blooket']}
+          rows={compareRows.map((row) => [...row])}
+          caption="Blooket plan features and pricing as of 2026 — check blooket.com for current Blooket Plus tiers."
+        />
+      </Section>
 
-      <TeacherProCompareCheckoutStrip locale={locale} />
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
-            Try LexiClash Free
-          </Link>
-          <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-            Classroom Games
-          </Link>
-          <Link href={`/${locale}/education/duels`} className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4">
-            Vocabulary Duels
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Side-by-side, no spin</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse rounded-neo border-3 border-neo-gray-400 text-sm sm:text-base">
-              <thead>
-                <tr className="border-b-3 border-neo-gray-400 bg-neo-navy/80">
-                  <th className="px-4 py-3 text-left font-bold text-neo-lime">Feature</th>
-                  <th className="px-4 py-3 text-center font-bold text-neo-cyan">LexiClash</th>
-                  <th className="px-4 py-3 text-center text-neo-gray-300">Blooket</th>
-                </tr>
-              </thead>
-              <tbody>
-                {compareRows.map(([feature, lexi, blooket]) => (
-                  <tr key={feature} className="border-b border-neo-gray-400/50">
-                    <td className="px-4 py-3 font-medium">{feature}</td>
-                    <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
-                    <td className="px-4 py-3 text-center text-neo-gray-300">{blooket}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-3 text-xs text-neo-gray-300">Blooket plan features and pricing as of 2026 — check blooket.com for current Blooket Plus tiers.</p>
-        </section>
-
+      <div className="min-w-0">
         <BlooketFreeTierHonestyStrip locale={locale} />
         <BlooketGapsSetHonestyStrip locale={locale} />
+      </div>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">When LexiClash beats Blooket</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              { title: 'No question sets to write', desc: 'Blooket needs a finished question set before anyone plays. LexiClash uses built-in word lists or a one-minute custom upload — no authoring step at all.' },
-              { title: 'Actually practices words', desc: 'Blooket gameplay rewards fast multiple-choice clicking. LexiClash makes students spell and form words under time pressure — the skill you are actually teaching.' },
-              { title: 'Purpose-built for vocabulary', desc: 'Blooket is subject-agnostic trivia. LexiClash is a word game with real dictionaries, so every round reinforces spelling, recall, and letter patterns.' },
-              { title: '6 native-dictionary languages', desc: 'For ESL/EFL, Hebrew immersion, or Spanish bilingual programs, LexiClash validates real words in EN/HE/ES/SV/JA/RU. Blooket only knows the answers you typed.' },
-              { title: 'Whole class free', desc: 'Blooket caps players and gates some modes/reports on Blooket Plus. LexiClash classroom features are free and full, up to 30 students.' },
-              { title: 'Faster to live', desc: 'Reuse-a-set still means finding the right Blooket set. LexiClash goes from idea to join code in under a minute.' },
-              { title: 'Miss gaps → Live without a 「Gaps Set」', desc: 'Blooket’s Incorrect% / Opportunities for Growth path still asks you to rebuild a 「Gaps Set」 for homework. LexiClash deep-links the same class misses into reteach Live (#1124) — no Question Bank hop.' },
-            ].map((item) => (
-              <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-lime">{item.title}</h3>
-                <p className="text-sm text-neo-gray-200">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      <Section title="When LexiClash beats Blooket">
+        <TileGrid
+          variant="paper"
+          items={[
+            { title: 'No question sets to write', desc: 'Blooket needs a finished question set before anyone plays. LexiClash uses built-in word lists or a one-minute custom upload — no authoring step at all.' },
+            { title: 'Actually practices words', desc: 'Blooket gameplay rewards fast multiple-choice clicking. LexiClash makes students spell and form words under time pressure — the skill you are actually teaching.' },
+            { title: 'Purpose-built for vocabulary', desc: 'Blooket is subject-agnostic trivia. LexiClash is a word game with real dictionaries, so every round reinforces spelling, recall, and letter patterns.' },
+            { title: '6 native-dictionary languages', desc: 'For ESL/EFL, Hebrew immersion, or Spanish bilingual programs, LexiClash validates real words in EN/HE/ES/SV/JA/RU. Blooket only knows the answers you typed.' },
+            { title: 'Whole class free', desc: 'Blooket caps players and gates some modes/reports on Blooket Plus. LexiClash classroom features are free and full, up to 30 students.' },
+            { title: 'Faster to live', desc: 'Reuse-a-set still means finding the right Blooket set. LexiClash goes from idea to join code in under a minute.' },
+            { title: 'Miss gaps → Live without a 「Gaps Set」', desc: 'Blooket’s Incorrect% / Opportunities for Growth path still asks you to rebuild a 「Gaps Set」 for homework. LexiClash deep-links the same class misses into reteach Live (#1124) — no Question Bank hop.' },
+          ].map((item) => ({ title: item.title, body: item.desc }))}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">When Blooket still wins</h2>
-          <p className="text-neo-gray-200">
+      <Section title="When Blooket still wins">
+        <Prose paper>
+          <p>
             LexiClash isn&apos;t a Blooket replacement for every subject. If you teach science, history, or math and want
             game-show review across any content you write, Blooket&apos;s mode variety and community set library are excellent.
             LexiClash is laser-focused: vocabulary, spelling, and word-pattern practice for ELA and language classes. Plenty of
             teachers run Blooket for general review and LexiClash for word work.
           </p>
-        </section>
+        </Prose>
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently asked questions</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+      <Section title="Frequently asked questions">
+        <FaqList items={faqs} />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More comparisons</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/lexiclash-vs-kahoot`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Kahoot</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Word games vs quiz-only. Free vs Kahoot+.</p>
-            </Link>
-            <Link href={`/${locale}/lexiclash-vs-vocabularyspellingcity`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs SpellingCity</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Multiplayer vs individual drills</p>
-            </Link>
-            <Link href={`/${locale}/education`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">Education Hub</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">All classroom word games</p>
-            </Link>
-          </div>
-        </section>
+      <Section title="More comparisons">
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: `/${locale}/lexiclash-vs-kahoot`, title: 'LexiClash vs Kahoot', body: 'Word games vs quiz-only. Free vs Kahoot+.' },
+            { href: `/${locale}/lexiclash-vs-vocabularyspellingcity`, title: 'LexiClash vs SpellingCity', body: 'Multiplayer vs individual drills' },
+            { href: `/${locale}/education`, title: 'Education Hub', body: 'All classroom word games' },
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Try it before next class</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Pick a word list. Project the join code. Watch 30 students dive in. No set to build, no signup, no credit card.
-            If LexiClash isn&apos;t a fit, you&apos;ve lost five minutes. If it is, you have a zero-prep word-review game for the rest of the year.
-          </p>
-          <div className="mt-6">
-            <Link href={`/${locale}/education/classroom-game`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-              Start a Classroom Game Free
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+      <CtaBand
+        tone="cyan"
+        title="Try it before next class"
+        body="Pick a word list. Project the join code. Watch 30 students dive in. No set to build, no signup, no credit card. If LexiClash isn't a fit, you've lost five minutes. If it is, you have a zero-prep word-review game for the rest of the year."
+        actions={<LandingButton href={`/${locale}/education/classroom-game`}>Start a Classroom Game Free</LandingButton>}
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

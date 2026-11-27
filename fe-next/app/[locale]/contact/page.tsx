@@ -5,7 +5,7 @@ import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 
 export const revalidate = 86400;
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { SeoKitBlock } from '@/components/landing/SeoKitBlock';
 
 const SITE_URL = 'https://www.lexiclash.live';
 
@@ -159,13 +159,14 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
       <FaqPageJsonLd
         faqs={content.faq.map(({ question, answer }) => ({ q: question, a: answer }))}
       />
-      <ContactPageClient />
-      <GamePageSeoContent
-        title={content.title}
-        description={content.description}
-        features={content.features}
-        faq={content.faq}
-      />
+      <ContactPageClient>
+        <SeoKitBlock
+          title={content.title}
+          description={content.description}
+          features={content.features}
+          faq={content.faq}
+        />
+      </ContactPageClient>
     </>
   );
 }

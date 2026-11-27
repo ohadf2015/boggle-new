@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BASE_URL, CANONICAL, DAILY_URL, dailyWordHeFaqs, buildHamilaHayomitJsonLd } from './seo';
+import { CtaBand, FaqList, LandingButton, LandingHero, LandingPage, Prose, Section, Steps, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 
 interface PageProps {
@@ -66,98 +68,79 @@ export default async function HamilaHayomitPage({ params }: PageProps) {
   const jsonLd = JSON.stringify(buildHamilaHayomitJsonLd());
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white" dir="rtl">
-      <script type="application/ld+json">{jsonLd}</script>
+    <div dir="rtl">
+      <LandingPage locale="he" play={{ href: '/he/daily', label: 'שחקו עכשיו ▶' }}>
+        <script type="application/ld+json">{jsonLd}</script>
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="font-neo-display text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-          המילה היומית — מה זה, ואיך משחקים את מילת היום
-        </h1>
-        <p className="mt-5 text-lg leading-relaxed text-neo-white">
-          מחפשים את <strong>המילה היומית</strong>? ב-LexiClash מחכה לכם <strong>מילת היום</strong> בפאזל
-          חדש מדי בוקר. כל שחקן בעולם מקבל בדיוק את אותו הלוח — מפצחים, שומרים על הרצף ומשתפים את התוצאה.
-          ללא הרשמה, ללא הורדה, חינם לגמרי.
-        </p>
+        <LandingHero
+          title="המילה היומית — מה זה, ואיך משחקים את מילת היום"
+          lead={
+            <>
+              מחפשים את <strong>המילה היומית</strong>? ב-LexiClash מחכה לכם <strong>מילת היום</strong> בפאזל חדש מדי בוקר.
+            </>
+          }
+          actions={
+            <>
+              <LandingButton href="/he/daily">שחקו את המילה היומית עכשיו ▶</LandingButton>
+              <LandingButton href="/he/daily/word-wheel" variant="secondary">
+                גלגל המילים היומי
+              </LandingButton>
+            </>
+          }
+          art={LANDING_ART.wheel('קמע של LexiClash מסובב גלגל אותיות')}
+          artTone="lime"
+          more={
+            <p>
+              כל שחקן בעולם מקבל בדיוק את אותו הלוח — מפצחים, שומרים על הרצף ומשתפים את התוצאה. ללא הרשמה, ללא הורדה,
+              חינם לגמרי.
+            </p>
+          }
+        />
 
-        <section className="mt-8 flex flex-col gap-3 sm:flex-row-reverse sm:gap-4">
-          <Link
-            href="/he/daily"
-            className="inline-flex items-center justify-center rounded-neo border-neo-thick border-neo-black bg-neo-lime px-6 py-3 font-neo-display text-lg font-bold text-neo-black shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
-          >
-            שחקו את המילה היומית עכשיו ▶
-          </Link>
-          <Link
-            href="/he/daily/word-wheel"
-            className="inline-flex items-center justify-center rounded-neo border-neo-thick border-neo-black bg-neo-cyan px-6 py-3 font-neo-display text-lg font-bold text-neo-black shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
-          >
-            גלגל המילים היומי
-          </Link>
-        </section>
+        <Section title='מה זה "המילה היומית"?'>
+          <Prose paper>
+            <p>
+              <strong>המילה היומית</strong> היא פאזל מילים יומי שבו כל השחקנים מקבלים את אותו אתגר בדיוק. ב-LexiClash היא
+              מגיעה בשתי גרסאות: <strong>ציד המילים</strong> — שילוב של וורדל ובוגל שבו מאתרים מילה נסתרת ב-10 ניסיונות,
+              ו<strong>גלגל המילים</strong> — שבו מרכיבים כמה שיותר מילים מאותיות סביב אות מרכזית. כל בוקר בחצות מתחיל
+              אתגר חדש וטבלת מובילים נקייה.
+            </p>
+          </Prose>
+        </Section>
 
-        <section className="mt-14">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">מה זה &quot;המילה היומית&quot;?</h2>
-          <p className="mt-4 text-lg leading-relaxed text-neo-white">
-            <strong>המילה היומית</strong> היא פאזל מילים יומי שבו כל השחקנים מקבלים את אותו אתגר בדיוק.
-            ב-LexiClash היא מגיעה בשתי גרסאות: <strong>ציד המילים</strong> — שילוב של וורדל ובוגל שבו
-            מאתרים מילה נסתרת ב-10 ניסיונות, ו<strong>גלגל המילים</strong> — שבו מרכיבים כמה שיותר מילים
-            מאותיות סביב אות מרכזית. כל בוקר בחצות מתחיל אתגר חדש וטבלת מובילים נקייה.
-          </p>
-        </section>
+        <Section title="למה לשחק את המילה היומית של LexiClash?">
+          <TileGrid items={features.map((f) => ({ title: f.title, body: f.text }))} />
+        </Section>
 
-        <section className="mt-14">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">למה לשחק את המילה היומית של LexiClash?</h2>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            {features.map((f) => (
-              <div
-                key={f.title}
-                className="rounded-neo border-neo border-neo-black bg-neo-navy-light p-5 shadow-hard-sm"
-              >
-                <div className="text-2xl" aria-hidden="true">{f.icon}</div>
-                <h3 className="mt-2 font-neo-display text-lg font-bold">{f.title}</h3>
-                <p className="mt-1 text-neo-white">{f.text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        <Section title="איך משחקים — צעד אחר צעד">
+          <Steps
+            items={[
+              {
+                title: (
+                  <>
+                    נכנסים ל<Link href="/he/daily" className="underline decoration-neo-pink decoration-2">עמוד האתגר היומי</Link>.
+                  </>
+                ),
+              },
+              { title: 'בוחרים בין ציד המילים לגלגל המילים.' },
+              { title: 'מפצחים את מילת היום במספר הניסיונות המותר.' },
+              { title: "משתפים את תוצאת האמוג'י ובונים את הרצף היומי שלכם." },
+            ]}
+          />
+        </Section>
 
-        <section className="mt-14">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">איך משחקים — צעד אחר צעד</h2>
-          <ol className="mt-4 list-decimal space-y-2 pe-6 text-lg leading-relaxed text-neo-white">
-            <li>נכנסים ל<Link href="/he/daily" className="font-bold text-neo-lime underline">עמוד האתגר היומי</Link>.</li>
-            <li>בוחרים בין ציד המילים לגלגל המילים.</li>
-            <li>מפצחים את מילת היום במספר הניסיונות המותר.</li>
-            <li>משתפים את תוצאת האמוג&apos;י ובונים את הרצף היומי שלכם.</li>
-          </ol>
-        </section>
+        <Section title="שאלות נפוצות על המילה היומית">
+          <FaqList items={dailyWordHeFaqs} />
+        </Section>
 
-        <section className="mt-14">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">שאלות נפוצות על המילה היומית</h2>
-          <div className="mt-6 space-y-3">
-            {dailyWordHeFaqs.map((f) => (
-              <details
-                key={f.q}
-                className="rounded-neo border-neo border-neo-black bg-neo-navy-light p-4 shadow-hard-sm"
-              >
-                <summary className="cursor-pointer font-neo-display text-lg font-bold">{f.q}</summary>
-                <p className="mt-2 leading-relaxed text-neo-white">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-14 rounded-neo border-neo-thick border-neo-black bg-neo-navy-light p-6 shadow-hard">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">מוכנים לפצח את מילת היום?</h2>
-          <p className="mt-3 text-lg leading-relaxed text-neo-white">
-            המילה היומית מחכה. הצטרפו לשחקנים מכל העולם, התחילו רצף ותראו עד לאן תגיעו בטבלת המובילים.
-          </p>
-          <Link
-            href="/he/daily"
-            className="mt-5 inline-flex items-center justify-center rounded-neo border-neo-thick border-neo-black bg-neo-lime px-6 py-3 font-neo-display text-lg font-bold text-neo-black shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
-          >
-            שחקו עכשיו ▶
-          </Link>
-        </section>
-      </div>
-    </main>
+        <CtaBand
+          tone="cyan"
+          title="מוכנים לפצח את מילת היום?"
+          body="המילה היומית מחכה. הצטרפו לשחקנים מכל העולם, התחילו רצף ותראו עד לאן תגיעו בטבלת המובילים."
+          actions={<LandingButton href="/he/daily">שחקו עכשיו ▶</LandingButton>}
+          art={LANDING_ART.trophy('')}
+        />
+      </LandingPage>
+    </div>
   );
 }

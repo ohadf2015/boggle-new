@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { HeroAnimated } from '../HeroAnimated';
 import { FeatureGrid } from '../FeatureGrid';
@@ -7,7 +7,7 @@ import { StepsSection } from '../StepsSection';
 import { ModesShowcase } from '../ModesShowcase';
 import { FaqAccordion } from '../FaqAccordion';
 import { BottomCTA } from '../BottomCTA';
-import { FAQS, FEATURES, MODES, STATS, STEPS, HERO_TILES } from '../../data';
+import { FAQS, FEATURES, MODES, STATS, STEPS } from '../../data';
 
 vi.mock('framer-motion', () => {
   type Tag = keyof JSX.IntrinsicElements;
@@ -41,18 +41,12 @@ vi.mock('next/image', () => ({
 }));
 
 describe('Spanish MP landing — composition', () => {
-  it('HeroAnimated renders title, all hero tiles, both CTAs and stats', () => {
+  it('HeroAnimated renders title, both CTAs and stats', () => {
     render(<HeroAnimated locale="es" />);
     const heading = screen.getByRole('heading', { level: 1 });
     expect(heading).toHaveTextContent('Juega gratis Scrabble español sin registrarse');
     expect(screen.getByText('Scrabble español online gratis sin registrarse')).toBeInTheDocument();
     expect(screen.getAllByText(/sin email/i).length).toBeGreaterThan(0);
-    HERO_TILES.forEach((tile, i) => {
-      // Each tile letter shows up — match by exact text in a span
-      const matches = screen.getAllByText(tile.ch);
-      expect(matches.length).toBeGreaterThan(0);
-      void i;
-    });
     expect(screen.getByRole('link', { name: /jugar ahora/i })).toHaveAttribute('href', '/es/multiplayer');
     expect(screen.getByRole('link', { name: /probar solo/i })).toHaveAttribute('href', '/es/quick-play');
     STATS.forEach((s) => {
@@ -63,18 +57,17 @@ describe('Spanish MP landing — composition', () => {
   it('FeatureGrid renders every FEATURES entry', () => {
     render(<FeatureGrid />);
     FEATURES.forEach((f) => {
-      expect(screen.getByText(f.text)).toBeInTheDocument();
+      expect(screen.getByText(f)).toBeInTheDocument();
     });
   });
 
-  it('StepsSection renders 3 ordered steps with mascot images', () => {
+  it('StepsSection renders 3 ordered steps', () => {
     render(<StepsSection />);
+    expect(screen.getAllByRole('listitem')).toHaveLength(STEPS.length);
     STEPS.forEach((s) => {
       expect(screen.getByText(s.title)).toBeInTheDocument();
-      expect(screen.getByText(s.n)).toBeInTheDocument();
+      expect(screen.getByText(s.body)).toBeInTheDocument();
     });
-    // Three mascot images, one per step
-    expect(document.querySelectorAll('img').length).toBe(STEPS.length);
   });
 
   it('ModesShowcase renders all MODES entries', () => {
@@ -85,24 +78,17 @@ describe('Spanish MP landing — composition', () => {
     });
   });
 
-  it('FaqAccordion: first item open by default, click second toggles open and closes first', () => {
-    render(<FaqAccordion />);
-    const firstButton = screen.getByRole('button', { name: new RegExp(FAQS[0].q.slice(0, 25), 'i') });
-    expect(firstButton).toHaveAttribute('aria-expanded', 'true');
-
-    const secondButton = screen.getByRole('button', { name: new RegExp(FAQS[1].q.slice(0, 25), 'i') });
-    fireEvent.click(secondButton);
-
-    expect(secondButton).toHaveAttribute('aria-expanded', 'true');
-    expect(firstButton).toHaveAttribute('aria-expanded', 'false');
-  });
-
-  it('FaqAccordion: clicking the open item closes it (collapse)', () => {
-    render(<FaqAccordion />);
-    const firstButton = screen.getByRole('button', { name: new RegExp(FAQS[0].q.slice(0, 25), 'i') });
-    expect(firstButton).toHaveAttribute('aria-expanded', 'true');
-    fireEvent.click(firstButton);
-    expect(firstButton).toHaveAttribute('aria-expanded', 'false');
+  it('FaqAccordion renders every question with its answer in the DOM', () => {
+    const { container } = render(<FaqAccordion />);
+    expect(container.querySelectorAll('details')).toHaveLength(FAQS.length);
+    const [first, second] = container.querySelectorAll('details');
+    expect(first).toHaveAttribute('open');
+    expect(second).not.toHaveAttribute('open');
+    expect(second.getAttribute('name')).toBe(first.getAttribute('name'));
+    FAQS.forEach((f) => {
+      expect(screen.getByText(f.q)).toBeInTheDocument();
+      expect(screen.getByText(f.a)).toBeInTheDocument();
+    });
   });
 
   it('BottomCTA points the primary CTA to the locale multiplayer route', () => {

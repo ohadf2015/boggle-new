@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { CompareTable, CtaBand, FaqList, LandingButton, LandingHero, LandingPage, LinkPills, Prose, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const revalidate = 86400;
 
@@ -106,194 +107,102 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
   ];
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white" dir="rtl">
-      {/* Static JSON-LD content — all hardcoded strings, safe for dangerouslySetInnerHTML */}
-      <script
-        type="application/ld+json"
-         
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: faqs.map((faq) => ({
-              '@type': 'Question',
-              name: faq.q,
-              acceptedAnswer: {
-                '@type': 'Answer',
-                text: faq.a,
-              },
-            })),
-          }),
-        }}
-      />
+    <div dir="rtl">
+      <LandingPage locale={locale} play={{ href: `/${locale}/quick-play`, label: 'שחקו עכשיו - בחינם!' }}>
+        {/* Static JSON-LD content — all hardcoded strings, safe for dangerouslySetInnerHTML */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'FAQPage',
+              mainEntity: faqs.map((faq) => ({
+                '@type': 'Question',
+                name: faq.q,
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: faq.a,
+                },
+              })),
+            }),
+          }}
+        />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          לקסיקלאש נגד וורדל - איזה משחק מילים באמת שווה את הזמן שלכם?
-        </h1>
+        <LandingHero
+          eyebrow="LexiClash vs Wordle"
+          title="לקסיקלאש נגד וורדל - איזה משחק מילים באמת שווה את הזמן שלכם?"
+          lead="אוקיי, בואו נהיה כנים - וורדל הוא משחק מעולה."
+          actions={
+            <>
+              <LandingButton href={`/${locale}/quick-play`}>שחקו עכשיו - בחינם!</LandingButton>
+              <LandingButton href={`/${locale}/daily`} variant="secondary">אתגר יומי</LandingButton>
+            </>
+          }
+          art={LANDING_ART.duel('שני קמעות של LexiClash בדו-קרב מילים')}
+          artTone="pink"
+          more={
+            <p>
+              <Link href={`/${locale}/hamila-hayomit`}>המילה היומית</Link> הזו ממכרת, והריגוש של לפתור ב-3 ניחושים הוא
+              אמיתי. אבל מה קורה אחרי שסיימתם את המילה של היום? אתם סוגרים את הטאב וממתינים 24 שעות. בלקסיקלאש? אתם רק
+              מתחילים. מרובה משתתפים, קרבות בוסים, מצב Blast עם קומבואים מטורפים, והכי חשוב - הכל בעברית מלאה. בואו נעשה
+              את ההשוואה.
+            </p>
+          }
+        >
+          <LinkPills items={[{ href: `/${locale}/multiplayer`, label: 'מרובה משתתפים' }]} />
+        </LandingHero>
 
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          אוקיי, בואו נהיה כנים - וורדל הוא משחק מעולה. <Link href={`/${locale}/hamila-hayomit`} className="text-neo-cyan underline">המילה היומית</Link> הזו ממכרת, והריגוש של לפתור ב-3 ניחושים
-          הוא אמיתי. אבל מה קורה אחרי שסיימתם את המילה של היום? אתם סוגרים את הטאב וממתינים 24 שעות.
-          בלקסיקלאש? אתם רק מתחילים. מרובה משתתפים, קרבות בוסים, מצב Blast עם קומבואים מטורפים, והכי
-          חשוב - הכל בעברית מלאה. בואו נעשה את ההשוואה.
-        </p>
+        <Section title="טבלת השוואה: לקסיקלאש מול וורדל">
+          <CompareTable
+            columns={['תכונה', 'וורדל', 'לקסיקלאש']}
+            highlight={2}
+            rows={comparisonRows.map((row) => [row.feature, row.wordle, row.lexiclash])}
+          />
+        </Section>
 
-        {/* Comparison Table */}
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            טבלת השוואה: לקסיקלאש מול וורדל
-          </h2>
-          <div className="overflow-x-auto rounded-neo border-3 border-neo-lime shadow-hard">
-            <table className="w-full text-right">
-              <thead>
-                <tr className="border-b-3 border-neo-lime bg-neo-lime/10">
-                  <th className="px-4 py-3 font-bold text-neo-lime">תכונה</th>
-                  <th className="px-4 py-3 font-bold text-neo-gray-200">וורדל</th>
-                  <th className="px-4 py-3 font-bold text-neo-cyan">לקסיקלאש</th>
-                </tr>
-              </thead>
-              <tbody>
-                {comparisonRows.map((row, idx) => (
-                  <tr
-                    key={row.feature}
-                    className={`border-b border-neo-gray-400/30 ${idx % 2 === 0 ? 'bg-neo-navy/50' : ''}`}
-                  >
-                    <td className="px-4 py-3 font-bold">{row.feature}</td>
-                    <td className="px-4 py-3 text-neo-gray-200">{row.wordle}</td>
-                    <td className="px-4 py-3 text-neo-cyan">{row.lexiclash}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <Section title="אז למה לעבור מוורדל ללקסיקלאש?">
+          <TileGrid
+            items={[
+              { tone: 'lime', title: 'אינסוף משחקים', body: 'לא צריך לחכות ליום הבא. שחקו כמה שרוצים, מתי שרוצים.' },
+              { tone: 'pink', title: 'משחק עם חברים', body: 'צרו חדר, שלחו לינק, ותתחרו בזמן אמת. וורדל לא מאפשר את זה.' },
+              { tone: 'cyan', title: 'עברית אמיתית', body: '10,000+ מילים בעברית, ממשק בעברית מלאה, ותמיכה מושלמת ב-RTL.' },
+              { tone: 'yellow', title: 'מגוון מצבים', body: 'Blast, ציד מילים, קרבות בוסים, הרפתקה, אתגר יומי - משעמם פה? בלתי אפשרי.' },
+              { tone: 'orange', title: 'קומבואים ובוסים', body: 'מצאו מילים ברצף ותרגישו את הקומבו עולה. קרבות בוסים עם טוויסטים מפתיעים.' },
+              { tone: 'purple', title: 'דירוגים ופרסים', body: 'לוח תוצאות גלובלי, הישגים, ואתגרים יומיים עם פרסים בלעדיים.' },
+            ]}
+          />
+        </Section>
 
-        {/* Why LexiClash */}
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            אז למה לעבור מוורדל ללקסיקלאש?
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-neo border-3 border-neo-lime bg-neo-navy/50 p-5 shadow-hard">
-              <h3 className="mb-2 font-bold text-neo-lime">אינסוף משחקים</h3>
-              <p className="text-sm text-neo-gray-200">
-                לא צריך לחכות ליום הבא. שחקו כמה שרוצים, מתי שרוצים.
-              </p>
-            </div>
-            <div className="rounded-neo border-3 border-neo-pink bg-neo-navy/50 p-5 shadow-hard">
-              <h3 className="mb-2 font-bold text-neo-pink">משחק עם חברים</h3>
-              <p className="text-sm text-neo-gray-200">
-                צרו חדר, שלחו לינק, ותתחרו בזמן אמת. וורדל לא מאפשר את זה.
-              </p>
-            </div>
-            <div className="rounded-neo border-3 border-neo-cyan bg-neo-navy/50 p-5 shadow-hard">
-              <h3 className="mb-2 font-bold text-neo-cyan">עברית אמיתית</h3>
-              <p className="text-sm text-neo-gray-200">
-                10,000+ מילים בעברית, ממשק בעברית מלאה, ותמיכה מושלמת ב-RTL.
-              </p>
-            </div>
-            <div className="rounded-neo border-3 border-neo-pink bg-neo-navy/50 p-5 shadow-hard">
-              <h3 className="mb-2 font-bold text-neo-pink">מגוון מצבים</h3>
-              <p className="text-sm text-neo-gray-200">
-                Blast, ציד מילים, קרבות בוסים, הרפתקה, אתגר יומי - משעמם פה? בלתי אפשרי.
-              </p>
-            </div>
-            <div className="rounded-neo border-3 border-neo-lime bg-neo-navy/50 p-5 shadow-hard">
-              <h3 className="mb-2 font-bold text-neo-lime">קומבואים ובוסים</h3>
-              <p className="text-sm text-neo-gray-200">
-                מצאו מילים ברצף ותרגישו את הקומבו עולה. קרבות בוסים עם טוויסטים מפתיעים.
-              </p>
-            </div>
-            <div className="rounded-neo border-3 border-neo-cyan bg-neo-navy/50 p-5 shadow-hard">
-              <h3 className="mb-2 font-bold text-neo-cyan">דירוגים ופרסים</h3>
-              <p className="text-sm text-neo-gray-200">
-                לוח תוצאות גלובלי, הישגים, ואתגרים יומיים עם פרסים בלעדיים.
-              </p>
-            </div>
-          </div>
-        </section>
+        <Section title="וורדל מעולה - אבל לקסיקלאש זה משחק מילים שלם">
+          <Prose paper>
+            <p>
+              וורדל הצליח לעשות משהו גאוני: הוא הפך משחק מילים פשוט לתופעת אינטרנט. המגבלה של מילה אחת ביום יוצרת מחויבות
+              יומית ותחושת FOMO שגורמת לאנשים לחזור. אין ספק שזה עובד.
+            </p>
+            <p>
+              אבל מה אם אתם רוצים יותר? מה אם סיימתם את המילה בשתי דקות ואתם רוצים להמשיך? מה אם אתם רוצים לשחק עם חברים
+              ולא רק לשתף ריבועים ירוקים בוואטסאפ? וגם - מה עם עברית? וורדל עובד רק באנגלית (ובכמה שיבוטים לא רשמיים).
+            </p>
+            <p>
+              לקסיקלאש לוקח את הרעיון הבסיסי של &quot;מצא מילים ותרגיש גאון&quot; ומרחיב אותו לכל כיוון. רוצים להתחרות בזמן
+              אמת? יש. רוצים אתגר יומי עם דירוג? יש. רוצים מצב Blast עם קומבואים שגורמים למסך לרעוד? בהחלט יש. רוצים לשחק
+              בעברית עם מילון של 10,000+ מילים? ברור שיש.
+            </p>
+          </Prose>
+        </Section>
 
-        {/* Detailed comparison prose */}
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">
-            וורדל מעולה - אבל לקסיקלאש זה משחק מילים שלם
-          </h2>
-          <p className="mt-4 text-neo-gray-200">
-            וורדל הצליח לעשות משהו גאוני: הוא הפך משחק מילים פשוט לתופעת אינטרנט. המגבלה של מילה אחת ביום
-            יוצרת מחויבות יומית ותחושת FOMO שגורמת לאנשים לחזור. אין ספק שזה עובד.
-          </p>
-          <p className="mt-4 text-neo-gray-200">
-            אבל מה אם אתם רוצים יותר? מה אם סיימתם את המילה בשתי דקות ואתם רוצים להמשיך? מה אם אתם
-            רוצים לשחק עם חברים ולא רק לשתף ריבועים ירוקים בוואטסאפ? וגם - מה עם עברית? וורדל עובד רק
-            באנגלית (ובכמה שיבוטים לא רשמיים).
-          </p>
-          <p className="mt-4 text-neo-gray-200">
-            לקסיקלאש לוקח את הרעיון הבסיסי של &quot;מצא מילים ותרגיש גאון&quot; ומרחיב אותו לכל כיוון.
-            רוצים להתחרות בזמן אמת? יש. רוצים אתגר יומי עם דירוג? יש. רוצים מצב Blast עם קומבואים
-            שגורמים למסך לרעוד? בהחלט יש. רוצים לשחק בעברית עם מילון של 10,000+ מילים? ברור שיש.
-          </p>
-        </section>
+        <Section title="שאלות נפוצות">
+          <FaqList items={faqs} />
+        </Section>
 
-        {/* CTA Section */}
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row-reverse sm:gap-4">
-          <Link
-            href={`/${locale}/quick-play`}
-            className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
-          >
-            שחקו עכשיו - בחינם!
-          </Link>
-          <Link
-            href={`/${locale}/daily`}
-            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4"
-          >
-            אתגר יומי
-          </Link>
-          <Link
-            href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
-          >
-            מרובה משתתפים
-          </Link>
-        </section>
-
-        {/* FAQ */}
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">שאלות נפוצות</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details
-                key={`faq-${idx}-${faq.q}`}
-                className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard"
-              >
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                  <span>{faq.q}</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        {/* Cross-link */}
-        <section className="mb-12 rounded-neo border-3 border-neo-pink bg-neo-navy/50 p-6 shadow-hard">
-          <h2 className="mb-3 font-neo-display text-xl font-bold sm:text-2xl">
-            רוצים לדעת עוד על משחקי מילים בעברית?
-          </h2>
-          <p className="mb-4 text-neo-gray-200">
-            קראו את המדריך המלא שלנו למשחקי מילים מרובי משתתפים בעברית - כולל טיפים, אסטרטגיות וכל מה
-            שצריך כדי לנצח.
-          </p>
-          <Link
-            href="/he/hebrew-multiplayer-word-game"
-            className="inline-block rounded-neo border-3 border-neo-pink bg-neo-pink/10 px-5 py-2 font-bold text-neo-pink transition-[background-color] hover:bg-neo-pink/20"
-          >
-            למדריך המלא &larr;
-          </Link>
-        </section>
-      </div>
-    </main>
+        <CtaBand
+          tone="pink"
+          title="רוצים לדעת עוד על משחקי מילים בעברית?"
+          body="קראו את המדריך המלא שלנו למשחקי מילים מרובי משתתפים בעברית - כולל טיפים, אסטרטגיות וכל מה שצריך כדי לנצח."
+          actions={<LandingButton href="/he/hebrew-multiplayer-word-game">למדריך המלא &larr;</LandingButton>}
+          art={LANDING_ART.trophy('')}
+        />
+      </LandingPage>
+    </div>
   );
 }

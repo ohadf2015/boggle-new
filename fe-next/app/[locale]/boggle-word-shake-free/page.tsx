@@ -1,6 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
+import {
+  CheckList,
+  CompareTable,
+  CtaBand,
+  FaqList,
+  LandingButton,
+  LandingHero,
+  LandingPage,
+  Prose,
+  Section,
+  Steps,
+  TileGrid,
+} from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 import BoggleWordShakeGameClient from './PageClient';
 
 export const dynamic = 'force-dynamic';
@@ -111,179 +124,109 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
   const { locale } = await params;
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/quick-play`, label: 'Play Word Shake Solo — Free' }}>
       {/* JSON-LD: static hardcoded content only, no user input — safe for inline serialization */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: howToJsonLd }} />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
+      <LandingHero
+        title="Boggle Shake Free Online — Play in Browser, No Download"
+        lead="LexiClash is a free online Boggle Word Shake game: shake a letter grid, find hidden words, and compete live with friends — no download, no signup."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/quick-play`}>Play Word Shake Solo — Free</LandingButton>
+            <LandingButton href={`/${locale}/multiplayer`} variant="secondary">
+              Play With Friends
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.solver('A LexiClash mascot hunting for words on a shaken letter grid')}
+        artTone="yellow"
+      >
+        <Link href={`/${locale}/daily-word-wheel`} className="font-bold text-neo-lime underline underline-offset-4">
+          Daily Word Wheel →
+        </Link>
+      </LandingHero>
 
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Boggle Shake Free Online — Play in Browser, No Download
-        </h1>
-
-        <section className="mb-8" aria-labelledby="wordplay-boggle-shake">
-          <h2 id="wordplay-boggle-shake" className="mb-3 font-neo-display text-2xl font-bold sm:text-3xl">
-            What is wordplay boggle shake?
-          </h2>
-          <p className="mb-4 text-lg leading-relaxed text-neo-gray-200">{WORDPLAY_BOGGLE_SHAKE_ANSWER}</p>
-          <p className="mb-3 text-sm text-neo-gray-400">
-            Classic Boggle scoring (Parker Brothers, 1973). Page updated October 2026.
+      <section className="grid items-start gap-8 lg:grid-cols-[3fr_2fr] lg:gap-12" aria-labelledby="wordplay-boggle-shake">
+        <Prose paper>
+          <h2 id="wordplay-boggle-shake">What is wordplay boggle shake?</h2>
+          <p>{WORDPLAY_BOGGLE_SHAKE_ANSWER}</p>
+          <p>
+            Miss the classic Boggle Shake game? LexiClash brings the same scramble-and-find gameplay to your browser —
+            completely free, no download required. Shake up a grid of letters, find as many words as you can, and compete
+            against friends or AI bots in real-time. Looking for free boggle online no download? You found it. Choose from
+            4x4, 5x5, or 6x6 grids with combo scoring for extra challenge.
           </p>
-          <table className="mb-2 w-full max-w-sm border-collapse text-sm">
-            <caption className="mb-2 text-left font-bold text-neo-lime">
-              Classic Boggle points by word length
-            </caption>
-            <thead>
-              <tr className="border-b-2 border-neo-cyan text-left">
-                <th className="py-2 pr-4 font-bold">Letters</th>
-                <th className="py-2 font-bold">Points</th>
-              </tr>
-            </thead>
-            <tbody>
-              {classicBoggleScoring.map((row) => (
-                <tr key={row.letters} className="border-b border-neo-gray-400/40">
-                  <td className="py-2 pr-4">{row.letters}</td>
-                  <td className="py-2">{row.points}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
+        </Prose>
+        <div className="flex flex-col gap-3">
+          <h3 className="font-neo-display text-xl font-bold">Classic Boggle points by word length</h3>
+          <CompareTable
+            highlight={-1}
+            columns={['Letters', 'Points']}
+            rows={classicBoggleScoring.map((row) => [row.letters, row.points])}
+            caption="Classic Boggle scoring (Parker Brothers, 1973). Page updated October 2026."
+          />
+        </div>
+      </section>
 
-        <p className="mb-4 text-lg font-bold leading-relaxed text-neo-lime">
-          LexiClash is a free online Boggle Word Shake game: shake a letter grid, find hidden words, and compete live with friends — no download, no signup.
-        </p>
-
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Miss the classic Boggle Shake game? LexiClash brings the same scramble-and-find gameplay to your browser —
-          completely free, no download required. Shake up a grid of letters, find as many words as you can, and compete
-          against friends or AI bots in real-time. Looking for free boggle online no download? You found it. Choose from
-          4x4, 5x5, or 6x6 grids with combo scoring for extra challenge.
-        </p>
-
-        <section className="mb-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link
-            href={`/${locale}/quick-play`}
-            className="rounded-neo border-4 border-neo-yellow bg-neo-yellow px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
-          >
-            Play Word Shake Solo — Free
-          </Link>
-          <Link
-            href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
-          >
-            Play With Friends
-          </Link>
-          <Link
-            href={`/${locale}/daily-word-wheel`}
-            className="rounded-neo border-4 border-neo-lime bg-transparent px-6 py-3 text-center font-bold text-neo-lime shadow-hard transition-[background-color] hover:bg-neo-lime/10 sm:px-8 sm:py-4"
-          >
-            Daily Word Wheel
-          </Link>
-        </section>
-      </div>
-
-      {/* Live playable Boggle Word Shake game — rendered immediately on this URL */}
-      <section aria-label="Play Boggle Word Shake" className="relative flex h-[650px] min-h-[650px] w-full flex-col lg:h-[750px]">
+      {/* Live playable Boggle Word Shake game: the shell holds the space until the game mounts as a full-screen layer */}
+      <section aria-label="Play Boggle Word Shake" className="relative flex w-full flex-col [&_[data-phase=playing]]:h-0 [&_[data-phase=playing]]:min-h-0">
         <BoggleWordShakeGameClient />
       </section>
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            How to Play Boggle Word Shake Online
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { step: '1', title: 'Open LexiClash', desc: 'Visit lexiclash.live — works on any device. No download or signup.' },
-              { step: '2', title: 'Start a Game', desc: 'Play solo vs AI bots, or create a room and invite 2-20+ friends via link.' },
-              { step: '3', title: 'Shake & Find Words', desc: 'Letters scramble on the grid. Connect adjacent letters to form words. Longer = more points!' },
-            ].map((item) => (
-              <div key={item.step} className="rounded-neo border-3 border-neo-cyan bg-neo-navy/50 p-5 shadow-hard">
-                <div className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-full border-3 border-neo-cyan bg-neo-cyan/20 font-bold text-neo-cyan">
-                  {item.step}
-                </div>
-                <h3 className="mb-1 font-bold text-neo-cyan">{item.title}</h3>
-                <p className="text-sm text-neo-gray-200">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      <Section title="How to Play Boggle Word Shake Online">
+        <Steps
+          items={[
+            { title: 'Open LexiClash', body: 'Visit lexiclash.live — works on any device. No download or signup.' },
+            { title: 'Start a Game', body: 'Play solo vs AI bots, or create a room and invite 2-20+ friends via link.' },
+            { title: 'Shake & Find Words', body: 'Letters scramble on the grid. Connect adjacent letters to form words. Longer = more points!' },
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            Why LexiClash Beats the Original Word Shake
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              'Same scramble-and-find gameplay you love',
-              'Real-time multiplayer with 2-20+ players',
-              'Multiple grid sizes: 4x4, 5x5, 6x6',
-              'Combo scoring for fast word chains',
-              'No download — plays in any browser',
-              'Daily challenges with global leaderboard',
-              'Available in 6 languages',
-              'Adventure mode with boss battles',
-            ].map((feature) => (
-              <div key={feature} className="flex gap-3 rounded-neo border-3 border-neo-yellow bg-neo-navy/50 p-4 shadow-hard">
-                <span className="shrink-0 text-neo-yellow">&#10003;</span>
-                <p className="text-sm sm:text-base">{feature}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      <Section title="Why LexiClash Beats the Original Word Shake">
+        <CheckList
+          items={[
+            'Same scramble-and-find gameplay you love',
+            'Real-time multiplayer with 2-20+ players',
+            'Multiple grid sizes: 4x4, 5x5, 6x6',
+            'Combo scoring for fast word chains',
+            'No download — plays in any browser',
+            'Daily challenges with global leaderboard',
+            'Available in 6 languages',
+            'Adventure mode with boss battles',
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}-${faq.q}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-yellow transition-transform group-open:rotate-180">&#9660;</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+      <Section title="Frequently Asked Questions">
+        <FaqList items={faqs} />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More Word Games</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
-              <h3 className="font-bold text-neo-cyan">Play Boggle Online Free</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">The full free Boggle experience</p>
-            </Link>
-            <Link href={`/${locale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-lime">Daily Word Wheel</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">New puzzle every day</p>
-            </Link>
-            <Link href="/en/words-with-friends-alternative" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink/40">
-              <h3 className="font-bold text-neo-pink">vs Words With Friends</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Real-time, not turn-based</p>
-            </Link>
-          </div>
-        </section>
+      <Section title="More Word Games">
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: `/${locale}/play-boggle-online-free`, title: 'Play Boggle Online Free', body: 'The full free Boggle experience' },
+            { href: `/${locale}/daily-word-wheel`, title: 'Daily Word Wheel', body: 'New puzzle every day' },
+            { href: '/en/words-with-friends-alternative', title: 'vs Words With Friends', body: 'Real-time, not turn-based' },
+          ]}
+        />
+      </Section>
 
-        <section>
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Start Shaking Words Now</h2>
-          <p className="mt-4 text-neo-gray-200">
+      <CtaBand
+        tone="yellow"
+        title="Start Shaking Words Now"
+        body={
+          <>
             No need to search for &quot;boggle word shake free no download&quot; anymore — you found it.
             Play the best free Boggle Word Shake alternative right now in your browser.
-          </p>
-          <div className="mt-6">
-            <Link
-              href={`/${locale}/quick-play`}
-              className="inline-block rounded-neo border-4 border-neo-yellow bg-neo-yellow px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg"
-            >
-              Play Boggle Word Shake Free
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+          </>
+        }
+        actions={<LandingButton href={`/${locale}/quick-play`}>Play Boggle Word Shake Free</LandingButton>}
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

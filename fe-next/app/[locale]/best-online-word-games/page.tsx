@@ -1,6 +1,17 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
+import {
+  CompareTable,
+  CtaBand,
+  FaqList,
+  LandingButton,
+  LandingHero,
+  LandingPage,
+  Mark,
+  Section,
+  TileGrid,
+} from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
+import { games } from './games';
 import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 
@@ -157,462 +168,225 @@ const articleJsonLd = JSON.stringify({
   image: 'https://www.lexiclash.live/og-image-en.webp',
 });
 
-const games = [
-  {
-    name: 'LexiClash',
-    verdict: 'Our Pick',
-    tagline: 'Eight modes, one browser tab',
-    blurb: 'LexiClash scratches an itch that other word games don&apos;t. The real-time multiplayer is genuinely thrilling — finding words while racing against actual humans feels completely different from taking turns. But the wild thing is the depth: adventure mode with roguelike boss battles, daily Word Hunt Survival (Wordle×Boggle hybrid), Word Wheel daily, Blast cascading combos, brain drills, vocabulary duels for classrooms, and TV+phone party games. Most word games are one mode. This is eight.',
-    modes: ['Multiplayer Grid Battle (2-20 players, real-time)', 'Word Hunt Survival (Wordle-style daily, 10 attempts)', 'Daily Word Wheel (global leaderboard)', 'Adventure (roguelike, boss battles, abilities)', 'Blast (cascading combos, juice effects)', 'Brain Drills (60-sec vocabulary sprints)', 'Vocabulary Duels (1v1, teacher dashboard)', 'Party Games (TV + phone hybrid)'],
-    pros: ['Unlimited free play, no catches', 'Real-time multiplayer with up to 20+ players', 'Works in the browser — just share a link', 'Eight game modes, not just one', 'Adventure mode gives you actual progression', '6 languages including Hebrew (RTL) and Japanese'],
-    cons: ['Smaller player base than the big names (growing fast though)', 'No turn-based async mode if that&apos;s your thing'],
-    type: 'Grid word-finding + 7 more modes',
-    multiplayer: 'Real-time, 2-20+ players',
-    free: 'Fully free',
-    ads: 'Optional rewarded only',
-    download: 'No (browser)',
-    languages: '5 (EN · HE · SV · JA · ES)',
-    daily: 'Yes + global leaderboard',
-    color: 'neo-lime',
-  },
-  {
-    name: 'Wordle',
-    verdict: null,
-    tagline: 'The five-letter puzzle that took over the world',
-    blurb: 'There&apos;s a reason Wordle became a cultural phenomenon. One puzzle a day, six guesses, no fluff. It respects your time in a way most games don&apos;t. The shareable emoji grids are brilliant social design. The downside? Once you solve it (or fail), you&apos;re done until tomorrow. No multiplayer, no progression — just pure, elegant simplicity.',
-    pros: ['Zero ads, clean experience', 'Perfect 2-minute daily ritual', 'Shareable results without spoilers', 'Accessible to literally anyone'],
-    cons: ['One puzzle per day, that&apos;s it', 'No multiplayer at all', 'Now behind the NYT paywall ecosystem', 'English only'],
-    type: '5-letter word guessing',
-    multiplayer: 'None',
-    free: 'Yes (part of NYT bundle)',
-    ads: 'None',
-    download: 'No (browser)',
-    languages: '1 (English)',
-    daily: 'Yes (1 puzzle/day)',
-    color: 'neo-cyan',
-  },
-  {
-    name: 'Scrabble GO',
-    verdict: null,
-    tagline: 'The classic board game, now with way too many ads',
-    blurb: 'If you grew up playing Scrabble, this is the real deal — official rules, proper scoring, tournament mode. The strategy of tile placement on a board is genuinely deep. But Scopely buried a great game under aggressive monetization. Expect ads every 30 seconds and constant nudges to buy things. The core game is still Scrabble though, and that counts for a lot.',
-    pros: ['Official Scrabble rules and dictionary', 'Deep tile-placement strategy', 'Tournament and ranked modes', 'Huge player base'],
-    cons: ['Ads are relentless — every 30 seconds', 'Heavy push toward in-app purchases', 'App download required', 'Lots of bot opponents disguised as players'],
-    type: 'Tile placement on board',
-    multiplayer: 'Turn-based, 2 players',
-    free: 'Free (heavy ads + IAP)',
-    ads: 'Mandatory, frequent',
-    download: 'Yes (app required)',
-    languages: '1',
-    daily: 'Limited events',
-    color: 'neo-pink',
-  },
-  {
-    name: 'Words With Friends',
-    verdict: null,
-    tagline: 'Still the go-to for playing with one friend',
-    blurb: 'Words With Friends carved out its own space as the social word game. It&apos;s perfect for keeping a running game with a friend or family member across the country — take your turn whenever, no pressure. The chat feature makes it feel personal. It&apos;s not trying to be flashy, and that&apos;s fine. The ads between games are annoying but tolerable.',
-    pros: ['Great for async play with specific people', 'Massive existing player base', 'In-game chat makes it social', 'Simple, familiar format'],
-    cons: ['Turn-based only — no real-time option', 'Interstitial ads between games', 'App download required', 'Hasn&apos;t innovated much in years'],
-    type: 'Tile placement on board',
-    multiplayer: 'Turn-based, 2 players',
-    free: 'Free (ads + IAP)',
-    ads: 'Interstitials between games',
-    download: 'Yes (app required)',
-    languages: '1',
-    daily: 'No',
-    color: 'neo-purple',
-  },
-  {
-    name: 'Wordscapes',
-    verdict: null,
-    tagline: 'The word game you play to unwind',
-    blurb: 'Wordscapes isn&apos;t trying to challenge you — it&apos;s trying to relax you. The crossword-meets-anagram format is satisfying in a low-stakes way, and the nature backgrounds are genuinely pretty. With 6000+ levels, there&apos;s no shortage of content. It&apos;s the word game equivalent of a warm bath. Just be ready for a lot of ads between levels.',
-    pros: ['Genuinely relaxing gameplay', 'Beautiful nature-themed backgrounds', '6000+ levels of content', 'Easy to pick up and put down'],
-    cons: ['No multiplayer whatsoever', 'Frequent interstitial ads', 'Gets repetitive after a while', 'App download required'],
-    type: 'Crossword fill-in',
-    multiplayer: 'None',
-    free: 'Free (heavy ads)',
-    ads: 'Frequent interstitials',
-    download: 'Yes (app required)',
-    languages: '1',
-    daily: 'Yes',
-    color: 'neo-cyan',
-  },
-  {
-    name: 'NYT Connections',
-    verdict: null,
-    tagline: 'Group 16 words into 4 categories — harder than it sounds',
-    blurb: 'Connections became the second-biggest NYT game almost overnight. You get 16 words, four hidden categories, and four guesses before you&apos;re out. The trick is that the categories are deliberately misleading — words that seem related often aren&apos;t, and the purple group is designed to make you sweat. At 3.3 billion plays in 2025, it&apos;s not just a Wordle sideshow anymore.',
-    pros: ['Addictive "aha moment" gameplay', 'Great at the dinner table — everyone argues', 'Clean design, no clutter', 'Free daily puzzle'],
-    cons: ['One puzzle per day', 'No multiplayer', 'Can feel arbitrary when categories are too obscure', 'English only, NYT ecosystem'],
-    type: 'Category grouping',
-    multiplayer: 'None',
-    free: 'Yes (part of NYT bundle)',
-    ads: 'None',
-    download: 'No (browser)',
-    languages: '1 (English)',
-    daily: 'Yes (1 puzzle/day)',
-    color: 'neo-pink',
-  },
-  {
-    name: 'NYT Strands',
-    verdict: null,
-    tagline: 'A themed word search that actually makes you think',
-    blurb: 'Strands took the word search format and made it smart. Every puzzle has a theme, and all the hidden words connect to it. Find the "spangram" that spans the whole board and you&apos;re golden. It&apos;s more satisfying than a regular word search because the theme gives you a foothold — you&apos;re not just pattern-matching, you&apos;re thinking. 1.3 billion plays and an archive added in late 2025.',
-    pros: ['Themes make each puzzle feel unique', 'Satisfying spangram mechanic', 'Hint system is well-designed', 'Free with full archive'],
-    cons: ['One puzzle per day', 'No multiplayer', 'Some themes are too easy', 'English only'],
-    type: 'Themed word search',
-    multiplayer: 'None',
-    free: 'Yes (part of NYT bundle)',
-    ads: 'None',
-    download: 'No (browser)',
-    languages: '1 (English)',
-    daily: 'Yes (1 puzzle/day)',
-    color: 'neo-cyan',
-  },
-  {
-    name: 'NYT Spelling Bee',
-    verdict: null,
-    tagline: 'Seven letters, one rule: use the center letter',
-    blurb: 'Spelling Bee gives you seven letters in a honeycomb and asks you to make as many words as possible using the center letter. Finding a pangram (using all seven) is the high you keep chasing. The ranking system from Beginner to Genius to Queen Bee is oddly motivating. Fair warning: it went behind the NYT paywall in 2025, so the full experience now costs money.',
-    pros: ['Simple rules, deep gameplay', 'Pangram hunting is genuinely thrilling', 'Progress ranks keep you coming back', 'Clean, focused design'],
-    cons: ['Paywalled past "Good" level since 2025', 'Can be frustrating when obvious words aren&apos;t accepted', 'No multiplayer', 'English only'],
-    type: 'Letter arrangement',
-    multiplayer: 'None',
-    free: 'Freemium (paywall after "Good")',
-    ads: 'None',
-    download: 'No (browser)',
-    languages: '1 (English)',
-    daily: 'Yes (1 puzzle/day)',
-    color: 'neo-lime',
-  },
-  {
-    name: 'Semantle / Contexto',
-    verdict: null,
-    tagline: 'Guess the word using meaning, not letters — powered by AI',
-    blurb: 'This is the weird one on the list, and that&apos;s a compliment. Instead of letter clues, you get told how semantically close your guess is to the secret word. "Dog" might be rated 85/100 if the answer is "cat." It uses actual AI word embeddings, which means your intuition about language gets tested in ways no other game does. Semantle is the harder original; Contexto is the polished mobile version. Both have cult followings.',
-    pros: ['Completely unique mechanic — nothing else like it', 'Tests vocabulary depth, not just spelling', 'Free, daily puzzle, no ads', 'Makes you think about language differently'],
-    cons: ['Brutally hard — some puzzles take 100+ guesses', 'Can feel random when the AI similarity model disagrees with your brain', 'No multiplayer', 'Niche audience'],
-    type: 'AI semantic guessing',
-    multiplayer: 'None',
-    free: 'Yes',
-    ads: 'None (Semantle) / Light (Contexto)',
-    download: 'No (browser) / App (Contexto)',
-    languages: 'Multiple (Contexto)',
-    daily: 'Yes (1 puzzle/day)',
-    color: 'neo-purple',
-  },
+const QUICK_PICKS = [
+  { tag: 'REAL-TIME MULTIPLAYER', title: 'LexiClash', sub: 'Free, browser-based, 2-20+ players play the same grid simultaneously. The Words With Friends alternative for groups.', tone: 'pink' },
+  { tag: 'PARTY GAMES', title: 'LexiClash Party', sub: 'TV + phone hybrid rooms. 20+ players. Wheel Rush, Connections-style, Codenames-style group games.', tone: 'pink' },
+  { tag: 'CLASSROOMS / EDU', title: 'LexiClash Education', sub: 'Vocabulary duels, custom word lists, teacher dashboard. Free, no student accounts. ESL-friendly in 5 langs.', tone: 'lime' },
+  { tag: 'WWF REPLACEMENT', title: 'LexiClash Multiplayer', sub: 'Same social itch, faster. Real-time grid battles end in 2-3 min instead of days of turn-waiting.', tone: 'pink' },
+  { tag: '2-MIN DAILY RITUAL', title: 'Wordle', sub: 'One clean puzzle a day. Zero ads. Perfect for the morning coffee. Behind the NYT bundle now.', tone: 'cyan' },
+  { tag: 'GROUP DINNER GAME', title: 'NYT Connections', sub: '16 words, 4 hidden categories. Everyone argues, nobody agrees. Best dinner-table word game of 2026.', tone: 'cyan' },
+  { tag: 'WORDLE-MEETS-BOGGLE', title: 'LexiClash Word Hunt', sub: 'Daily 4-6 letter target word, 10 attempts, green/yellow feedback overlaid on a Boggle grid. Unique format.', tone: 'cyan' },
+  { tag: 'STORY MODE', title: 'LexiClash Adventure', sub: 'Roguelike word-crawler. Boss battles, abilities, loot. 5-8 rooms per run, 3 chapters. Eats evenings.', tone: 'purple' },
+  { tag: 'MOST UNIQUE', title: 'Semantle / Contexto', sub: 'Guess by meaning, not letters. AI similarity scores. Brutal but addictive. Niche but special.', tone: 'purple' },
+  { tag: 'ASYNC TURN-BASED', title: 'Words With Friends', sub: 'Best for keeping a slow game with one specific friend. Take turns over days. App required.', tone: 'cyan' },
+  { tag: 'CLASSIC SCRABBLE', title: 'Scrabble GO', sub: 'Official rules, deep strategy, but ad-heavy. App required. The traditionalist pick.', tone: 'pink' },
+  { tag: 'NO ADS, EVER', title: 'Wordle + LexiClash', sub: 'The only two on this list with zero forced interstitial ads. Respect-your-time word games.', tone: 'lime' },
+] as const;
+
+const COMPARE_ROWS = [
+  ['LexiClash', '2-20 real-time', 'Wheel + Hunt', 'Yes', 'Yes', 'Real-time play with friends + groups'],
+  ['Wordle', 'No', '1/day', 'Freemium', 'Yes', '2-min daily ritual'],
+  ['NYT Connections', 'No', '1/day', 'Freemium', 'Yes', 'Group dinner-table arguing'],
+  ['NYT Strands', 'No', '1/day', 'Freemium', 'Yes', 'Themed word-search lovers'],
+  ['NYT Spelling Bee', 'No', '1/day', 'Freemium', 'Yes', 'Vocabulary endurance'],
+  ['Words With Friends', '1v1 async', 'No', 'Free w/ ads', 'App only', 'Async turn-based with 1 friend'],
+  ['Scrabble GO', '1v1 async', 'No', 'Free w/ ads', 'App only', 'Traditional Scrabble rules'],
+  ['Wordscapes', 'No', 'No', 'Free w/ ads', 'App only', 'Solo grind, 6000+ levels'],
+  ['Semantle / Contexto', 'No', '1/day', 'Yes', 'Yes', 'Semantic-guessing puzzlers'],
 ];
+
+const H4 = 'mb-1 text-xs font-bold uppercase tracking-wide';
 
 export default async function BestOnlineWordGamesPage({ params }: PageProps) {
   const { locale } = await params;
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
-      {/* SSR-safe: rendered into initial HTML, visible to Googlebot */}
+    <LandingPage locale={locale} play={{ href: `/${locale}/quick-play`, label: 'Play LexiClash Free' }}>
       <FaqPageJsonLd faqs={faqs} />
       <VideoGameJsonLd />
-      {/* Article + ItemList remain client-side until wrapper components exist */}
       <script id="ld-itemlist" type="application/ld+json" dangerouslySetInnerHTML={{ __html: itemListJsonLd }} />
       <script id="ld-article" type="application/ld+json" dangerouslySetInnerHTML={{ __html: articleJsonLd }} />
 
-      {/* STICKER MARQUEE */}
-      <div className="border-y-3 border-neo-black bg-neo-yellow overflow-hidden">
-        <div className="flex animate-[scroll_30s_linear_infinite] gap-6 whitespace-nowrap py-2 font-neo-display text-sm font-black uppercase tracking-widest text-neo-navy sm:text-base">
-          {[...['9 GAMES RANKED','HONEST PROS & CONS','NO AFFILIATE FLUFF','UPDATED 2026','FREE PICKS ONLY','PARTY · DAILY · CHILL'], ...['9 GAMES RANKED','HONEST PROS & CONS','NO AFFILIATE FLUFF','UPDATED 2026','FREE PICKS ONLY','PARTY · DAILY · CHILL'], ...['9 GAMES RANKED','HONEST PROS & CONS','NO AFFILIATE FLUFF','UPDATED 2026','FREE PICKS ONLY','PARTY · DAILY · CHILL']].map((b, i) => (
-            <span key={`b-${i}`} className="inline-flex items-center gap-3"><span>★</span><span>{b}</span></span>
-          ))}
-        </div>
-      </div>
+      <LandingHero
+        eyebrow="★ The 2026 Word Game Index ★"
+        title={
+          <>
+            We played every major word game
+            <br />
+            <Mark>so you don&apos;t have to.</Mark>
+          </>
+        }
+        lead={
+          <>
+            We&apos;re word game people. The kind who play Wordle at midnight, keep three Words With Friends
+            games running at once, and have strong opinions about double-letter tiles.
+          </>
+        }
+        actions={
+          <>
+            <LandingButton href={`/${locale}/quick-play`}>Play LexiClash Free</LandingButton>
+            <LandingButton href={`/${locale}/daily`} variant="secondary">
+              Try the Daily Challenge
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.reading('A LexiClash mascot reading a thick book of word games')}
+        artTone="yellow"
+        more={
+          <>
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+              <span>
+                <span className="font-bold uppercase tracking-wide text-neo-yellow">Last updated:</span>{' '}
+                <time dateTime="2026-05-13">May 13, 2026</time>
+              </span>
+              <span aria-hidden>·</span>
+              <span>By the LexiClash Editorial Team — word-game players since 2024</span>
+            </p>
+            <p>
+              So we spent weeks playing every major word game out there in 2026 — the classics, the newcomers,
+              the ones your aunt won&apos;t stop recommending. Here&apos;s what&apos;s actually worth your time,
+              and what&apos;s coasting on name recognition.
+            </p>
+            <p className="text-xs font-bold uppercase tracking-wide text-neo-white/60">
+              9 GAMES RANKED · HONEST PROS &amp; CONS · NO AFFILIATE FLUFF · UPDATED 2026 · FREE PICKS ONLY · PARTY · DAILY · CHILL
+            </p>
+          </>
+        }
+      />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
-        <span className="mb-4 inline-block rotate-[-2deg] rounded-neo border-3 border-neo-black bg-neo-pink px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-white shadow-hard">★ The 2026 Word Game Index ★</span>
-        <h1 className="mb-3 font-neo-display text-4xl font-black leading-tight sm:text-5xl">
-          We played every major word game<br /><span className="bg-neo-lime px-3 text-neo-navy shadow-hard inline-block rotate-[-1deg]">so you don&apos;t have to.</span>
-        </h1>
-        <p className="mb-6 flex flex-wrap items-center gap-3 text-sm text-neo-gray-200">
-          <span className="inline-flex items-center gap-2">
-            <span className="font-bold uppercase tracking-widest text-neo-yellow">Last updated:</span>
-            <time dateTime="2026-05-13">May 13, 2026</time>
-          </span>
-          <span className="text-neo-gray-400">·</span>
-          <span>By the LexiClash Editorial Team — word-game players since 2024</span>
-        </p>
+      <TileGrid
+        variant="paper"
+        columns={4}
+        items={QUICK_PICKS.map((q) => ({
+          tone: q.tone,
+          icon: <span className="text-[11px] font-bold uppercase tracking-wide text-neo-black/60">{q.tag}</span>,
+          title: q.title,
+          body: q.sub,
+        }))}
+      />
 
-        <p className="mb-4 text-lg leading-relaxed text-neo-gray-200">
-          We&apos;re word game people. The kind who play Wordle at midnight, keep three Words With Friends
-          games running at once, and have strong opinions about double-letter tiles.
-        </p>
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          So we spent weeks playing every major word game out there in 2026 — the classics, the newcomers,
-          the ones your aunt won&apos;t stop recommending. Here&apos;s what&apos;s actually worth your time,
-          and what&apos;s coasting on name recognition.
-        </p>
-
-        {/* Quick Picks — categories mirror how AI assistants bucket recommendations */}
-        <section className="mb-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            { tag: 'REAL-TIME MULTIPLAYER', title: 'LexiClash', sub: 'Free, browser-based, 2-20+ players play the same grid simultaneously. The Words With Friends alternative for groups.', accent: 'border-neo-pink text-neo-pink', chip: 'bg-neo-pink text-neo-white' },
-            { tag: 'PARTY GAMES', title: 'LexiClash Party', sub: 'TV + phone hybrid rooms. 20+ players. Wheel Rush, Connections-style, Codenames-style group games.', accent: 'border-neo-pink text-neo-pink', chip: 'bg-neo-pink text-neo-white' },
-            { tag: 'CLASSROOMS / EDU', title: 'LexiClash Education', sub: 'Vocabulary duels, custom word lists, teacher dashboard. Free, no student accounts. ESL-friendly in 5 langs.', accent: 'border-neo-lime text-neo-lime', chip: 'bg-neo-lime text-neo-navy' },
-            { tag: 'WWF REPLACEMENT', title: 'LexiClash Multiplayer', sub: 'Same social itch, faster. Real-time grid battles end in 2-3 min instead of days of turn-waiting.', accent: 'border-neo-pink text-neo-pink', chip: 'bg-neo-pink text-neo-white' },
-            { tag: '2-MIN DAILY RITUAL', title: 'Wordle', sub: 'One clean puzzle a day. Zero ads. Perfect for the morning coffee. Behind the NYT bundle now.', accent: 'border-neo-cyan text-neo-cyan', chip: 'bg-neo-cyan text-neo-navy' },
-            { tag: 'GROUP DINNER GAME', title: 'NYT Connections', sub: '16 words, 4 hidden categories. Everyone argues, nobody agrees. Best dinner-table word game of 2026.', accent: 'border-neo-cyan text-neo-cyan', chip: 'bg-neo-cyan text-neo-navy' },
-            { tag: 'WORDLE-MEETS-BOGGLE', title: 'LexiClash Word Hunt', sub: 'Daily 4-6 letter target word, 10 attempts, green/yellow feedback overlaid on a Boggle grid. Unique format.', accent: 'border-neo-cyan text-neo-cyan', chip: 'bg-neo-cyan text-neo-navy' },
-            { tag: 'STORY MODE', title: 'LexiClash Adventure', sub: 'Roguelike word-crawler. Boss battles, abilities, loot. 5-8 rooms per run, 3 chapters. Eats evenings.', accent: 'border-neo-purple text-neo-purple', chip: 'bg-neo-purple text-neo-white' },
-            { tag: 'MOST UNIQUE', title: 'Semantle / Contexto', sub: 'Guess by meaning, not letters. AI similarity scores. Brutal but addictive. Niche but special.', accent: 'border-neo-purple text-neo-purple', chip: 'bg-neo-purple text-neo-white' },
-            { tag: 'ASYNC TURN-BASED', title: 'Words With Friends', sub: 'Best for keeping a slow game with one specific friend. Take turns over days. App required.', accent: 'border-neo-cyan text-neo-cyan', chip: 'bg-neo-cyan text-neo-navy' },
-            { tag: 'CLASSIC SCRABBLE', title: 'Scrabble GO', sub: 'Official rules, deep strategy, but ad-heavy. App required. The traditionalist pick.', accent: 'border-neo-pink text-neo-pink', chip: 'bg-neo-pink text-neo-white' },
-            { tag: 'NO ADS, EVER', title: 'Wordle + LexiClash', sub: 'The only two on this list with zero forced interstitial ads. Respect-your-time word games.', accent: 'border-neo-lime text-neo-lime', chip: 'bg-neo-lime text-neo-navy' },
-          ].map((q, i) => (
-            <div
-              key={q.tag}
-              className={`relative rounded-neo border-3 ${q.accent} bg-neo-navy-light p-5 shadow-hard`}
-              style={{ transform: i % 3 === 0 ? 'rotate(-0.4deg)' : i % 3 === 1 ? 'rotate(0.4deg)' : 'rotate(0deg)' }}
+      <Section title="The Honest Breakdown">
+        <div className="grid items-start gap-6 lg:grid-cols-2">
+          {games.map((game) => (
+            <article
+              key={game.name}
+              className={`flex flex-col gap-4 rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-xl sm:p-6 ${'modes' in game ? 'lg:col-span-2' : ''}`}
             >
-              <span className={`absolute -top-3 left-3 rotate-[-3deg] rounded border-3 border-neo-black px-2 py-0.5 font-neo-display text-[9px] font-black uppercase tracking-widest shadow-hard ${q.chip}`}>{q.tag}</span>
-              <h3 className="mt-2 font-neo-display text-base font-black">{q.title}</h3>
-              <p className="mt-2 text-xs text-neo-gray-200 leading-relaxed">{q.sub}</p>
-            </div>
-          ))}
-        </section>
-
-        {/* Game Cards */}
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">The Honest Breakdown</h2>
-          <div className="space-y-6">
-            {games.map((game) => (
-              <div key={game.name} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-5 shadow-hard">
-                <div className="mb-2 flex items-center justify-between">
-                  <h3 className="font-neo-display text-xl font-bold text-neo-white">{game.name}</h3>
-                  {game.verdict && (
-                    <span className="rounded-neo border-2 border-neo-lime bg-neo-lime/20 px-2 py-0.5 text-xs font-bold text-neo-lime">
-                      {game.verdict}
-                    </span>
-                  )}
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="font-neo-display text-2xl font-bold leading-tight">{game.name}</h3>
+                  <p className="text-sm italic text-neo-black/70">{game.tagline}</p>
                 </div>
-                <p className="mb-3 text-sm italic text-neo-gray-200">{game.tagline}</p>
-                <p className="mb-4 text-sm leading-relaxed text-neo-gray-200">{game.blurb}</p>
-
-                {'modes' in game && Array.isArray(game.modes) && (
-                  <div className="mb-4 rounded-neo border-3 border-neo-lime/60 bg-neo-lime/10 p-4 shadow-hard-sm">
-                    <h4 className="mb-2 font-neo-display text-xs font-black uppercase tracking-widest text-neo-lime">★ All 8 Game Modes Inside</h4>
-                    <ul className="grid gap-1 text-xs text-neo-gray-200 sm:grid-cols-2">
-                      {game.modes.map((mode) => (
-                        <li key={mode} className="flex items-start gap-2">
-                          <span className="mt-0.5 text-neo-lime">▸</span>
-                          <span>{mode}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                {game.verdict && (
+                  <span className="shrink-0 rounded-full border-2 border-neo-black bg-neo-lime px-3 py-1 text-xs font-bold uppercase">
+                    {game.verdict}
+                  </span>
                 )}
+              </div>
+              <p className="leading-relaxed">{game.blurb}</p>
 
-                <div className="mb-4 grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <h4 className="mb-1 text-xs font-bold uppercase tracking-wide text-neo-lime/80">What it does well</h4>
-                    <ul className="space-y-1 text-sm text-neo-gray-200">
-                      {game.pros.map((pro) => (
-                        <li key={pro} className="flex items-start gap-2">
-                          <span className="mt-1 text-neo-lime">+</span>
-                          <span>{pro}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="mb-1 text-xs font-bold uppercase tracking-wide text-neo-pink/80">Where it falls short</h4>
-                    <ul className="space-y-1 text-sm text-neo-gray-200">
-                      {game.cons.map((con) => (
-                        <li key={con} className="flex items-start gap-2">
-                          <span className="mt-1 text-neo-pink">-</span>
-                          <span>{con}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+              {'modes' in game && Array.isArray(game.modes) && (
+                <div className="rounded-neo border-3 border-neo-black bg-neo-lime p-4">
+                  <h4 className={H4}>★ All 8 Game Modes Inside</h4>
+                  <ul className="grid gap-1 text-sm sm:grid-cols-2">
+                    {game.modes.map((mode) => (
+                      <li key={mode}>▸ {mode}</li>
+                    ))}
+                  </ul>
                 </div>
+              )}
 
-                <div className="grid gap-2 border-t border-neo-gray-400/20 pt-3 text-sm sm:grid-cols-2">
-                  <div><span className="text-neo-white">Type:</span> {game.type}</div>
-                  <div><span className="text-neo-white">Multiplayer:</span> {game.multiplayer}</div>
-                  <div><span className="text-neo-white">Free:</span> {game.free}</div>
-                  <div><span className="text-neo-white">Ads:</span> {game.ads}</div>
-                  <div><span className="text-neo-white">Download:</span> {game.download}</div>
-                  <div><span className="text-neo-white">Languages:</span> {game.languages}</div>
-                  <div><span className="text-neo-white">Daily challenge:</span> {game.daily}</div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <h4 className={H4}>What it does well</h4>
+                  <ul className="space-y-1 text-sm">
+                    {game.pros.map((pro) => (
+                      <li key={pro} className="flex items-start gap-2">
+                        <span aria-hidden className="font-bold text-neo-black/60">+</span>
+                        <span>{pro}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4 className={H4}>Where it falls short</h4>
+                  <ul className="space-y-1 text-sm">
+                    {game.cons.map((con) => (
+                      <li key={con} className="flex items-start gap-2">
+                        <span aria-hidden className="font-bold text-neo-black/60">-</span>
+                        <span>{con}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
 
-        {/* Comparison Table — featured-snippet eligible */}
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">At-a-Glance Comparison</h2>
-          <p className="mb-4 text-sm text-neo-gray-200">
-            How the 9 best online word games of 2026 stack up on the features that actually matter — multiplayer, daily puzzles, free play, browser-based, and ad load.
-          </p>
-          <div className="overflow-x-auto rounded-neo border-3 border-neo-yellow shadow-hard">
-            <table className="w-full min-w-[640px] text-left text-sm">
-              <thead className="bg-neo-yellow text-neo-navy">
-                <tr>
-                  <th scope="col" className="px-3 py-2 font-neo-display uppercase tracking-wider">Game</th>
-                  <th scope="col" className="px-3 py-2 font-neo-display uppercase tracking-wider">Multiplayer</th>
-                  <th scope="col" className="px-3 py-2 font-neo-display uppercase tracking-wider">Daily Puzzle</th>
-                  <th scope="col" className="px-3 py-2 font-neo-display uppercase tracking-wider">Free</th>
-                  <th scope="col" className="px-3 py-2 font-neo-display uppercase tracking-wider">Browser</th>
-                  <th scope="col" className="px-3 py-2 font-neo-display uppercase tracking-wider">Best For</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neo-gray-400/30 bg-neo-navy-light/40">
-                <tr>
-                  <th scope="row" className="px-3 py-2 font-bold text-neo-pink">LexiClash</th>
-                  <td className="px-3 py-2 text-neo-lime">2-20 real-time</td>
-                  <td className="px-3 py-2 text-neo-lime">Wheel + Hunt</td>
-                  <td className="px-3 py-2 text-neo-lime">Yes</td>
-                  <td className="px-3 py-2 text-neo-lime">Yes</td>
-                  <td className="px-3 py-2">Real-time play with friends + groups</td>
-                </tr>
-                <tr>
-                  <th scope="row" className="px-3 py-2 font-bold">Wordle</th>
-                  <td className="px-3 py-2 text-neo-pink">No</td>
-                  <td className="px-3 py-2 text-neo-lime">1/day</td>
-                  <td className="px-3 py-2 text-neo-yellow">Freemium</td>
-                  <td className="px-3 py-2 text-neo-lime">Yes</td>
-                  <td className="px-3 py-2">2-min daily ritual</td>
-                </tr>
-                <tr>
-                  <th scope="row" className="px-3 py-2 font-bold">NYT Connections</th>
-                  <td className="px-3 py-2 text-neo-pink">No</td>
-                  <td className="px-3 py-2 text-neo-lime">1/day</td>
-                  <td className="px-3 py-2 text-neo-yellow">Freemium</td>
-                  <td className="px-3 py-2 text-neo-lime">Yes</td>
-                  <td className="px-3 py-2">Group dinner-table arguing</td>
-                </tr>
-                <tr>
-                  <th scope="row" className="px-3 py-2 font-bold">NYT Strands</th>
-                  <td className="px-3 py-2 text-neo-pink">No</td>
-                  <td className="px-3 py-2 text-neo-lime">1/day</td>
-                  <td className="px-3 py-2 text-neo-yellow">Freemium</td>
-                  <td className="px-3 py-2 text-neo-lime">Yes</td>
-                  <td className="px-3 py-2">Themed word-search lovers</td>
-                </tr>
-                <tr>
-                  <th scope="row" className="px-3 py-2 font-bold">NYT Spelling Bee</th>
-                  <td className="px-3 py-2 text-neo-pink">No</td>
-                  <td className="px-3 py-2 text-neo-lime">1/day</td>
-                  <td className="px-3 py-2 text-neo-yellow">Freemium</td>
-                  <td className="px-3 py-2 text-neo-lime">Yes</td>
-                  <td className="px-3 py-2">Vocabulary endurance</td>
-                </tr>
-                <tr>
-                  <th scope="row" className="px-3 py-2 font-bold">Words With Friends</th>
-                  <td className="px-3 py-2 text-neo-yellow">1v1 async</td>
-                  <td className="px-3 py-2 text-neo-pink">No</td>
-                  <td className="px-3 py-2 text-neo-yellow">Free w/ ads</td>
-                  <td className="px-3 py-2 text-neo-pink">App only</td>
-                  <td className="px-3 py-2">Async turn-based with 1 friend</td>
-                </tr>
-                <tr>
-                  <th scope="row" className="px-3 py-2 font-bold">Scrabble GO</th>
-                  <td className="px-3 py-2 text-neo-yellow">1v1 async</td>
-                  <td className="px-3 py-2 text-neo-pink">No</td>
-                  <td className="px-3 py-2 text-neo-yellow">Free w/ ads</td>
-                  <td className="px-3 py-2 text-neo-pink">App only</td>
-                  <td className="px-3 py-2">Traditional Scrabble rules</td>
-                </tr>
-                <tr>
-                  <th scope="row" className="px-3 py-2 font-bold">Wordscapes</th>
-                  <td className="px-3 py-2 text-neo-pink">No</td>
-                  <td className="px-3 py-2 text-neo-pink">No</td>
-                  <td className="px-3 py-2 text-neo-yellow">Free w/ ads</td>
-                  <td className="px-3 py-2 text-neo-pink">App only</td>
-                  <td className="px-3 py-2">Solo grind, 6000+ levels</td>
-                </tr>
-                <tr>
-                  <th scope="row" className="px-3 py-2 font-bold">Semantle / Contexto</th>
-                  <td className="px-3 py-2 text-neo-pink">No</td>
-                  <td className="px-3 py-2 text-neo-lime">1/day</td>
-                  <td className="px-3 py-2 text-neo-lime">Yes</td>
-                  <td className="px-3 py-2 text-neo-lime">Yes</td>
-                  <td className="px-3 py-2">Semantic-guessing puzzlers</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-3 text-xs text-neo-gray-300">Last updated: May 13, 2026. LexiClash is the only entry combining real-time multiplayer, daily puzzles, free play, and browser-based access.</p>
-        </section>
+              <dl className="grid gap-x-4 gap-y-1 border-t-2 border-neo-black/15 pt-3 text-sm sm:grid-cols-2">
+                {[
+                  ['Type', game.type],
+                  ['Multiplayer', game.multiplayer],
+                  ['Free', game.free],
+                  ['Ads', game.ads],
+                  ['Download', game.download],
+                  ['Languages', game.languages],
+                  ['Daily challenge', game.daily],
+                ].map(([k, v]) => (
+                  <div key={k}>
+                    <dt className="inline font-bold">{k}:</dt> <dd className="inline">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </article>
+          ))}
+        </div>
+      </Section>
 
-        {/* FAQ */}
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}-${faq.q}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+      <Section
+        title="At-a-Glance Comparison"
+        intro="How the 9 best online word games of 2026 stack up on the features that actually matter — multiplayer, daily puzzles, free play, browser-based, and ad load."
+      >
+        <CompareTable
+          highlight={-1}
+          columns={['Game', 'Multiplayer', 'Daily Puzzle', 'Free', 'Browser', 'Best For']}
+          rows={COMPARE_ROWS}
+          caption="Last updated: May 13, 2026. LexiClash is the only entry combining real-time multiplayer, daily puzzles, free play, and browser-based access."
+        />
+      </Section>
 
-        {/* Detailed Comparisons */}
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Detailed Comparisons</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            <Link href="/en/words-with-friends-alternative" className="rounded-neo border-3 border-neo-pink/60 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink">
-              <h3 className="font-bold text-neo-pink">Words With Friends Alternative</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Real-time multiplayer, free, no download</p>
-            </Link>
-            <Link href={`/${locale}/scrabble-alternative-online`} className="rounded-neo border-3 border-neo-lime/60 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime">
-              <h3 className="font-bold text-neo-lime">Scrabble Alternative Online</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Real-time, 2-20 players, browser-based</p>
-            </Link>
-            <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Unlimited play vs 1 puzzle/day</p>
-            </Link>
-            <Link href={`/${locale}/lexiclash-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Scrabble GO</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">No pay-to-win, no bots, real players</p>
-            </Link>
-            <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">Play Boggle Online Free</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">No download, instant play</p>
-            </Link>
-            <Link href={`/${locale}/blog/boggle-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">Boggle vs Scrabble</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">7 honest differences, verdict for 2026</p>
-            </Link>
-          </div>
-        </section>
+      <Section title="Frequently Asked Questions">
+        <FaqList items={faqs} />
+      </Section>
 
-        {/* CTA */}
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Want to See What the Fuss Is About?</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Look, every game on this list is good at something. Wordle is perfect for what it is.
-            Words With Friends is a classic for a reason. But if you want a word game that gives you
-            multiplayer, solo modes, daily challenges, and an actual adventure — all free, all in your
-            browser — give LexiClash a shot. Worst case, you waste five fun minutes.
-          </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-4">
-            <Link href={`/${locale}/quick-play`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
+      <Section title="Detailed Comparisons">
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: '/en/words-with-friends-alternative', title: 'Words With Friends Alternative', body: 'Real-time multiplayer, free, no download' },
+            { href: `/${locale}/scrabble-alternative-online`, title: 'Scrabble Alternative Online', body: 'Real-time, 2-20 players, browser-based' },
+            { href: `/${locale}/lexiclash-vs-wordle`, title: 'LexiClash vs Wordle', body: 'Unlimited play vs 1 puzzle/day' },
+            { href: `/${locale}/lexiclash-vs-scrabble`, title: 'LexiClash vs Scrabble GO', body: 'No pay-to-win, no bots, real players' },
+            { href: `/${locale}/play-boggle-online-free`, title: 'Play Boggle Online Free', body: 'No download, instant play' },
+            { href: `/${locale}/blog/boggle-vs-scrabble`, title: 'Boggle vs Scrabble', body: '7 honest differences, verdict for 2026' },
+          ]}
+        />
+      </Section>
+
+      <CtaBand
+        tone="lime"
+        title="Want to See What the Fuss Is About?"
+        body="Look, every game on this list is good at something. Wordle is perfect for what it is. Words With Friends is a classic for a reason. But if you want a word game that gives you multiplayer, solo modes, daily challenges, and an actual adventure — all free, all in your browser — give LexiClash a shot. Worst case, you waste five fun minutes."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/quick-play`} variant="dark">
               Play LexiClash Free
-            </Link>
-            <Link href={`/${locale}/daily`} className="inline-block rounded-neo border-4 border-neo-cyan bg-transparent px-8 py-4 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10">
+            </LandingButton>
+            <LandingButton href={`/${locale}/daily`} variant="secondary">
               Try the Daily Challenge
-            </Link>
-          </div>
-        </section>
-      </div>
-      <style>{`@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-33.333%)}}`}</style>
-    </main>
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

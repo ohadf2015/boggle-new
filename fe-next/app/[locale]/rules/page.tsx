@@ -1,4 +1,4 @@
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { SeoKitBlock } from '@/components/landing/SeoKitBlock';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
 import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
@@ -175,16 +175,19 @@ export default async function RulesPage({ params }: { params: Promise<{ locale: 
     <>
       <BreadcrumbJsonLd items={breadcrumbItems} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-      <RulesPageClient />
-      <GuidesCalloutLink locale={locale} />
-      <EducationCalloutLink locale={locale} />
-      <EsScrabbleCrossLink locale={locale} anchorVariant="query" />
-      <GamePageSeoContent
-        title={content.title}
-        description={content.description}
-        features={content.features}
-        faq={content.faq}
-      />
+      <RulesPageClient>
+        <div className="flex flex-col gap-4 empty:hidden">
+          <GuidesCalloutLink locale={locale} />
+          <EducationCalloutLink locale={locale} />
+          <EsScrabbleCrossLink locale={locale} anchorVariant="query" />
+        </div>
+        <SeoKitBlock
+          title={content.title}
+          description={content.description}
+          features={content.features}
+          faq={content.faq}
+        />
+      </RulesPageClient>
     </>
   );
 }

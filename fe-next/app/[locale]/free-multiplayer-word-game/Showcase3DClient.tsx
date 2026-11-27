@@ -6,12 +6,12 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
 import GameplayPanel, { type Mode } from '@/components/showcase3d/GameplayPanel';
 import Split3DHeading from '@/components/showcase3d/Split3DHeading';
 import FloatingCTA from '@/components/showcase3d/FloatingCTA';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
-import FaqAccordion from '@/components/showcase3d/FaqAccordion';
+import { CtaBand, FaqList, LandingButton, Section } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 import { loadPercent, isPlayable } from '@/lib/showcase3d/loadProgress';
 import { getAssetUrl } from '@/lib/assets/cdn';
 
@@ -46,7 +46,7 @@ interface Caption {
   window: [number, number]; // [enter, exit] as fractions of the scrub timeline (0..1)
 }
 
-const MARQUEE = ['SPELL', 'CHAIN', 'COMBO', 'VERSUS', 'DAILY', 'STEAL THE WIN', '5 LANGUAGES'];
+const MARQUEE = ['SPELL', 'CHAIN', 'COMBO', 'VERSUS', 'DAILY', 'STEAL THE WIN', '6 LANGUAGES'];
 
 export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
   const { t } = useLanguage();
@@ -215,7 +215,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
     { scope: section },
   );
 
-  // page life: marquee (velocity-reactive) + floating word-dust + CTA pop
+  // page life: velocity-reactive marquee
   useGSAP(
     () => {
       const mm = gsap.matchMedia();
@@ -231,23 +231,6 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
             gsap.to(marqRef.current, { timeScale: boost, duration: 0.4, overwrite: true });
           },
         });
-        gsap.to('.s3-dust', {
-          y: '+=22',
-          rotation: '+=10',
-          duration: () => 2.4 + Math.random() * 2.2,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          stagger: { each: 0.3, from: 'random' },
-        });
-        gsap.from('.s3-cta-pop', {
-          scale: 0.94,
-          autoAlpha: 0,
-          y: 30,
-          duration: 0.6,
-          ease: 'back.out(1.4)',
-          scrollTrigger: { trigger: ctaRef.current, start: 'top 85%' },
-        });
       });
     },
     { scope: main },
@@ -258,7 +241,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
       {/* crawlable, localized SEO/GEO content (visually hidden, in SSR HTML) —
           kept srOnly here because this block sits ABOVE the pinned 3D hero and a
           visible card would break the showcase layout; the page has its own
-          visible FaqAccordion + chapter copy further down. */}
+          visible FAQ + chapter copy further down. */}
       <GamePageSeoContent
         asH1
         srOnly
@@ -275,8 +258,6 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
       <div aria-hidden className="fixed inset-x-0 top-0 z-50 h-1 bg-neo-navy-light">
         <div ref={barRef} className="h-full origin-left bg-neo-lime" style={{ transform: 'scaleX(0)' }} />
       </div>
-
-      <TopBackLink className="mb-4" />
 
       {/* ── PINNED MULTI-CHAPTER SCROLL-SCRUB HERO ───────────── */}
       {/* min-h-[100svh] reserves the pinned hero's box BEFORE GSAP wraps pinWrap in a
@@ -321,9 +302,13 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-64 bg-gradient-to-l from-neo-navy/90 via-neo-navy/45 to-transparent lg:block" />
           {/* top fade for the score chip + wordmark */}
           <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-neo-navy/85 to-transparent" />
-          <p className="absolute left-5 top-6 z-20 font-neo-display text-xl font-bold uppercase tracking-widest text-neo-lime drop-shadow-[2px_2px_0_rgb(10,10,18)] sm:left-10">
+          <Link
+            href={`/${locale}`}
+            dir="ltr"
+            className="absolute left-5 top-6 z-20 font-neo-display text-xl font-bold uppercase tracking-widest text-neo-lime drop-shadow-[2px_2px_0_rgb(var(--neo-black))] sm:left-10"
+          >
             LexiClash
-          </p>
+          </Link>
 
           {/* live score — counts up as you scrub (compact on mobile, fuller on sm+) */}
           <div className="absolute right-3 top-4 z-20 flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-navy-light px-2.5 py-1 shadow-hard sm:right-4 sm:top-5 sm:gap-2 sm:px-3 sm:py-1.5">
@@ -377,7 +362,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
                     </span>
                   )}
                   <h2 className="mt-2 font-neo-display text-4xl font-bold leading-[0.95] text-neo-white sm:text-6xl" style={{ textShadow: '0 1px 0 #0a0a12,0 2px 0 #0a0a12,0 3px 0 #0a0a12,0 4px 0 #0a0a12,0 5px 0 rgba(0,255,255,0.65),0 6px 0 #0a0a12,0 7px 0 #0a0a12,0 8px 0 #0a0a12,0 10px 0 rgba(255,20,147,0.45),0 16px 24px rgba(0,0,0,0.6)' }}>{cap.title}</h2>
-                  <p className="mx-auto mt-3 max-w-xl font-neo-body text-base text-neo-white drop-shadow-[2px_2px_0_rgba(0,0,0,0.7)] sm:text-lg">{cap.body}</p>
+                  <p className="mx-auto mt-3 max-w-xl font-neo-body text-base text-neo-white drop-shadow-[2px_2px_0_rgb(var(--neo-black)/0.7)] sm:text-lg">{cap.body}</p>
                 </div>
               ))}
             </div>
@@ -387,7 +372,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
             <span className="rounded-neo border-neo-thick border-black bg-neo-lime px-4 py-1.5 font-neo-display text-sm font-bold uppercase tracking-widest text-black shadow-hard">
               {t('showcase3d.scrollHint', 'Scroll to play')}
             </span>
-            <span aria-hidden className="animate-bounce font-neo-display text-3xl font-bold leading-none text-neo-lime drop-shadow-[2px_2px_0_rgb(10,10,18)]">
+            <span aria-hidden className="animate-bounce font-neo-display text-3xl font-bold leading-none text-neo-lime drop-shadow-[2px_2px_0_rgb(var(--neo-black))]">
               ↓
             </span>
           </div>
@@ -406,58 +391,40 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
         </div>
       </div>
 
-      {/* ── MODE SHOWCASE (scroll-revealed 3D gameplay) ──────── */}
-      <section ref={modesRef} className="relative overflow-hidden px-5 py-24 lg:px-10">
-        {/* floating word-dust */}
-        {[
-          { ch: 'A', c: 'bg-neo-cyan', s: 'left-[6%] top-[12%]' },
-          { ch: 'Z', c: 'bg-neo-pink', s: 'right-[8%] top-[20%]' },
-          { ch: 'Q', c: 'bg-neo-purple', s: 'left-[14%] bottom-[16%]' },
-          { ch: '+', c: 'bg-neo-lime', s: 'right-[12%] bottom-[24%]' },
-          { ch: '!', c: 'bg-neo-pink', s: 'left-[48%] top-[6%]' },
-        ].map((d) => (
-          <span
-            key={d.ch + d.s}
-            aria-hidden
-            className={`s3-dust pointer-events-none absolute z-0 hidden h-12 w-12 place-items-center rounded-neo border-neo-thick border-black font-neo-display text-xl font-bold text-black opacity-70 shadow-hard sm:grid ${d.c} ${d.s}`}
-          >
-            {d.ch}
-          </span>
-        ))}
-
-        <div className="relative z-10 mx-auto max-w-6xl">
-          <Split3DHeading text={t('showcase3d.modesTitle', 'Three ways to clash')} className="mb-4 font-neo-display text-3xl font-bold sm:text-4xl" />
-          <p className="mb-16 max-w-[48ch] font-neo-body text-neo-white">{t('showcase3d.modesSub', 'Real rounds, real boards — each one slides in as you scroll.')}</p>
-          <div className="flex flex-col gap-24">
-            {modes.map((mode) => (
-              <GameplayPanel key={mode.title} mode={mode} isRTL={isRTL} />
-            ))}
-          </div>
+      {/* ── MODE SHOWCASE (scroll-revealed gameplay) ──────── */}
+      <section ref={modesRef} className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+        <Split3DHeading text={t('showcase3d.modesTitle', 'Three ways to clash')} className="mb-3 font-neo-display text-3xl font-bold sm:text-4xl" />
+        <p className="mb-10 max-w-[48ch] font-neo-body text-lg text-neo-white/85">{t('showcase3d.modesSub', 'Real rounds, real boards — each one slides in as you scroll.')}</p>
+        <div className="flex flex-col gap-8 sm:gap-10">
+          {modes.map((mode) => (
+            <GameplayPanel key={mode.title} mode={mode} isRTL={isRTL} />
+          ))}
         </div>
       </section>
 
-      {/* ── FAQ (visible + crawlable) ────────────────────────── */}
-      <FaqAccordion
-        title={t('showcase3d.faqTitle', 'Questions, answered')}
-        items={[1, 2, 3, 4, 5, 6]
-          .map((i) => ({ q: t(`showcase3d.faqQ${i}`, ''), a: t(`showcase3d.faqA${i}`, '') }))
-          .filter((f) => f.q && f.a)}
-      />
+      <div className="mx-auto flex max-w-6xl flex-col gap-14 px-4 pb-24 sm:gap-20 sm:px-6">
+        <Section title={t('showcase3d.faqTitle', 'Questions, answered')}>
+          <FaqList
+            items={[1, 2, 3, 4, 5, 6]
+              .map((i) => ({ q: t(`showcase3d.faqQ${i}`, ''), a: t(`showcase3d.faqA${i}`, '') }))
+              .filter((f) => f.q && f.a)
+              .map((f) => ({ q: <h3>{f.q}</h3>, a: f.a }))}
+          />
+        </Section>
 
-      {/* ── BOTTOM CTA ───────────────────────────────────────── */}
-      <section ref={ctaRef} className="mx-auto max-w-6xl px-5 pb-28 lg:px-10">
-        <div className="s3-cta-pop relative overflow-hidden rounded-neo-xl border-neo-thick border-black bg-neo-lime px-7 py-14 text-black shadow-hard-xl sm:px-12 sm:py-20">
-          <span aria-hidden className="s3-dust absolute right-6 top-6 grid h-14 w-14 rotate-12 place-items-center rounded-neo border-neo-thick border-black bg-neo-navy font-neo-display text-2xl font-bold text-neo-white shadow-hard">W</span>
-          <span aria-hidden className="s3-dust absolute bottom-8 right-24 grid h-10 w-10 -rotate-6 place-items-center rounded-neo border-neo-thick border-black bg-neo-pink font-neo-display text-lg font-bold text-black shadow-hard">!</span>
-          <Split3DHeading text={t('showcase3d.bottomTitle', 'Your move. Make it loud.')} className="relative z-10 max-w-[18ch] font-neo-display text-[clamp(2rem,5vw,3.5rem)] font-bold leading-[0.95]" />
-          <Link
-            href={playHref}
-            className="relative z-10 mt-7 inline-block rounded-neo border-neo-thick border-black bg-neo-navy px-8 py-4 font-neo-display text-lg font-bold text-neo-white shadow-hard-lg transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-0.5"
-          >
-            {t('showcase3d.bottomCta', 'Play LexiClash free')}
-          </Link>
-        </div>
-      </section>
+        <section ref={ctaRef}>
+          <CtaBand
+            tone="lime"
+            title={t('showcase3d.bottomTitle', 'Your move. Make it loud.')}
+            actions={
+              <LandingButton href={playHref} variant="dark">
+                {t('showcase3d.bottomCta', 'Play LexiClash free')}
+              </LandingButton>
+            }
+            art={LANDING_ART.trophy('')}
+          />
+        </section>
+      </div>
 
       <FloatingCTA href={playHref} label={t('showcase3d.floatCta', 'Play free')} isRTL={isRTL} hideBelow={ctaRef} />
     </main>

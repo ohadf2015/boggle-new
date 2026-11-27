@@ -1,6 +1,17 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
+import {
+  CompareTable,
+  CtaBand,
+  FaqList,
+  LandingButton,
+  LandingHero,
+  LandingPage,
+  Mark,
+  Section,
+  Steps,
+  TileGrid,
+} from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 import { getBrainLandingCopy } from './content';
 
 interface PageProps {
@@ -66,12 +77,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-const DRILL_VISUALS = [
-  { icon: '⚡', accentBg: 'bg-neo-lime', accentText: 'text-neo-lime' },
-  { icon: '🧠', accentBg: 'bg-neo-purple', accentText: 'text-neo-purple' },
-  { icon: '🎯', accentBg: 'bg-neo-orange', accentText: 'text-neo-orange' },
-  { icon: '💎', accentBg: 'bg-neo-cyan', accentText: 'text-neo-cyan' },
-];
+const DRILL_TONE = ['bg-neo-lime', 'bg-neo-purple', 'bg-neo-orange', 'bg-neo-cyan'];
 
 export default async function BrainTrainingWordGamesPage({ params }: PageProps) {
   const { locale } = await params;
@@ -135,179 +141,103 @@ export default async function BrainTrainingWordGamesPage({ params }: PageProps) 
   });
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
+    <LandingPage locale={locale} play={{ href: `/${locale}/brain`, label: copy.ctaPrimary }}>
       <script id="ld-faq-brain" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
       <script id="ld-videogame-brain" type="application/ld+json" dangerouslySetInnerHTML={{ __html: videoGameJsonLd }} />
       <script id="ld-itemlist-brain" type="application/ld+json" dangerouslySetInnerHTML={{ __html: itemListJsonLd }} />
       <script id="ld-howto-brain" type="application/ld+json" dangerouslySetInnerHTML={{ __html: howToJsonLd }} />
 
-      <div className="border-y-3 border-neo-black bg-neo-purple overflow-hidden">
-        <div className="flex animate-[scrollBT_30s_linear_infinite] gap-6 whitespace-nowrap py-2 font-neo-display text-sm font-black uppercase tracking-widest text-neo-white sm:text-base">
-          {[...copy.marqueeBadges, ...copy.marqueeBadges, ...copy.marqueeBadges].map((b, i) => (
-            <span key={`bt-${i}`} className="inline-flex items-center gap-3"><span>★</span><span>{b}</span></span>
+      <LandingHero
+        eyebrow={copy.badge}
+        title={
+          <>
+            {copy.h1Pre}
+            <br />
+            <Mark tone="purple">{copy.h1Highlight}</Mark>
+          </>
+        }
+        lead={copy.introP1}
+        actions={
+          <>
+            <LandingButton href={`/${locale}/brain`}>{copy.ctaPrimary}</LandingButton>
+            <LandingButton href={`/${locale}/brain/drills/lightning-round`} variant="secondary">
+              {copy.ctaSecondary}
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.brain('')}
+        more={
+          <>
+            <p>{copy.introP2}</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-neo-white/60">{copy.marqueeBadges.join(' · ')}</p>
+          </>
+        }
+      />
+
+      <Section title={copy.drillsHeading} intro={copy.drillsSub}>
+        <div className="grid items-start gap-5 md:grid-cols-2">
+          {copy.drills.map((drill, i) => (
+            <article key={drill.name} className="flex flex-col overflow-hidden rounded-neo-lg border-3 border-neo-black bg-neo-cream text-neo-black shadow-hard-xl">
+              <div className={`flex flex-col gap-0.5 border-b-3 border-neo-black px-5 py-4 ${DRILL_TONE[i % DRILL_TONE.length]}`}>
+                <span className="text-xs font-bold uppercase tracking-wide">{drill.domain}</span>
+                <h3 className="font-neo-display text-2xl font-bold leading-tight">{drill.name}</h3>
+              </div>
+              <div className="flex flex-col gap-3 p-5">
+                <p className="font-medium italic">{drill.tagline}</p>
+                <p className="text-[15px] leading-relaxed">{drill.blurb}</p>
+                <div className="rounded-neo border-2 border-neo-black/20 p-3">
+                  <p className="mb-1 text-[11px] font-bold uppercase tracking-wide text-neo-black/60">{copy.researchLabel}</p>
+                  <p className="text-sm leading-relaxed">{drill.research}</p>
+                </div>
+              </div>
+            </article>
           ))}
         </div>
-      </div>
+      </Section>
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
-        <span className="mb-4 inline-block rotate-[-2deg] rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">{copy.badge}</span>
-        <h1 className="mb-6 font-neo-display text-4xl font-black leading-tight sm:text-5xl">
-          {copy.h1Pre}<br /><span className="bg-neo-purple px-3 text-neo-white shadow-hard inline-block rotate-[-1deg]">{copy.h1Highlight}</span>
-        </h1>
+      <Section title={copy.comparisonHeading}>
+        <CompareTable columns={copy.comparisonHeaders} rows={copy.comparisonRows} caption={copy.comparisonFooter} />
+      </Section>
 
-        <p className="mb-4 text-lg leading-relaxed text-neo-gray-200">{copy.introP1}</p>
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">{copy.introP2}</p>
+      <Section title={copy.howHeading}>
+        <Steps items={copy.steps.map((s) => ({ title: s.title, body: s.sub }))} />
+      </Section>
 
-        <div className="mb-12 flex flex-col gap-3 sm:flex-row">
-          <Link href={`/${locale}/brain`} className="inline-block rounded-neo border-4 border-neo-purple bg-neo-purple px-8 py-4 text-center font-bold text-neo-white shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-            {copy.ctaPrimary}
-          </Link>
-          <Link href={`/${locale}/brain/drills/lightning-round`} className="inline-block rounded-neo border-4 border-neo-cyan bg-transparent px-8 py-4 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10">
-            {copy.ctaSecondary}
-          </Link>
-        </div>
+      <Section title={copy.faqHeading}>
+        <FaqList items={copy.faqs} />
+      </Section>
 
-        {/* DRILLS */}
-        <section className="mb-12">
-          <h2 className="mb-2 font-neo-display text-2xl font-bold sm:text-3xl">{copy.drillsHeading}</h2>
-          <p className="mb-6 text-sm text-neo-gray-200">{copy.drillsSub}</p>
-          <div className="space-y-5">
-            {copy.drills.map((drill, i) => {
-              const v = DRILL_VISUALS[i];
-              return (
-                <div
-                  key={drill.name}
-                  className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-5 shadow-hard"
-                  style={{ transform: i % 2 === 0 ? 'rotate(-0.2deg)' : 'rotate(0.2deg)' }}
-                >
-                  <div className="mb-3 flex items-center gap-3">
-                    <span className={`inline-flex h-12 w-12 items-center justify-center rounded-md border-3 border-neo-black ${v.accentBg} text-2xl shadow-hard-sm`}>{v.icon}</span>
-                    <div>
-                      <h3 className="font-neo-display text-xl font-bold text-neo-white">{drill.name}</h3>
-                      <p className={`text-xs font-black uppercase tracking-widest ${v.accentText}`}>{drill.domain}</p>
-                    </div>
-                  </div>
-                  <p className="mb-3 text-sm italic text-neo-gray-200">{drill.tagline}</p>
-                  <p className="mb-4 text-sm leading-relaxed text-neo-gray-200">{drill.blurb}</p>
-                  <div className="rounded-neo border-2 border-neo-gray-400/40 bg-neo-navy-light/40 p-3">
-                    <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-neo-cyan">{copy.researchLabel}</p>
-                    <p className="text-xs leading-relaxed text-neo-gray-200">{drill.research}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+      <Section title={copy.relatedHeading}>
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: `/${locale}/brain`, title: copy.relatedHubTitle, body: copy.relatedHubSub, tone: 'purple' as const },
+            { href: `/${locale}/blog/word-games-for-brain-training`, title: copy.relatedScienceTitle, body: copy.relatedScienceSub },
+            ...(locale === 'he'
+              ? [{ href: '/he/mischaqey-safa-imun-kogniti', title: 'משחקי שפה לאימון קוגניטיבי', body: 'איזה משחק מתרגל איזו יכולת, ותוכנית של 10 דקות ביום' }]
+              : []),
+            { href: `/${locale}/best-online-word-games`, title: copy.relatedBestTitle, body: copy.relatedBestSub },
+            { href: `/${locale}/daily`, title: copy.relatedDailyTitle, body: copy.relatedDailySub },
+            { href: `/${locale}/word-of-the-day`, title: copy.relatedWotdTitle, body: copy.relatedWotdSub },
+            { href: `/${locale}/multiplayer`, title: copy.relatedMpTitle, body: copy.relatedMpSub },
+          ]}
+        />
+      </Section>
 
-        {/* COMPARISON */}
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">{copy.comparisonHeading}</h2>
-          <div className="overflow-x-auto rounded-neo border-3 border-neo-black bg-neo-navy/50 shadow-hard">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b-3 border-neo-black bg-neo-purple text-neo-white">
-                  {copy.comparisonHeaders.map((h) => (
-                    <th key={h} className="p-3 text-start font-neo-display text-xs uppercase tracking-widest">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="text-neo-gray-200">
-                {copy.comparisonRows.map((row) => (
-                  <tr key={row[0]} className="border-b border-neo-gray-400/20 last:border-0">
-                    {row.map((cell, i) => (
-                      <td key={i} className={`p-3 ${i === 0 ? 'font-bold text-neo-white' : i === 1 ? 'text-neo-lime' : ''}`}>{cell}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-3 text-xs text-neo-gray-200/70">{copy.comparisonFooter}</p>
-        </section>
-
-        {/* HOW IT WORKS */}
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">{copy.howHeading}</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {copy.steps.map((s) => (
-              <div key={s.step} className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard">
-                <span className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-md border-2 border-neo-black bg-neo-purple font-neo-display text-lg font-black text-neo-white">{s.step}</span>
-                <h3 className="mb-1 font-neo-display text-base font-bold">{s.title}</h3>
-                <p className="text-xs leading-relaxed text-neo-gray-200">{s.sub}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* FAQ */}
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">{copy.faqHeading}</h2>
-          <div className="space-y-4">
-            {copy.faqs.map((faq, idx) => (
-              <details key={`bt-faq-${idx}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-purple transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        {/* INTERNAL LINKS */}
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">{copy.relatedHeading}</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <Link href={`/${locale}/brain`} className="rounded-neo border-3 border-neo-purple/60 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-purple">
-              <h3 className="font-bold text-neo-purple">{copy.relatedHubTitle}</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">{copy.relatedHubSub}</p>
-            </Link>
-            <Link href={`/${locale}/blog/word-games-for-brain-training`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-purple/40">
-              <h3 className="font-bold text-neo-cyan">{copy.relatedScienceTitle}</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">{copy.relatedScienceSub}</p>
-            </Link>
-            {locale === 'he' && (
-              <Link href="/he/mischaqey-safa-imun-kogniti" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-purple/40">
-                <h3 className="font-bold text-neo-cyan">משחקי שפה לאימון קוגניטיבי</h3>
-                <p className="mt-1 text-xs text-neo-gray-200">איזה משחק מתרגל איזו יכולת, ותוכנית של 10 דקות ביום</p>
-              </Link>
-            )}
-            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-purple/40">
-              <h3 className="font-bold text-neo-cyan">{copy.relatedBestTitle}</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">{copy.relatedBestSub}</p>
-            </Link>
-            <Link href={`/${locale}/daily`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-purple/40">
-              <h3 className="font-bold text-neo-cyan">{copy.relatedDailyTitle}</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">{copy.relatedDailySub}</p>
-            </Link>
-            <Link href={`/${locale}/word-of-the-day`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-purple/40">
-              <h3 className="font-bold text-neo-cyan">{copy.relatedWotdTitle}</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">{copy.relatedWotdSub}</p>
-            </Link>
-            <Link href={`/${locale}/multiplayer`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink/40">
-              <h3 className="font-bold text-neo-pink">{copy.relatedMpTitle}</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">{copy.relatedMpSub}</p>
-            </Link>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">{copy.finalCtaHeading}</h2>
-          <p className="mt-4 text-neo-gray-200">{copy.finalCtaBody}</p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-4">
-            <Link href={`/${locale}/brain`} className="inline-block rounded-neo border-4 border-neo-purple bg-neo-purple px-8 py-4 text-center font-bold text-neo-white shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-              {copy.finalCtaPrimary}
-            </Link>
-            <Link href={`/${locale}/brain/drills/lightning-round`} className="inline-block rounded-neo border-4 border-neo-lime bg-transparent px-8 py-4 text-center font-bold text-neo-lime shadow-hard transition-[background-color] hover:bg-neo-lime/10">
+      <CtaBand
+        tone="purple"
+        title={copy.finalCtaHeading}
+        body={copy.finalCtaBody}
+        actions={
+          <>
+            <LandingButton href={`/${locale}/brain`}>{copy.finalCtaPrimary}</LandingButton>
+            <LandingButton href={`/${locale}/brain/drills/lightning-round`} variant="secondary">
               {copy.finalCtaSecondary}
-            </Link>
-          </div>
-        </section>
-      </div>
-      <style>{`@keyframes scrollBT{from{transform:translateX(0)}to{transform:translateX(-33.333%)}}`}</style>
-    </main>
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

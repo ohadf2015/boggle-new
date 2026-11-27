@@ -20,6 +20,8 @@ describe('games-for-teachers page', () => {
     expect(container.querySelector('[data-answer]')).not.toBeNull();
     expect(container.querySelector('[data-geo-faq] h3')).not.toBeNull();
     expect(container.querySelector('[data-geo-faq] details')).toBeNull();
+    const faq = container.querySelector('[data-geo-faq]')!.textContent;
+    for (const { a } of getGamesForTeachersLanding('en').faqs) expect(faq).toContain(a);
   });
 });
 

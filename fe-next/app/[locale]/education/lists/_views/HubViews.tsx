@@ -7,7 +7,7 @@ import type { WordList } from '@/lib/seo/wordLists/model';
 import { gradeHubPath, langHubPath, listPath, pickLocale, topicHubPath } from '@/lib/seo/wordLists/paths';
 import { displayTitle, gradeLabel, langName, topicLabel, tr, wordsIn } from '@/lib/seo/wordLists/i18n';
 import { wordListMetadata } from '@/lib/seo/wordLists/metadata';
-import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
+import { EducationKitRelated } from '@/components/landing/education/EducationKitRelated';
 import { CardGrid, LANG_ACCENT, ListsFrame, PageHeader, SectionTitle, Tag } from '../_components/ui';
 import { GradeChips, TopicChips, baseCrumbs, gradeCrumb, langCrumb, topicHubsFor, wordTotal } from './shared';
 
@@ -77,13 +77,13 @@ export function LangHubView({ hub, locale }: { hub: LangHub; locale: string }) {
               {gh && (
                 <Link
                   href={`/${pickLocale(gh.locales, locale)}${gradeHubPath(hub.lang, gh.grade)}`}
-                  className="rounded-neo border-3 border-neo-black bg-neo-white px-4 py-2 text-sm font-black text-neo-navy shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                  className="inline-flex min-h-11 items-center rounded-full border-3 border-neo-black bg-neo-cream px-4 py-1.5 text-sm font-bold text-neo-black shadow-hard-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-white"
                 >
                   {tr(locale, 'hub.viewAll', { count: gh.lists.length })}
                 </Link>
               )}
             </div>
-            <CardGrid lists={lists.slice(0, PREVIEW_PER_GRADE)} locale={locale} />
+            <CardGrid rail lists={lists.slice(0, PREVIEW_PER_GRADE)} locale={locale} />
           </section>
         );
       })}
@@ -92,7 +92,7 @@ export function LangHubView({ hub, locale }: { hub: LangHub; locale: string }) {
         title={tr(locale, 'hub.byTopic')}
         hubs={topicHubsFor((h) => h.lists.some((l) => l.lang === hub.lang))}
       />
-      <EducationRelatedLinks locale={locale} slug="lists" />
+      <div className="mt-14"><EducationKitRelated locale={locale} slug="lists" /></div>
     </ListsFrame>
   );
 }
@@ -166,7 +166,7 @@ export function GradeHubView({ hub, locale }: { hub: GradeHub; locale: string })
         title={tr(locale, 'hub.byTopic')}
         hubs={topicHubsFor((h) => hub.lists.some((l) => l.topic === h.topic))}
       />
-      <EducationRelatedLinks locale={locale} slug="lists" />
+      <div className="mt-14"><EducationKitRelated locale={locale} slug="lists" /></div>
     </ListsFrame>
   );
 }
@@ -222,7 +222,7 @@ export function TopicHubView({ hub, locale }: { hub: TopicHub; locale: string })
         </section>
       ))}
       <TopicChips locale={locale} title={tr(locale, 'hub.otherTopics')} hubs={getCatalog().topicHubs} activeTopic={hub.topic} />
-      <EducationRelatedLinks locale={locale} slug="lists" />
+      <div className="mt-14"><EducationKitRelated locale={locale} slug="lists" /></div>
     </ListsFrame>
   );
 }

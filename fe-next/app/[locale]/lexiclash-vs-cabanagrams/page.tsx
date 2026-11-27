@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { CheckList, CompareTable, CtaBand, FaqList, LandingButton, LandingHero, LandingPage, LinkPills, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const revalidate = 86400;
 
@@ -88,189 +89,151 @@ export default async function LexiClashVsCabanagramsPage({ params }: PageProps) 
   const { locale } = await params;
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/multiplayer`, label: 'Try LexiClash Free' }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqJsonLd }}
       />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
-
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          LexiClash vs Cabanagrams — Which Word Game Wins?
-        </h1>
-
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Both are free, no-signup word games built on the foundation of Bananagrams — build words fast, race other players, no complicated scoring. But they diverge from there. Cabanagrams nails the purist Bananagrams experience in your browser with 11 languages. LexiClash swaps the personal-grid mechanic for shared-board word finding and wraps it in 30+ game modes, progression systems, and mobile apps. Here&apos;s the breakdown.
-        </p>
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
-            Try LexiClash Free
-          </Link>
-          <Link href={`/${locale}/adventure`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-            Adventure Mode
-          </Link>
-          <Link href={`/${locale}/brain`} className="rounded-neo border-4 border-neo-purple bg-transparent px-6 py-3 text-center font-bold text-neo-purple shadow-hard transition-[background-color] hover:bg-neo-purple/10 sm:px-8 sm:py-4">
-            Brain Drills
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">The Honest Comparison</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse rounded-neo border-3 border-neo-gray-400 text-sm sm:text-base">
-              <thead>
-                <tr className="border-b-3 border-neo-gray-400 bg-neo-navy/80">
-                  <th className="px-4 py-3 text-left font-bold text-neo-lime">Feature</th>
-                  <th className="px-4 py-3 text-center font-bold text-neo-cyan">LexiClash</th>
-                  <th className="px-4 py-3 text-center text-neo-gray-300">Cabanagrams</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  ['Game mechanic', 'Shared grid, connect letters', 'Personal grid, build words'],
-                  ['Game modes', '30+', '1 main mode (Bananagrams-style)'],
-                  ['Solo vs AI', 'Yes, extensive solo + adventure', 'Yes, 3 difficulty tiers'],
-                  ['Multiplayer', 'Real-time, 2-20+ players', 'Real-time, up to 4 players'],
-                  ['Languages', '5 (EN, HE, SV, JA, ES)', '11 (broad multilingual support)'],
-                  ['RTL support', 'Yes (Hebrew)', 'No'],
-                  ['Platforms', 'Web + Android app', 'Web-only'],
-                  ['No download needed', 'Yes (browser only)', 'Yes (browser only)'],
-                  ['Free to play', 'Completely', 'Completely'],
-                  ['Monetization', 'Ad-supported (optional)', 'Donationware (Buy Me a Coffee)'],
-                  ['Progression system', 'Ranked ladder, achievements', 'None (session-based)'],
-                  ['Daily challenges', 'Yes, with leaderboards', 'Word of the day (varies)'],
-                  ['Adventure/Story', 'Yes (100+ levels, boss fights)', 'No'],
-                  ['Accessibility', 'WCAG 2.1 AA', 'Standard'],
-                ].map(([feature, lexi, cabanagrams]) => (
-                  <tr key={feature} className="border-b border-neo-gray-400/50">
-                    <td className="px-4 py-3 font-medium">{feature}</td>
-                    <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
-                    <td className="px-4 py-3 text-center text-neo-gray-300">{cabanagrams}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">What LexiClash Offers That Cabanagrams Doesn&apos;t</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              { title: 'Adventure Campaign', desc: '100+ levels, story progression, boss battles, loot upgrades. A full narrative experience that turns word games into exploration.' },
-              { title: 'Brain Training Drills', desc: '5 dedicated modes (Memory Hunt, Combo Master, etc.) designed around cognitive improvement, not just competition.' },
-              { title: '30+ Game Modes', desc: 'Connections, Wordle-style daily, Blast action mode, party games, ranked competitive, and more. Same skill set, wildly different feels.' },
-              { title: 'Native Android App', desc: 'Play from your home screen. Cabanagrams is web-only; LexiClash has a proper Android app with offline access and shortcuts.' },
-              { title: 'Ranked Competitive Play', desc: 'ELO ladder, ranked seasons, leaderboards. Cabanagrams is casual drop-in; LexiClash has infrastructure for serious players.' },
-              { title: 'Cross-Locale Progression', desc: '6 languages (EN, HE, SV, JA, ES) with full progression sync. Hebrew speakers get a full RTL experience.' },
-            ].map((item) => (
-              <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-lime">{item.title}</h3>
-                <p className="text-sm text-neo-gray-200">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">The Gameplay Difference: Shared Grid vs Personal Grid</h2>
-          <div className="rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 p-6 shadow-hard">
-            <div className="mb-6">
-              <h3 className="mb-2 font-bold text-neo-cyan">Cabanagrams (Personal Grid)</h3>
-              <p className="text-neo-gray-200">
-                You each get your own grid of random tiles. Your job: rearrange them into a connected, valid word grid as fast as possible. Think Bananagrams — competitive scrabble where setup and strategy matter. You win by finishing first. It&apos;s clever, tactile, and multiplayer-focused but simple in scope.
-              </p>
-            </div>
-            <div>
-              <h3 className="mb-2 font-bold text-neo-pink">LexiClash (Shared Grid)</h3>
-              <p className="text-neo-gray-200">
-                Everyone sees the same grid of random letters (like Boggle). Your job: find as many words as possible by connecting adjacent letters. Unlimited words per round. It&apos;s scanning + pattern recognition + speed. Less chess-like than Cabanagrams, more arcade-like. The same energy (real-time, competitive, frantic) but completely different puzzle-solving path.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Why Choose Each Game</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-neo border-3 border-neo-cyan bg-neo-navy/50 p-6 shadow-hard">
-              <h3 className="mb-3 font-bold text-neo-cyan">Choose Cabanagrams If You Want:</h3>
-              <ul className="space-y-2 text-sm text-neo-gray-200">
-                <li>Pure Bananagrams experience in your browser</li>
-                <li>Minimal, focused gameplay (one great mode)</li>
-                <li>11 language options for global play</li>
-                <li>No ads, fully supported by donations</li>
-                <li>Quick, casual sessions with friends</li>
-              </ul>
-            </div>
-            <div className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-6 shadow-hard">
-              <h3 className="mb-3 font-bold text-neo-lime">Choose LexiClash If You Want:</h3>
-              <ul className="space-y-2 text-sm text-neo-gray-200">
-                <li>30+ game modes (variety + replayability)</li>
-                <li>Adventure campaign + brain training</li>
-                <li>Native Android app (no browser required)</li>
-                <li>Ranked competitive play with progression</li>
-                <li>Hebrew, Swedish, Japanese support</li>
-                <li>Everything for free with optional ads</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}-${faq.q}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More Comparisons</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Unlimited vs 1 puzzle/day</p>
-            </Link>
-            <Link href={`/${locale}/lexiclash-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Scrabble GO</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">No interruptions, no bots</p>
-            </Link>
-            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">Best Word Games 2026</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Complete comparison guide</p>
-            </Link>
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">So Which One?</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Cabanagrams is a fantastic game. It nails the Bananagrams experience and has incredible language breadth. If you love that personal-grid-building puzzle and want it with real players online, that&apos;s exactly what you get. The donation model is honest and friction-free.
+      <LandingHero
+        eyebrow="LexiClash vs Cabanagrams"
+        title="LexiClash vs Cabanagrams — Which Word Game Wins?"
+        lead="Both are free, no-signup word games built on the foundation of Bananagrams — build words fast, race other players, no complicated scoring."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/multiplayer`}>Try LexiClash Free</LandingButton>
+            <LandingButton href={`/${locale}/adventure`} variant="secondary">Adventure Mode</LandingButton>
+          </>
+        }
+        art={LANDING_ART.duel('Two LexiClash mascots facing off in a word duel')}
+        artTone="yellow"
+        more={
+          <p>
+            But they diverge from there. Cabanagrams nails the purist Bananagrams experience in your browser with 11 languages. LexiClash swaps the personal-grid mechanic for shared-board word finding and wraps it in 30+ game modes, progression systems, and mobile apps. Here&apos;s the breakdown.
           </p>
-          <p className="mt-4 text-neo-gray-200">
-            LexiClash is for people who want more: the same multiplayer adrenaline, but also adventure campaigns, brain training, 30+ modes, mobile apps, ranked play, and progression systems. It&apos;s bigger, deeper, and built for players who want to invest hours, not just sessions.
-          </p>
-          <p className="mt-4 text-neo-gray-200">
-            Both are free. Both are real multiplayer. You honestly can&apos;t go wrong. But if you&apos;re scrolling this page, you probably want to see what LexiClash has to offer. Here&apos;s your shot.
-          </p>
-          <div className="mt-6">
-            <Link href={`/${locale}/multiplayer`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-              Play LexiClash Now — Free, No Download
-            </Link>
+        }
+      >
+        <LinkPills items={[{ href: `/${locale}/brain`, label: 'Brain Drills' }]} />
+      </LandingHero>
+
+      <Section title="The Honest Comparison">
+        <CompareTable
+          columns={['Feature', 'LexiClash', 'Cabanagrams']}
+          rows={[
+            ['Game mechanic', 'Shared grid, connect letters', 'Personal grid, build words'],
+            ['Game modes', '30+', '1 main mode (Bananagrams-style)'],
+            ['Solo vs AI', 'Yes, extensive solo + adventure', 'Yes, 3 difficulty tiers'],
+            ['Multiplayer', 'Real-time, 2-20+ players', 'Real-time, up to 4 players'],
+            ['Languages', '5 (EN, HE, SV, JA, ES)', '11 (broad multilingual support)'],
+            ['RTL support', 'Yes (Hebrew)', 'No'],
+            ['Platforms', 'Web + Android app', 'Web-only'],
+            ['No download needed', 'Yes (browser only)', 'Yes (browser only)'],
+            ['Free to play', 'Completely', 'Completely'],
+            ['Monetization', 'Ad-supported (optional)', 'Donationware (Buy Me a Coffee)'],
+            ['Progression system', 'Ranked ladder, achievements', 'None (session-based)'],
+            ['Daily challenges', 'Yes, with leaderboards', 'Word of the day (varies)'],
+            ['Adventure/Story', 'Yes (100+ levels, boss fights)', 'No'],
+            ['Accessibility', 'WCAG 2.1 AA', 'Standard'],
+          ]}
+        />
+      </Section>
+
+      <Section title="What LexiClash Offers That Cabanagrams Doesn't">
+        <TileGrid
+          variant="paper"
+          items={[
+            { title: 'Adventure Campaign', body: '100+ levels, story progression, boss battles, loot upgrades. A full narrative experience that turns word games into exploration.' },
+            { title: 'Brain Training Drills', body: '5 dedicated modes (Memory Hunt, Combo Master, etc.) designed around cognitive improvement, not just competition.' },
+            { title: '30+ Game Modes', body: 'Connections, Wordle-style daily, Blast action mode, party games, ranked competitive, and more. Same skill set, wildly different feels.' },
+            { title: 'Native Android App', body: 'Play from your home screen. Cabanagrams is web-only; LexiClash has a proper Android app with offline access and shortcuts.' },
+            { title: 'Ranked Competitive Play', body: 'ELO ladder, ranked seasons, leaderboards. Cabanagrams is casual drop-in; LexiClash has infrastructure for serious players.' },
+            { title: 'Cross-Locale Progression', body: '6 languages (EN, HE, SV, JA, ES) with full progression sync. Hebrew speakers get a full RTL experience.' },
+          ]}
+        />
+      </Section>
+
+      <Section title="The Gameplay Difference: Shared Grid vs Personal Grid">
+        <TileGrid
+          columns={2}
+          items={[
+            {
+              tone: 'cyan',
+              title: 'Cabanagrams (Personal Grid)',
+              body: "You each get your own grid of random tiles. Your job: rearrange them into a connected, valid word grid as fast as possible. Think Bananagrams — competitive scrabble where setup and strategy matter. You win by finishing first. It's clever, tactile, and multiplayer-focused but simple in scope.",
+            },
+            {
+              tone: 'pink',
+              title: 'LexiClash (Shared Grid)',
+              body: "Everyone sees the same grid of random letters (like Boggle). Your job: find as many words as possible by connecting adjacent letters. Unlimited words per round. It's scanning + pattern recognition + speed. Less chess-like than Cabanagrams, more arcade-like. The same energy (real-time, competitive, frantic) but completely different puzzle-solving path.",
+            },
+          ]}
+        />
+      </Section>
+
+      <Section title="Why Choose Each Game">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="flex flex-col gap-3">
+            <h3 className="font-neo-display text-xl font-bold text-neo-cyan">Choose Cabanagrams If You Want:</h3>
+            <CheckList
+              items={[
+                'Pure Bananagrams experience in your browser',
+                'Minimal, focused gameplay (one great mode)',
+                '11 language options for global play',
+                'No ads, fully supported by donations',
+                'Quick, casual sessions with friends',
+              ]}
+            />
           </div>
-        </section>
-      </div>
-    </main>
+          <div className="flex flex-col gap-3">
+            <h3 className="font-neo-display text-xl font-bold text-neo-lime">Choose LexiClash If You Want:</h3>
+            <CheckList
+              items={[
+                '30+ game modes (variety + replayability)',
+                'Adventure campaign + brain training',
+                'Native Android app (no browser required)',
+                'Ranked competitive play with progression',
+                'Hebrew, Swedish, Japanese support',
+                'Everything for free with optional ads',
+              ]}
+            />
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Frequently Asked Questions">
+        <FaqList items={faqs} />
+      </Section>
+
+      <Section title="More Comparisons">
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: `/${locale}/lexiclash-vs-wordle`, title: 'LexiClash vs Wordle', body: 'Unlimited vs 1 puzzle/day' },
+            { href: `/${locale}/lexiclash-vs-scrabble`, title: 'LexiClash vs Scrabble GO', body: 'No interruptions, no bots' },
+            { href: `/${locale}/best-online-word-games`, title: 'Best Word Games 2026', body: 'Complete comparison guide' },
+          ]}
+        />
+      </Section>
+
+      <CtaBand
+        tone="pink"
+        title="So Which One?"
+        body={
+          <div className="flex flex-col gap-3">
+            <p>
+              Cabanagrams is a fantastic game. It nails the Bananagrams experience and has incredible language breadth. If you love that personal-grid-building puzzle and want it with real players online, that&apos;s exactly what you get. The donation model is honest and friction-free.
+            </p>
+            <p>
+              LexiClash is for people who want more: the same multiplayer adrenaline, but also adventure campaigns, brain training, 30+ modes, mobile apps, ranked play, and progression systems. It&apos;s bigger, deeper, and built for players who want to invest hours, not just sessions.
+            </p>
+            <p>
+              Both are free. Both are real multiplayer. You honestly can&apos;t go wrong. But if you&apos;re scrolling this page, you probably want to see what LexiClash has to offer. Here&apos;s your shot.
+            </p>
+          </div>
+        }
+        actions={<LandingButton href={`/${locale}/multiplayer`}>Play LexiClash Now — Free, No Download</LandingButton>}
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

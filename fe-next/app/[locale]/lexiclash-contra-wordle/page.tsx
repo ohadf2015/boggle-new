@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { CheckList, CompareTable, CtaBand, FaqList, LandingButton, LandingHero, LandingPage, LinkPills, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const revalidate = 86400;
 
@@ -95,164 +96,104 @@ export default async function LexiClashContraWordlePage({ params }: PageProps) {
   const { locale } = await params;
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/quick-play`, label: 'Jugar Solo — Gratis' }}>
       {/* JSON-LD structured data for FAQ rich results — static content only, no user input */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqJsonLd }}
       />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          LexiClash vs Wordle — ¿Por Qué Cambiarte a Algo Mejor?
-        </h1>
-
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Ya te sabes la rutina: abres Wordle, adivinas la palabra en 4 intentos, compartes tu cuadradito verde
-          en Twitter y... ya. Hasta mañana. ¿Y si te dijéramos que hay un juego de palabras que puedes jugar
-          cuando quieras, contra tus amigos en tiempo real, con combos, jefes y desafíos diarios? Eso es
-          LexiClash — la alternativa a Wordle que no sabías que necesitabas.
-        </p>
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link
-            href={`/${locale}/quick-play`}
-            className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
-          >
-            Jugar Solo — Gratis
-          </Link>
-          <Link
-            href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4"
-          >
-            Jugar con Amigos
-          </Link>
-          <Link
-            href={`/${locale}/daily`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
-          >
-            Desafío Diario
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            LexiClash vs Wordle — Comparación Completa
-          </h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse rounded-neo border-3 border-neo-gray-400 text-sm sm:text-base">
-              <thead>
-                <tr className="border-b-3 border-neo-gray-400 bg-neo-navy/80">
-                  <th className="px-4 py-3 text-left font-bold text-neo-lime">Característica</th>
-                  <th className="px-4 py-3 text-center font-bold text-neo-cyan">LexiClash</th>
-                  <th className="px-4 py-3 text-center text-neo-gray-300">Wordle</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  ['Partidas por día', 'Ilimitadas', '1 por día'],
-                  ['Multijugador', '✓ Tiempo real (2-20+ jugadores)', '✗ Solo individual'],
-                  ['Precio', 'Gratis, sin anuncios molestos', 'Gratis (con anuncios en NYT)'],
-                  ['Mecánica', 'Conectar letras en grilla', 'Adivinar palabra de 5 letras'],
-                  ['Desafío diario', '✓ Mismo tablero para todos', '✓ Misma palabra para todos'],
-                  ['Modo aventura', '✓ Jefes, upgrades, misiones', '✗'],
-                  ['Idiomas', '5 (ES, EN, HE, SV, JA)', '37+ (solo texto)'],
-                  ['Tamaños de grilla', '4×4, 5×5, 6×6', 'N/A (5 letras fijas)'],
-                  ['Sistema de combos', '✓ Puntos extra por velocidad', '✗'],
-                  ['Sin descarga', '✓ Directo en el navegador', '✓ Directo en el navegador'],
-                ].map(([feature, lexi, wordle]) => (
-                  <tr key={feature} className="border-b border-neo-gray-400/50">
-                    <td className="px-4 py-3 font-medium">{feature}</td>
-                    <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
-                    <td className="px-4 py-3 text-center text-neo-gray-300">{wordle}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            ¿Por Qué LexiClash Es la Mejor Alternativa a Wordle?
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              'Juega cuantas veces quieras — sin esperar al día siguiente',
-              'Multijugador en tiempo real: reta a tus amigos al instante',
-              'Sistema de combos que premia la velocidad y consistencia',
-              'Modo aventura con jefes, upgrades y progresión tipo RPG',
-              'Desafío diario global — compite contra el mundo entero',
-              'Grillas de 4×4, 5×5 y 6×6 para todos los niveles',
-              'Funciona en celular, tablet y computadora sin descargar nada',
-              'Disponible en español latino con diccionario completo',
-            ].map((feature) => (
-              <div
-                key={feature}
-                className="flex gap-3 rounded-neo border-3 border-neo-lime bg-neo-navy/50 p-4 shadow-hard"
-              >
-                <span className="shrink-0 text-neo-lime">✓</span>
-                <p className="text-sm sm:text-base">{feature}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Preguntas Frecuentes</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details
-                key={`faq-${idx}-${faq.q}`}
-                className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard"
-              >
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Más Sobre Juegos de Palabras</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Link href="/es/juego-de-palabras-multijugador" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink/40">
-              <h3 className="font-bold text-neo-pink">Scrabble Online en Español Multijugador</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Sala con enlace, tiempo real, gratis y sin registro</p>
-            </Link>
-            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
-              <h3 className="font-bold text-neo-cyan">Mejores Juegos de Palabras 2026</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Guía completa de comparación</p>
-            </Link>
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Deja Wordle. Prueba Algo Mejor.</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Wordle está bien para un ratito, pero si de verdad te gustan los juegos de palabras, te vas a quedar
-            con ganas de más. LexiClash te da partidas ilimitadas, competencia real contra otros jugadores y un
-            sistema de progresión que engancha. Todo gratis, todo en tu navegador, todo en español.
+      <LandingHero
+        eyebrow="LexiClash vs Wordle"
+        title="LexiClash vs Wordle — ¿Por Qué Cambiarte a Algo Mejor?"
+        lead="Ya te sabes la rutina: abres Wordle, adivinas la palabra en 4 intentos, compartes tu cuadradito verde en Twitter y... ya."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/quick-play`}>Jugar Solo — Gratis</LandingButton>
+            <LandingButton href={`/${locale}/multiplayer`} variant="secondary">Jugar con Amigos</LandingButton>
+          </>
+        }
+        art={LANDING_ART.duel('Dos mascotas de LexiClash en un duelo de palabras')}
+        artTone="lime"
+        more={
+          <p>
+            Hasta mañana. ¿Y si te dijéramos que hay un juego de palabras que puedes jugar cuando quieras, contra tus
+            amigos en tiempo real, con combos, jefes y desafíos diarios? Eso es LexiClash — la alternativa a Wordle que no
+            sabías que necesitabas.
           </p>
-          <p className="mt-4 text-neo-gray-200">
-            Ya sea que busques una alternativa a Wordle en español, un juego de palabras online para jugar con
-            amigos, o simplemente algo más intenso que adivinar 5 letras — LexiClash es tu respuesta. Dale,
-            que la primera partida es en 30 segundos.
-          </p>
-          <div className="mt-6">
-            <Link
-              href={`/${locale}/quick-play`}
-              className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg"
-            >
-              Jugar LexiClash Gratis — Sin Descargas
-            </Link>
+        }
+      >
+        <LinkPills items={[{ href: `/${locale}/daily`, label: 'Desafío Diario' }]} />
+      </LandingHero>
+
+      <Section title="LexiClash vs Wordle — Comparación Completa">
+        <CompareTable
+          columns={['Característica', 'LexiClash', 'Wordle']}
+          rows={[
+            ['Partidas por día', 'Ilimitadas', '1 por día'],
+            ['Multijugador', '✓ Tiempo real (2-20+ jugadores)', '✗ Solo individual'],
+            ['Precio', 'Gratis, sin anuncios molestos', 'Gratis (con anuncios en NYT)'],
+            ['Mecánica', 'Conectar letras en grilla', 'Adivinar palabra de 5 letras'],
+            ['Desafío diario', '✓ Mismo tablero para todos', '✓ Misma palabra para todos'],
+            ['Modo aventura', '✓ Jefes, upgrades, misiones', '✗'],
+            ['Idiomas', '5 (ES, EN, HE, SV, JA)', '37+ (solo texto)'],
+            ['Tamaños de grilla', '4×4, 5×5, 6×6', 'N/A (5 letras fijas)'],
+            ['Sistema de combos', '✓ Puntos extra por velocidad', '✗'],
+            ['Sin descarga', '✓ Directo en el navegador', '✓ Directo en el navegador'],
+          ]}
+        />
+      </Section>
+
+      <Section title="¿Por Qué LexiClash Es la Mejor Alternativa a Wordle?">
+        <CheckList
+          items={[
+            'Juega cuantas veces quieras — sin esperar al día siguiente',
+            'Multijugador en tiempo real: reta a tus amigos al instante',
+            'Sistema de combos que premia la velocidad y consistencia',
+            'Modo aventura con jefes, upgrades y progresión tipo RPG',
+            'Desafío diario global — compite contra el mundo entero',
+            'Grillas de 4×4, 5×5 y 6×6 para todos los niveles',
+            'Funciona en celular, tablet y computadora sin descargar nada',
+            'Disponible en español latino con diccionario completo',
+          ]}
+        />
+      </Section>
+
+      <Section title="Preguntas Frecuentes">
+        <FaqList items={faqs} />
+      </Section>
+
+      <Section title="Más Sobre Juegos de Palabras">
+        <TileGrid
+          columns={2}
+          variant="paper"
+          items={[
+            { href: '/es/juego-de-palabras-multijugador', tone: 'pink', title: 'Scrabble Online en Español Multijugador', body: 'Sala con enlace, tiempo real, gratis y sin registro' },
+            { href: `/${locale}/best-online-word-games`, tone: 'cyan', title: 'Mejores Juegos de Palabras 2026', body: 'Guía completa de comparación' },
+          ]}
+        />
+      </Section>
+
+      <CtaBand
+        tone="pink"
+        title="Deja Wordle. Prueba Algo Mejor."
+        body={
+          <div className="flex flex-col gap-3">
+            <p>
+              Wordle está bien para un ratito, pero si de verdad te gustan los juegos de palabras, te vas a quedar con ganas
+              de más. LexiClash te da partidas ilimitadas, competencia real contra otros jugadores y un sistema de progresión
+              que engancha. Todo gratis, todo en tu navegador, todo en español.
+            </p>
+            <p>
+              Ya sea que busques una alternativa a Wordle en español, un juego de palabras online para jugar con amigos, o
+              simplemente algo más intenso que adivinar 5 letras — LexiClash es tu respuesta. Dale, que la primera partida es
+              en 30 segundos.
+            </p>
           </div>
-        </section>
-      </div>
-    </main>
+        }
+        actions={<LandingButton href={`/${locale}/quick-play`}>Jugar LexiClash Gratis — Sin Descargas</LandingButton>}
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

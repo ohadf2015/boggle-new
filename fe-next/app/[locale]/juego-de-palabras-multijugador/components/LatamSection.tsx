@@ -7,7 +7,7 @@ const COUNTRIES: { name: string; tone: string }[] = [
   { name: 'Argentina', tone: 'bg-neo-cyan' },
   { name: 'Colombia', tone: 'bg-neo-yellow' },
   { name: 'Chile', tone: 'bg-neo-pink' },
-  { name: 'Perú', tone: 'bg-neo-cream' },
+  { name: 'Perú', tone: 'bg-neo-orange' },
   { name: 'Ecuador', tone: 'bg-neo-lime' },
   { name: 'Uruguay', tone: 'bg-neo-cyan' },
   { name: 'España', tone: 'bg-neo-yellow' },
@@ -48,7 +48,7 @@ function GroupChat() {
 export function LatamSection({ locale }: { locale: string }) {
   return (
     <section
-      className="relative mb-14 rounded-neo-lg border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard-lg sm:p-8"
+      className="relative rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 pt-8 text-neo-black shadow-hard-xl sm:p-8 sm:pt-10"
       data-seo="latam"
     >
       <span
@@ -59,7 +59,7 @@ export function LatamSection({ locale }: { locale: string }) {
       </span>
       <div className="grid items-center gap-8 lg:grid-cols-[1.4fr_1fr] lg:gap-10">
         <div>
-          <h2 className="mb-4 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
+          <h2 className="mb-4 font-neo-display text-2xl font-bold leading-tight text-balance sm:text-3xl">
             Juegos de palabras con amigos, desde el celular y sin descargar nada
           </h2>
           <ul data-country-chips aria-hidden="true" className="mb-5 flex flex-wrap gap-2">
@@ -67,7 +67,7 @@ export function LatamSection({ locale }: { locale: string }) {
               <li
                 key={c.name}
                 className={cn(
-                  'rounded-neo border-2 border-neo-black px-2.5 py-1 font-neo-display text-xs font-black uppercase tracking-wide text-neo-black shadow-hard-sm',
+                  'rounded-neo border-2 border-neo-black px-2.5 py-1 font-neo-display text-xs font-bold uppercase tracking-wide text-neo-black',
                   c.tone,
                   i % 2 === 0 ? '-rotate-1' : 'rotate-1'
                 )}
@@ -76,9 +76,9 @@ export function LatamSection({ locale }: { locale: string }) {
               </li>
             ))}
           </ul>
-          <div className="space-y-3 font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
+          <div className="space-y-3 leading-relaxed [&_a]:font-bold [&_a]:underline [&_a]:decoration-neo-pink [&_a]:decoration-2 [&_a]:underline-offset-2">
             <p>
-              Si buscabas algo como <strong className="text-neo-cyan">Palabras con amigos</strong> pero sin
+              Si buscabas algo como <strong>Palabras con amigos</strong> pero sin
               esperar un día entero a que el otro haga su jugada, aquí todo pasa en vivo. Todos ven la misma
               cuadrícula al mismo tiempo y la ronda se termina en dos o tres minutos. Se abre en el navegador
               del celular o de la compu, así que no hace falta bajar ninguna app ni crearse una cuenta.
@@ -89,11 +89,11 @@ export function LatamSection({ locale }: { locale: string }) {
               compartiendo pantalla para que todos vean el marcador.
             </p>
             <p>
-              <Link href={`/${locale}/multiplayer`} className="text-neo-pink underline">
+              <Link href={`/${locale}/multiplayer`}>
                 Arma una sala para tu grupo
               </Link>{' '}
               o, si hoy juegas solo, prueba{' '}
-              <Link href={`/${locale}/daily`} className="text-neo-pink underline">
+              <Link href={`/${locale}/daily`}>
                 el reto diario
               </Link>
               , que es el mismo tablero para todos los jugadores del mundo.

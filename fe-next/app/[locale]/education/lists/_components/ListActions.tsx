@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState, type ComponentType } from 'react';
+import { landingButtonClass } from '@/components/landing/kit';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { writeQuickLaunchIntent, QUICK_LAUNCH_FLOW } from '@/components/teacher/dashboard/quickLaunchIntent';
@@ -78,24 +79,24 @@ export function ListActions({ locale, signupHref, title, lang, words, playable, 
           data-cta="play-class"
           href={signupHref}
           onClick={playWithClass}
-          className="rounded-neo border-4 border-neo-black bg-neo-lime px-7 py-4 sm:flex-1 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-transform duration-150 hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white"
+          className={`${landingButtonClass('primary')} flex-col gap-0 sm:flex-1`}
         >
           <span className="block text-base sm:text-lg">{labels.playClass}</span>
-          <span className="block text-xs font-bold tracking-widest opacity-70">{labels.playClassSub}</span>
+          <span className="block text-xs font-bold opacity-70">{labels.playClassSub}</span>
         </a>
         <button
           type="button"
           data-cta="practice-solo"
           onClick={() => openPractice('tiles')}
-          className="rounded-neo border-4 border-neo-black bg-neo-cyan px-7 py-4 sm:flex-1 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard transition-transform duration-150 hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white"
+          className={`${landingButtonClass('secondary')} flex-col gap-0 sm:flex-1`}
         >
           <span className="block text-base sm:text-lg">{labels.practiceSolo}</span>
-          <span className="block text-xs font-bold tracking-widest opacity-70">{labels.practiceSoloSub}</span>
+          <span className="block text-xs font-bold opacity-70">{labels.practiceSoloSub}</span>
         </button>
       </div>
 
       <section aria-labelledby="practice-modes" className="mt-10">
-        <h2 id="practice-modes" className="font-neo-display text-sm font-black uppercase tracking-widest text-neo-white/70">
+        <h2 id="practice-modes" className="font-neo-display text-base font-bold text-neo-white/80">
           {labels.modesTitle}
         </h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
@@ -105,12 +106,12 @@ export function ListActions({ locale, signupHref, title, lang, words, playable, 
               type="button"
               data-mode={m}
               onClick={() => openPractice(m)}
-              className="flex min-h-[64px] items-center gap-3 rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-4 text-start shadow-hard transition-transform duration-150 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white"
+              className="flex min-h-[64px] items-center gap-3 rounded-neo-lg border-3 border-neo-black bg-neo-cream p-4 text-start text-neo-black shadow-hard-lg motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-white"
             >
               <span aria-hidden className={`h-10 w-3 shrink-0 rounded-sm border-2 border-neo-black ${MODE_TINT[m]}`} />
               <span>
-                <span className="block font-neo-display text-base font-black text-neo-white">{labels.modes[m].title}</span>
-                <span className="block text-xs text-neo-white/70">{labels.modes[m].sub}</span>
+                <span className="block font-neo-display text-base font-bold">{labels.modes[m].title}</span>
+                <span className="block text-xs text-neo-black/70">{labels.modes[m].sub}</span>
               </span>
             </button>
           ))}

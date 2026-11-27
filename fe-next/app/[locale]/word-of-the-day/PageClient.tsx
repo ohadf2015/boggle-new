@@ -3,18 +3,20 @@
 import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { InlineBannerAd } from "@/components/ads";
+import { LandingButton, LandingPage, landingButtonClass } from '@/components/landing/kit';
 import { buildEmbedSnippet } from '../embed/word-of-the-day/embedSnippet';
 import type { WordEntry } from './content';
 
+const PAPER = 'rounded-neo-lg border-3 border-neo-black bg-neo-cream text-neo-black shadow-hard-xl';
+
 const difficultyColors: Record<string, string> = {
-  easy: 'bg-green-500 text-white',
-  medium: 'bg-neo-orange text-white',
-  hard: 'bg-neo-pink text-white',
+  easy: 'bg-neo-lime text-neo-black',
+  medium: 'bg-neo-orange text-neo-black',
+  hard: 'bg-neo-pink text-neo-black',
 };
 
 const difficultyLabels: Record<string, Record<string, string>> = {
@@ -88,182 +90,101 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
     }
   }, [lang]);
 
+  const h3 = 'mb-1 font-neo-display text-sm font-bold uppercase tracking-wide text-neo-black/70';
+
   return (
-    <>
+    <div className="min-h-dvh bg-neo-navy">
       <AutoHideHeader />
-      <main className="min-h-dvh bg-neo-navy text-white px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl">
-          {/* Page Title */}
-          <m.h1
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="font-neo-display text-3xl sm:text-4xl font-bold text-center text-neo-yellow mb-8"
-          >
-            {label('wordOfTheDay', lang)}
-          </m.h1>
+      <LandingPage locale={lang} topBar={false}>
+        <div className="grid items-start gap-8 lg:grid-cols-[1.4fr_1fr] lg:gap-x-10 lg:pt-6">
+          <div className="flex flex-col gap-6">
+            <h1 className="font-neo-display text-[2rem] font-bold leading-[1.1] sm:text-5xl">{label('wordOfTheDay', lang)}</h1>
 
-          {/* Today's Word Card */}
-          <m.article
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="border-3 border-neo-black shadow-hard rounded-neo bg-neo-navy-light p-6 sm:p-8 mb-6"
-            aria-label={todayWord.word}
-          >
-            {/* Word + Badges */}
-            <div className="flex flex-wrap items-center gap-3 mb-4">
-              <h2
-                data-speakable="true"
-                className="font-neo-display text-4xl sm:text-5xl font-black text-neo-cyan break-all"
-              >
-                {todayWord.word}
-              </h2>
-              <span className={cn('px-2 py-0.5 rounded-neo text-xs font-bold uppercase border-2 border-neo-black', difficultyColors[todayWord.difficulty])}>
-                {difficultyLabels[todayWord.difficulty]?.[lang] || todayWord.difficulty}
-              </span>
-              <span className="px-2 py-0.5 rounded-neo text-xs font-bold bg-neo-navy-elevated text-neo-white border-2 border-neo-black">
-                {todayWord.partOfSpeech}
-              </span>
-            </div>
-
-            {/* Definition */}
-            <section className="mb-4">
-              <h3 className="font-neo-display text-sm font-bold text-neo-yellow uppercase tracking-wide mb-1">
-                {label('definition', lang)}
-              </h3>
-              <p data-speakable="true" className="text-lg text-neo-white leading-relaxed">
-                {todayWord.definition}
-              </p>
-            </section>
-
-            {/* Etymology */}
-            <section className="mb-4">
-              <h3 className="font-neo-display text-sm font-bold text-neo-yellow uppercase tracking-wide mb-1">
-                {label('etymology', lang)}
-              </h3>
-              <p data-speakable="true" className="text-neo-white leading-relaxed">
-                {todayWord.etymology}
-              </p>
-            </section>
-
-            {/* Example */}
-            <section className="mb-4">
-              <h3 className="font-neo-display text-sm font-bold text-neo-yellow uppercase tracking-wide mb-1">
-                {label('example', lang)}
-              </h3>
-              <blockquote
-                data-speakable="true"
-                className="border-s-4 border-neo-cyan ps-4 italic text-neo-white"
-              >
-                {todayWord.example}
-              </blockquote>
-            </section>
-
-            {/* Fun Fact */}
-            <section className="mb-6 bg-neo-navy-elevated/50 border-2 border-neo-black rounded-neo p-4">
-              <h3 className="font-neo-display text-sm font-bold text-neo-pink uppercase tracking-wide mb-1">
-                {label('funFact', lang)}
-              </h3>
-              <p data-speakable="true" className="text-neo-white">
-                {todayWord.funFact}
-              </p>
-            </section>
-
-            {/* Action Buttons */}
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href={`/${lang}/quick-play`}
-                className="inline-flex items-center px-5 py-2.5 font-neo-display font-bold text-sm uppercase border-3 border-neo-black rounded-neo bg-neo-yellow text-neo-black shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-[box-shadow,translate,scale,rotate,transform] duration-100"
-              >
-                {label('practiceNow', lang)}
-              </Link>
-              <button
-                type="button"
-                onClick={handleShare}
-                className="inline-flex items-center px-5 py-2.5 font-neo-display font-bold text-sm uppercase border-3 border-neo-black rounded-neo bg-neo-cyan text-neo-black shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-[box-shadow,translate,scale,rotate,transform] duration-100"
-              >
-                {copied ? label('copied', lang) : label('share', lang)}
-              </button>
-            </div>
-
-            {/* Embed Widget Section */}
-            <section className="mt-6 pt-6 border-t-2 border-neo-black">
-              <h3 className="font-neo-display text-sm font-bold text-neo-pink uppercase tracking-wide mb-3">
-                {label('embedWidget', lang)}
-              </h3>
-              <p className="text-sm text-neo-white mb-3">
-                {label('embedSnippet', lang)}
-              </p>
-              <div className="bg-neo-navy-elevated border-2 border-neo-black rounded-neo p-3 mb-3">
-                <textarea
-                  readOnly
-                  value={buildEmbedSnippet(lang)}
-                  className="w-full bg-transparent text-neo-cream font-mono text-xs p-0 border-0 outline-none resize-none"
-                  rows={4}
-                />
+            <article className={cn(PAPER, 'flex flex-col gap-5 p-5 sm:p-8')} aria-label={todayWord.word}>
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 data-speakable="true" className="break-all font-neo-display text-5xl font-bold sm:text-6xl">
+                  {todayWord.word}
+                </h2>
+                <span className={cn('rounded-full border-2 border-neo-black px-3 py-0.5 text-xs font-bold uppercase', difficultyColors[todayWord.difficulty])}>
+                  {difficultyLabels[todayWord.difficulty]?.[lang] || todayWord.difficulty}
+                </span>
+                <span className="rounded-full border-2 border-neo-black bg-neo-white px-3 py-0.5 text-xs font-bold">
+                  {todayWord.partOfSpeech}
+                </span>
               </div>
-              <button
-                type="button"
-                onClick={handleEmbedCopy}
-                className="inline-flex items-center px-4 py-2 font-neo-display font-bold text-xs uppercase border-2 border-neo-black rounded-neo bg-neo-pink text-white shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-[box-shadow,translate,scale,rotate,transform] duration-100"
-              >
-                {embedCopied ? label('copied', lang) : label('embedCopyButton', lang)}
-              </button>
-            </section>
-          </m.article>
 
-          {/* Ad between sections */}
-          <InlineBannerAd webZone="content-page" className="mb-6" />
+              <section>
+                <h3 className={h3}>{label('definition', lang)}</h3>
+                <p data-speakable="true" className="text-xl leading-relaxed">{todayWord.definition}</p>
+              </section>
 
-          {/* Previous Words */}
-          <section>
-            <h2 className="font-neo-display text-2xl font-bold text-neo-yellow mb-4">
-              {label('previousWords', lang)}
-            </h2>
-            <div className="space-y-3 max-h-[500px] overflow-y-auto pe-1">
-              {previousWords.map((word, i) => (
-                <m.div
-                  key={word.dateKey}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: 0.05 * i }}
-                  className="border-3 border-neo-black shadow-hard-sm rounded-neo bg-neo-navy-light p-4"
-                >
-                  <div className="flex flex-wrap items-center gap-2 mb-1">
-                    <span className="font-neo-display text-xl font-black text-neo-cyan">
-                      {word.word}
-                    </span>
-                    <span className={cn('px-1.5 py-0.5 rounded-neo text-[10px] font-bold uppercase border border-neo-black', difficultyColors[word.difficulty])}>
+              <section>
+                <h3 className={h3}>{label('etymology', lang)}</h3>
+                <p data-speakable="true" className="leading-relaxed">{todayWord.etymology}</p>
+              </section>
+
+              <section>
+                <h3 className={h3}>{label('example', lang)}</h3>
+                <blockquote data-speakable="true" className="border-s-4 border-neo-pink ps-4 italic">
+                  {todayWord.example}
+                </blockquote>
+              </section>
+
+              <section className="rounded-neo border-2 border-neo-black bg-neo-yellow p-4">
+                <h3 className="mb-1 font-neo-display text-sm font-bold uppercase tracking-wide">{label('funFact', lang)}</h3>
+                <p data-speakable="true">{todayWord.funFact}</p>
+              </section>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <LandingButton href={`/${lang}/quick-play`}>{label('practiceNow', lang)}</LandingButton>
+                <button type="button" onClick={handleShare} className={landingButtonClass('secondary')}>
+                  {copied ? label('copied', lang) : label('share', lang)}
+                </button>
+              </div>
+            </article>
+          </div>
+
+          <section className="flex flex-col gap-4 lg:pt-[4.5rem]">
+            <h2 className="font-neo-display text-2xl font-bold">{label('previousWords', lang)}</h2>
+            <div className="flex flex-col gap-3">
+              {previousWords.map((word) => (
+                <div key={word.dateKey} className={cn(PAPER, 'p-4 shadow-hard-lg')}>
+                  <div className="mb-1 flex flex-wrap items-center gap-2">
+                    <span className="font-neo-display text-xl font-bold">{word.word}</span>
+                    <span className={cn('rounded-full border border-neo-black px-1.5 py-0.5 text-[10px] font-bold uppercase', difficultyColors[word.difficulty])}>
                       {difficultyLabels[word.difficulty]?.[lang] || word.difficulty}
                     </span>
-                    <span className="text-xs text-neo-white ms-auto">{word.dateKey}</span>
+                    <span className="ms-auto text-xs text-neo-black/70">{word.dateKey}</span>
                   </div>
-                  <p className="text-sm text-neo-white">{word.definition}</p>
-                </m.div>
+                  <p className="text-sm">{word.definition}</p>
+                </div>
               ))}
             </div>
           </section>
-
-          {/* Ad after previous words */}
-          <InlineBannerAd webZone="content-page" className="my-6" />
-
-          {/* CTA */}
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="text-center mt-8"
-          >
-            <Link
-              href={`/${lang}/quick-play`}
-              className="inline-flex items-center px-8 py-3 font-neo-display font-bold text-lg uppercase border-3 border-neo-black rounded-neo bg-neo-pink text-white shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-[box-shadow,translate,scale,rotate,transform] duration-100"
-            >
-              {label('playNow', lang)}
-            </Link>
-          </m.div>
         </div>
-      </main>
-    </>
+
+        <InlineBannerAd webZone="content-page" />
+
+        <section className="flex max-w-3xl flex-col gap-3">
+          <h2 className="font-neo-display text-xl font-bold">{label('embedWidget', lang)}</h2>
+          <p className="text-sm text-neo-white/80">{label('embedSnippet', lang)}</p>
+          <textarea
+            readOnly
+            value={buildEmbedSnippet(lang)}
+            className="w-full resize-none rounded-neo border-2 border-neo-black bg-neo-navy-elevated p-3 font-mono text-xs text-neo-cream outline-none"
+            rows={4}
+          />
+          <button type="button" onClick={handleEmbedCopy} className={cn(landingButtonClass('secondary'), 'min-h-11 self-start px-4 py-1.5 text-sm')}>
+            {embedCopied ? label('copied', lang) : label('embedCopyButton', lang)}
+          </button>
+        </section>
+
+        <InlineBannerAd webZone="content-page" />
+
+        <div className="flex justify-center">
+          <LandingButton href={`/${lang}/quick-play`} variant="secondary">{label('playNow', lang)}</LandingButton>
+        </div>
+      </LandingPage>
+    </div>
   );
 }

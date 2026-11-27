@@ -6,6 +6,7 @@ import { getContent, type Locale } from './content';
 import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
 import { SOLVER_EXAMPLES } from './examples';
 import { SolverExamplesSection } from './SolverExamplesSection';
+import { LinkPills, Prose, Section } from '@/components/landing/kit';
 
 const POPULAR_ANAGRAM_SEEDS = ['listen', 'stared', 'heart', 'stone', 'rates', 'learn', 'smart', 'great', 'earth', 'words'];
 
@@ -151,44 +152,37 @@ export default async function WordSolverPage({ params }: PageParams) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
       ))}
-      <WordSolverPageClient />
-      {examples && <SolverExamplesSection examples={examples} />}
-      <div className="mx-auto max-w-4xl px-4">
-        {locale === 'en' && (
-          <p className="text-neo-white text-sm mb-4">
-            Need letters in fixed positions, a pattern like c_a_e, or blank tiles? Use the{' '}
-            <Link href="/en/word-finder" className="text-neo-cyan underline">Word Finder</Link>.
-            Teaching the words you just found? Run{' '}
-            <Link href="/en/education/esl-word-games" className="text-neo-yellow underline">vocabulary games for the classroom</Link>
-            {' '}or{' '}
-            <Link href="/en/education/vocabulary-games-classroom" className="text-neo-pink underline">vocabulary games online free</Link>.
-          </p>
+      <WordSolverPageClient>
+        {examples && <SolverExamplesSection examples={examples} />}
+        {!examples && (
+          <Section
+            title="Popular Anagram Lookups"
+            intro="Shareable URLs for every anagram search — perfect for sending to friends or bookmarking."
+          >
+            <LinkPills
+              items={POPULAR_ANAGRAM_SEEDS.map((letters) => ({
+                href: `/${locale}/anagram/${letters}`,
+                label: <span className="uppercase">{letters}</span>,
+              }))}
+            />
+          </Section>
         )}
-        <GuidesCalloutLink locale={locale} />
-      </div>
-      {!examples && (
-        <section className="mx-auto max-w-4xl px-4 pb-12">
-          <h2 className="text-xl font-neo-display font-bold text-neo-pink uppercase tracking-wider mb-3">
-            Popular Anagram Lookups
-          </h2>
-          <p className="text-slate-400 text-sm mb-4">
-            Shareable URLs for every anagram search — perfect for sending to friends or bookmarking.
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-            {POPULAR_ANAGRAM_SEEDS.map((letters) => (
-              <Link
-                key={letters}
-                href={`/${locale}/anagram/${letters}`}
-                className="bg-neo-navy border-2 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm hover:shadow-hard hover:border-neo-pink transition-[box-shadow,border-color] text-center"
-              >
-                <span className="text-sm font-neo-display font-bold text-neo-white uppercase">
-                  {letters}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
+        <div className="flex flex-col gap-2">
+          {locale === 'en' && (
+            <Prose>
+              <p>
+                Need letters in fixed positions, a pattern like c_a_e, or blank tiles? Use the{' '}
+                <Link href="/en/word-finder">Word Finder</Link>.
+                Teaching the words you just found? Run{' '}
+                <Link href="/en/education/esl-word-games">vocabulary games for the classroom</Link>
+                {' '}or{' '}
+                <Link href="/en/education/vocabulary-games-classroom">vocabulary games online free</Link>.
+              </p>
+            </Prose>
+          )}
+          <GuidesCalloutLink locale={locale} />
+        </div>
+      </WordSolverPageClient>
     </>
   );
 }

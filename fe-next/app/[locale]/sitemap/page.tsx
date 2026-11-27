@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { LandingPage } from '@/components/landing/kit';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { getHelpContent } from '@/components/education/help/content';
 import { HELP_POPULAR, helpArticleHref } from '@/components/education/help/helpRegistry';
@@ -106,54 +107,52 @@ export default async function SitemapPage({ params }: PageProps) {
   const resolve = (key: string, fallback: string) => getNestedValue(t, key) || fallback;
   const helpArticles = servesHelp(locale) ? getHelpContent(locale).articles : null;
 
+  const CARD = 'flex flex-col overflow-hidden rounded-neo-lg border-3 border-neo-black bg-neo-cream text-neo-black shadow-hard-xl';
+  const TONES = ['bg-neo-lime', 'bg-neo-cyan', 'bg-neo-pink', 'bg-neo-yellow', 'bg-neo-purple', 'bg-neo-orange'];
+  const LINK = 'block rounded-neo px-2 py-1 text-[15px] font-medium hover:bg-neo-yellow';
+
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
-      <div className="max-w-4xl mx-auto px-4 py-12 sm:py-16">
-        <h1 className="text-2xl sm:text-3xl font-black uppercase text-neo-yellow mb-8 neo-title">
+    <LandingPage locale={locale}>
+      <header className="lg:pt-6">
+        <h1 className="font-neo-display text-[2rem] font-bold leading-[1.1] sm:text-5xl">
           {resolve('sitemap.title', 'Sitemap')}
         </h1>
+      </header>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {SECTIONS.map((section) => (
-            <div key={section.titleKey}>
-              <h2 className="text-sm font-black uppercase tracking-widest text-neo-yellow mb-3">
-                {resolve(section.titleKey, section.fallback)}
-              </h2>
-              <ul className="space-y-2">
-                {section.links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={`/${locale}${link.href}`}
-                      className="text-sm text-neo-white hover:text-neo-cyan transition-colors duration-100"
-                    >
-                      {resolve(link.labelKey, link.fallback)}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-          {helpArticles && (
-            <div>
-              <h2 className="text-sm font-black uppercase tracking-widest text-neo-yellow mb-3">
-                {resolve('footer.forTeachers', 'For Teachers')}
-              </h2>
-              <ul className="space-y-2">
-                {HELP_POPULAR.filter((slug) => helpArticles[slug]).map((slug) => (
-                  <li key={slug}>
-                    <Link
-                      href={helpArticleHref(locale, slug)}
-                      className="text-sm text-neo-white hover:text-neo-cyan transition-colors duration-100"
-                    >
-                      {helpArticles[slug].title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
+      <div className="grid grid-cols-1 items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {SECTIONS.map((section, i) => (
+          <div key={section.titleKey} className={CARD}>
+            <h2 className={`border-b-3 border-neo-black px-5 py-3 font-neo-display text-lg font-bold ${TONES[i % TONES.length]}`}>
+              {resolve(section.titleKey, section.fallback)}
+            </h2>
+            <ul className="space-y-0.5 p-3">
+              {section.links.map((link) => (
+                <li key={link.href}>
+                  <Link href={`/${locale}${link.href}`} className={LINK}>
+                    {resolve(link.labelKey, link.fallback)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+        {helpArticles && (
+          <div className={CARD}>
+            <h2 className={`border-b-3 border-neo-black px-5 py-3 font-neo-display text-lg font-bold ${TONES[SECTIONS.length % TONES.length]}`}>
+              {resolve('footer.forTeachers', 'For Teachers')}
+            </h2>
+            <ul className="space-y-0.5 p-3">
+              {HELP_POPULAR.filter((slug) => helpArticles[slug]).map((slug) => (
+                <li key={slug}>
+                  <Link href={helpArticleHref(locale, slug)} className={LINK}>
+                    {helpArticles[slug].title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
-    </main>
+    </LandingPage>
   );
 }

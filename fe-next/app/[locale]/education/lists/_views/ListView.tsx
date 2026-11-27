@@ -1,8 +1,8 @@
 import { WORD_LIST_INDEXING } from '@/lib/seo/wordLists/indexPolicy';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { GeoFaqList } from '@/components/seo/GeoFaqList';
-import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
+import { FaqCards, Section, landingButtonClass } from '@/components/landing/kit';
+import { EducationKitRelated } from '@/components/landing/education/EducationKitRelated';
 import { getCatalog, relatedLists } from '@/lib/seo/wordLists/catalog';
 import { listGraph } from '@/lib/seo/wordLists/jsonLd';
 import { playableWord, type WordList } from '@/lib/seo/wordLists/model';
@@ -143,16 +143,16 @@ export function ListView({ list, locale }: { list: WordList; locale: string }) {
 
       <section className="mt-14" aria-labelledby="words">
         <SectionTitle id="words">{tr(locale, 'detail.wordsTitle', { count: list.words.length })}</SectionTitle>
-        <ol className="mt-6 grid gap-3 sm:grid-cols-2">
+        <ol className="mt-5 grid divide-y-2 divide-neo-black/10 rounded-neo-lg border-3 border-neo-black bg-neo-cream px-4 text-neo-black shadow-hard-xl sm:grid-cols-2 sm:gap-x-8 sm:divide-y-0 sm:px-6 sm:py-2">
           {list.words.map((w, i) => (
-            <li key={w.word} className="flex gap-4 rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-4 shadow-hard">
-              <span className={`w-7 shrink-0 font-neo-display text-sm font-black ${accent.text}`}>{i + 1}</span>
+            <li key={w.word} className="flex gap-4 py-3 sm:border-b-2 sm:border-neo-black/10">
+              <span className="w-7 shrink-0 font-neo-display text-sm font-bold text-neo-black/50">{i + 1}</span>
               <div className="min-w-0 flex-1">
-                <p lang={list.lang} className="font-neo-display text-2xl font-black leading-tight text-neo-white">
+                <p lang={list.lang} className="font-neo-display text-xl font-bold leading-tight">
                   <bdi>{w.word}</bdi>
                 </p>
                 {w.definition && (
-                  <p className="mt-1 text-sm leading-relaxed text-neo-white/75">
+                  <p className="mt-1 text-sm leading-relaxed text-neo-black/75">
                     <bdi>{w.definition}</bdi>
                   </p>
                 )}
@@ -166,24 +166,24 @@ export function ListView({ list, locale }: { list: WordList; locale: string }) {
         <SectionTitle id="how">{tr(locale, 'detail.howTitle')}</SectionTitle>
         <ol className="mt-6 grid gap-4 sm:grid-cols-3">
           {[1, 2, 3].map((n) => (
-            <li key={n} className="rounded-neo border-3 border-neo-black bg-neo-cream p-5 text-neo-navy shadow-hard-lg">
+            <li key={n} className="rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-xl">
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-lime font-neo-display font-black shadow-hard-sm">
                 {n}
               </span>
-              <h3 className="mt-3 font-neo-display text-lg font-black">{tr(locale, `detail.how${n}Title`)}</h3>
+              <h3 className="mt-3 font-neo-display text-lg font-bold">{tr(locale, `detail.how${n}Title`)}</h3>
               <p className="mt-1 text-sm leading-relaxed text-neo-navy/80">{tr(locale, `detail.how${n}`)}</p>
             </li>
           ))}
         </ol>
       </section>
 
-      <aside className="mt-14 rounded-neo border-4 border-neo-black bg-neo-pink p-6 text-neo-navy shadow-hard-xl sm:p-10">
-        <h2 className="font-neo-display text-3xl font-black leading-tight sm:text-4xl">{tr(locale, 'detail.leadTitle')}</h2>
-        <p className="mt-3 max-w-2xl text-base font-bold sm:text-lg">{tr(locale, 'detail.leadBody')}</p>
+      <aside className="mt-14 rounded-neo-lg border-3 border-neo-black bg-neo-pink p-5 text-neo-black shadow-hard-xl sm:p-10">
+        <h2 className="font-neo-display text-2xl font-bold leading-tight sm:text-3xl">{tr(locale, 'detail.leadTitle')}</h2>
+        <p className="mt-3 max-w-2xl text-base font-medium sm:text-lg">{tr(locale, 'detail.leadBody')}</p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
           <Link
             href={accessHref}
-            className="rounded-neo border-4 border-neo-cream/40 bg-neo-navy px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime shadow-hard-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className={landingButtonClass('dark')}
           >
             {tr(locale, 'detail.leadCta')}
           </Link>
@@ -195,7 +195,7 @@ export function ListView({ list, locale }: { list: WordList; locale: string }) {
 
       <section className="mt-14" aria-labelledby="related">
         <SectionTitle id="related">{tr(locale, 'detail.relatedTitle')}</SectionTitle>
-        <CardGrid lists={relatedLists(list)} locale={locale} />
+        <CardGrid rail lists={relatedLists(list)} locale={locale} />
       </section>
 
       <section className="mt-14" aria-labelledby="browse">
@@ -227,9 +227,13 @@ export function ListView({ list, locale }: { list: WordList; locale: string }) {
         </div>
       </section>
 
-      <GeoFaqList title={tr(locale, 'detail.faqTitle')} items={faqs} />
+      <div data-geo-faq className="mt-14">
+        <Section title={tr(locale, 'detail.faqTitle')}>
+          <FaqCards items={faqs} />
+        </Section>
+      </div>
 
-      <EducationRelatedLinks locale={locale} slug="lists" />
+      <div className="mt-14"><EducationKitRelated locale={locale} slug="lists" /></div>
     </ListsFrame>
   );
 }

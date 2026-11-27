@@ -191,8 +191,9 @@ export default async function GuidesIndexPage({ params }: PageProps) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json">{encodeJsonLd(faqSchema)}</script>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
-      <GuidesIndexPageClient />
-      <EducationCalloutLink locale={locale} />
+      <GuidesIndexPageClient>
+        <EducationCalloutLink locale={locale} />
+      </GuidesIndexPageClient>
     </>
   );
 }

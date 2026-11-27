@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
 import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
 import benchmark from '@/lib/wordleSolver/benchmark.json';
+import { CtaBand, FaqList, LandingButton, Prose, Section } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 import WordleSolverPageClient from './PageClient';
 import { faqs } from './faqs';
 
@@ -42,9 +43,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-const sectionClass = 'bg-neo-navy-light border-3 border-neo-black rounded-neo p-5 sm:p-6 mb-6';
-const h2Class = 'font-neo-display text-2xl font-bold text-white mb-3';
-const pClass = 'text-neo-white leading-relaxed mb-3';
 
 export default async function WordleSolverPage({ params }: PageProps) {
   const { locale } = await params;
@@ -74,28 +72,27 @@ export default async function WordleSolverPage({ params }: PageProps) {
   });
 
   return (
-    <div dir="ltr" className="min-h-dvh bg-neo-navy">
+    <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: webAppJsonLd }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
       <FaqPageJsonLd faqs={faqs} />
 
-      <WordleSolverPageClient />
-
-      <article className="max-w-4xl mx-auto px-4 pb-12">
-        <section className={sectionClass}>
-          <h2 className={h2Class}>Tested on every Wordle answer</h2>
-          <p className={pClass}>
-            We played the solver against all {benchmark.games.toLocaleString('en-US')} answers in the original Wordle
-            list. It found every one within six guesses and needed {benchmark.average} guesses on average. Here is how
-            many games took each number of guesses:
-          </p>
-          <div className="space-y-1.5" role="table" aria-label="Guesses needed per game">
+      <WordleSolverPageClient>
+        <Section title="Tested on every Wordle answer">
+          <Prose>
+            <p>
+              We played the solver against all {benchmark.games.toLocaleString('en-US')} answers in the original Wordle
+              list. It found every one within six guesses and needed {benchmark.average} guesses on average. Here is how
+              many games took each number of guesses:
+            </p>
+          </Prose>
+          <div className="max-w-3xl space-y-1.5 rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-xl" role="table" aria-label="Guesses needed per game">
             {rows.map((r) => (
               <div key={r.guesses} role="row" className="flex items-center gap-3">
-                <span role="cell" className="w-6 font-mono font-bold text-neo-white text-end">{r.guesses}</span>
+                <span role="cell" className="w-6 text-end font-mono font-bold">{r.guesses}</span>
                 <span role="cell" className="flex-1">
                   <span
-                    className="block h-6 bg-neo-lime border-2 border-neo-black rounded-sm text-end pe-2 font-mono font-bold text-neo-black text-sm leading-5"
+                    className="block h-6 rounded-sm border-2 border-neo-black bg-neo-lime pe-2 text-end font-mono text-sm font-bold leading-5"
                     style={{ width: `${Math.max(8, (r.games / widest) * 100)}%` }}
                   >
                     {r.games}
@@ -104,47 +101,34 @@ export default async function WordleSolverPage({ params }: PageProps) {
               </div>
             ))}
           </div>
-        </section>
+        </Section>
 
-        <section className={sectionClass}>
-          <h2 className={h2Class}>How to use it</h2>
-          <p className={pClass}>
-            Play the suggested word in your Wordle game. Then tap each tile here until its color matches what the game
-            showed you, and press Next guess. If you played a different word, type it into the row first. Keep going
-            until the tiles are all green.
-          </p>
-          <p className={pClass}>
-            Under the board you can see every answer that still fits, so you can also just use it as a hint list and
-            pick the word yourself.
-          </p>
-        </section>
+        <Section title="How to use it">
+          <Prose>
+            <p>
+              Play the suggested word in your Wordle game. Then tap each tile here until its color matches what the game
+              showed you, and press Next guess. If you played a different word, type it into the row first. Keep going
+              until the tiles are all green.
+            </p>
+            <p>
+              Under the board you can see every answer that still fits, so you can also just use it as a hint list and
+              pick the word yourself.
+            </p>
+          </Prose>
+        </Section>
 
-        <section className="mb-8">
-          <h2 className={h2Class}>Frequently asked questions</h2>
-          <div className="space-y-3">
-            {faqs.map((faq) => (
-              <details key={faq.q} className="bg-neo-navy-light border-3 border-neo-black rounded-neo p-4">
-                <summary className="font-neo-display font-bold text-neo-orange cursor-pointer">{faq.q}</summary>
-                <p className="text-neo-white mt-3 leading-relaxed">{faq.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
+        <Section title="Frequently asked questions">
+          <FaqList items={faqs} />
+        </Section>
 
-        <section className="bg-neo-yellow border-3 border-neo-black shadow-hard rounded-neo p-6 text-center">
-          <h2 className="font-neo-display text-2xl font-bold text-neo-black mb-2">One Wordle a day not enough?</h2>
-          <p className="text-neo-black/80 mb-4">
-            LexiClash is a free word game where you race friends or the clock to find words in a letter grid. New
-            daily challenge every day, no download.
-          </p>
-          <Link
-            href={`/${locale}/daily`}
-            className="inline-block px-8 py-3 font-neo-display font-bold text-lg bg-neo-navy text-white border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-pressed transition-shadow duration-100"
-          >
-            Play today&apos;s challenge
-          </Link>
-        </section>
-      </article>
-    </div>
+        <CtaBand
+          tone="yellow"
+          title="One Wordle a day not enough?"
+          body="LexiClash is a free word game where you race friends or the clock to find words in a letter grid. New daily challenge every day, no download."
+          actions={<LandingButton href={`/${locale}/daily`} variant="dark">Play today&apos;s challenge</LandingButton>}
+          art={LANDING_ART.trophy('')}
+        />
+      </WordleSolverPageClient>
+    </>
   );
 }

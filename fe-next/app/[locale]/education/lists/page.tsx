@@ -16,7 +16,7 @@ import {
 import { gradeLabel, langName, topicLabel, tr } from '@/lib/seo/wordLists/i18n';
 import { wordListMetadata } from '@/lib/seo/wordLists/metadata';
 import { hreflangAlternates } from '@/lib/seo/hreflang';
-import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
+import { EducationKitRelated } from '@/components/landing/education/EducationKitRelated';
 import { CardGrid, LANG_ACCENT, ListsFrame, PageHeader, SectionTitle, Tag } from './_components/ui';
 import { TopicChips, baseCrumbs, wordTotal } from './_views/shared';
 
@@ -101,15 +101,15 @@ export default async function WordListsHubPage({ params }: PageProps) {
             return (
               <article
                 key={h.lang}
-                className="flex flex-col rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard-lg"
+                className="flex flex-col rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-xl"
               >
                 <Link href={`/${pickLocale(h.locales, locale)}${langHubPath(h.lang)}`} className="group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
                   <span
-                    className={`inline-block rounded-neo border-3 border-neo-black ${accent.fill} px-3 py-1 font-neo-display text-2xl font-black text-neo-navy shadow-hard group-hover:-translate-y-0.5`}
+                    className={`inline-block rounded-neo border-3 border-neo-black ${accent.fill} px-3 py-1 font-neo-display text-2xl font-bold text-neo-black shadow-hard-lg motion-safe:group-hover:-translate-y-0.5`}
                   >
                     {langName(locale, h.lang)}
                   </span>
-                  <p className="mt-3 text-sm font-bold text-neo-white/70">
+                  <p className="mt-3 text-sm font-bold text-neo-black/70">
                     {tr(locale, 'hub.langCard', { lists: h.lists.length, words: wordTotal(h.lists) })}
                   </p>
                 </Link>
@@ -131,7 +131,7 @@ export default async function WordListsHubPage({ params }: PageProps) {
                     <Link
                       key={pill.key}
                       href={pill.href}
-                      className="inline-flex min-h-11 items-center rounded-neo border-2 border-neo-black bg-neo-white px-3 text-sm font-black text-neo-navy shadow-hard-sm hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                      className="inline-flex min-h-11 items-center rounded-full border-2 border-neo-black bg-neo-white px-3 text-sm font-bold text-neo-black motion-safe:hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-black"
                     >
                       {gradeLabel(locale, pill.grade)}
                     </Link>
@@ -148,10 +148,10 @@ export default async function WordListsHubPage({ params }: PageProps) {
 
       <section className="mt-14" aria-labelledby="featured">
         <SectionTitle id="featured">{tr(locale, 'hub.langTitle.' + ownLang)}</SectionTitle>
-        <CardGrid lists={featured} locale={locale} />
+        <CardGrid rail lists={featured} locale={locale} />
       </section>
 
-      <EducationRelatedLinks locale={locale} slug="lists" />
+      <div className="mt-14"><EducationKitRelated locale={locale} slug="lists" /></div>
     </ListsFrame>
   );
 }

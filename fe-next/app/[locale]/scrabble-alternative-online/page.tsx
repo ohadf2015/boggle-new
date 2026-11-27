@@ -1,6 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
+import {
+  CompareTable,
+  CtaBand,
+  FaqList,
+  LandingButton,
+  LandingHero,
+  LandingPage,
+  LinkPills,
+  Mark,
+  Section,
+  Steps,
+  TileGrid,
+} from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 import { MULTIPLAYER_FAQ, MULTIPLAYER_HEADING, MULTIPLAYER_INTRO, MULTIPLAYER_STEPS } from './multiplayer';
 
 interface PageProps {
@@ -147,181 +160,104 @@ const compareRows: ReadonlyArray<readonly [string, string, string]> = [
   ['Pay-to-win mechanics', 'None', 'Boosts buy advantages'],
 ];
 
+const ANSWER_CARD = 'flex flex-col items-start gap-4 rounded-neo-lg border-3 border-neo-black bg-neo-cream p-6 text-neo-black shadow-hard-xl sm:p-8';
+const ANSWER_H2 = 'font-neo-display text-2xl font-bold leading-tight';
+
 export default async function ScrabbleAlternativeOnlinePage({ params }: PageProps) {
-  await params;
+  const { locale } = await params;
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
+    <LandingPage locale={locale} play={{ href: '/en/multiplayer', label: 'Play free now' }}>
       <script id="ld-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
       <script id="ld-videogame" type="application/ld+json" dangerouslySetInnerHTML={{ __html: videoGameJsonLd }} />
       <script id="ld-howto" type="application/ld+json" dangerouslySetInnerHTML={{ __html: howToJsonLd }} />
       <script id="ld-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
 
-      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-        <TopBackLink className="mb-4" />
-        <section className="mb-12">
-          <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
-            ★ Free · Real-Time · 2-20 Players ★
-          </span>
-          <h1 className="mt-5 font-neo-display text-5xl font-black leading-[0.95] tracking-tight sm:text-6xl">
-            The free <span className="inline-block rotate-[-2deg] bg-neo-pink px-3 text-neo-white shadow-hard">Scrabble</span>
+      <LandingHero
+        eyebrow="★ Free · Real-Time · 2-20 Players ★"
+        title={
+          <>
+            The free <Mark tone="pink">Scrabble</Mark>
             <br />
-            alternative — <span className="text-neo-cyan">online &amp; live</span>.
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">
-            LexiClash is a free, browser-based <strong>Scrabble alternative</strong>: same word-strategy depth, none of the turn-waiting. 2-20+ players share one letter grid simultaneously, the match wraps in 2-3 minutes, and nothing ever installs. No signup, no app store, no pay-to-win.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-            <Link
-              href="/en/multiplayer"
-              className="rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 text-center font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg"
-            >
-              Play free now →
-            </Link>
-            <Link
-              href="/en/best-online-word-games"
-              className="rounded-neo border-3 border-neo-black bg-neo-navy-light px-6 py-3 text-center font-neo-display text-lg font-black uppercase text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10"
-            >
+            alternative — online &amp; live.
+          </>
+        }
+        lead={
+          <>
+            LexiClash is a free, browser-based <strong className="font-bold text-neo-white">Scrabble alternative</strong>: same word-strategy depth, none of the turn-waiting. 2-20+ players share one letter grid simultaneously, the match wraps in 2-3 minutes, and nothing ever installs. No signup, no app store, no pay-to-win.
+          </>
+        }
+        actions={
+          <>
+            <LandingButton href="/en/multiplayer">Play free now →</LandingButton>
+            <LandingButton href="/en/best-online-word-games" variant="secondary">
               Compare 9 word games
-            </Link>
-          </div>
-        </section>
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.duel('Two LexiClash mascots facing off over a board of letter tiles')}
+        artTone="pink"
+      />
 
-        <section className="mb-12">
-          <h2 className="mb-3 font-neo-display text-3xl font-black tracking-tight text-neo-pink">
-            {NOT_ON_POGO_QUESTION}
-          </h2>
-          <p className="max-w-2xl text-lg leading-relaxed text-slate-300">{NOT_ON_POGO_ANSWER}</p>
-          <Link
-            href="/en/multiplayer"
-            className="mt-4 inline-block rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 text-center font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard"
-          >
-            Start a free room →
-          </Link>
+      <div className="grid items-start gap-6 lg:grid-cols-2">
+        <section className={ANSWER_CARD}>
+          <h2 className={ANSWER_H2}>{NOT_ON_POGO_QUESTION}</h2>
+          <p className="leading-relaxed">{NOT_ON_POGO_ANSWER}</p>
+          <LandingButton href="/en/multiplayer" variant="dark">Start a free room →</LandingButton>
         </section>
-
-        <section className="mb-12">
-          <h2 className="mb-3 font-neo-display text-3xl font-black tracking-tight text-neo-cyan">
-            {SCRABLE_ON_LINE_QUESTION}
-          </h2>
-          <p className="max-w-2xl text-lg leading-relaxed text-slate-300">{SCRABLE_ON_LINE_ANSWER}</p>
-          <Link
-            href="/en/multiplayer"
-            className="mt-4 inline-block rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 text-center font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard"
-          >
-            Play free now →
-          </Link>
+        <section className={ANSWER_CARD}>
+          <h2 className={ANSWER_H2}>{SCRABLE_ON_LINE_QUESTION}</h2>
+          <p className="leading-relaxed">{SCRABLE_ON_LINE_ANSWER}</p>
+          <LandingButton href="/en/multiplayer" variant="dark">Play free now →</LandingButton>
         </section>
-
-        <section id="online-multiplayer" className="mb-12">
-          <h2 className="mb-3 font-neo-display text-3xl font-black tracking-tight text-neo-lime">
-            {MULTIPLAYER_HEADING}
-          </h2>
-          <p className="mb-5 max-w-2xl text-lg leading-relaxed text-slate-300">{MULTIPLAYER_INTRO}</p>
-          <ol className="grid gap-4 sm:grid-cols-2">
-            {MULTIPLAYER_STEPS.map((step, i) => (
-              <li key={step.title} className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard">
-                <h3 className="font-neo-display text-lg font-black text-neo-cyan">
-                  {i + 1}. {step.title}
-                </h3>
-                <p className="mt-1 text-sm leading-relaxed text-slate-300">{step.body}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-3xl font-black uppercase tracking-tight text-neo-cyan">
-            LexiClash vs Scrabble GO at a glance
-          </h2>
-          <div className="overflow-hidden rounded-neo border-3 border-neo-black shadow-hard">
-            <table className="w-full border-collapse text-sm sm:text-base">
-              <thead>
-                <tr className="bg-neo-pink text-neo-white">
-                  <th className="border-b-3 border-r-3 border-neo-black px-3 py-2 text-left font-neo-display font-black uppercase">Feature</th>
-                  <th className="border-b-3 border-r-3 border-neo-black px-3 py-2 text-left font-neo-display font-black uppercase">LexiClash</th>
-                  <th className="border-b-3 border-neo-black px-3 py-2 text-left font-neo-display font-black uppercase">Scrabble GO</th>
-                </tr>
-              </thead>
-              <tbody>
-                {compareRows.map((row, i) => (
-                  <tr key={row[0]} className={i % 2 === 0 ? 'bg-neo-navy-light' : 'bg-neo-navy'}>
-                    <td className="border-b-2 border-r-2 border-neo-black px-3 py-2 font-bold text-neo-white">{row[0]}</td>
-                    <td className="border-b-2 border-r-2 border-neo-black px-3 py-2 text-neo-lime">{row[1]}</td>
-                    <td className="border-b-2 border-neo-black px-3 py-2 text-slate-300">{row[2]}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-3 text-xs text-slate-400">
-            Comparison reflects publicly available product details as of 2026. LexiClash is an independent word game; Scrabble® is a trademark of Hasbro / Mattel.
-          </p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-3xl font-black uppercase tracking-tight text-neo-lime">
-            Why play a Scrabble alternative?
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-neo border-3 border-neo-cyan/60 bg-neo-navy-light p-4 shadow-hard">
-              <h3 className="font-neo-display text-lg font-black text-neo-cyan">No turn waiting</h3>
-              <p className="mt-1 text-sm text-slate-300">Async Scrabble is great for one move per day. Real-time is great for game night. Pick the right tool.</p>
-            </div>
-            <div className="rounded-neo border-3 border-neo-pink/60 bg-neo-navy-light p-4 shadow-hard">
-              <h3 className="font-neo-display text-lg font-black text-neo-pink">Group-scale built in</h3>
-              <p className="mt-1 text-sm text-slate-300">Scrabble caps at 4 players. LexiClash goes to 20+ in one room — parties, classrooms, family nights.</p>
-            </div>
-            <div className="rounded-neo border-3 border-neo-lime/60 bg-neo-navy-light p-4 shadow-hard">
-              <h3 className="font-neo-display text-lg font-black text-neo-lime">Browser, not app</h3>
-              <p className="mt-1 text-sm text-slate-300">Send a URL. Friends join from any device — phone, laptop, tablet. No app store gate, no IT approval at work.</p>
-            </div>
-            <div className="rounded-neo border-3 border-neo-purple/60 bg-neo-navy-light p-4 shadow-hard">
-              <h3 className="font-neo-display text-lg font-black text-neo-purple">6 languages with full dictionaries</h3>
-              <p className="mt-1 text-sm text-slate-300">English, Spanish, Swedish, Japanese, Hebrew (RTL), Russian. Each with 10,000+ valid words verified against native dictionaries.</p>
-            </div>
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-3xl font-black uppercase tracking-tight text-neo-pink">
-            FAQ
-          </h2>
-          <div className="space-y-3">
-            {faqs.map(f => (
-              <details key={f.q} className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard">
-                <summary className="cursor-pointer font-neo-display font-black text-neo-white">{f.q}</summary>
-                <p className="mt-2 text-sm leading-relaxed text-slate-300">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-8 rounded-neo border-3 border-neo-lime bg-neo-navy-light p-6 shadow-hard">
-          <h2 className="mb-3 font-neo-display text-2xl font-black uppercase tracking-tight text-neo-lime">
-            Ready to play a real-time Scrabble alternative?
-          </h2>
-          <p className="mb-5 text-slate-300">
-            One link, 2-20 friends, 2 minutes per match. Always free to play.
-          </p>
-          <Link
-            href="/en/multiplayer"
-            className="inline-block rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg"
-          >
-            Start a free room →
-          </Link>
-        </section>
-
-        <nav className="border-t-2 border-neo-black/50 pt-6 text-sm text-slate-400">
-          <p className="mb-2 font-neo-display font-bold uppercase tracking-wider text-slate-300">More from LexiClash</p>
-          <ul className="flex flex-wrap gap-3">
-            <li><Link className="text-neo-cyan hover:underline" href="/en/free-multiplayer-word-game">Multiplayer word game online</Link></li>
-            <li><Link className="text-neo-pink hover:underline" href="/en/words-with-friends-alternative">Words With Friends alternative</Link></li>
-            <li><Link className="text-neo-lime hover:underline" href="/en/best-online-word-games">9 best word games (compare)</Link></li>
-            <li><Link className="text-neo-cyan hover:underline" href="/en/blog/boggle-vs-scrabble">Boggle vs Scrabble</Link></li>
-            <li><Link className="text-neo-lime hover:underline" href="/en/play-boggle-online-free">Play Boggle online free</Link></li>
-          </ul>
-        </nav>
       </div>
-    </main>
+
+      <Section id="online-multiplayer" title={MULTIPLAYER_HEADING} intro={MULTIPLAYER_INTRO}>
+        <Steps items={MULTIPLAYER_STEPS.map((step) => ({ title: step.title, body: step.body }))} />
+      </Section>
+
+      <Section title="LexiClash vs Scrabble GO at a glance">
+        <CompareTable
+          columns={['Feature', 'LexiClash', 'Scrabble GO']}
+          rows={compareRows.map((r) => [...r])}
+          caption="Comparison reflects publicly available product details as of 2026. LexiClash is an independent word game; Scrabble® is a trademark of Hasbro / Mattel."
+        />
+      </Section>
+
+      <Section title="Why play a Scrabble alternative?">
+        <TileGrid
+          columns={4}
+          items={[
+            { title: 'No turn waiting', body: 'Async Scrabble is great for one move per day. Real-time is great for game night. Pick the right tool.' },
+            { title: 'Group-scale built in', body: 'Scrabble caps at 4 players. LexiClash goes to 20+ in one room — parties, classrooms, family nights.' },
+            { title: 'Browser, not app', body: 'Send a URL. Friends join from any device — phone, laptop, tablet. No app store gate, no IT approval at work.' },
+            { title: '6 languages with full dictionaries', body: 'English, Spanish, Swedish, Japanese, Hebrew (RTL), Russian. Each with 10,000+ valid words verified against native dictionaries.' },
+          ]}
+        />
+      </Section>
+
+      <Section title="FAQ">
+        <FaqList items={faqs} />
+      </Section>
+
+      <CtaBand
+        tone="lime"
+        title="Ready to play a real-time Scrabble alternative?"
+        body="One link, 2-20 friends, 2 minutes per match. Always free to play."
+        actions={<LandingButton href="/en/multiplayer" variant="dark">Start a free room →</LandingButton>}
+        art={LANDING_ART.trophy('')}
+      />
+
+      <Section title="More from LexiClash">
+        <LinkPills
+          items={[
+            { href: '/en/free-multiplayer-word-game', label: 'Multiplayer word game online' },
+            { href: '/en/words-with-friends-alternative', label: 'Words With Friends alternative' },
+            { href: '/en/best-online-word-games', label: '9 best word games (compare)' },
+            { href: '/en/blog/boggle-vs-scrabble', label: 'Boggle vs Scrabble' },
+            { href: '/en/play-boggle-online-free', label: 'Play Boggle online free' },
+          ]}
+        />
+      </Section>
+    </LandingPage>
   );
 }

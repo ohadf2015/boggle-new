@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { LandingButton, LandingPage, Prose, Section } from '@/components/landing/kit';
 import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 export const revalidate = 86400;
@@ -128,36 +129,36 @@ export default async function OhadFisherPage({ params }: PageProps) {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: jsonLd }}
             />
-            <main className="min-h-screen bg-neo-navy px-4 py-12 sm:px-6 lg:px-8">
-                <div className="mx-auto max-w-3xl">
-                    <div className="mb-10 flex flex-col items-center gap-6 sm:flex-row sm:items-start">
+            <LandingPage locale={locale} className="max-w-4xl">
+                    <header className="flex flex-col items-center gap-6 rounded-neo-lg border-3 border-neo-black bg-neo-yellow p-6 text-neo-black shadow-hard-xl sm:flex-row sm:items-center sm:p-8 lg:mt-6">
                         <Image
                             src="/images/author-ohad.png"
                             alt="Ohad Fisher — Founder and Editor-in-Chief of LexiClash"
                             width={112}
                             height={112}
-                            className="h-28 w-28 shrink-0 rounded-neo border-3 border-black object-cover shadow-hard-lg"
+                            className="h-28 w-28 shrink-0 -rotate-2 rounded-neo-lg border-3 border-neo-black bg-neo-cream object-cover shadow-hard-lg sm:h-32 sm:w-32"
                             priority
                         />
                         <div className="text-center sm:text-start">
-                            <h1 className="font-neo-display text-3xl font-bold text-neo-white sm:text-4xl">Ohad Fisher</h1>
-                            <p className="mt-2 font-neo-body text-lg text-neo-lime">
+                            <h1 className="font-neo-display text-4xl font-bold sm:text-5xl">Ohad Fisher</h1>
+                            <p className="mt-2 text-lg font-bold">
                                 Founder &amp; Editor-in-Chief, LexiClash
                             </p>
                             <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
-                                <a href="mailto:editor@lexiclash.live" className="rounded-neo border-3 border-black bg-neo-cyan px-3 py-1 font-neo-body text-xs font-bold text-black shadow-hard-sm hover:shadow-hard">
+                                <a href="mailto:editor@lexiclash.live" className="inline-flex min-h-11 items-center rounded-full border-3 border-neo-black bg-neo-cream px-4 text-sm font-bold shadow-hard-sm">
                                     editor@lexiclash.live
                                 </a>
-                                <Link href={`/${locale}/editorial-policy`} className="rounded-neo border-3 border-black bg-neo-pink px-3 py-1 font-neo-body text-xs font-bold text-black shadow-hard-sm hover:shadow-hard">
+                                <Link href={`/${locale}/editorial-policy`} className="inline-flex min-h-11 items-center rounded-full border-3 border-neo-black bg-neo-cream px-4 text-sm font-bold shadow-hard-sm">
                                     Editorial Policy
                                 </Link>
                             </div>
                         </div>
-                    </div>
+                    </header>
 
-                    <section className="mb-10 rounded-neo border-3 border-black bg-neo-navy/80 p-6 shadow-hard">
-                        <h2 className="mb-4 font-neo-display text-xl font-bold text-neo-white">About Ohad</h2>
-                        <div className="space-y-4 font-neo-body text-base leading-relaxed text-gray-300">
+                    <Prose paper className="max-w-none space-y-8">
+                    <section>
+                        <h2 className="mb-4">About Ohad</h2>
+                        <div className="space-y-4">
                             <p>
                                 I&apos;m Ohad Fisher, the founder and editor-in-chief of LexiClash. I&apos;ve spent the last eight
                                 years building, playing, and studying word games — first as an obsessive competitive Boggle player,
@@ -170,7 +171,7 @@ export default async function OhadFisherPage({ params }: PageProps) {
                                 and I don&apos;t pretend to be one — when I write about memory, vocabulary, or brain health, every
                                 factual claim is sourced from peer-reviewed research and linked in the article so you can check it
                                 yourself. Our full approach is documented in the{' '}
-                                <Link href={`/${locale}/editorial-policy`} className="text-neo-lime underline">
+                                <Link href={`/${locale}/editorial-policy`}>
                                     LexiClash Editorial Policy
                                 </Link>
                                 .
@@ -179,7 +180,7 @@ export default async function OhadFisherPage({ params }: PageProps) {
                                 I write about the science, strategy, and psychology behind word games so players can get more out of
                                 their time with them — whether that&apos;s a casual daily puzzle or a serious run at a tournament
                                 leaderboard. I answer every email personally at{' '}
-                                <a href="mailto:editor@lexiclash.live" className="text-neo-lime underline">
+                                <a href="mailto:editor@lexiclash.live">
                                     editor@lexiclash.live
                                 </a>
                                 .
@@ -187,9 +188,9 @@ export default async function OhadFisherPage({ params }: PageProps) {
                         </div>
                     </section>
 
-                    <section className="mb-10 rounded-neo border-3 border-black bg-neo-navy/80 p-6 shadow-hard">
-                        <h2 className="mb-4 font-neo-display text-xl font-bold text-neo-white">How I Research &amp; Fact-Check</h2>
-                        <ul className="list-disc space-y-2 pl-5 font-neo-body text-base leading-relaxed text-gray-300">
+                    <section>
+                        <h2 className="mb-4">How I Research &amp; Fact-Check</h2>
+                        <ul className="space-y-2">
                             <li>
                                 <strong>I play every game I write about.</strong> Every review or comparison is based on at least
                                 ten hours of real play — no press kits, no second-hand opinions.
@@ -201,7 +202,7 @@ export default async function OhadFisherPage({ params }: PageProps) {
                             <li>
                                 <strong>I correct errors publicly.</strong> If something is wrong, I fix it and add a dated note at
                                 the bottom of the article. Email me at{' '}
-                                <a href="mailto:editor@lexiclash.live" className="text-neo-lime underline">
+                                <a href="mailto:editor@lexiclash.live">
                                     editor@lexiclash.live
                                 </a>{' '}
                                 with the URL and I&apos;ll respond within five business days.
@@ -210,54 +211,47 @@ export default async function OhadFisherPage({ params }: PageProps) {
                                 <strong>I disclose AI use.</strong> I use AI tools as a research assistant, never as a ghostwriter.
                                 Every word you read on LexiClash was written, rewritten, or signed off on by me. Full disclosure in
                                 the{' '}
-                                <Link href={`/${locale}/editorial-policy`} className="text-neo-lime underline">
+                                <Link href={`/${locale}/editorial-policy`}>
                                     Editorial Policy
                                 </Link>
                                 .
                             </li>
                         </ul>
                     </section>
+                    </Prose>
 
-                    <section className="mb-10">
-                        <h2 className="mb-4 font-neo-display text-xl font-bold text-neo-white">Areas of Expertise</h2>
+                    <Section title="Areas of Expertise">
                         <div className="flex flex-wrap gap-3">
                             {EXPERTISE.map((area) => (
                                 <span
                                     key={area}
-                                    className="rounded-neo border-3 border-black bg-neo-lime px-3 py-1 font-neo-body text-sm font-bold text-black shadow-hard-sm"
+                                    className="rounded-full border-3 border-neo-black bg-neo-lime px-4 py-1.5 text-sm font-bold text-neo-black shadow-hard-sm"
                                 >
                                     {area}
                                 </span>
                             ))}
                         </div>
-                    </section>
+                    </Section>
 
-                    <section className="mb-10">
-                        <h2 className="mb-4 font-neo-display text-xl font-bold text-neo-white">
-                            Articles by Ohad Fisher
-                        </h2>
-                        <ul className="space-y-3">
+                    <Section title="Articles by Ohad Fisher">
+                        <ul className="grid gap-3 sm:grid-cols-2">
                             {BLOG_POSTS.map((post) => (
                                 <li key={post.slug}>
                                     <Link
                                         href={`/${locale}/blog/${post.slug}`}
-                                        className="block rounded-neo border-3 border-black bg-neo-navy/60 px-4 py-3 font-neo-body text-neo-white shadow-hard-sm transition-shadow hover:shadow-hard"
+                                        className="flex h-full items-center rounded-neo-lg border-3 border-neo-black bg-neo-cream px-4 py-3 font-bold text-neo-black shadow-hard-lg hover:bg-neo-yellow"
                                     >
                                         {post.title}
                                     </Link>
                                 </li>
                             ))}
                         </ul>
-                    </section>
+                    </Section>
 
-                    <Link
-                        href={`/${locale}/about`}
-                        className="inline-block rounded-neo border-3 border-black bg-neo-yellow px-4 py-2 font-neo-body font-bold text-black shadow-hard-sm transition-shadow hover:shadow-hard"
-                    >
+                    <LandingButton href={`/${locale}/about`} variant="secondary" className="self-start">
                         &larr; Back to About
-                    </Link>
-                </div>
-            </main>
+                    </LandingButton>
+            </LandingPage>
         </>
     );
 }
