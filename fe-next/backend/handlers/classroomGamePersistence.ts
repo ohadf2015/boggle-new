@@ -18,7 +18,7 @@
  *
  * XP columns (`total_xp`, `current_level`, streaks, …) are NEVER written
  * here — only through the RPC. The progress upsert touches exactly
- * `words_attempted`, `words_mastered` and `started_at`.
+ * `words_attempted` and `started_at`; `words_mastered` follows the word memory.
  */
 
 import { getSupabase } from '../modules/supabase/client.js';
@@ -42,9 +42,11 @@ import {
   restrictToOffered,
   splitLessonWords,
   upsertLessonProgress,
+  liveWordResults,
   type LessonVocabulary,
 } from './classroomLessonVocabulary';
 import { loadTestAccountIds } from '@/lib/education/eduTestAccount';
+import { recordWordReviews } from '@/lib/education/recordWordReviews';
 
 export { playerScoresFromGameResults, roundHasStudents } from './classroomRoundParticipants.js';
 
@@ -375,6 +377,7 @@ export async function persistClassroomGameScores(
 
       // Lesson progress — the rows the teacher analytics read. One failure
       // must not hide the other lessons (or the XP below).
+      const quizAnswers = options.answersByUser ? (options.answersByUser[player.userId] ?? []) : null;
       for (const lessonId of lessonIds) {
         const lessonVocab = vocabByLesson.get(lessonId);
         if (!lessonVocab || lessonVocab.words.size === 0) continue;
@@ -389,6 +392,22 @@ export async function persistClassroomGameScores(
             'CLASSROOM_GAME',
             `Failed to record lesson progress for ${player.userId} on lesson ${lessonId} ` +
               `(game ${game.gameCode}): ${(err as Error).message}`
+          );
+        }
+        const reviews = liveWordResults(vocab, foundKeys, quizAnswers);
+        if (reviews.length === 0) continue;
+        try {
+          await recordWordReviews(supabase, {
+            studentId: player.userId,
+            lessonId,
+            lesson: { language: lessonVocab.language, words: [...lessonVocab.words.values()] },
+            reviews,
+            today: now.slice(0, 10),
+          });
+        } catch (err) {
+          logger.error(
+            'CLASSROOM_GAME',
+            `Failed to update word memory for ${player.userId} on lesson ${lessonId} (game ${game.gameCode}): ${(err as Error).message}`
           );
         }
       }

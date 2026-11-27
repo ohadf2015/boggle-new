@@ -44,6 +44,12 @@ vi.mock('../../redisClient', () => ({
   getRedisClient: vi.fn(() => ({ set: mockRedisSet })),
 }));
 
+const mockRecordWordReviews = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/education/recordWordReviews', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/education/recordWordReviews')>()),
+  recordWordReviews: (...a: unknown[]) => mockRecordWordReviews(...a),
+}));
+
 const mockLogger = vi.hoisted(() => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }));
 vi.mock('../../utils/logger', () => ({ default: mockLogger }));
 
@@ -91,6 +97,7 @@ describe('persistClassroomGameScores', () => {
     mockRpc.mockResolvedValue({ error: null });
     // Redis NX: acquired on first call
     mockRedisSet.mockResolvedValue('OK');
+    mockRecordWordReviews.mockResolvedValue({ recorded: 1, dropped: 0, mastered: [] });
   });
 
   describe('F-06: practice session payload', () => {
@@ -181,7 +188,7 @@ describe('persistClassroomGameScores', () => {
       expect(mockLessonsIn).toHaveBeenCalledWith('id', ['lesson-a', 'lesson-b']);
     });
 
-    it('merges words_attempted with the existing row and appends newly found words to words_mastered', async () => {
+    it('merges words_attempted with the existing row and leaves words_mastered to the word memory', async () => {
       // GIVEN an existing progress row where "cat" was tried twice, once correctly
       mockMaybeSingle.mockResolvedValue({
         data: {
@@ -206,7 +213,7 @@ describe('persistClassroomGameScores', () => {
       expect(payload.words_attempted.cat).toMatchObject({ attempts: 3, correct: 2 });
       expect(payload.words_attempted.dog).toMatchObject({ attempts: 1, correct: 0 });
       expect(payload.words_attempted.cat.lastAttemptAt).not.toBe('2026-01-01T00:00:00.000Z');
-      expect(payload.words_mastered).toEqual(['cat']);      // deduped, not appended twice
+      expect(payload).not.toHaveProperty('words_mastered');
       expect(payload.started_at).toBe('2026-01-01T00:00:00.000Z'); // kept
       // never write XP columns directly
       expect(payload).not.toHaveProperty('total_xp');
@@ -225,7 +232,48 @@ describe('persistClassroomGameScores', () => {
         cat: { attempts: 1, correct: 0, lastAttemptAt: expect.any(String) },
         dog: { attempts: 1, correct: 1, lastAttemptAt: expect.any(String) },
       });
-      expect(payload.words_mastered).toEqual(['dog']);
+      expect(payload).not.toHaveProperty('words_mastered');
+    });
+
+    it('records each found lesson word as a live find in the word memory (a find alone never masters)', async () => {
+      await persistClassroomGameScores(makeGame(), [{ userId: 'stu-1', score: 30, wordsFound: ['DOG', 'tree'] }]);
+      expect(mockRecordWordReviews).toHaveBeenCalledTimes(1);
+      const [, args] = mockRecordWordReviews.mock.calls[0];
+      expect(args).toMatchObject({
+        studentId: 'stu-1',
+        lessonId: 'lesson-1',
+        lesson: { language: 'en', words: ['cat', 'dog'] },
+        reviews: [{ word: 'dog', correct: true, kind: 'find' }],
+        today: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+      });
+    });
+
+    it('records nothing for lesson words a board player did not find (they may never have been on the board)', async () => {
+      await persistClassroomGameScores(makeGame(), [{ userId: 'stu-1', score: 0, wordsFound: [] }]);
+      expect(mockRecordWordReviews).not.toHaveBeenCalled();
+    });
+
+    it('records quiz answers as recognition, right and wrong, never as finds', async () => {
+      const answersByUser = {
+        'stu-1': [
+          { word: 'cat', choiceIndex: 0, correct: true, ms: 900 },
+          { word: 'dog', choiceIndex: 2, correct: false, ms: 1500 },
+        ],
+      };
+      await persistClassroomGameScores(makeGame({ settings: { timerMinutes: 3, gameMode: 'vocab-quiz' } }), [{ userId: 'stu-1', score: 10, wordsFound: ['cat'] }], { answersByUser });
+      const [, args] = mockRecordWordReviews.mock.calls[0];
+      expect(args.reviews).toEqual([
+        { word: 'cat', correct: true, kind: 'recognise', ms: 900 },
+        { word: 'dog', correct: false, kind: 'recognise', ms: 1500 },
+      ]);
+    });
+
+    it('keeps the round, its progress and XP when the word memory write fails, and logs it', async () => {
+      mockRecordWordReviews.mockRejectedValueOnce(new Error('boom'));
+      await persistClassroomGameScores(makeGame(), [{ userId: 'stu-1', score: 30, wordsFound: ['dog'] }]);
+      expect(mockUpsert).toHaveBeenCalledTimes(1);
+      expect(mockRpc).toHaveBeenCalled();
+      expect(mockLogger.error).toHaveBeenCalledWith('CLASSROOM_GAME', expect.stringContaining('word memory'));
     });
 
     it('matches Hebrew lesson words regardless of final-letter form', async () => {
@@ -240,8 +288,8 @@ describe('persistClassroomGameScores', () => {
       // storage key is the normalized (final-collapsed) form, same as normalizeForStorage
       expect(payload.words_attempted['שלומ']).toMatchObject({ attempts: 1, correct: 1 });
       expect(payload.words_attempted['ילד']).toMatchObject({ attempts: 1, correct: 0 });
-      // mastered keeps the teacher's display form
-      expect(payload.words_mastered).toEqual(['שלום']);
+      // the word memory gets the teacher's display form
+      expect(mockRecordWordReviews.mock.calls[0][1].reviews).toEqual([{ word: 'שלום', correct: true, kind: 'find' }]);
       const row = mockInsert.mock.calls[0][0];
       expect(row.results.lessonWordsFound).toEqual(['שלום']);
       expect(row.results.lessonWordsMissed).toEqual(['ילד']);

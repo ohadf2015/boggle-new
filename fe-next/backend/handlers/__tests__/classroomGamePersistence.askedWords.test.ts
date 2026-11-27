@@ -167,9 +167,9 @@ describe('a quiz that asked only some of the lesson', () => {
     expect(sessionInserts[0].accuracy).toBe(50);
   });
 
-  it('only masters words that were asked AND answered correctly', async () => {
+  it('never writes words_mastered from a round (the word memory owns it)', async () => {
     await persistClassroomGameScores(game('vocab-quiz'), scores, { askedWords: asked });
-    expect((upserts[0].words_mastered as string[]).sort()).toEqual(['abandon', 'brittle']);
+    expect(upserts[0]).not.toHaveProperty('words_mastered');
   });
 
   it('carries per-question answers when the caller supplies them', async () => {
