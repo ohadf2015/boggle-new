@@ -15,7 +15,7 @@
  * ```
  */
 
-import React, { useRef, ReactNode } from 'react';
+import React, { useRef, useSyncExternalStore, ReactNode } from 'react';
 import { InlineConfetti } from '@/components/effects/InlineConfetti';
 import { prefersStaticFullscreenOverlay } from '@/lib/native/webViewLayerFlash';
 
@@ -34,6 +34,8 @@ interface BoundedConfettiBurstProps {
   onComplete?: () => void;
 }
 
+const noopSubscribe = () => () => {};
+
 export function BoundedConfettiBurst({
   trigger,
   children,
@@ -43,6 +45,8 @@ export function BoundedConfettiBurst({
   onComplete,
 }: BoundedConfettiBurstProps) {
   const anchorRef = useRef<HTMLDivElement>(null);
+  // The confetti layer depends on the client viewport, so the server never renders it.
+  const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
 
   // On mobile web, refuse to render full-screen confetti (it causes white flash).
   // Desktop web and native can render animations safely.
@@ -69,7 +73,7 @@ export function BoundedConfettiBurst({
       style={styleOverrides}
     >
       {children}
-      {trigger && !shouldSkip && (
+      {hydrated && trigger && !shouldSkip && (
         <div className="pointer-events-none">
           <InlineConfetti size={size} colors={colors} onComplete={onComplete} />
         </div>

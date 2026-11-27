@@ -79,8 +79,3 @@ export const MODE_FILL: Record<ModeColorFamily, string> = {
   purple: 'bg-neo-purple',
   orange: 'bg-neo-orange',
 };
-
-/** MpTimer only knows the four electric families. */
-export function timerColor(color: ModeColorFamily): 'lime' | 'pink' | 'cyan' | 'purple' {
-  return color === 'orange' ? 'pink' : color;
-}

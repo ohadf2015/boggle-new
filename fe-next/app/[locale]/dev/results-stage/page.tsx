@@ -85,6 +85,7 @@ function SoloScenario({ bots, zero }: { bots: boolean; zero?: boolean }) {
           rank={1}
           totalPlayers={bots ? 4 : 1}
           isNewHighScore={!zero && bots}
+          topWords={zero ? [] : ['quartz', 'stone', 'notes', 'tones']}
         />
       </div>
       <ResultsNextBar

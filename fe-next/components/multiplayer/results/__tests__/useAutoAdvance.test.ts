@@ -21,6 +21,16 @@ describe('useAutoAdvance', () => {
     expect(result.current.secondsLeft).toBe(7);
   });
 
+  it('restarts from full when the host changes the next mode mid-count', () => {
+    const onFire = vi.fn();
+    const { result } = renderHook(() => useAutoAdvance({ seconds: 10, armed: true, paused: false, enabled: true, onFire }));
+    act(() => { vi.advanceTimersByTime(8_000); });
+    act(() => { result.current.restart(); });
+    expect(result.current.secondsLeft).toBe(10);
+    act(() => { vi.advanceTimersByTime(9_000); });
+    expect(onFire).not.toHaveBeenCalled();
+  });
+
   it('fires exactly once when it runs out', () => {
     const onFire = vi.fn();
     renderHook(() => useAutoAdvance({ seconds: 10, armed: true, paused: false, enabled: true, onFire }));

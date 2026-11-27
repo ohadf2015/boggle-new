@@ -38,7 +38,7 @@ vi.mock('framer-motion', async (orig) => ({ ...(await orig<typeof import('framer
 // The header's sound toggle (new on the rebuilt screen) reads the app's MusicProvider.
 vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: false, toggle: () => {}, label: 'Mute', title: 'Mute' }) }));
 vi.mock('@/contexts/NavigationContext', () => ({ useRegisterHeaderAudioControl: () => {} }));
-vi.mock('@/components/ui/AnimatedCounter', () => ({ __esModule: true, default: ({ value }: { value: number }) => <span>{value}</span> }));
+vi.mock('@/components/ui/AnimatedCounter', () => { const C = ({ value }: { value: number }) => <span>{value}</span>; return { __esModule: true, default: C, AnimatedCounter: C }; });
 vi.mock('next/dynamic', () => ({ __esModule: true, default: () => () => null }));
 vi.mock('@/components/auth/InlineSignupCard', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/components/ads/ResultsBannerSlot', () => ({
@@ -198,6 +198,25 @@ describe('MpResultsScreen', () => {
     const card = screen.getByTestId('mp-next-mode');
     expect(card.getAttribute('data-mode')).toBe('');
     expect(card.textContent).toContain('mpUi.results.hostPicking');
+    useGameStore.getState().setHostSelectedGameMode('random');
+  });
+
+  it('intermission joiner: NEXT UP follows the pick the host makes on results', () => {
+    const { socket } = renderScreen({ isHost: false });
+    skip();
+    expect(socket.emit).toHaveBeenCalledWith('requestNextMode');
+    const onNextMode = (socket.on as ReturnType<typeof vi.fn>).mock.calls.find(([e]) => e === 'nextMode')?.[1];
+    act(() => onNextMode({ gameCode: 'ROOM12', mode: 'blast' }));
+    expect(screen.getByTestId('mp-next-mode').getAttribute('data-mode')).toBe('blast');
+  });
+
+  it('intermission host: one tap on a mode chip picks it and tells the room', () => {
+    useGameStore.getState().setHostSelectedGameMode('classic');
+    const { socket } = renderScreen({ isHost: true });
+    skip();
+    fireEvent.click(screen.getByTestId('mp-next-mode-option-blast'));
+    expect(screen.getByTestId('mp-next-mode').getAttribute('data-mode')).toBe('blast');
+    expect(socket.emit).toHaveBeenCalledWith('updateNextMode', { gameCode: 'ROOM12', mode: 'blast' });
     useGameStore.getState().setHostSelectedGameMode('random');
   });
 
@@ -370,7 +389,8 @@ describe('MpResultsScreen', () => {
       renderScreen({ finalScores: TIED.map((p) => ({ ...p, score: 0 })), username: 'T' });
       expect(screen.queryByTestId('mp-standing-crown')).toBeNull();
       expect(screen.getByTestId('mp-my-card').getAttribute('data-winner')).toBe('false');
-      expect(screen.getByTestId('mp-my-card').textContent).toContain('mpUi.results.tiedWithMore:{"name":"Host","more":2}');
+      expect(screen.getByTestId('mp-my-card').textContent).toContain('mpUi.results.headAllZero');
+      expect(screen.queryByTestId('mp-my-rank')).toBeNull();
     });
   });
   describe('final screen of a series (r4 capture: round 5 all on 0, host 94 over the series)', () => {

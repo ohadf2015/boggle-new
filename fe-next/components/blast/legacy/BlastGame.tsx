@@ -117,6 +117,8 @@ interface BlastGameProps {
    *  BlastStage's own desktop side-rails (rivals/word-area) so the board fills
    *  the slot and stops duplicating the shell's rails. */
   isDesktopCanvas?: boolean;
+  /** Solo round on the MP engine (quick-play): no round shell hosts a mute, so the HUD carries one. */
+  ownMute?: boolean;
   /** SP run context for the HUD: run totals, furthest wave and targets to beat. */
   progress?: BlastHudProgress;
 }
@@ -158,6 +160,7 @@ export function BlastGame({
   onConsumeLife,
   onGridRetry,
   isDesktopCanvas = false,
+  ownMute,
   progress,
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
@@ -718,6 +721,7 @@ export function BlastGame({
       })()}
 
       <BlastStage
+        ownMute={ownMute}
         grid={engine.grid}
         tileStates={engine.tileStates}
         gridSize={config.gridSize}

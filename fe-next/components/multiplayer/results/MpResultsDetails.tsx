@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { MpSheet } from '../shell/MpSheet';
 import BlastMpResults, { buildBlastMpResults } from '@/components/blast/legacy/BlastMpResults';
@@ -35,6 +35,8 @@ interface Props {
   open: boolean;
   onClose: () => void;
   c: MpResultsController;
+  /** Rendered first in the sheet (the stage's social row). */
+  extra?: ReactNode;
 }
 
 /**
@@ -42,11 +44,12 @@ interface Props {
  * my words (found / only me / missed) and the round awards or series grid.
  * Mounts only while open, so the reveal screen stays one screen.
  */
-export default function MpResultsDetails({ open, onClose, c }: Props) {
+export default function MpResultsDetails({ open, onClose, c, extra }: Props) {
   const isDesktop = useIsDesktop();
   if (!open) return null;
   return (
     <MpSheet open onClose={onClose} title={c.t('mpUi.results.detailsTitle')} side={isDesktop ? 'end' : 'bottom'} testId="mp-results-details">
+      {extra}
       <DetailsBody c={c} />
     </MpSheet>
   );

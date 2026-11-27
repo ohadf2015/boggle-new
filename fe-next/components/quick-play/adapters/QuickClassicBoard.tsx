@@ -207,10 +207,6 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
         left={
           <QuickClassicLeftRail
             t={t}
-            remaining={core.timer.remainingTime}
-            total={config.durationSec}
-            score={core.score}
-            validWords={validWords}
             leaderboard={leaderboard}
             selfUsername={selfUsername}
           />

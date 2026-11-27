@@ -32,7 +32,7 @@ vi.mock('@/hooks/useTeacherPro', () => ({
 }));
 vi.mock('next/image', () => ({
   // eslint-disable-next-line @next/next/no-img-element -- test stub
-  default: (p: Record<string, unknown>) => <img alt={String(p.alt ?? '')} src={String(p.src ?? '')} />,
+  default: (p: Record<string, unknown>) => <img alt={String(p.alt ?? '')} src={String(p.src ?? '')} data-testid={p['data-testid'] as string | undefined} />,
 }));
 
 const mockUseTeacherAccess = vi.fn();
@@ -53,19 +53,19 @@ describe('access PageClient — CLS reserve while access is loading', () => {
     });
   });
 
-  it('keeps the header, h1, and hero in place instead of a short loading column', () => {
+  it('keeps the header, mascot and h1 in place instead of a short loading column', () => {
     render(<PageClient />);
     expect(screen.getByTestId('landing-header')).toBeInTheDocument();
     expect(screen.getByText('education.access.h1')).toBeInTheDocument();
-    expect(screen.getByAltText('education.access.hero_alt')).toBeInTheDocument();
+    expect(screen.getByTestId('access-mascot')).toBeInTheDocument();
     expect(screen.getByTestId('access-gate-skeleton')).toHaveClass('min-h-[220px]');
     expect(screen.queryByTestId('access-request-gate')).toBeNull();
   });
 
   it('Suspense fallback in page.tsx reserves pitch chrome, not the approved card', () => {
     const src = readFileSync(join(__dirname, '..', 'page.tsx'), 'utf8');
-    expect(src).toMatch(/max-w-6xl/);
-    expect(src).toMatch(/aspect-\[918\/880\]/);
+    expect(src).toMatch(/max-w-md/);
+    expect(src).toMatch(/h-\[136px\] w-\[136px\]/);
     expect(src).toMatch(/min-h-\[220px\]/);
     expect(src).not.toMatch(/already_approved/);
   });

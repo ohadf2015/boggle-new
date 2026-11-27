@@ -49,7 +49,7 @@ export const SoloLeftRail = memo(function SoloLeftRail({ t, score, bots, validWo
           </p>
         )}
       </ShellStats>
-      <ShellKeysCard t={t} mascotStageRef={mascotStageRef} />
+      <ShellKeysCard t={t} mascotStageRef={mascotStageRef} compact />
     </>
   );
 });

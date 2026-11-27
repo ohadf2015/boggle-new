@@ -42,7 +42,7 @@ export function BlastTileFirstUseCallout({ type, onDismiss, isMultiplayer = fals
 
   return (
     <div
-      className="pointer-events-none absolute inset-x-0 top-full mt-3 z-30 flex justify-center px-3"
+      className="pointer-events-none relative z-30 flex w-full justify-center px-3"
       aria-live="polite"
     >
       <div

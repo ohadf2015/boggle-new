@@ -14,7 +14,7 @@ import { WordsLadder, type LadderWord } from '../desktop/WordsLadder';
 import { MpRoundHud } from './MpRoundHud';
 import { MpScoreFloaters } from './MpScoreFloaters';
 import { MpRecentWords } from './MpRecentWords';
-import { MODE_TEXT, FALLBACK_MODE_ICON, MODE_ICONS, roundModeMeta, timerColor } from './roundModes';
+import { MODE_TEXT, FALLBACK_MODE_ICON, MODE_ICONS, roundModeMeta } from './roundModes';
 import { useRoundJuice, type RoundSocket } from './useRoundJuice';
 import { mergeServerWords, useServerAcceptedWords } from './useServerAcceptedWords';
 import { useRoundFrameToastLane } from './useRoundToastLane';
@@ -171,7 +171,6 @@ function MpRoundLayoutImpl({
           rankFlipKey={juice.rankFlipKey}
           comboLevel={comboLevel}
           hudBadge={hudBadge}
-          timerColor={timerColor(mode.color)}
           onExit={onExit}
         />
       </div>

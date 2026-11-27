@@ -102,6 +102,7 @@ export function useMpAutoContinue({ branch, isClassroom, isHost, isReady, armed,
     total: AUTO_ADVANCE_SECONDS,
     cancel,
     clearCancel: auto.clearCancel,
+    restart: auto.restart,
     labelKey: plan.labelKey,
   };
 }

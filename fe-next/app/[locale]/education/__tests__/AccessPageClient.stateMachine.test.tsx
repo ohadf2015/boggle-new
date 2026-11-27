@@ -79,7 +79,7 @@ describe('<PageClient> (access page state machine)', () => {
     mockTeacherAccessState.isLoading = true;
     render(<PageClient />);
     // The skeleton is an aria-hidden pulse block
-    const skeleton = document.querySelector('[aria-hidden="true"]');
+    const skeleton = screen.getByTestId('access-gate-skeleton');
     expect(skeleton).toBeInTheDocument();
     expect(skeleton).toHaveClass('animate-pulse');
     // The form should not render while loading
@@ -140,7 +140,7 @@ describe('<PageClient> (access page state machine)', () => {
     mockTeacherAccessState.isLoading = true;
     render(<PageClient />);
     // Should show skeleton, not form
-    const skeleton = document.querySelector('[aria-hidden="true"]');
+    const skeleton = screen.getByTestId('access-gate-skeleton');
     expect(skeleton).toBeInTheDocument();
     expect(screen.queryByTestId('access-request-gate')).not.toBeInTheDocument();
   });
@@ -191,7 +191,7 @@ describe('<PageClient> (access page state machine)', () => {
       mockTeacherAccessState.status = 'none';
       render(<PageClient />);
       pitchKeys.forEach((k) => expect(screen.getByText(k)).toBeInTheDocument());
-      expect(screen.getByRole('img', { name: 'education.access.hero_alt' })).toBeInTheDocument();
+      expect(screen.getByTestId('access-mascot')).toBeInTheDocument();
     });
 
     it('does NOT render the pitch when hasAccess resolves before any request row exists', () => {
@@ -213,7 +213,7 @@ describe('<PageClient> (access page state machine)', () => {
         mockTeacherAccessState.hasAccess = status === 'approved';
         render(<PageClient />);
         pitchKeys.forEach((k) => expect(screen.queryByText(k)).not.toBeInTheDocument());
-        expect(screen.queryByRole('img', { name: 'education.access.hero_alt' })).not.toBeInTheDocument();
+        expect(screen.queryByTestId('access-mascot')).not.toBeInTheDocument();
       },
     );
   });
@@ -223,7 +223,7 @@ describe('<PageClient> (access page state machine)', () => {
       mockTeacherAccessState.isLoading = true;
       render(<PageClient />);
       // Should have the skeleton in the status-card slot
-      const skeleton = document.querySelector('[aria-hidden="true"]');
+      const skeleton = screen.getByTestId('access-gate-skeleton');
       expect(skeleton).toBeInTheDocument();
       // CRITICAL: step cards should STILL be rendered, not dropped by early return
       expect(screen.getByText('education.access.next.step1_title')).toBeInTheDocument();
@@ -236,7 +236,7 @@ describe('<PageClient> (access page state machine)', () => {
       // Existing test passes but doesn't check for step presence — tighten it
       mockTeacherAccessState.isLoading = true;
       render(<PageClient />);
-      const skeleton = document.querySelector('[aria-hidden="true"]');
+      const skeleton = screen.getByTestId('access-gate-skeleton');
       expect(skeleton).toBeInTheDocument();
       expect(skeleton).toHaveClass('animate-pulse');
       expect(screen.queryByTestId('access-request-gate')).not.toBeInTheDocument();

@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, type Ref } from 'react';
+import { memo, useEffect, useState, type Ref } from 'react';
 import { Keyboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ShellT } from './ShellPanel';
@@ -12,13 +12,24 @@ interface ShellKeysCardProps {
   showClear?: boolean;
   /** Lets a host play mascot gags in the sprite's spot. */
   mascotStageRef?: Ref<HTMLDivElement>;
+  /** Game rails: a one-line hint on the player's first game, nothing after. */
+  compact?: boolean;
+}
+
+function useFirstGame(): boolean {
+  const [first, setFirst] = useState(false);
+  useEffect(() => {
+    try { setFirst(!localStorage.getItem('lexiclash_first_game_played')); } catch { /* storage blocked */ }
+  }, []);
+  return first;
 }
 
 const KEY =
   'inline-flex min-w-[2.75rem] items-center justify-center rounded-md border-2 border-black bg-neo-cream px-1.5 py-0.5 font-neo-display text-[11px] font-black uppercase text-black shadow-[0_3px_0_#000] tv:text-base';
 
 /** Teaches keyboard play on desktop: the keys are drawn, not described. */
-function ShellKeysCardImpl({ t, showClear = true, mascotStageRef }: ShellKeysCardProps) {
+function ShellKeysCardImpl({ t, showClear = true, mascotStageRef, compact = false }: ShellKeysCardProps) {
+  const firstGame = useFirstGame();
   return (
     <>
       <div
@@ -30,6 +41,12 @@ function ShellKeysCardImpl({ t, showClear = true, mascotStageRef }: ShellKeysCar
         {/* eslint-disable-next-line @next/next/no-img-element -- decorative sprite, sized by the rail's leftover height */}
         <img src="/mascot/hello-nobg.webp" alt="" draggable={false} className={cn('h-full max-h-52 w-auto min-h-0 object-contain', styles.mascotBob)} />
       </div>
+      {compact ? firstGame && (
+        <p data-testid="shell-keys-hint" className="mt-auto flex items-center justify-center gap-2 rounded-full bg-neo-black/30 px-3 py-1.5 font-neo-display text-xs font-bold uppercase tracking-wider text-neo-cream/70 tv:text-lg">
+          <Keyboard className="h-4 w-4 shrink-0" aria-hidden="true" />
+          {t('gameShell.keys.title')}
+        </p>
+      ) : (
       <div data-testid="shell-keys" className="mt-auto flex flex-col gap-2 rounded-[14px] border-3 border-dashed border-neo-cream/25 px-3.5 py-3 text-neo-cream/80">
         <p className="flex items-center gap-2 font-neo-display text-xs font-bold uppercase tracking-[0.14em] tv:text-lg">
           <Keyboard className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -52,6 +69,7 @@ function ShellKeysCardImpl({ t, showClear = true, mascotStageRef }: ShellKeysCar
           )}
         </ul>
       </div>
+      )}
     </>
   );
 }

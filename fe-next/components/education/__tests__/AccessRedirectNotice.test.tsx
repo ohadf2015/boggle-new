@@ -57,12 +57,12 @@ describe('<AccessRedirectNotice>', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('names the destination the teacher was actually trying to reach', () => {
+  it('names the destination the teacher was actually trying to reach, as one short chip above the headline', () => {
     render(<AccessRedirectNotice from="/es/education/classroom-game" />);
-    expect(screen.getByText('education.access.redirect_title')).toBeInTheDocument();
-    expect(
-      screen.getByText(/education\.access\.redirect_body\|dest=education\.header\.breadcrumbs\.classroomGame/)
-    ).toBeInTheDocument();
+    const chip = screen.getByRole('status');
+    expect(chip.textContent).toMatch(/education\.access\.redirect_chip\|dest=education\.header\.breadcrumbs\.classroomGame/);
+    expect(chip.className).toMatch(/rounded-full/);
+    expect(screen.queryByText(/redirect_title|redirect_body/)).toBeNull();
   });
 
   it('falls back to a generic destination phrase, never a raw key path', () => {

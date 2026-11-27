@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: null, profile: null, loading: false }) }));
@@ -25,8 +25,18 @@ describe('<AccessRequestGate> signed-out card on a phone', () => {
     expect(before(micro, signin)).toBe(true);
   });
 
-  it('GIVEN a phone THEN the explanatory body leaves the fold and stays from tablet width up', () => {
+  it('GIVEN the page h1 already says it THEN the stack has no second heading, body or divider, just the two buttons', () => {
     render(<AccessRequestGate />);
-    expect(screen.getByText('education.access.auth_required_body').className).toMatch(/max-sm:hidden/);
+    expect(screen.queryByRole('heading')).toBeNull();
+    expect(screen.queryByText('education.access.auth_required_title')).toBeNull();
+    expect(screen.queryByText('education.access.auth_required_body')).toBeNull();
+    expect(screen.queryByText('auth.magicLink.divider')).toBeNull();
+  });
+
+  it('GIVEN the email button WHEN pressed THEN it sinks onto its chunky lip', () => {
+    render(<AccessRequestGate />);
+    const email = screen.getByRole('button', { name: /education\.access\.auth_required_cta/ });
+    fireEvent.pointerDown(email, { button: 0 });
+    expect(email.getAttribute('data-pressed')).toBe('true');
   });
 });

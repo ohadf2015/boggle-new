@@ -69,20 +69,20 @@ describe('access PageClient — redirect reason channel', () => {
     expect(mockGet).toHaveBeenCalledWith('from');
     // The destination the teacher actually clicked must reach the copy.
     expect(
-      screen.getByText(/education\.access\.redirect_body\|education\.header\.breadcrumbs\.classroomGame/)
+      screen.getByText(/education\.access\.redirect_chip\|education\.header\.breadcrumbs\.classroomGame/)
     ).toBeInTheDocument();
   });
 
   it('stays quiet for a teacher who navigated here directly', () => {
     mockGet.mockReturnValue(null);
     render(<PageClient />);
-    expect(screen.queryByText(/redirect_body/)).toBeNull();
+    expect(screen.queryByText(/redirect_chip/)).toBeNull();
   });
 
   it('does not re-pitch access to a teacher who already has it', () => {
     mockGet.mockImplementation((k: string) => (k === 'from' ? '/es/teacher' : null));
     mockUseTeacherAccess.mockReturnValue({ ...NEEDS_ACCESS, hasAccess: true, status: 'approved' });
     render(<PageClient />);
-    expect(screen.queryByText(/redirect_body/)).toBeNull();
+    expect(screen.queryByText(/redirect_chip/)).toBeNull();
   });
 });

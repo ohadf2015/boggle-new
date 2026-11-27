@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { ShellKeysCard } from '../ShellKeysCard';
 
 const t = (k: string) => k;
@@ -19,5 +19,23 @@ describe('ShellKeysCard', () => {
     expect(stage).toBe(spot);
     expect(spot.className).toContain('relative');
     expect(spot.className).toContain('[&:has([data-mascot-stage-layer])>img]:invisible');
+  });
+
+  describe('compact (game rails): keyboard help shows on the first game only, as a small hint', () => {
+    afterEach(() => localStorage.clear());
+
+    it('first game: a one-line keyboard hint, not the full keys card', () => {
+      render(<ShellKeysCard t={t} compact />);
+      expect(screen.getByTestId('shell-keys-hint')).toHaveTextContent('gameShell.keys.title');
+      expect(screen.queryByTestId('shell-keys')).toBeNull();
+    });
+
+    it('returning player: no keyboard help at all, the mascot keeps the rail', () => {
+      localStorage.setItem('lexiclash_first_game_played', '1');
+      render(<ShellKeysCard t={t} compact />);
+      expect(screen.queryByTestId('shell-keys-hint')).toBeNull();
+      expect(screen.queryByTestId('shell-keys')).toBeNull();
+      expect(screen.getByTestId('shell-mascot')).toBeInTheDocument();
+    });
   });
 });

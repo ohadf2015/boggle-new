@@ -34,7 +34,7 @@ vi.mock('framer-motion', async (orig) => ({ ...(await orig<typeof import('framer
 // The header's sound toggle (new on the rebuilt screen) reads the app's MusicProvider.
 vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: false, toggle: () => {}, label: 'Mute', title: 'Mute' }) }));
 vi.mock('@/contexts/NavigationContext', () => ({ useRegisterHeaderAudioControl: () => {} }));
-vi.mock('@/components/ui/AnimatedCounter', () => ({ __esModule: true, default: ({ value }: { value: number }) => <span>{value}</span> }));
+vi.mock('@/components/ui/AnimatedCounter', () => { const C = ({ value }: { value: number }) => <span>{value}</span>; return { __esModule: true, default: C, AnimatedCounter: C }; });
 vi.mock('next/dynamic', () => ({ __esModule: true, default: () => () => null }));
 vi.mock('@/components/auth/InlineSignupCard', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/components/ads/ResultsBannerSlot', () => ({
@@ -106,7 +106,7 @@ describe('MpResultsStage brag share', () => {
         onResetSeries={vi.fn()}
       />,
     );
-    expect(await screen.findByTestId('mp-brag-strip')).toBeTruthy();
+    expect(await screen.findByTestId('mp-results-share')).toBeTruthy();
     expect(shareModalOpened()).toBe(false);
     fireEvent.click(screen.getByTestId('mp-results-share'));
     await waitFor(() => expect(h.share).toHaveBeenCalledTimes(1));

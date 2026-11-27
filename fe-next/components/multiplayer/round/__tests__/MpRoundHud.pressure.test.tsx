@@ -24,7 +24,6 @@ const PROPS = {
   rank: 2,
   total: 5,
   comboLevel: 0,
-  timerColor: 'cyan' as const,
   onExit: () => {},
 };
 
@@ -37,20 +36,20 @@ describe('MpRoundHud — pressure dials', () => {
 
   it('a casual room (null pressure) shows clock and rank as before', () => {
     render(<MpRoundHud {...PROPS} />);
-    expect(screen.getByTestId('mp-timer')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
     expect(screen.getByTestId('mp-rank-chip')).toBeInTheDocument();
   });
 
   it('timer=off unmounts the clock — no countdown on a calm round', () => {
     setPressure({ ...DEFAULT_CLASSROOM_PRESSURE, timer: 'off' });
     render(<MpRoundHud {...PROPS} />);
-    expect(screen.queryByTestId('mp-timer')).toBeNull();
+    expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
   it('timer=gentle keeps the clock but suppresses the urgency punch', () => {
     setPressure({ ...DEFAULT_CLASSROOM_PRESSURE, timer: 'gentle' });
     render(<MpRoundHud {...PROPS} remainingTime={5} />);
-    expect(screen.getByTestId('mp-timer')).toHaveAttribute('data-urgent', 'false');
+    expect(screen.getByRole('progressbar')).toHaveAttribute('data-urgent', 'false');
   });
 
   it('leaderboard=hidden swaps the rank chip for the reveal-at-end beat', () => {

@@ -130,4 +130,62 @@ describe('lobbySettingsHandler', () => {
     joiner.handlers.requestLobbySettings();
     expect(joiner.socket.emit).not.toHaveBeenCalled();
   });
+
+  describe('next-round mode between rounds', () => {
+    const PICK = { gameCode: 'GAME1', mode: 'blast' };
+    beforeEach(() => { game.gameState = 'finished'; });
+
+    it('relays the host pick to the room', () => {
+      const { io, to, emit } = createIo();
+      const { socket, handlers } = createSocket('host');
+      registerLobbySettingsHandlers(io, socket);
+      handlers.updateNextMode(PICK);
+      expect(to).toHaveBeenCalledWith('game:GAME1');
+      expect(emit).toHaveBeenCalledWith('nextMode', { gameCode: 'GAME1', mode: 'blast' });
+    });
+
+    it('ignores a non-host sender', () => {
+      const { io, emit } = createIo();
+      const { socket, handlers } = createSocket('player');
+      registerLobbySettingsHandlers(io, socket);
+      handlers.updateNextMode(PICK);
+      expect(emit).not.toHaveBeenCalled();
+    });
+
+    it.each(['chess', 'vocab-quiz', 'crossword', 42, undefined])('rejects mode %s', (mode) => {
+      const { io, emit } = createIo();
+      const { socket, handlers } = createSocket('host');
+      registerLobbySettingsHandlers(io, socket);
+      handlers.updateNextMode({ gameCode: 'GAME1', mode });
+      expect(emit).not.toHaveBeenCalled();
+    });
+
+    it.each(['in-progress', 'waiting'])('ignores a pick while the room is %s', (state) => {
+      game.gameState = state;
+      const { io, emit } = createIo();
+      const { socket, handlers } = createSocket('host');
+      registerLobbySettingsHandlers(io, socket);
+      handlers.updateNextMode(PICK);
+      expect(emit).not.toHaveBeenCalled();
+    });
+
+    it('sends a player who opens results after the pick the current one', () => {
+      const { io } = createIo();
+      const host = createSocket('host');
+      registerLobbySettingsHandlers(io, host.socket);
+      host.handlers.updateNextMode(PICK);
+      host.handlers.updateNextMode({ ...PICK, mode: 'word-hunt' });
+      const joiner = createSocket('p2');
+      registerLobbySettingsHandlers(io, joiner.socket);
+      joiner.handlers.requestNextMode();
+      expect(joiner.socket.emit).toHaveBeenCalledWith('nextMode', { gameCode: 'GAME1', mode: 'word-hunt' });
+    });
+
+    it('answers nothing before the host picked', () => {
+      const joiner = createSocket('p2');
+      registerLobbySettingsHandlers(createIo().io, joiner.socket);
+      joiner.handlers.requestNextMode();
+      expect(joiner.socket.emit).not.toHaveBeenCalled();
+    });
+  });
 });

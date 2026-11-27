@@ -41,7 +41,7 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
   // Mobile header; pe-12 keeps the disabled hint button (invisible to the FAB's hit probe) out from under the floating mute FAB
   if (isMobile) {
     return (
-      <div className={`lg:hidden w-full flex items-center justify-between px-2 py-0.5 shrink-0${hints?.isSinglePlayer ? ' pe-12' : ''}`}>
+      <div className={`lg:hidden w-full flex items-center justify-between px-2 pt-2 pb-0.5 shrink-0${hints?.isSinglePlayer ? ' pe-12' : ''}`}>
         <div className="flex items-center gap-1.5">
           {onExitRoom && (
             <ExitRoomButton
