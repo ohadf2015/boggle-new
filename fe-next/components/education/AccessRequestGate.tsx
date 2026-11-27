@@ -102,7 +102,9 @@ export function AccessRequestGate({ onApproved }: { onApproved?: (approval: Acce
           }}
           className={EMAIL_CTA_CLASS}
         >
-          <Mail className="size-5 shrink-0" aria-hidden="true" />
+          <span data-testid="access-email-icon" aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-yellow text-neo-black">
+            <Mail className="size-5" strokeWidth={2.5} />
+          </span>
           <span className="text-balance">{t('education.access.auth_required_cta')}</span>
         </PressSurface>
         <p className="text-center text-sm font-semibold text-edu-ink/60">{t('education.access.cta_micro')}</p>
