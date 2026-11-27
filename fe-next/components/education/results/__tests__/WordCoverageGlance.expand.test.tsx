@@ -64,7 +64,7 @@ describe('WordCoverageGlance — the remainder is reachable', () => {
     expect(more).toHaveAttribute('aria-expanded', 'false');
     // It reads as a control from the back of the room: cream edge on navy.
     expect(more.className).toMatch(/border-\[(2|3)px\]/);
-    expect(more.className).toMatch(/border-neo-cream/);
+    expect(more.className).toMatch(/border-edu-line/);
   });
 
   it('expanding prints every remaining word', () => {

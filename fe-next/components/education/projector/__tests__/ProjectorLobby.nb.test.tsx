@@ -81,7 +81,7 @@ describe('ProjectorLobby: neo-brutalist wall', () => {
 
   it('on a short wall the Start bar sticks to the bottom edge, so Start never scrolls away', () => {
     render(<ProjectorLobby {...props} />);
-    expect(tokens(screen.getByTestId('projector-start-bar'))).toEqual(expect.arrayContaining([`${SHORT_WALL}sticky`, `${SHORT_WALL}bottom-0`, `${SHORT_WALL}bg-neo-navy`]));
+    expect(tokens(screen.getByTestId('projector-start-bar'))).toEqual(expect.arrayContaining([`${SHORT_WALL}sticky`, `${SHORT_WALL}bottom-0`, `${SHORT_WALL}bg-edu-surface`]));
   });
 
   it('a locked Start reads as not-yet: dashed edge, no shadow', () => {

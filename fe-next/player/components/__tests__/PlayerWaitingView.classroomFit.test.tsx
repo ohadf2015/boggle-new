@@ -151,7 +151,7 @@ describe('PlayerWaitingView — icon-only controls still read as controls', () =
     render(<PlayerWaitingView {...defaultProps} isClassroomMode />);
     const exit = screen.getByTestId('edu-student-leave');
     expect(exit).toHaveTextContent('eduLiveRoom.student.leave');
-    expect(exit.className).toContain('text-neo-cream');
+    expect(exit.className).toContain('text-edu-ink');
   });
 
   it('gives the avatar button its own border width AND colour', () => {

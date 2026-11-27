@@ -34,7 +34,7 @@ describe('NbDialogContent', () => {
 
   it('Given the dark app theme, Then navy fill, cream 3px edge and hard shadow hold under dark: too', () => {
     const cls = tokens(renderDialog().el);
-    for (const want of ['bg-neo-navy', 'dark:bg-neo-navy', 'border-[3px]', 'sm:border-[3px]', 'border-neo-cream/50', 'dark:border-neo-cream/50', 'shadow-hard-xl', 'text-neo-cream', 'dark:text-neo-cream']) {
+    for (const want of ['bg-edu-surface', 'dark:bg-edu-surface', 'border-[3px]', 'sm:border-[3px]', 'border-edu-line', 'dark:border-edu-line', 'shadow-hard-xl', 'text-edu-ink', 'dark:text-edu-ink']) {
       expect(cls, want).toContain(want);
     }
   });
@@ -87,8 +87,8 @@ describe('NbDialogHeader', () => {
   it('Given no color, Then the strip is navy with a cream rule (never black on navy)', () => {
     renderDialog();
     const strip = screen.getByRole('heading', { name: 'Rename class' }).closest('[data-nb-dialog-header]') as HTMLElement;
-    expect(strip.className).toContain('bg-neo-navy-light');
-    expect(strip.className).toContain('border-neo-cream/50');
+    expect(strip.className).toContain('bg-edu-surface');
+    expect(strip.className).toContain('border-edu-line');
     expect(strip.className).not.toContain('border-neo-black');
   });
 

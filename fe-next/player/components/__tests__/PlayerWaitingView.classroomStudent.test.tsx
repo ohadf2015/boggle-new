@@ -125,7 +125,7 @@ describe('PlayerWaitingView - the classroom student waiting room', () => {
   it('asks before leaving on the dark host surface, not the cream one', () => {
     render(<PlayerWaitingView {...defaultProps} isClassroomMode showExitConfirm />);
     const dialog = screen.getByTestId('exit-dialog');
-    expect(dialog.className).toContain('bg-neo-navy-light');
+    expect(dialog.className).toContain('bg-edu-surface');
     expect(dialog.className).not.toContain('bg-neo-cream');
     expect(screen.getByText('eduStudent.exit.title')).toBeInTheDocument();
   });

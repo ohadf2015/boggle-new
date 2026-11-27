@@ -29,7 +29,7 @@ describe('WaitingWarmUp with list words: spelling tiles', () => {
     expect(slots()).toHaveLength(3);
     expect(slots().map((s) => s.getAttribute('data-filled'))).toEqual(['false', 'false', 'false']);
     expect(slots().map((s) => s.textContent)).toEqual(['C', 'A', 'T']);
-    for (const slot of slots()) expect(slot.className).toContain('text-neo-cream/35');
+    for (const slot of slots()) expect(slot.className).toContain('text-edu-ink/35');
     const letters = within(screen.getByTestId('warmup-spell-tiles')).getAllByRole('button').map((b) => b.getAttribute('data-letter'));
     expect([...letters].sort()).toEqual(['A', 'C', 'T']);
   });

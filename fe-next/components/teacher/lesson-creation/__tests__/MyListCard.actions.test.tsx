@@ -62,7 +62,7 @@ describe('MyListCard face', () => {
     const { rerender } = renderCard();
     const card = screen.getByTestId('my-list-L1');
     const first = card.getAttribute('data-accent');
-    expect(card.className).toContain('bg-neo-navy-light');
+    expect(card.className).toContain('bg-edu-surface');
     rerender(<MyListCard lesson={lesson} index={1} sharing={false} {...handlers} />);
     expect(screen.getByTestId('my-list-L1').getAttribute('data-accent')).not.toBe(first);
   });

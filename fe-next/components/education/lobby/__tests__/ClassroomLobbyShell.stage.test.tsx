@@ -13,7 +13,7 @@ describe('ClassroomLobbyShell — the launch stage', () => {
   it('paints a solid navy stage with no art layer behind the lobby text', () => {
     render(<ClassroomLobbyShell pinned={<div />} aside={<div />}>body</ClassroomLobbyShell>);
     const shell = screen.getByTestId('classroom-lobby-shell');
-    expect(shell.className).toContain('bg-neo-navy');
+    expect(shell.className).toContain('bg-edu-page');
     expect(shell.querySelector('img')).toBeNull();
     expect(screen.queryByTestId('lobby-arena-art')).toBeNull();
   });

@@ -29,7 +29,7 @@ describe('<AcademyBackdrop>', () => {
     expect(backdrop().className).toContain('pointer-events-none');
     expect(backdrop().className).toContain('-z-10');
     expect(backdrop().className).toContain('absolute');
-    expect(backdrop().className).toContain('bg-neo-navy');
+    expect(backdrop().className).toContain('bg-edu-surface');
     expect(backdrop().innerHTML).not.toContain('opacity-0');
   });
 });

@@ -46,7 +46,7 @@ describe('<HomeClassRoster>', () => {
     const pills = screen.getAllByTestId('home-roster-pill');
     expect(pills[0]).toHaveClass('bg-neo-lime/20');
     expect(pills[1]).toHaveClass('bg-neo-yellow', 'text-neo-black');
-    expect(pills[2]).toHaveClass('bg-neo-cream/15');
+    expect(pills[2]).toHaveClass('bg-edu-ink/15');
   });
 
   it('Given a row, Then the name and XP are bold enough to scan', () => {

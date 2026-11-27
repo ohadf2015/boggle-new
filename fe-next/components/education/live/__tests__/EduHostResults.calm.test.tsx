@@ -28,8 +28,8 @@ describe('EduHostResults: calm round-end wall', () => {
     render(<TvRecapHeader title="eduLive.results.lineupTitle" lessonNames={['Autumn']} />);
     const title = screen.getByRole('heading');
     expect(tokens(title)).not.toContain('uppercase');
-    expect(tokens(title)).not.toContain('text-neo-yellow');
-    expect(tokens(title)).toContain('text-neo-cream');
+    expect(tokens(title)).not.toContain('text-edu-yellow-ink');
+    expect(tokens(title)).toContain('text-edu-ink');
   });
 
   it('labels every action in normal case', () => {
@@ -43,7 +43,7 @@ describe('EduHostResults: calm round-end wall', () => {
     render(<ZeroRoundNote t={t} />);
     const note = screen.getByTestId('podium-zero-note');
     expect(tokens(note).filter((c) => /^bg-neo-navy[\w-]*\/\d+$/.test(c))).toEqual([]);
-    expect(tokens(note)).toContain('bg-neo-navy');
+    expect(tokens(note)).toContain('bg-edu-surface');
   });
 
   it('reads the class numbers in cream, with no lime or cyan accents competing with Play again', () => {

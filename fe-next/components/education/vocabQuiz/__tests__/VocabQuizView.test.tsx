@@ -254,7 +254,7 @@ describe('VocabQuizView', () => {
     const { socket } = makeSocket();
     const { container } = render(<VocabQuizView socket={socket} username="ana" t={t} />);
     const root = container.firstElementChild as HTMLElement;
-    expect(root.className).toContain('bg-neo-navy');
+    expect(root.className).toContain('bg-edu-page');
     expect(root.className).not.toContain('bg-neo-cream');
   });
 });

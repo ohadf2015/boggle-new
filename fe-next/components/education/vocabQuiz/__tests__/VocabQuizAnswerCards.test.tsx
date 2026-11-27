@@ -34,10 +34,10 @@ function grid(selectedIndex: number | null = null, correctIndex: number | null =
 describe('Answer cards are dark cards on one neutral edge, not saturated slabs', () => {
   it('Given no pick, Then every card rests on the navy with the same neutral border and white ink', () => {
     grid().forEach((card, i) => {
-      expect(card.className).toContain('bg-neo-navy-elevated');
-      expect(card.className).toContain('border-neo-white/20');
+      expect(card.className).toContain('bg-edu-surface');
+      expect(card.className).toContain('border-edu-line/20');
       expect(card.className).toContain('border-[3px]');
-      expect(card.className).toContain('text-neo-white');
+      expect(card.className).toContain('text-edu-ink');
       expect(card.className).not.toMatch(new RegExp(`(^|\\s)bg-neo-${FAMILIES[i]}(\\s|$)`));
     });
   });
@@ -62,7 +62,7 @@ describe('Answer cards are dark cards on one neutral edge, not saturated slabs',
     const wash = cards[1].querySelector('[data-testid="vocab-quiz-choice-wash"]')!;
     expect(wash.className).toContain('bg-neo-pink/20');
     expect(cards[1].className).not.toMatch(/(^|\s)bg-neo-pink(\s|$)/);
-    expect(cards[1].className).toContain('text-neo-white');
+    expect(cards[1].className).toContain('text-edu-ink');
     expect(cards[1].querySelector('[data-testid="vocab-quiz-choice-chip"]')!.getAttribute('data-chip')).toBe('picked');
     expect(cards[0].querySelector('[data-testid="vocab-quiz-choice-wash"]')).toBeNull();
     expect(cards[0].querySelector('[data-testid="vocab-quiz-choice-chip"]')).toBeNull();
@@ -136,7 +136,7 @@ describe('The live question gives its height to the prompt, not to stretched car
     mountQuestion();
     const panel = screen.getByTestId('vocab-quiz-question-block');
     expect(panel.className).not.toContain('border-[3px]');
-    expect(panel.className).not.toContain('bg-neo-navy-elevated');
+    expect(panel.className).not.toContain('bg-edu-surface');
     expect(panel.contains(screen.getByTestId('vocab-quiz-question-mascot'))).toBe(true);
     expect(panel.contains(screen.getByTestId('vocab-quiz-prompt'))).toBe(true);
   });

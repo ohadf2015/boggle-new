@@ -223,7 +223,7 @@ describe('XpProgressBar', () => {
       const container = screen.getByRole('progressbar');
       // Cream border on the navy track: black-on-navy measured 1.23:1 (invisible),
       // cream keeps the chunky edge visible (WCAG 1.4.11, >= 3:1).
-      expect(container).toHaveClass('border-neo-cream');
+      expect(container).toHaveClass('border-edu-line');
       expect(screen.getByTestId('xp-progress-container')).toHaveClass('shadow-hard');
     });
 

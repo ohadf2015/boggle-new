@@ -122,7 +122,7 @@ describe('<EducationNav>', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="tabs" />);
     const bar = getByTestId('education-tabbar');
     expect(bar.className).toContain('border-t-[3px]');
-    expect(bar.className).toContain('border-neo-cream');
+    expect(bar.className).toContain('border-edu-line');
     // `border-neo` would be dropped by twMerge and render borderless.
     expect(bar.className).not.toMatch(/border-neo(\s|$)/);
   });
@@ -133,7 +133,7 @@ describe('<EducationNav>', () => {
     const inactive = getByTestId('education-tab-reports');
 
     expect(active.getAttribute('aria-current')).toBe('page');
-    expect(active.className).toContain('text-neo-cream');
+    expect(active.className).toContain('text-edu-ink');
     expect(active.className).not.toMatch(/neo-lime/);
 
     const pill = getByTestId('education-tab-indicator');
@@ -146,7 +146,7 @@ describe('<EducationNav>', () => {
     expect(inactive.getAttribute('aria-current')).toBeNull();
     // One dock, not four boxed buttons.
     expect(inactive.className).not.toMatch(/border-\[2px\]/);
-    expect(inactive.className).not.toContain('bg-neo-navy-light');
+    expect(inactive.className).not.toContain('bg-edu-surface');
   });
 
   it('slides the pill to the active tab with a short transform-only transition', async () => {

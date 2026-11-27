@@ -139,8 +139,8 @@ describe('ClassroomGuestDemo', () => {
     render(<ClassroomGuestDemo />);
     const join = screen.getByTestId('guest-join-submit');
     expect(join.className).toContain('border-neo-lime');
-    expect(join.className).toContain('text-neo-lime');
-    expect(join.className).not.toContain('text-neo-cream/60');
+    expect(join.className).toContain('text-edu-lime-ink');
+    expect(join.className).not.toContain('text-edu-ink/60');
   });
 
   it('centres the card vertically at every size and sets a big headline', () => {

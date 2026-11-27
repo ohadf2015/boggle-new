@@ -57,7 +57,7 @@ describe('EduHostResults', () => {
     const root = screen.getByTestId('edu-host-results');
     expect(root.className).toContain('fixed inset-0');
     expect(root.className).toContain('z-[75]');
-    expect(root.className).toContain('bg-neo-navy');
+    expect(root.className).toContain('bg-edu-page');
   });
 
   it('given a finished round, when the projector shows results, then a podium and class stats appear', () => {

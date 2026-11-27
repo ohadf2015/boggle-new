@@ -45,7 +45,7 @@ describe('Library cards', () => {
   ])('Given a %s list, Then the card is calm navy with one small accent and no colored fill elsewhere', (_l, patch, badgeKey) => {
     render(<LibraryCard item={{ ...base, ...patch }} index={0} onOpen={vi.fn()} />);
     const card = screen.getByTestId('library-card');
-    expect(card.className).toContain('bg-neo-navy-light');
+    expect(card.className).toContain('bg-edu-surface');
     expect(within(card).getByTestId('library-card-badge')).toHaveTextContent(badgeKey);
     const accent = within(card).getByTestId('list-card-accent');
     expect(fills(card)).toEqual([accent]);

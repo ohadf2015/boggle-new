@@ -71,7 +71,7 @@ describe('<HqLaunchStage> — GO LIVE never shows a bare splash', () => {
   it('Given a full-screen layer, Then it paints at rest — no opacity-0 entrance on the root (Class 5)', () => {
     render(<HqLaunchStage />);
     const stage = screen.getByTestId('hq-launch-stage');
-    expect(stage.className).toContain('bg-neo-navy');
+    expect(stage.className).toContain('bg-edu-page');
     expect(stage.className).not.toMatch(/opacity-0|animate-in|fade-in/);
     const src = readFileSync(path.join(__dirname, '..', 'HqLaunchStage.tsx'), 'utf8');
     expect(src).not.toMatch(/initial=\{\{\s*opacity:\s*0/);

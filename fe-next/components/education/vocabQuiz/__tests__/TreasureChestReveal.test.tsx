@@ -114,7 +114,7 @@ describe('TreasureChestReveal', () => {
     const { container } = render(<TreasureChestReveal state={chest} t={mockT} />);
     const wrapper = container.firstChild as HTMLElement;
 
-    expect(wrapper.classList.contains('bg-neo-navy')).toBe(true);
+    expect(wrapper.classList.contains('bg-edu-page')).toBe(true);
   });
 
   it('shows a small loss as a positive number with kind wording, never "-7"', () => {

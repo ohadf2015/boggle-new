@@ -31,8 +31,8 @@ describe('EducationHeader compact: a quiet title for the Pick-a-game setup', () 
     render(<EducationHeader compact showBackButton title="Classroom Game" />);
     const tile = screen.getByTestId('edu-header-icon');
     expect(tile.className).not.toMatch(/bg-neo-(cyan|lime|pink|yellow|purple)/);
-    expect(tile.className).toContain('text-neo-cream');
-    expect(screen.getByTestId('edu-header-crumbs').className).toContain('[&_[aria-current=page]]:text-neo-cream');
+    expect(tile.className).toContain('text-edu-ink');
+    expect(screen.getByTestId('edu-header-crumbs').className).toContain('[&_[aria-current=page]]:text-edu-ink');
     expect(screen.getByTestId('edu-utility-bar').className).toContain('[&_[data-testid=whats-new-dot]]:bg-neo-cream');
   });
 

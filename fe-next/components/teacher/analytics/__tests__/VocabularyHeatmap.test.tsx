@@ -215,7 +215,7 @@ describe('VocabularyHeatmap', () => {
     expect(masteredCell).toHaveClass('bg-neo-cream');
     expect(practicingCell).toHaveClass('bg-neo-cream/45');
     expect(strugglingCell).toHaveClass('bg-neo-pink');
-    expect(notStartedCell).toHaveClass('bg-neo-navy/50');
+    expect(notStartedCell).toHaveClass('bg-edu-surface/50');
   });
 
   it('should show tooltip on hover', async () => {

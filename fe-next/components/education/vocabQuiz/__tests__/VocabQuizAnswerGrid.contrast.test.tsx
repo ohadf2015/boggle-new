@@ -57,10 +57,10 @@ describe('VocabQuizAnswerGrid — reads as a control', () => {
     }
   });
 
-  it('draws one light neutral lip on every resting tile, since a black lip vanishes on the navy', () => {
+  it('draws one neutral edu-line lip on every resting tile, never a family-coloured one', () => {
     const tiles = setup();
     ['lime', 'pink', 'cyan', 'purple'].forEach((family, i) => {
-      expect(tiles[i].className).toContain('shadow-neo-white/15');
+      expect(tiles[i].className).toContain('shadow-edu-line/15');
       expect(tiles[i].className).not.toContain(`shadow-neo-${family}-muted`);
     });
   });
@@ -79,10 +79,10 @@ describe('VocabQuizAnswerGrid — reads as a control', () => {
     });
   });
 
-  it('puts white ink on every resting dark card', () => {
+  it('puts edu ink on every resting card surface', () => {
     for (const tile of setup()) {
-      expect(tile.className).toContain('bg-neo-navy-elevated');
-      expect(tile.className).toContain('text-neo-white');
+      expect(tile.className).toContain('bg-edu-surface');
+      expect(tile.className).toContain('text-edu-ink');
     }
   });
 
@@ -91,22 +91,22 @@ describe('VocabQuizAnswerGrid — reads as a control', () => {
     expect(tiles[3].className).toMatch(/(^|\s)bg-neo-lime(\s|$)/);
     expect(tiles[3].className).not.toMatch(/(^|\s)bg-neo-purple(\s|$)/);
     expect(tiles[3].className).toContain('text-neo-black');
-    expect(tiles[3].className).not.toContain('text-neo-white');
+    expect(tiles[3].className).not.toContain('text-edu-ink');
   });
 
-  it('keeps white ink on a picked card, whose 20% wash leaves the navy dark', () => {
+  it('keeps edu ink on a picked card under its 20% wash', () => {
     const tiles = setup({ selectedIndex: 3 });
     expect(tiles[3].className).not.toMatch(/(^|\s)bg-neo-purple(\s|$)/);
-    expect(tiles[3].className).toContain('bg-neo-navy-elevated');
-    expect(tiles[3].className).toContain('text-neo-white');
+    expect(tiles[3].className).toContain('bg-edu-surface');
+    expect(tiles[3].className).toContain('text-edu-ink');
   });
 
   it('keeps a revealed distractor legible instead of dimming it into the navy', () => {
     const distractor = setup({ correctIndex: 0, selectedIndex: 1 })[3];
-    // Stacked transparency took the old distractor text to ~1.7:1; one 70% white on the navy stays above 7:1.
+    // Stacked transparency took the old distractor text to ~1.7:1; one 70% ink stays readable on the card.
     expect(distractor.className).not.toContain('opacity-60');
-    expect(distractor.className).toContain('text-neo-white/70');
-    expect(distractor.className).toMatch(/border-neo-white\/25/);
+    expect(distractor.className).toContain('text-edu-ink/70');
+    expect(distractor.className).toMatch(/(^|\s)border-edu-line(\s|$)/);
   });
 
   it('marks a wrong pick in red, not in its own family colour', () => {

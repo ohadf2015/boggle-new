@@ -130,7 +130,7 @@ describe('ClassroomManager — swipe carousel instead of page scroll', () => {
   it('Given several classes, Then each card is a navy body under its color band', () => {
     mq.wide = true;
     render(<ClassroomManager />);
-    for (const card of screen.getAllByTestId('classroom-card')) expect(card.className).toContain('bg-neo-navy-light');
+    for (const card of screen.getAllByTestId('classroom-card')) expect(card.className).toContain('bg-edu-surface');
   });
 
   it('Given three classes on a desktop row, Then they all fit and there is no arrow nav', () => {
@@ -174,7 +174,7 @@ describe('ClassroomManager — swipe carousel instead of page scroll', () => {
     render(<ClassroomManager />);
     const cls = screen.getByTestId('classroom-create-link').className;
     expect(cls).not.toMatch(/(^|\s)bg-neo-(cyan|lime|pink|yellow)(\s|$)/);
-    expect(cls).toMatch(/border-neo-cream/);
+    expect(cls).toMatch(/border-edu-line/);
   });
 
   it('Given a class, Then its card shows a short student preview', () => {

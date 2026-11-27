@@ -25,7 +25,7 @@ describe('StudentPageClient — one screen, nothing to scroll', () => {
     const hub = await screen.findByTestId('academy-hub');
     expect(hub.className).toContain('fixed');
     expect(hub.className).toContain('overflow-hidden');
-    expect(hub.className).toContain('bg-neo-navy');
+    expect(hub.className).toContain('bg-edu-surface');
     expect(container.querySelector('[data-testid="education-shell-scroll"]')).toBeNull();
   });
 

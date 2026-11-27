@@ -64,8 +64,8 @@ describe('<JoinFlow> layout', () => {
   it('Then the form sits on a solid panel over the busy stage and widens on desktop', () => {
     render(<JoinFlow />);
     const stage = screen.getByTestId('join-stage').className;
-    expect(stage).toMatch(/(^|\s)bg-neo-navy(\s|$)/);
-    expect(stage).toContain('border-neo-cream');
+    expect(stage).toMatch(/(^|\s)bg-edu-surface(\s|$)/);
+    expect(stage).toContain('border-edu-line');
     expect(stage).toContain('lg:max-w-2xl');
   });
 

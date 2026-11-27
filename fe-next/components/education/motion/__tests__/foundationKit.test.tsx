@@ -149,7 +149,7 @@ describe('CelebrationBurst sparkle variant', () => {
   it('draws stars in one neo tone via currentColor, never a hex', () => {
     render(<kit.CelebrationBurst playing variant="sparkle" />);
     for (const s of screen.getAllByTestId('edu-burst-piece')) {
-      expect(s.getAttribute('class') ?? '').toMatch(/text-neo-lime/);
+      expect(s.getAttribute('class') ?? '').toMatch(/text-edu-lime-ink/);
       expect(s.outerHTML).not.toMatch(/#[0-9a-f]{3,6}/i);
     }
   });

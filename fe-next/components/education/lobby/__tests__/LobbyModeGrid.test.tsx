@@ -188,7 +188,7 @@ describe('<LobbyModeGrid> — the picker is the page', () => {
 
   it('Then the recommended sticker is a neutral outline', () => {
     renderGrid();
-    expect(screen.getByTestId('mode-recommended').className).toContain('border-neo-cream');
+    expect(screen.getByTestId('mode-recommended').className).toContain('border-edu-line');
   });
 
   it('Given a lesson run sheet sits above the grid, When the grid is dense, Then the cover art goes shorter so the page still fits', () => {

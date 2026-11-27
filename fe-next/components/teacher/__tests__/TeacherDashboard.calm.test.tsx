@@ -107,7 +107,7 @@ describe('Teacher Home: one primary, chunky blocks', () => {
   it('Then the class name is white on the panel, not a lime headline', () => {
     render(<TeacherDashboard />);
     const title = screen.getByRole('heading', { level: 2, name: '5B - English' });
-    expect(title.className).toContain('text-neo-white');
+    expect(title.className).toContain('text-edu-ink');
     expect(title.className).not.toMatch(/text-neo-lime/);
   });
 

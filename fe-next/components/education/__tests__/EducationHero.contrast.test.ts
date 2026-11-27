@@ -40,12 +40,13 @@ function classNameOf(src: string, tag: string): string {
 
 describe('EducationHero', () => {
   const src = fs.readFileSync(HERO, 'utf8');
-  const sectionIsDark = /<section[^>]*className="[^"]*bg-neo-navy/.test(src);
+  const sectionIsSky = /<section[^>]*className="[^"]*bg-edu-(surface|page)/.test(src);
 
-  it('does not put navy copy on a navy section', () => {
-    expect(sectionIsDark, 'expected the hero section to be bg-neo-navy').toBe(true);
+  it('puts ink copy on the sky section', () => {
+    expect(sectionIsSky, 'expected the hero section to be an edu-surface or edu-page').toBe(true);
 
-    // The h1 and the sub carry the value proposition. Neither may be navy.
+    // The h1 and the sub carry the value proposition. On sky both need the
+    // edu ink: white or navy copy is invisible on one theme or the other.
     // The sub is addressed by its own `education-hero-sub` class rather than by
     // tag: the first <p> in the file is the pink eyebrow, so a `<p>` lookup
     // would assert against an element that was never navy and pass vacuously.
@@ -53,10 +54,10 @@ describe('EducationHero', () => {
     expect(sub, 'no .education-hero-sub element found').toBeTruthy();
 
     for (const [label, cls] of [['h1', classNameOf(src, 'h1')], ['sub', sub!]]) {
-      expect(
-        cls,
-        `${label} is navy-on-navy — invisible against bg-neo-navy`,
-      ).not.toMatch(/text-neo-navy/);
+      expect(cls, `${label} must use the edu ink`).toMatch(/(^|\s)text-edu-ink(\/\d+)?(\s|$)/);
+      expect(cls, `${label} has a fixed light or navy ink`).not.toMatch(
+        /text-(neo-navy|white|neo-white|neo-cream)\b/,
+      );
     }
   });
 

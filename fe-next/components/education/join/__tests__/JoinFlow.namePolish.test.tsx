@@ -74,7 +74,7 @@ describe('<JoinFlow> nickname step polish', () => {
     render(<JoinFlow initialCode="ZZZZZ9" />);
     const alert = await screen.findByRole('alert');
     expect(alert.className).toContain('text-neo-black');
-    expect(alert.className).not.toContain('text-neo-white');
+    expect(alert.className).not.toContain('text-edu-ink');
   });
 
   it('Given a saved nickname on this device, Then the invite link asks "Continue as Maya?" before reusing it, never a random one', async () => {

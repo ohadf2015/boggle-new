@@ -66,7 +66,7 @@ describe('The clock is one countdown ring with quiet points text, never a second
   it('Given a running clock, Then a lime ring drains with the seconds and the points are plain small text', () => {
     render(<VocabQuizStakesMeter clock={CLOCK} points={POINTS} t={t} />);
     const timer = screen.getByRole('timer');
-    expect(timer.className).toContain('text-neo-lime');
+    expect(timer.className).toContain('text-edu-lime-ink');
     expect(timer.dataset.urgent).toBe('false');
     const fill = screen.getByTestId('vocab-quiz-stakes-fill');
     expect(fill.tagName.toLowerCase()).toBe('circle');
@@ -89,7 +89,7 @@ describe('The clock is one countdown ring with quiet points text, never a second
     render(<VocabQuizStakesMeter clock={{ ...CLOCK, secondsLeft: 3, fractionLeft: 0.15, urgent: true, ticking: true }} points={POINTS} t={t} />);
     const timer = screen.getByRole('timer');
     expect(timer.dataset.urgent).toBe('true');
-    expect(timer.className).toContain('text-neo-orange');
+    expect(timer.className).toContain('text-edu-orange-ink');
     expect(timer.outerHTML).not.toContain('animate-pulse');
   });
 
@@ -126,7 +126,7 @@ describe('The student screen: the clock lives inside the question card', () => {
   it('Given a question, Then the footer slot is not a lit slab competing with the answers', () => {
     mount();
     const footer = screen.getByTestId('vocab-quiz-footer');
-    expect(footer.className).not.toContain('bg-neo-navy-elevated');
+    expect(footer.className).not.toContain('bg-edu-surface');
     expect(footer.textContent).not.toContain('vocabQuiz.stakes.label');
   });
 

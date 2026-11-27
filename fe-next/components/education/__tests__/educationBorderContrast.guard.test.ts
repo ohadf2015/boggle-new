@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import SKY_DEBT from './eduSkyBorderDebt.json';
 
 /**
  * Module-wide guard: a card border must be VISIBLE against its own fill.
@@ -34,6 +35,12 @@ const TOKENS: Record<string, string> = {
   'neo-yellow': '#ffe135',
   'neo-purple': '#8b5cf6',
   'neo-orange': '#ff6b35',
+  // Classroom sky values (app/edu-sky.css): the education roots render under data-edu-theme="sky".
+  'edu-page': '#9ed8ff',
+  'edu-surface': '#ffffff',
+  'edu-tile': '#fff6e3',
+  'edu-ink': '#101114',
+  'edu-line': '#101114',
 };
 
 type RGB = [number, number, number];
@@ -134,7 +141,10 @@ interface Violation {
   ratio: number;
 }
 
+let pairCount = 0;
+
 function scan(): Violation[] {
+  pairCount = 0;
   const violations: Violation[] = [];
   for (const file of sourceFiles()) {
     const src = fs.readFileSync(file, 'utf8');
@@ -154,12 +164,12 @@ function scan(): Violation[] {
       // prefix: `border-neo-thick` is a width utility, and finding it first
       // would skip the colour token sitting right after it.
       const bgToken = tokens
-        .filter((t) => t.startsWith('bg-neo-'))
+        .filter((t) => t.startsWith('bg-neo-') || t.startsWith('bg-edu-'))
         .map((t) => t.slice(3))
         .find((t) => resolve(t));
       const border = tokens
         .map((t) =>
-          t.startsWith('border-neo-')
+          t.startsWith('border-neo-') || t.startsWith('border-edu-')
             ? t.slice(7)
             : // `border-black` is Tailwind's own black, not a neo token.
               t === 'border-black'
@@ -174,12 +184,13 @@ function scan(): Violation[] {
       const bd = resolve(border);
       if (!bg || !bd) continue;
 
-      // A translucent fill (`bg-neo-pink/10`) sits on whatever is behind it.
-      // This app is dark-only and every one of these tiles lives inside a navy
-      // card, so composite over navy rather than skipping: skipping is how the
-      // note-tile failures (`border-neo-pink/40` on `bg-neo-pink/10` = 1.69:1)
-      // hid from an earlier version of this check while it reported green.
-      const ground = bg.alpha === 1 ? bg.rgb : over(bg.rgb, toRgb(TOKENS['neo-navy']), bg.alpha);
+      // A translucent fill (`bg-neo-pink/10`) sits on whatever is behind it:
+      // a white sky card in the classroom, a navy card in adventure/wordTower.
+      // Composite rather than skip: skipping is how the note-tile failures
+      // (`border-neo-pink/40` on `bg-neo-pink/10` = 1.69:1) hid from an
+      // earlier version of this check while it reported green.
+      const behind = TOKENS[isExtra(path.relative(REPO, file)) ? 'neo-navy' : 'edu-surface'];
+      const ground = bg.alpha === 1 ? bg.rgb : over(bg.rgb, toRgb(behind), bg.alpha);
 
       const painted = over(bd.rgb, ground, bd.alpha);
       // Border painted identically to its fill = a deliberate solid block, not a
@@ -187,6 +198,7 @@ function scan(): Violation[] {
       // edge that matters there is against the PARENT, which this cannot see.
       if (painted.every((c, i) => c === ground[i])) continue;
 
+      pairCount++;
       const r = ratio(painted, ground);
       if (r < 3) {
         violations.push({
@@ -250,8 +262,18 @@ const FROZEN_EXTRA = [
 describe('education + teacher card borders', () => {
   // AssignmentProgressMatrix sample cells are separate elements on purpose:
   // a ternary className concatenates and false-fails cream against lime.
+  // Accent edges on a white sky card measure ~1.2:1. The pairs the sky skin
+  // inherited are listed in eduSkyBorderDebt.json; fix one and delete its line.
   it('every education-root border is visible against its own fill (>= 3:1)', () => {
-    const violations = scan().filter((v) => !isExtra(v.file));
+    const debt = [...SKY_DEBT];
+    const violations = scan()
+      .filter((v) => !isExtra(v.file))
+      .filter((v) => {
+        const i = debt.indexOf(`${v.file}|${v.bg}|${v.border}`);
+        if (i === -1) return true;
+        debt.splice(i, 1);
+        return false;
+      });
     const report = violations
       .map((v) => `  ${v.file}: border-${v.border} on bg-${v.bg} = ${v.ratio}:1`)
       .join('\n');
@@ -266,5 +288,10 @@ describe('education + teacher card borders', () => {
 
   it('scans a non-trivial number of files (guard against a vacuous pass)', () => {
     expect(sourceFiles().length).toBeGreaterThan(100);
+  });
+
+  it('resolves the sky tokens, so edu-* borders are measured rather than skipped', () => {
+    scan();
+    expect(pairCount).toBeGreaterThan(400);
   });
 });

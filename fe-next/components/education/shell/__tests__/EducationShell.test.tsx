@@ -124,10 +124,10 @@ describe('EducationShell', () => {
     expect(document.body.classList.contains('screen-fit')).toBe(true);
   });
 
-  it('is dark-only: hardcodes bg-neo-navy with no cream light-mode pair to flash', () => {
+  it('hardcodes the bg-edu-page token with no cream light-mode pair to flash', () => {
     const { getByTestId } = render(<EducationShell>body</EducationShell>);
     const root = getByTestId('education-shell');
-    expect(root.className).toContain('bg-neo-navy');
+    expect(root.className).toContain('bg-edu-page');
     expect(root.className).not.toContain('bg-neo-cream');
   });
 

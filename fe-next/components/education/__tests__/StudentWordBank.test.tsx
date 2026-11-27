@@ -45,7 +45,7 @@ describe('StudentWordBank', () => {
     const sheet = screen.getByTestId('student-word-bank');
     expect(sheet.className).toMatch(/\bfixed\b/);
     expect(sheet.className).toMatch(/bottom-0/);
-    expect(sheet.className).toMatch(/bg-neo-navy/);
+    expect(sheet.className).toMatch(/bg-edu-surface/);
     expect(sheet.className).not.toMatch(/dark:bg-neo-navy/);
   });
 

@@ -55,7 +55,7 @@ describe('RewardChest', () => {
       />
     );
     const root = container.querySelector('[role="dialog"]') as HTMLElement;
-    expect(root.className).toContain('bg-neo-navy');
+    expect(root.className).toContain('bg-edu-page');
     expect(root.className).not.toContain('bg-neo-cream');
   });
 
