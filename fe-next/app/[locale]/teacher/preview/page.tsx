@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { TeacherHomePreview, type TeacherHomePreviewState } from '@/components/teacher/home/TeacherHomePreview';
 import { TeacherProBannersPreview } from '@/components/teacher/home/TeacherProBannersPreview';
 
-const STATES: readonly TeacherHomePreviewState[] = ['classes', 'empty', 'loading'];
+const STATES: readonly TeacherHomePreviewState[] = ['classes', 'empty', 'loading', 'new'];
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
