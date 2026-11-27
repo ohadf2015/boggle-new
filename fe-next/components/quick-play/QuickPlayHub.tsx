@@ -7,6 +7,7 @@
  */
 import { publishLevelUp, type LevelUpLike } from '@/lib/avatar/revealTrigger';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,7 +15,7 @@ import { useAnnouncer } from '@/components/GameAnnouncer';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { QuickModeAdapter } from './adapters/QuickModeAdapter';
 import { preloadQuickMode } from './adapters/preloadQuickMode';
-import { QuickPlayResults, type QuickRival } from './QuickPlayResults';
+import type { QuickRival } from './QuickPlayResults';
 import type { CollectedWord } from './QuickWordsCollected';
 import { recordGuestRound, quickCoinsFor, quickXpFor, recentAveragePct, quickRoundsPlayed, bestScoreFor } from '@/lib/quickPlay/guestProgress';
 import { COACH_SEED_PREFIX } from '@/shared/utils/coachBoard';
@@ -29,12 +30,20 @@ import { BackButton } from '@/components/ui/BackButton';
 import { Button } from '@/components/ui/button';
 import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 import { LoadingDancer } from '@/components/ui/LoadingDancer';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { BaseErrorBoundary } from '@/components/ErrorBoundaries';
 import { captureError } from '@/utils/sentry';
 import { useBackOneLevel } from '@/hooks/useBackOneLevel';
 import type { WheelSelection } from './wheelGeometry';
 import { strikeHoldMs } from './lightningPath';
 import { QUICK_MODES, roundTarget, type QuickMode, type QuickRoundConfig, type QuickRoundResult, type QuickSubmitOutcome } from './types';
+
+// Results screen (rival compare, avatar stage, leaderboard cards) is only
+// needed after a round ends — split out of the initial quick-play bundle.
+const QuickPlayResults = dynamic(() => import('./QuickPlayResults').then((m) => m.QuickPlayResults), {
+  ssr: false,
+  loading: () => <PageLoader nested priority={false} />,
+});
 
 type HubPhase = 'loading' | 'error' | 'playing' | 'results';
 

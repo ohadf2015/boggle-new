@@ -63,3 +63,27 @@ describe('MyWordsChips styling', () => {
     expect(screen.getByText('+24')).toBeTruthy();
   });
 });
+
+describe('MyWordsChips status legend (accessibility — status must not rely on color alone)', () => {
+  const t = (path: string, params?: Record<string, string | number>) => {
+    if (path === 'wordWheel.chipLockedLabel') return `${params?.word} scored, worth ${params?.score} points`;
+    if (path === 'wordWheel.chipClosedLabel') return `${params?.word}, claimed by an opponent`;
+    return path;
+  };
+
+  it('labels a locked (scored) chip with its word and score for screen readers', () => {
+    render(<MyWordsChips words={[{ word: 'VEND', kind: 'locked', score: 24, ts: 0 }]} t={t} />);
+    expect(screen.getByLabelText('VEND scored, worth 24 points')).toBeTruthy();
+  });
+
+  it('labels a closed (claimed-by-opponent) chip distinctly from a locked one', () => {
+    render(<MyWordsChips words={[{ word: 'VEND', kind: 'closed', ts: 0 }]} t={t} />);
+    expect(screen.getByLabelText('VEND, claimed by an opponent')).toBeTruthy();
+  });
+
+  it('marks a closed chip with a non-color cue (strikethrough) so it reads without color', () => {
+    const { container } = render(<MyWordsChips words={[{ word: 'VEND', kind: 'closed', ts: 0 }]} t={t} />);
+    const chip = container.querySelector('[data-kind="closed"]') as HTMLElement;
+    expect(chip.className).toContain('line-through');
+  });
+});

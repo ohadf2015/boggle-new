@@ -88,4 +88,12 @@ describe('BlastWaveClear', () => {
     act(() => { vi.advanceTimersByTime(5000); });
     expect(onContinue).toHaveBeenCalledTimes(1);
   });
+
+  it('stops the countdown interval once it hits zero instead of ticking forever', () => {
+    vi.useFakeTimers();
+    const clearSpy = vi.spyOn(global, 'clearInterval');
+    render(<BlastWaveClear {...base} onContinue={vi.fn()} autoContinueMs={2000} />);
+    act(() => { vi.advanceTimersByTime(2000); });
+    expect(clearSpy).toHaveBeenCalled();
+  });
 });

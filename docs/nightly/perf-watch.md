@@ -34,6 +34,16 @@ Items flagged by the nightly performance lane that need human judgement or are o
 - If Realtime is required, accept this as infrastructure overhead and suppress the INVESTIGATE alert for the WAL query specifically.
 - File a Supabase support ticket: WAL parser overhead with empty publication should be zero or near-zero.
 
+**Update 2026-11-22:** `db_perf_top_query_audit`'s newest snapshot (weekly, 2026-11-16) has this query at rank 1, **55.52% of total exec time**, 5.8M calls / 32586s total — read via PostgREST REST (supabase MCP tool didn't surface tonight). Cross-checked `realtime_auto_remediation_log`: all 5 tables ever flagged (leaderboard, profiles, game_results, user_notifications, student_lesson_progress) were already auto-dropped between 07-10 and 10-18, and `v_suspicious_realtime_publications` returns 0 rows right now. `pg_stat_statements` totals are cumulative since last reset, so 55.52% likely still includes the pre-remediation history (leaderboard alone had 523,835 lifetime writes before its drop) rather than being new live cost — consistent with this item's root cause (Realtime's internal WAL subscription exists even with an empty publication). Did not have SQL execute access tonight (REST API only) to run `pg_stat_statements_reset()` or re-confirm with a fresh window; next run with supabase MCP access should do that before re-raising severity.
+
+---
+
+## [RESOLVED 2026-11-24] `realtime-publication-audit` daily cron — no row since 2026-11-15
+
+**Severity:** was Medium (silent-failure candidate, Class 4) — fixed tonight.
+**Root cause:** `pg_cron.job_run_details` showed jobid 22 `succeeded` every single night (11-16 → 11-23); the gap wasn't the cron failing to fire. `snapshot_realtime_publication()` inserts one row per currently-published table, and `pg_publication_tables WHERE pubname='supabase_realtime'` is currently EMPTY (0 tables — all high-write tables were already auto-remediated by 2026-10-18). With 0 tables to insert, the function legitimately writes 0 rows — and pg_cron's `return_message` always reports the outer `SELECT`'s row count (1, for the function call itself), not rows written inside the function body. A genuinely-stalled cron and a healthy "nothing to report" cron were indistinguishable from `max(audited_at)` alone.
+**Fix:** migration `20261124013000_fix_realtime_publication_audit_silent_empty_run.sql` — when the per-table INSERT affects 0 rows, the function now inserts a `_meta/__heartbeat_no_tables_published__` sentinel row instead, so the table always gets a fresh row on every run. Verified live: ran the function manually post-migration, confirmed a new row landed with today's timestamp.
+
 ---
 
 ## [FRONTEND] Multiplayer LCP — improving but still POOR

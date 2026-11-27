@@ -179,9 +179,14 @@ export default function WordSolverPageClient() {
             sections below it down) while the click still counts as input, so
             the answer that lands later fills space that is already there
             instead of shifting the page. It never shrinks back, even for no
-            results or an error, because that collapse would be a shift too. */}
+            results or an error, because that collapse would be a shift too.
+            Fixed height (not min-height) with internal scroll: a big word
+            list (up to 500 capped results) can exceed any reasonable
+            reservation, and growing past it would shift the page below on
+            arrival -- after the 500ms input-exclusion window has long since
+            closed, so web-vitals counts it as real CLS. */}
         {(isLoading || hasSearched || error) && (
-          <section className="mb-8 min-h-[50vh]" aria-live="polite" data-testid="solver-results">
+          <section className="mb-8 h-[50dvh] overflow-y-auto" aria-live="polite" data-testid="solver-results">
             {error && (
               <div className="bg-red-900/50 border-3 border-red-500 rounded-neo p-4 mb-6 text-red-200">
                 {error}

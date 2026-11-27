@@ -2546,6 +2546,7 @@ const he = {
       "youWin": "ניצחת במירוץ!",
       "wins": "ניצח במירוץ!",
       "winner": "{winner} ניצח במירוץ!",
+      "yourRank": "המקום שלך",
       "statSeparator": "/",
       "statPercent": "{percent}%"
     },
@@ -10394,7 +10395,6 @@ const he = {
     "minLetters": "מינימום {min} אותיות",
     "scoreLabel": "ניקוד",
     "timeLeft": "זמן שנותר",
-    "closeRace": "מרוץ צמוד!",
     "gameOver": "הזמן נגמר!",
     "submit": "שלחו",
     "alreadyFoundBonus": "נמצאה שוב (+{points})",
@@ -10403,6 +10403,8 @@ const he = {
     "missingLetter": "חסרה: {letter}",
     "streakBadge": "{count} ברצף!",
     "onFireBadge": "{count} על האש!",
+    "chipLockedLabel": "{word}, הניבה {score} נקודות",
+    "chipClosedLabel": "{word}, נתפסה על ידי יריב",
     "closeRace": "מרוץ צמוד",
     "inputPlaceholder": "הקלידו מילה...",
     "firstHint": "מקישים או גוררים — בכל מילה יש {letter}",
@@ -13954,18 +13956,21 @@ const he = {
     "continueModal": {
       "title": "אל תעצרו עכשיו!",
       "body": "נגמרו המהלכים. צפו בפרסומת קצרה והמשיכו לשחק.",
+      "bodyNoAd": "נגמרו המהלכים. אין פרסומת זמינה כרגע — אפשר לסיים את המשחק.",
       "cta": "צפו בפרסומת ל-+{moves} מהלכים",
       "decline": "סיימו משחק"
     },
     "retryWaveModal": {
       "title": "גל {wave}, כמעט!",
       "body": "ניקית {percent}%. צפו בפרסומת ונסו שוב את גל {wave}. הגלים הקודמים נשמרים.",
+      "bodyNoAd": "ניקית {percent}%. אין פרסומת זמינה כרגע — אפשר להתחיל מחדש מגל 1.",
       "cta": "צפו בפרסומת · נסו שוב את גל {wave}",
       "decline": "התחילו מחדש מגל 1"
     },
     "pregameBuff": {
       "title": "לחזק?",
       "body": "בחרו בוסט, צפו בפרסומת קצרה והתחילו את הריצה עם יתרון.",
+      "bodyNoAd": "אין בוסטים זמינים כרגע — אפשר לדלג ולהתחיל ישר במשחק.",
       "shield": "מגן",
       "bomb": "פצצה",
       "combo2x": "קומבו x2",
@@ -14159,7 +14164,9 @@ const he = {
       "sweating": "קמע מתוח ששורד את הספירה לאחור",
       "celebrating": "קמע חוגג עם גביע",
       "sadSmile": "קמע עם חיוך מנחם",
-      "neutral": "קמע עליז מוכן לגל הבא"
+      "neutral": "קמע עליז מוכן לגל הבא",
+      "mute": "השתק תגובות קמע",
+      "unmute": "בטל השתקת תגובות קמע"
     },
     "archetypes": {
       "normal": "גל רגיל",
@@ -16198,7 +16205,11 @@ const he = {
       "homeCta": "לצפייה בשבוע הזה"
     },
     "proPowered": {"hint": "חלק מתוכנית פרו למורים שלך"},
-    "trialUsage": {"lead": "בתקופת הניסיון:", "games_one": "משחק כיתתי אחד", "games_other": "{count} משחקים כיתתיים", "students_one": "תלמיד אחד במעקב", "students_other": "{count} תלמידים במעקב", "practice_one": "תרגול אחד", "practice_other": "{count} תרגולים"}
+    "trialUsage": {"lead": "בתקופת הניסיון:", "games_one": "משחק כיתתי אחד", "games_other": "{count} משחקים כיתתיים", "students_one": "תלמיד אחד במעקב", "students_other": "{count} תלמידים במעקב", "practice_one": "תרגול אחד", "practice_other": "{count} תרגולים"},
+    "schoolBulkCta": {
+      "text": "מריצים את זה בכל בית הספר?",
+      "link": "קבלו מחיר לבתי ספר"
+    }
   },
   "education": {
     "race": {
@@ -17317,6 +17328,7 @@ const he = {
         "subtitle": "השם הזה יופיע על לוח הכיתה.",
         "placeholder": "הקלידו את השם",
         "submit": "כניסה למשחק",
+        "submitting": "נכנסים…",
         "roomLabel": "חדר {{code}}"
       },
       "classroomLessonLabel": "{{classroom}} · משחק חי: {{lesson}}",
@@ -21163,6 +21175,7 @@ const he = {
         "titleLost": "נגמרו האריחים",
         "subtitleWon": "אספת את כל כתרי האבן. הציד הושלם.",
         "subtitleLost": "השק התרוקן לפני שסיימתם. נסו שוב!",
+        "subtitleLostClose": "כל כך קרוב — כתר אחד חסר!",
         "restart": "ציד חדש",
         "crownsCaption": "{{n}}/4 כתרים נאספו"
       },

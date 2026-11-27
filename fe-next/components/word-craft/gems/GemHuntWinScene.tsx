@@ -17,6 +17,7 @@ export interface GemHuntWinSceneProps {
     titleLost: string;
     subtitleWon: string;
     subtitleLost: string;
+    subtitleLostClose: string;
     score: string;
     turns: string;
     restart: string;
@@ -56,6 +57,7 @@ function GemHuntWinSceneImpl({ totalScore, turnIndex, outcome, onRestart, invent
   }, [totalScore]);
 
   const isWin = outcome === 'won';
+  const isNearMiss = !isWin && wonCount >= GEM_COLORS.length - 1;
   return (
     <div
       ref={cardRef}
@@ -73,7 +75,7 @@ function GemHuntWinSceneImpl({ totalScore, turnIndex, outcome, onRestart, invent
           {isWin ? labels.titleWon : labels.titleLost}
         </h2>
         <p className="mb-3 font-neo-body text-sm text-neo-white">
-          {isWin ? labels.subtitleWon : labels.subtitleLost}
+          {isWin ? labels.subtitleWon : isNearMiss ? labels.subtitleLostClose : labels.subtitleLost}
         </p>
         <div className="mb-1 flex items-center justify-center gap-2">
           {GEM_COLORS.map((color, i) => (

@@ -99,6 +99,9 @@ export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogAct
                 <span className={cn('absolute -bottom-0.5 -end-0.5 h-2 w-2 rounded-full border border-neo-black', connected ? 'bg-neo-lime' : 'bg-neo-cream/30')} />
               </span>
               <span dir="auto" translate="no" className="notranslate min-w-0 truncate font-neo-display text-sm font-bold text-neo-white">{p.username}</span>
+              {isCloseRace && p.username === rival?.username && (
+                <Zap data-testid={`wheel-opp-close-race-${p.username}`} aria-label={t('wordWheel.closeRace')} className="h-3.5 w-3.5 shrink-0 text-neo-orange motion-safe:animate-pulse" />
+              )}
               {fogActive ? (
                 <span className="font-neo-display text-sm font-black tracking-wider text-neo-cyan">???</span>
               ) : (

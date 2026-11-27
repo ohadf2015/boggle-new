@@ -17,6 +17,7 @@ import { ResultsMute } from './ResultsMute';
 import { DailyChestRow } from './rewards/DailyChestRow';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import type { V2ResultsProps } from './V2Results';
+import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 
 type Props = V2ResultsProps & { daily: NonNullable<V2ResultsProps['daily']> };
 
@@ -226,6 +227,7 @@ export function DailyTowerResults(p: Props) {
             ) : null}
 
             <DailyChestRow t={t} payoutStatus={p.payoutStatus} reducedMotion={reducedMotion} />
+            <ResultsBannerSlot placement="word-tower-complete" className="mt-3" />
           </DailyResultsFrame>
         </div>
 

@@ -6,6 +6,10 @@ vi.mock('@/hooks/useMasterMute', () => ({
   useMasterMute: () => ({ allMuted: false, toggle: vi.fn(), label: 'Mute', title: 'Sound on' }),
 }));
 
+vi.mock('@/components/ads/ResultsBannerSlot', () => ({
+  default: ({ placement }: { placement: string }) => <div data-testid="results-banner" data-placement={placement} />,
+}));
+
 import { V2Results } from '../V2Results';
 
 afterEach(cleanup);
@@ -76,5 +80,11 @@ describe('V2Results', () => {
     render(<V2Results {...base} onRestart={() => {}} />);
     const coinsLabel = screen.queryByText('common.coins');
     expect(coinsLabel).toBeNull();
+  });
+
+  it('given a finished run, when shown, then the results ad banner is rendered', () => {
+    render(<V2Results {...base} onRestart={() => {}} />);
+    const banner = screen.getByTestId('results-banner');
+    expect(banner).toHaveAttribute('data-placement', 'word-tower-complete');
   });
 });

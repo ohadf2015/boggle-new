@@ -96,7 +96,15 @@ export function BlastWaveClear({
 
   const [secondsLeft, setSecondsLeft] = useState(Math.ceil(autoContinueMs / 1000));
   useEffect(() => {
-    const id = setInterval(() => setSecondsLeft((s) => Math.max(0, s - 1)), 1000);
+    const id = setInterval(() => {
+      setSecondsLeft((s) => {
+        if (s <= 1) {
+          clearInterval(id);
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
     return () => clearInterval(id);
   }, []);
 

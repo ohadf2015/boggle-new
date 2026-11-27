@@ -2660,6 +2660,7 @@ const sv = {
       "youWin": "Du vinner loppet!",
       "wins": "vinner loppet!",
       "winner": "{winner} vinner loppet!",
+      "yourRank": "Du kom på plats",
       "statSeparator": "/",
       "statPercent": "{percent}%"
     },
@@ -10765,7 +10766,6 @@ const sv = {
     "minLetters": "Min {min} bokstäver",
     "scoreLabel": "Poäng",
     "timeLeft": "Tid kvar",
-    "closeRace": "Jämnt lopp!",
     "gameOver": "Tiden är ute!",
     "submit": "SKICKA",
     "alreadyFoundBonus": "Hittad igen (+{points})",
@@ -10774,6 +10774,8 @@ const sv = {
     "missingLetter": "Saknas: {letter}",
     "streakBadge": "{count} i rad!",
     "onFireBadge": "{count} i rad – glödhett!",
+    "chipLockedLabel": "{word}, gav {score} poäng",
+    "chipClosedLabel": "{word}, tagen av en motståndare",
     "closeRace": "Jämn kamp",
     "inputPlaceholder": "Skriv ett ord...",
     "firstHint": "Tryck eller dra — varje ord har {letter}",
@@ -14375,18 +14377,21 @@ const sv = {
     "continueModal": {
       "title": "Sluta inte nu!",
       "body": "Du har slut på drag. Titta på en snabb annons för att fortsätta.",
+      "bodyNoAd": "Du har slut på drag. Ingen annons tillgänglig just nu — avsluta rundan här.",
       "cta": "Se annons för +{moves} drag",
       "decline": "Avsluta rundan"
     },
     "retryWaveModal": {
       "title": "Våg {wave}: så nära!",
       "body": "Du rensade {percent}%. Se en annons för att göra om våg {wave}. Tidigare vågor är sparade.",
+      "bodyNoAd": "Du rensade {percent}%. Ingen annons tillgänglig just nu — starta om från våg 1.",
       "cta": "Se annons · gör om våg {wave}",
       "decline": "Starta om från våg 1"
     },
     "pregameBuff": {
       "title": "Boosta?",
       "body": "Välj en boost, titta på en snabb annons och starta rundan med övertag.",
+      "bodyNoAd": "Inga boostar tillgängliga just nu — hoppa över och starta rundan direkt.",
       "shield": "Sköld",
       "bomb": "Bomb",
       "combo2x": "2x Combo",
@@ -14596,7 +14601,9 @@ const sv = {
       "sweating": "Nervös maskot som överlever nedräkningen",
       "celebrating": "Firande maskot med pokal",
       "sadSmile": "Maskot med tröstande leende",
-      "neutral": "Glad maskot redo för nästa våg"
+      "neutral": "Glad maskot redo för nästa våg",
+      "mute": "Tysta maskotreaktioner",
+      "unmute": "Slå på maskotreaktioner"
     },
     "archetypes": {
       "normal": "Standardvåg",
@@ -16624,7 +16631,11 @@ const sv = {
       "homeCta": "Se veckan"
     },
     "proPowered": {"hint": "Ingår i din Teacher Pro-plan"},
-    "trialUsage": {"lead": "Under din provperiod:", "games_one": "{count} klassmatch", "games_other": "{count} klassmatcher", "students_one": "{count} elev följs", "students_other": "{count} elever följs", "practice_one": "{count} övningspass", "practice_other": "{count} övningspass"}
+    "trialUsage": {"lead": "Under din provperiod:", "games_one": "{count} klassmatch", "games_other": "{count} klassmatcher", "students_one": "{count} elev följs", "students_other": "{count} elever följs", "practice_one": "{count} övningspass", "practice_other": "{count} övningspass"},
+    "schoolBulkCta": {
+      "text": "Kör ni det här för hela skolan?",
+      "link": "Se prissättning för skolor"
+    }
   },
   "education": {
     "race": {
@@ -17743,6 +17754,7 @@ const sv = {
         "subtitle": "Klassen ser det här namnet på tavlan.",
         "placeholder": "Skriv ditt namn",
         "submit": "Gå med i spelet",
+        "submitting": "Går med…",
         "roomLabel": "Rum {{code}}"
       },
       "classroomLessonLabel": "{{classroom}} · live-spel: {{lesson}}",
@@ -21230,6 +21242,7 @@ const sv = {
         "titleLost": "Slut på brickor",
         "subtitleWon": "Du samlade alla kronstenar. Jakten klar.",
         "subtitleLost": "Påsen tog slut innan du blev klar. Försök igen.",
+        "subtitleLostClose": "Så nära — en krona kvar!",
         "restart": "Ny jakt",
         "crownsCaption": "{{n}}/4 kronor samlade"
       },

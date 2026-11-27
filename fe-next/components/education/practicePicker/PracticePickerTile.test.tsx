@@ -13,8 +13,11 @@
  * carries a light border instead.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { toast } from 'sonner';
 import PracticePickerTile from './PracticePickerTile';
+import { trackGrowthEvent } from '@/utils/growthTracking';
+import { useExperiment } from '@/hooks/useExperiment';
 import type { PracticeTile } from '@/lib/education/practicePicker';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -25,6 +28,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
     dir: 'ltr',
   }),
 }));
+
+vi.mock('sonner', () => ({ toast: vi.fn() }));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+vi.mock('@/hooks/useExperiment', () => ({ useExperiment: vi.fn(() => ({ variant: 'control', trackExposure: vi.fn() })) }));
 
 const tile = (over: Partial<PracticeTile> = {}): PracticeTile =>
   ({
@@ -64,6 +71,7 @@ describe('PracticePickerTile contrast', () => {
   });
 
   it('keeps a locked tile bordered so it still reads as a control', () => {
+    vi.mocked(useExperiment).mockReturnValue({ variant: 'control', trackExposure: vi.fn() });
     render(
       <PracticePickerTile
         tile={tile({ id: 'vocab_focus:synonym', mode: 'vocab_focus', ready: false })}
@@ -76,5 +84,45 @@ describe('PracticePickerTile contrast', () => {
     expect(button.className).toContain('border-neo-cream');
     expect(button.className).not.toContain('opacity-');
     expect(button.className).toContain('border-[3px]');
+  });
+});
+
+describe('PracticePickerTile locked-tile feedback experiment (exp-edu-locked-tile-feedback-v1)', () => {
+  const lockedTile = tile({ id: 'vocab_focus:synonym', mode: 'vocab_focus', ready: false });
+
+  it('control: a locked tile stays natively disabled, no toast', () => {
+    vi.mocked(useExperiment).mockReturnValue({ variant: 'control', trackExposure: vi.fn() });
+    const onSelect = vi.fn();
+    render(<PracticePickerTile tile={lockedTile} onSelect={onSelect} />);
+    const button = screen.getByTestId('practice-tile-vocab_focus:synonym');
+    expect(button).toBeDisabled();
+    fireEvent.click(button);
+    expect(toast).not.toHaveBeenCalled();
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('feedback: tapping a locked tile toasts the unlock reason and reports it, never opens the mode', () => {
+    vi.mocked(useExperiment).mockReturnValue({ variant: 'feedback', trackExposure: vi.fn() });
+    const onSelect = vi.fn();
+    render(<PracticePickerTile tile={lockedTile} onSelect={onSelect} />);
+    const button = screen.getByTestId('practice-tile-vocab_focus:synonym');
+    expect(button).not.toBeDisabled();
+    fireEvent.click(button);
+    expect(toast).toHaveBeenCalledTimes(1);
+    expect(onSelect).not.toHaveBeenCalled();
+    expect(trackGrowthEvent).toHaveBeenCalledWith(
+      'practice_tile_locked_tapped',
+      expect.objectContaining({ tileId: 'vocab_focus:synonym', mode: 'vocab_focus' })
+    );
+  });
+
+  it('feedback: a ready tile still opens the mode normally, no toast', () => {
+    vi.mocked(useExperiment).mockReturnValue({ variant: 'feedback', trackExposure: vi.fn() });
+    const onSelect = vi.fn();
+    const readyTile = tile();
+    render(<PracticePickerTile tile={readyTile} onSelect={onSelect} />);
+    fireEvent.click(screen.getByTestId('practice-tile-matching'));
+    expect(onSelect).toHaveBeenCalledWith(readyTile);
+    expect(toast).not.toHaveBeenCalled();
   });
 });
