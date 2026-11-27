@@ -72,6 +72,8 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
 - 15:45: prod-build shots: 266+dyn+juego parity OK, headings OK. Phone pages were 1.09x taller -> kit/blog phone
   spacing tightened; rebuilding, re-shooting, then full suite and review page (`~/.cache/lexiclash/lp1127/build_review.py`).
   Helper scripts live in `~/.cache/lexiclash/lp1127/` (scratchpad was cleared once mid-run).
+- 15:50: review page published https://claude.ai/artifact/4QJpueuw6p7gMvTKZoGXor (rebuild: `build_review.py`).
+  Full suite running (~/.cache/lexiclash/lp1127/suite-{fe,be}.log). Then WAIT for owner approval before push/PR/merge.
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
