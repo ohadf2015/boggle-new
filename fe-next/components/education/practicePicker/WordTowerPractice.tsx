@@ -220,7 +220,7 @@ function WordTowerRun({
           size="sm"
           onClick={onBack}
           aria-label={t('common.back')}
-          className="text-edu-ink hover:text-edu-ink hover:bg-edu-ink/10"
+          className="text-edu-ink hover:text-edu-ink hover:bg-edu-ink/10 edu-sky:text-edu-ink edu-sky:border-edu-line"
         >
           <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
         </Button>
