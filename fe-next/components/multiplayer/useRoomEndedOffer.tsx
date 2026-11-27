@@ -17,8 +17,8 @@ import { trackGrowthEvent } from '@/utils/growthTracking';
 import { markRoomEndedRecoveryAccepted } from '@/lib/multiplayer/roomEndedRecovery';
 import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
 
-/** Long enough to read a sentence and reach the button on a phone. */
-export const ROOM_ENDED_OFFER_DURATION_MS = 10_000;
+/** Persistent: a 10s toast converted 3 of 45 dead-room visitors, so it stays until acted on or closed. */
+export const ROOM_ENDED_OFFER_DURATION_MS = Infinity;
 
 interface UseRoomEndedOfferInput {
   /** A fresh object per dead room; null when there is nothing to offer. */
@@ -27,6 +27,8 @@ interface UseRoomEndedOfferInput {
   onShown?: () => void;
   /** Start Quick Play (the entry's own handler). */
   onPlayNow: () => void;
+  /** Open the create-room flow, so a dead link becomes a hosting prompt. */
+  onCreateRoom?: () => void;
   t: (key: string) => string;
   /**
    * True while the join in flight was a typed code. The server answers a typo
@@ -36,11 +38,11 @@ interface UseRoomEndedOfferInput {
   typedCodeRef?: MutableRefObject<boolean>;
 }
 
-export function useRoomEndedOffer({ offer, onShown, onPlayNow, t, typedCodeRef }: UseRoomEndedOfferInput): void {
+export function useRoomEndedOffer({ offer, onShown, onPlayNow, onCreateRoom, t, typedCodeRef }: UseRoomEndedOfferInput): void {
   // The toast outlives this render; read the latest handlers when tapped.
-  const latest = useRef({ onShown, onPlayNow, t });
+  const latest = useRef({ onShown, onPlayNow, onCreateRoom, t });
   useEffect(() => {
-    latest.current = { onShown, onPlayNow, t };
+    latest.current = { onShown, onPlayNow, onCreateRoom, t };
   });
 
   const seq = offer?.seq ?? null;
@@ -51,7 +53,7 @@ export function useRoomEndedOffer({ offer, onShown, onPlayNow, t, typedCodeRef }
     if (typedCodeRef) typedCodeRef.current = false;
     toast(
       (tt) => (
-        <span className="flex items-center gap-3 font-neo-body text-sm">
+        <span className="flex flex-wrap items-center gap-2 font-neo-body text-sm">
           <span>{tr(lineKey)}</span>
           <button
             type="button"
@@ -64,6 +66,30 @@ export function useRoomEndedOffer({ offer, onShown, onPlayNow, t, typedCodeRef }
             className="shrink-0 rounded-neo border-2 border-neo-black bg-neo-lime px-3 py-1.5 font-neo-display font-bold uppercase tracking-tight text-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-hard-pressed"
           >
             {tr('multiplayerFlow.roomEnded.playNow')}
+          </button>
+          {latest.current.onCreateRoom && (
+            <button
+              type="button"
+              onClick={() => {
+                toast.dismiss(tt.id);
+                trackGrowthEvent('mp_room_gone_recovery', { stage: 'create_room' });
+                latest.current.onCreateRoom?.();
+              }}
+              className="shrink-0 rounded-neo border-2 border-neo-black bg-white px-3 py-1.5 font-neo-display font-bold uppercase tracking-tight text-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-hard-pressed"
+            >
+              {tr('multiplayerFlow.roomEnded.createRoom')}
+            </button>
+          )}
+          <button
+            type="button"
+            aria-label={tr('multiplayerFlow.roomEnded.dismiss')}
+            onClick={() => {
+              toast.dismiss(tt.id);
+              trackGrowthEvent('mp_room_gone_recovery', { stage: 'dismissed' });
+            }}
+            className="shrink-0 px-2 py-1 font-bold text-neo-black"
+          >
+            ×
           </button>
         </span>
       ),

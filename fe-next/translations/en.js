@@ -5067,6 +5067,8 @@ const en = {
     "roomEnded": {
       "line": "That room has ended. Jump into a new game?",
       "playNow": "Play now",
+      "createRoom": "Create a room",
+      "dismiss": "Close",
       "noRoom": "No room with that code, or it has ended. Check the code and try again."
     },
     "rejoinedRoom": "Back in! Rejoined room {code}",

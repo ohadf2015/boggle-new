@@ -5527,6 +5527,8 @@ const es = {
     "roomEnded": {
       "line": "Esa sala ya terminó. ¿Te unes a una partida nueva?",
       "playNow": "Jugar ya",
+      "createRoom": "Crear una sala",
+      "dismiss": "Cerrar",
       "noRoom": "No hay ninguna sala con ese código, o ya terminó. Revisa el código e inténtalo de nuevo."
     },
     "rejoinedRoom": "¡De vuelta! Reconectado a la sala {code}",

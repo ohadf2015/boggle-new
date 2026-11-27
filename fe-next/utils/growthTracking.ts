@@ -611,7 +611,8 @@ export type GrowthEvent =
   // old room links) and was offered one-tap Quick Play instead of a dead end.
   // Never for a classroom student (lib/multiplayer/roomEndedRecovery).
   //   Props: { stage: 'offered', cameFromInvite: boolean }
-  //        | { stage: 'accepted' } | { stage: 'joined', asHost: boolean }.
+  //        | { stage: 'accepted' } | { stage: 'create_room' } | { stage: 'dismissed' }
+  //        | { stage: 'joined', asHost: boolean }.
   | 'mp_room_gone_recovery'
   | 'classroom_game_move_followed'
   // exp-mp-round-issue-probe-v1 triage chip selection.

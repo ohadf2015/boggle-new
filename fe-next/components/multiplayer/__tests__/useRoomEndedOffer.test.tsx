@@ -58,6 +58,33 @@ describe('useRoomEndedOffer', () => {
     expect(consumeRoomEndedRecoveryAccepted()).toBe(true);
   });
 
+  it('GIVEN an offer THEN the toast stays until dismissed (no auto-dismiss)', () => {
+    renderHook(() => useRoomEndedOffer({ offer: { seq: 1 }, onShown: vi.fn(), onPlayNow: vi.fn(), t }));
+    expect(toast.mock.calls[0][1]).toMatchObject({ duration: Infinity });
+  });
+
+  it('WHEN Create a room is tapped THEN opens create, dismisses the toast and tracks it', () => {
+    const onCreateRoom = vi.fn();
+    const onPlayNow = vi.fn();
+    renderHook(() => useRoomEndedOffer({ offer: { seq: 1 }, onShown: vi.fn(), onPlayNow, onCreateRoom, t }));
+    const renderToast = toast.mock.calls[0][0] as (tt: { id: string }) => React.ReactElement;
+    render(renderToast({ id: 'toast-1' }));
+    fireEvent.click(screen.getByRole('button', { name: 'multiplayerFlow.roomEnded.createRoom' }));
+    expect(onCreateRoom).toHaveBeenCalledTimes(1);
+    expect(onPlayNow).not.toHaveBeenCalled();
+    expect(toast.dismiss).toHaveBeenCalledWith('toast-1');
+    expect(trackGrowthEvent).toHaveBeenCalledWith('mp_room_gone_recovery', { stage: 'create_room' });
+  });
+
+  it('WHEN the close button is tapped THEN dismisses the toast and tracks dismissed', () => {
+    renderHook(() => useRoomEndedOffer({ offer: { seq: 1 }, onShown: vi.fn(), onPlayNow: vi.fn(), t }));
+    const renderToast = toast.mock.calls[0][0] as (tt: { id: string }) => React.ReactElement;
+    render(renderToast({ id: 'toast-1' }));
+    fireEvent.click(screen.getByRole('button', { name: 'multiplayerFlow.roomEnded.dismiss' }));
+    expect(toast.dismiss).toHaveBeenCalledWith('toast-1');
+    expect(trackGrowthEvent).toHaveBeenCalledWith('mp_room_gone_recovery', { stage: 'dismissed' });
+  });
+
   it('GIVEN the player typed the code THEN says no room has that code (a typo reads the same as an ended room) and resets the flag', () => {
     const typedCodeRef = { current: true };
     renderHook(() => useRoomEndedOffer({ offer: { seq: 1 }, onShown: vi.fn(), onPlayNow: vi.fn(), t, typedCodeRef }));

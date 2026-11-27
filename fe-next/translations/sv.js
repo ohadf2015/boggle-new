@@ -5830,6 +5830,8 @@ const sv = {
     "roomEnded": {
       "line": "Det rummet har avslutats. Hoppa in i ett nytt spel?",
       "playNow": "Spela nu",
+      "createRoom": "Skapa ett rum",
+      "dismiss": "Stäng",
       "noRoom": "Inget rum har den koden, eller så har det avslutats. Kolla koden och försök igen."
     },
     "rejoinedRoom": "Du är tillbaka i rum {code}",

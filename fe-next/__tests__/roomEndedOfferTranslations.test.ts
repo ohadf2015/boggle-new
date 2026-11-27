@@ -14,7 +14,7 @@ import { ru } from '@/translations/ru.js';
 const get = (o: unknown, path: string): unknown =>
   path.split('.').reduce<unknown>((a, k) => (a as Record<string, unknown> | undefined)?.[k], o);
 
-const KEYS = ['multiplayerFlow.roomEnded.line', 'multiplayerFlow.roomEnded.playNow'];
+const KEYS = ['multiplayerFlow.roomEnded.line', 'multiplayerFlow.roomEnded.playNow', 'multiplayerFlow.roomEnded.createRoom', 'multiplayerFlow.roomEnded.dismiss'];
 
 describe.each(Object.entries({ en, he, sv, ja, es, ru }))('%s room-ended offer', (locale, bundle) => {
   it.each(KEYS)('%s is a non-empty string', (key) => {
