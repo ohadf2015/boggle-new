@@ -18,13 +18,11 @@ interface MissedWordsListProps {
   children?: ReactNode;
   /** On a wide wall, grow to the column's height and pin the action to the panel's foot. */
   fill?: boolean;
-  /** Drawn under the heading, above the chips: the round's hardest words. */
-  lead?: ReactNode;
 }
 
 /** "Words your class missed": the free reteach insight, sized off the results container so the back row can read it. */
-export function MissedWordsList({ words, maxChips = 8, title, t, children, fill = false, lead }: MissedWordsListProps) {
-  if (words.length === 0 && !lead) return null;
+export function MissedWordsList({ words, maxChips = 8, title, t, children, fill = false }: MissedWordsListProps) {
+  if (words.length === 0) return null;
   const shown = words.slice(0, maxChips);
   const rest = words.length - shown.length;
 
@@ -44,7 +42,6 @@ export function MissedWordsList({ words, maxChips = 8, title, t, children, fill 
           {title}
         </h2>
       </div>
-      {lead}
       {(shown.length > 0 || rest > 0) && (
       <ul className={cn('flex flex-wrap gap-1.5 @5xl/results:gap-2.5', fill && '@5xl/results:gap-3')}>
         {shown.map((w) => (

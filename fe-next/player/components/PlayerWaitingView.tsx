@@ -97,7 +97,8 @@ interface PlayerWaitingViewProps {
 
 type T = (path: string, params?: Record<string, string | number>) => string;
 
-const CARD = 'rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-3 desktop-tall:p-4';
+// Sections sit straight on the lobby backdrop: spacing only, no panel chrome.
+const CARD = 'p-1 desktop-tall:p-2';
 
 const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.ReactElement => {
   const {
@@ -255,8 +256,11 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
   const waitingCard = (
     <div data-testid="waiting-status" className={cn(CARD, 'flex flex-col items-center justify-center-safe gap-3 text-center', wide ? 'flex-1 min-h-0 overflow-y-auto overscroll-contain' : 'flex-[1_0_auto]')}>
       <div className="w-full max-w-md flex items-center justify-center gap-3">
+        {/* MascotRig's idle breathe, CSS-only: no framer on the lobby path. */}
         {!gameOpen && (
-          <DJMascot size="xs" className="!w-[min(calc(120px*var(--mp-u,1)),12vh)] !h-[min(calc(120px*var(--mp-u,1)),12vh)] min-h-14 min-w-14 shrink-0 -rotate-3 rounded-neo-lg border-3 border-neo-black shadow-hard overflow-hidden" alt="" />
+          <span className="shrink-0 inline-block neo-mascot-idle">
+            <DJMascot size="xs" className="!w-[min(calc(120px*var(--mp-u,1)),12vh)] !h-[min(calc(120px*var(--mp-u,1)),12vh)] min-h-14 min-w-14 shrink-0 -rotate-3 rounded-neo-lg border-3 border-neo-black shadow-hard overflow-hidden" alt="" />
+          </span>
         )}
         <div className={cn('min-w-0 flex flex-col items-center gap-2', gameOpen && 'w-full')}>
           {!gameOpen && (
@@ -277,8 +281,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
 
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 w-full bg-neo-navy text-neo-white relative lg:max-w-[calc(1280px*var(--mp-u,1))] lg:mx-auto">
-      <header className="shrink-0 border-b-3 border-neo-black bg-neo-navy">
+    <div className="flex-1 flex flex-col min-h-0 w-full text-neo-white relative lg:max-w-[calc(1280px*var(--mp-u,1))] lg:mx-auto">
+      <header className="shrink-0 border-b-2 border-neo-black/70">
         <MpHudBar
           className="grid-cols-[auto_1fr_auto]"
           start={<LobbyExitButton onPress={onExitRoom} t={t} />}
@@ -313,7 +317,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
               rightContent={
                 <div data-testid="desktop-chat-area" className="flex-1 min-h-0 flex flex-col gap-4">
                   <InviteCard gameCode={gameCode} t={props.t} />
-                  <section className={cn(CARD, 'flex-1 min-h-28 flex flex-col p-0 overflow-hidden')}>
+                  <section className="flex-1 min-h-28 flex flex-col overflow-hidden rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard">
                     <h2 className="shrink-0 px-4 py-2 border-b-2 border-neo-black font-neo-display text-sm font-bold uppercase tracking-wider text-neo-white/80">
                       {t('mpUi.lobby.chat')}
                     </h2>
@@ -325,7 +329,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
               }
             />
             {readyButton && (
-              <div className="shrink-0 px-6 py-3 border-t-3 border-neo-black bg-neo-navy">
+              <div className="shrink-0 px-6 py-3">
                 <div className="mx-auto w-full max-w-[480px] tv:max-w-[720px]">{readyButton}</div>
               </div>
             )}
@@ -337,7 +341,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
               {waitingCard}
             </div>
             {readyButton && (
-              <div className="shrink-0 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
+              <div className="shrink-0 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
                 <div className="max-w-[600px] mx-auto">{readyButton}</div>
               </div>
             )}

@@ -38,6 +38,7 @@ import { ResultsSocialSlot } from '@/components/results/ResultsSocialSlot';
 import { QuickWordsCollected, type CollectedWord } from './QuickWordsCollected';
 import { QuickLeaderboardCard } from './QuickLeaderboardCard';
 import { celebrationTier } from './celebrationTier';
+import { QuickHeroRank } from './QuickHeroRank';
 import { quickRank } from './quickRank';
 import { NODE_COLORS } from './modeColors';
 import type { QuickGhostRival } from '@/lib/quickPlay/ghostRivals';
@@ -185,6 +186,7 @@ export function QuickPlayResults({
     wordsFound: result.wordsFound,
     parWords: parWords ?? result.totalWords,
   });
+  const bestMargin = isPersonalBest && nearMiss?.kind === 'newBestBy' ? nearMiss.points : null;
   const nearMissTracked = useRef(false);
   useEffect(() => {
     if (!nearMiss || nearMissTracked.current) return;
@@ -297,16 +299,15 @@ export function QuickPlayResults({
               >
                 {t('quickPlay.solo.roundComplete')}
               </h1>
-              <p className="text-sm font-semibold text-neo-white/70">
-                {t('quickPlay.solo.wordsFound', { found: String(result.wordsFound), total: String(result.totalWords) })}
-              </p>
             </div>
 
             {(isPersonalBest || rankedUp || isNearMiss) && (
               <div className="relative z-10 flex flex-wrap items-center justify-center gap-2">
                 {isPersonalBest && (
                   <span className={`${badge} -rotate-2 bg-neo-yellow`} data-testid="quick-new-best">
-                    ★ {t('quickPlay.solo.newBest')}
+                    ★ {bestMargin !== null
+                      ? t('quickLoop.nearMiss.newBestBy', { points: String(bestMargin) })
+                      : t('quickPlay.solo.newBest')}
                   </span>
                 )}
                 {rankedUp && (
@@ -340,7 +341,7 @@ export function QuickPlayResults({
               modeInk={modeColor.text}
             />
 
-            {nearMiss && (
+            {nearMiss && bestMargin === null && (
               <p
                 className="rounded-full border-2 border-neo-yellow px-3 py-1 text-center text-sm font-bold text-neo-yellow"
                 data-testid="quick-near-miss-line"
@@ -354,11 +355,6 @@ export function QuickPlayResults({
               </p>
             )}
 
-            {showPercentile && (
-              <p className="text-center text-xs font-bold text-neo-cream">
-                {t('quickPlay.solo.betterThan', { pct: String(percentileToday) })}
-              </p>
-            )}
             {result.mode === 'word-hunt' && result.targetWord && (
               <p className={`text-sm font-bold ${result.targetWordFound ? 'text-neo-lime' : 'text-neo-white/75'}`}>
                 {t(result.targetWordFound ? 'quickPlay.solo.targetWordFound' : 'quickPlay.solo.targetWordMissed', {
@@ -367,25 +363,16 @@ export function QuickPlayResults({
               </p>
             )}
 
-            <div className="flex flex-wrap items-center justify-center gap-2.5">
-              <RewardLine
-                coins={outcome.coins}
-                xp={outcome.xp}
-                mode={`quick-${result.mode}`}
-                t={t}
-                className="rounded-full border-[3px] border-black bg-neo-navy-elevated px-3 py-1 text-sm text-neo-yellow shadow-hard"
-                leading={<span ref={coinChipRef} className="block"><CoinArt size={20} /></span>}
-              />
-              {improvementPct !== null && improvementPct !== 0 && (
-                <span
-                  className={`rounded-full border-2 px-2.5 py-1 text-xs font-bold ${
-                    improvementPct > 0 ? 'border-neo-lime text-neo-lime' : 'border-neo-white/30 text-neo-white/70'
-                  }`}
-                >
-                  {improvementPct > 0 ? '▲' : '▼'} {t('quickPlay.solo.vsAverage', { pct: String(Math.abs(improvementPct)) })}
-                </span>
-              )}
-            </div>
+            <QuickHeroRank totalPoints={outcome.totalPoints} animate={animate} />
+
+            <RewardLine
+              coins={outcome.coins}
+              xp={outcome.xp}
+              mode={`quick-${result.mode}`}
+              t={t}
+              className="rounded-full border-[3px] border-black bg-neo-navy-elevated px-3 py-1 text-sm text-neo-yellow shadow-hard"
+              leading={<span ref={coinChipRef} className="block"><CoinArt size={20} /></span>}
+            />
             {isGuest && (
               <p className="text-center text-[11px] text-neo-white/55" data-testid="quick-rewards-pending">
                 {t('quickPlay.solo.rewardsPending', 'Sign in to start banking coins and XP')}
@@ -408,6 +395,22 @@ export function QuickPlayResults({
               xp={user && outcome.newTotalXp == null ? null : { gained: outcome.xp, total: outcome.newTotalXp }}
             />
             <QuickPlayRankCard totalPoints={outcome.totalPoints} percentileToday={percentileToday} scorePct={result.scorePct} />
+            {(showPercentile || (improvementPct !== null && improvementPct !== 0)) && (
+              <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-bold" data-testid="quick-compare-row">
+                {showPercentile && (
+                  <span className="text-neo-cream">{t('quickPlay.solo.betterThan', { pct: String(percentileToday) })}</span>
+                )}
+                {improvementPct !== null && improvementPct !== 0 && (
+                  <span
+                    className={`rounded-full border-2 px-2.5 py-1 ${
+                      improvementPct > 0 ? 'border-neo-lime text-neo-lime' : 'border-neo-white/30 text-neo-white/70'
+                    }`}
+                  >
+                    {improvementPct > 0 ? '▲' : '▼'} {t('quickPlay.solo.vsAverage', { pct: String(Math.abs(improvementPct)) })}
+                  </span>
+                )}
+              </div>
+            )}
             <QuickRivalsPassed
               rivals={rivals}
               myScorePct={result.scorePct}

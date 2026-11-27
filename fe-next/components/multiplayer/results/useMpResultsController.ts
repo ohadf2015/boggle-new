@@ -13,6 +13,7 @@ import { useQuickReactions } from '@/hooks/useQuickReactions';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useMultiplayerSignupNudge } from '@/hooks/useMultiplayerSignupNudge';
+import { readMpSessionGames } from '@/lib/multiplayer/mpSessionGames';
 import { useFirstWinCelebration } from '@/hooks/useFirstWinCelebration';
 import { useGameKeyboardShortcuts } from '@/hooks/useGameKeyboardShortcuts';
 import { useMpExit } from '@/hooks/useMpExit';
@@ -146,6 +147,8 @@ export function useMpResultsController(props: MpResultsProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- once on mount
   }, []);
 
+  // Read before this screen records its game: 1 = the first MP game of the tab session.
+  const [mpSessionGame] = useState(() => readMpSessionGames() + 1);
   const nudge = useMultiplayerSignupNudge({ isAuthenticated, isResultsVisible: true });
   // Record once BOTH the room and the played mode are known (mount-only fired
   // before the mode hydrated → PostHog got 'multiplayer' for ~65% of games).
@@ -252,7 +255,7 @@ export function useMpResultsController(props: MpResultsProps) {
     handleStartGame();
   }, [onResetSeries, handleStartGame]);
 
-  const showDailyInvite = shouldShowDailyInvite({ isGuest, gameCode, isBotsOnlyGame: data.isBotsOnlyGame, isSeriesComplete, isClassroom });
+  const showDailyInvite = shouldShowDailyInvite({ isGuest, gameCode, isBotsOnlyGame: data.isBotsOnlyGame && isSeriesComplete, isClassroom, isSeriesComplete });
   useGameKeyboardShortcuts({
     onRematch: onReturnToRoom || undefined,
     onEscape: requestExit,
@@ -278,6 +281,7 @@ export function useMpResultsController(props: MpResultsProps) {
     marginToNext,
     sideEffects,
     nudge,
+    mpSessionGame,
     showExitConfirm,
     setShowExitConfirm,
     requestExit,

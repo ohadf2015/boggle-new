@@ -29,7 +29,7 @@ describe('ClassCard primary action by class state', () => {
     render(<ClassCard {...props} onInvite={onInvite} />);
     const invite = screen.getByTestId('classroom-card-invite');
     expect(invite.className).toContain('bg-neo-lime');
-    expect(invite).toHaveTextContent('eduShell.home.shareCode');
+    expect(invite).toHaveAccessibleName('eduShell.home.shareCode');
     const start = screen.getByTestId('classroom-card-start-game');
     expect(start.className).not.toContain('bg-neo-lime');
     expect(start).toHaveAttribute('href', '/en/teacher?classroomId=c1');

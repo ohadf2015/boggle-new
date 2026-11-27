@@ -129,10 +129,11 @@ describe('WordWheelGame coverage celebration', () => {
     const { onEffect } = mountGame();
     await buildAndSubmit('CANTERS');
     const banner = await screen.findByTestId('wheel-celebration');
-    expect(banner).toHaveAttribute('data-tier', 'golden');
-    expect(onEffect).toHaveBeenCalledWith(expect.objectContaining({ type: 'pangram' }));
-    expect(golden.report).toHaveBeenCalledWith('2026-06-01', 'en', 'in_game');
     golden.word = '';
+    expect(banner).toHaveAttribute('data-tier', 'golden');
+    expect(golden.report).toHaveBeenCalledWith('2026-06-01', 'en', 'in_game');
+    // Particles follow the frame (afterPaint), so the burst lands after the banner.
+    await waitFor(() => expect(onEffect).toHaveBeenCalledWith(expect.objectContaining({ type: 'pangram' })));
   });
 
   it('shows the ALL-letters banner + pangram effect + legendary sound for a full-wheel word', async () => {
@@ -142,23 +143,26 @@ describe('WordWheelGame coverage celebration', () => {
     const banner = await screen.findByTestId('wheel-celebration');
     expect(banner).toHaveAttribute('data-tier', 'all');
     await waitFor(() => expect(legendarySpy).toHaveBeenCalled());
-    expect(onEffect).toHaveBeenCalledWith(expect.objectContaining({ type: 'pangram' }));
+    await waitFor(() => expect(onEffect).toHaveBeenCalledWith(expect.objectContaining({ type: 'pangram' })));
   });
 
   it('shows the ALMOST banner (lighter) for an all-but-one word', async () => {
-    mountGame();
+    const { onEffect } = mountGame();
     await buildAndSubmit('CANTER'); // C A N T E R → 6 of 7 distinct
 
     const banner = await screen.findByTestId('wheel-celebration');
     expect(banner).toHaveAttribute('data-tier', 'almost');
-    // Lighter touch: no legendary sound, no pangram mega-burst for "almost".
+    // Lighter touch: no legendary sound, no pangram mega-burst for "almost" (checked once the frame's effects ran).
+    await waitFor(() => expect(onEffect).toHaveBeenCalledWith(expect.objectContaining({ type: 'wordValid' })));
     expect(legendarySpy).not.toHaveBeenCalled();
+    expect(onEffect).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'pangram' }));
   });
 
   it('does not celebrate an ordinary word', async () => {
     const { onEffect } = mountGame();
     await buildAndSubmit('CAR'); // 3 distinct → none
 
+    await waitFor(() => expect(onEffect).toHaveBeenCalledWith(expect.objectContaining({ type: 'wordValid' })));
     expect(screen.queryByTestId('wheel-celebration')).toBeNull();
     expect(onEffect).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'pangram' }));
   });

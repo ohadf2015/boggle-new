@@ -3,8 +3,10 @@
 import { memo, type ReactNode } from 'react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { MpBackButton, MpHudBar, MpRankChip, MpScoreChip, MpTimer, type MpScoreGain, type MpTimerColor } from '../shell';
+import { MpBackButton, MpHudBar, MpRankChip, MpScoreChip, type MpScoreGain } from '../shell';
+import { GameTimerBar } from '@/components/game/hud/GameHud';
 import { MpComboMeter } from './MpComboMeter';
+import { HUD_FIRE_SLOT } from '@/components/earthquake/FireRoundIndicator';
 import { MpRoundMute } from './MpRoundMute';
 import { QuietBoundary } from './QuietBoundary';
 import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
@@ -25,7 +27,6 @@ export interface MpRoundHudProps {
   comboLevel: number;
   /** Replaces the combo meter beside the score (classroom: the class streak flame). */
   hudBadge?: ReactNode;
-  timerColor: MpTimerColor;
   onExit: () => void;
 }
 
@@ -34,10 +35,8 @@ export interface MpRoundHudProps {
  * Structure is CSS; only the ring/chip SIZE tier reads a media query — the
  * round mounts behind the solid countdown, so it has resolved long before GO.
  */
-function MpRoundHudImpl({ remainingTime, totalTime, score, gain, rank, total, rankFlipKey, comboLevel, hudBadge, timerColor, onExit }: MpRoundHudProps) {
+function MpRoundHudImpl({ remainingTime, totalTime, score, gain, rank, total, rankFlipKey, comboLevel, hudBadge, onExit }: MpRoundHudProps) {
   const isDesktop = useMediaQuery('(min-width: 1024px)');
-  const isTv = useMediaQuery('(min-width: 1800px) and (min-height: 1000px)');
-  const timerSize = isTv ? 'xl' : isDesktop ? 'lg' : 'md';
   const { t } = useLanguage();
 
   // The teacher's pressure dials on the desktop shell (null outside a
@@ -68,7 +67,7 @@ function MpRoundHudImpl({ remainingTime, totalTime, score, gain, rank, total, ra
           ) : (
             !rankOffPodium && (
               /* "#2/4" is a number, not prose: keep it LTR inside RTL layouts. */
-              <span dir="ltr" className="inline-flex">
+              <span dir="ltr" className="hidden lg:inline-flex">
                 <MpRankChip
                   rank={rank}
                   total={total}
@@ -82,14 +81,10 @@ function MpRoundHudImpl({ remainingTime, totalTime, score, gain, rank, total, ra
         </>
       }
       center={
-        !timerHidden && (
-          <MpTimer
-            remainingSec={remainingTime}
-            totalSec={Math.max(totalTime, 1)}
-            size={timerSize}
-            colorFamily={timerColor}
-            suppressUrgency={timerGentle}
-          />
+        timerHidden ? (
+          <span {...{ [HUD_FIRE_SLOT]: '' }} className="inline-flex empty:hidden" />
+        ) : (
+          <GameTimerBar remaining={remainingTime} total={Math.max(totalTime, 1)} gentle={timerGentle} className="w-[calc(100vw-14rem)] max-w-[40rem] lg:w-[34vw]" />
         )
       }
       end={

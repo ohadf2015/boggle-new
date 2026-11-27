@@ -45,6 +45,17 @@ describe('HeaderBackButton', () => {
     expect(screen.getByRole('button', { name: /common\.back/i })).toBeInTheDocument();
   });
 
+  it('sinks with the shared chunky press while held', () => {
+    currentPath = '/en/daily';
+    render(<HeaderBackButton />);
+    const button = screen.getByRole('button', { name: /common\.back/i });
+    fireEvent.pointerDown(button, { button: 0 });
+    expect(button).toHaveAttribute('data-pressed', 'true');
+    expect(button.className).toContain('data-[pressed=true]:translate-y-[2px]');
+    fireEvent.pointerUp(button);
+    expect(button).not.toHaveAttribute('data-pressed');
+  });
+
   it('does not render on localized home', () => {
     currentPath = '/en';
     const { container } = render(<HeaderBackButton />);

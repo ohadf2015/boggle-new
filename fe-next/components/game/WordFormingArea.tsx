@@ -253,23 +253,18 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
     >
       <AnimatePresence mode="wait">
         {showEmpty ? (
-          /* Empty state - subtle placeholder */
           <m.div
             key="empty"
+            data-testid="word-forming-empty"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.3 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className={cn(
-              'border-2 border-dashed border-neo-black/20 rounded-neo flex items-center justify-center',
-              compact ? 'h-8 min-w-[80px] px-3' : 'h-10 min-w-[100px] px-4'
+              'flex items-center justify-center rounded-full border-2 border-neo-cream/15 bg-neo-cream/5 font-neo-display font-bold text-neo-cream/55',
+              compact ? 'h-8 px-3 text-xs' : 'h-10 px-5 text-sm'
             )}
           >
-            <span className={cn(
-              'text-neo-black/30 font-medium',
-              compact ? 'text-xs' : 'text-sm'
-            )}>
-              ···
-            </span>
+            {t('game.wordChipEmpty')}
           </m.div>
         ) : (
           /* Main content - morphs between forming and feedback states */

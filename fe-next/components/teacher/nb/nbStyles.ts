@@ -33,8 +33,12 @@ export type NbColor = keyof typeof NB_BLOCK;
 
 /** The one main action on a screen. */
 export const NB_PRIMARY = NEO_BUTTON.primary;
+/** NB_PRIMARY's face for a <PressSurface asChild>, which adds the chunky lip and press. */
+export const NB_PRIMARY_FACE = `inline-flex items-center justify-center gap-2 rounded-neo-lg border-[3px] border-neo-black bg-neo-lime px-5 text-center font-neo-display text-xl font-black leading-tight text-neo-black ${FOCUS}`;
 /** A real second action: dark, still chunky. */
 export const NB_SECONDARY = NEO_BUTTON.secondary;
+/** NB_SECONDARY's face for a <PressSurface asChild>; pair with a cream/40 lip, since black has no edge on navy. */
+export const NB_SECONDARY_FACE = `inline-flex min-h-[48px] items-center justify-center gap-2 rounded-neo-lg border-[3px] ${NB_DARK_EDGE} bg-neo-navy-light px-4 text-center font-neo-display text-base font-black leading-tight text-neo-cream shadow-neo-cream/40 ${FOCUS}`;
 /** Small chunky button for inside cards. Combine with an NB_BLOCK color. */
 export const NB_SMALL = NEO_BUTTON.small;
 

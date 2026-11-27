@@ -19,7 +19,7 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { shouldMountBlastFxCanvas } from './utils/shouldMountBlastFxCanvas';
 import { createCellsChannel, listSpecialTiles } from './effects/blastFxEvents';
 import { useBlastTileFirstUse } from './hooks/useBlastTileFirstUse';
-import { BlastTileFirstUseCallout } from './BlastTileFirstUseCallout';
+import { BlastBoardFooter } from './board/BlastBoardFooter';
 import { BlastHUD } from './BlastHUD';
 import { BlastMPLeaderboard } from './BlastMPLeaderboard';
 import { selectMyBlastScore } from '@/lib/blast/selectMyBlastScore';
@@ -123,6 +123,8 @@ interface BlastStageProps {
    *  rivals/roster + found-words), so the board fills the slot and the
    *  closest-rivals panel isn't duplicated. */
   isDesktopCanvas?: boolean;
+  /** Solo round on the MP engine (quick-play): no round shell hosts a mute, so the HUD carries one. */
+  ownMute?: boolean;
   // Translation
   t: (key: string) => string | undefined;
   // Currency (SP only)
@@ -182,6 +184,7 @@ export const BlastStage = memo(function BlastStage({
   remainingTime,
   totalTime,
   isDesktopCanvas = false,
+  ownMute,
   t,
   activeModifier,
   coins = 0,
@@ -320,6 +323,7 @@ export const BlastStage = memo(function BlastStage({
         ddaBoostActive={ddaBoostActive}
         hintSlot={hintSlot}
         isMultiplayer={isMultiplayer}
+        ownMute={ownMute}
         remainingTime={remainingTime}
         totalTime={totalTime}
         // Without this the HUD defaults to false and draws its own countdown on
@@ -370,6 +374,14 @@ export const BlastStage = memo(function BlastStage({
         }}
       >
         <BlastBoardTray
+          footer={(
+            <BlastBoardFooter teaching={firstUseTeaching ?? null} busy={Boolean(liveWord || currentFeedback)} onDismissTeaching={dismissFirstUse} isMultiplayer={isMultiplayer}>
+              <div className="relative z-40 flex min-h-[44px] w-full max-w-[360px] shrink-0 items-center justify-center gap-2 px-2 md:max-w-[480px]">
+                <WordFormingArea word={liveWord} letterCount={liveWord.length} feedback={currentFeedback} compact morphLayout={false} />
+                {liveWord && <span className="text-[10px] font-bold tabular-nums text-white">{liveWord.length}</span>}
+              </div>
+            </BlastBoardFooter>
+          )}
           chainLevel={sequencerState?.chainLevel ?? 0}
           comboFlashTier={comboFlashTier}
           animateGlow={mountBlastFx}
@@ -420,15 +432,6 @@ export const BlastStage = memo(function BlastStage({
               </div>
             )}
           </div>
-          {/* First-use teaching: names a special tile + what it does the
-              first time the player meets it (once per tile, persisted). */}
-          {firstUseTeaching && (
-            <BlastTileFirstUseCallout
-              type={firstUseTeaching}
-              onDismiss={dismissFirstUse}
-              isMultiplayer={isMultiplayer}
-            />
-          )}
         </BlastBoardTray>
         {/* Cascade word discovery banner */}
         <AdaptiveAnimatePresence>
@@ -474,31 +477,6 @@ export const BlastStage = memo(function BlastStage({
       <ComboMilestoneAnnouncement comboLevel={comboLevel} />
       <BlastMicroToast id={microId} t={t} />
 
-      {/* 4. Word forming area — the traced or typed word, under the board on every screen. */}
-      <div className={cn(
-        'flex items-center justify-center shrink-0 relative z-40 px-4 py-2',
-        'max-w-[360px] md:max-w-[480px] mx-auto w-full overflow-visible',
-        'min-h-[44px]',
-      )}>
-        <div
-          className={cn(
-            'flex items-center justify-center gap-2 px-5 py-2 w-full',
-            liveWord ? 'opacity-100' : 'opacity-40',
-          )}
-          style={{
-            borderRadius: '8px',
-            border: liveWord ? '2px solid rgba(0,0,0,0.4)' : '2px solid transparent',
-            background: liveWord ? 'rgba(255,255,255,0.05)' : 'transparent',
-          }}
-        >
-          <WordFormingArea word={liveWord} letterCount={liveWord.length} feedback={currentFeedback} compact morphLayout={false} />
-          {liveWord && (
-            <span className="text-[10px] font-bold text-white tabular-nums">
-              {liveWord.length}
-            </span>
-          )}
-        </div>
-      </div>
 
       {/* 5a. Out of moves — mobile only */}
       <AdaptiveAnimatePresence>

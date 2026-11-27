@@ -43,6 +43,8 @@ beforeEach(() => {
   vi.setSystemTime(new Date('2026-08-15T00:00:00Z'));
   localStorage.clear();
   sessionStorage.clear();
+  sessionStorage.setItem('games_completed_at_session_start', '0');
+  localStorage.setItem('games_completed_count', '1');
   useAndroidInstallStore.setState({ open: false, source: 'auto_popup', pillVisible: true });
   Object.defineProperty(navigator, 'userAgent', { value: DESKTOP_UA, configurable: true });
 });
@@ -53,7 +55,7 @@ afterEach(() => {
 });
 
 describe('AndroidInstallPill — respects the install dismissal cooldown', () => {
-  it('shows on a fresh desktop visit', () => {
+  it('shows on a desktop visit once a game has finished', () => {
     mountPill();
     expect(screen.queryByText('androidAppPromo.pillLabel')).toBeInTheDocument();
   });

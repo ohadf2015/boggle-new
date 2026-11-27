@@ -13,7 +13,7 @@ const LOCALES = { en, he, es, sv, ja, ru } as unknown as Record<string, Tree>;
 const STREAK_DIR = path.resolve(__dirname, '..');
 const OTHERS = [
   '../home-preview/DailyBlock.tsx',
-  '../home-preview/HeroQuickLinks.tsx',
+  '../home-preview/ModeRail.tsx',
   '../daily/streak/PersistentStreakDisplay.tsx',
 ].map((f) => path.resolve(STREAK_DIR, f));
 

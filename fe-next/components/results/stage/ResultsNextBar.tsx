@@ -1,5 +1,6 @@
 'use client';
 
+import { PressSurface } from '@/components/motion/PressSurface';
 import type { ReactNode } from 'react';
 
 interface BarAction {
@@ -79,13 +80,13 @@ export function ResultsNextBar({
           </span>
         )}
         {secondary && (
-          <button
-            type="button"
+          <PressSurface
+            lip={2}
             data-testid={secondary.testId}
             onClick={secondary.onClick}
             aria-label={secondary.label}
             title={secondary.title ?? secondary.label}
-            className={`flex h-[56px] min-h-[44px] shrink-0 items-center justify-center rounded-2xl border-[3px] border-neo-white/25 text-neo-cream active:translate-y-0.5 ${secondary.shortLabel ? 'min-w-[64px] flex-col gap-0.5 px-2' : 'w-[56px]'}`}
+            className={`flex h-[56px] min-h-[44px] shrink-0 items-center justify-center rounded-2xl border-[3px] border-neo-white/25 text-neo-cream shadow-neo-cream/30 ${secondary.shortLabel ? 'min-w-[64px] flex-col gap-0.5 px-2' : 'w-[56px]'}`}
           >
             {secondary.icon}
             {secondary.shortLabel && (
@@ -93,13 +94,13 @@ export function ResultsNextBar({
                 {secondary.shortLabel}
               </span>
             )}
-          </button>
+          </PressSurface>
         )}
-        <button
-          type="button"
+        <PressSurface
+          lip={4}
           data-testid={primary.testId}
           onClick={primary.onClick}
-          className="relative flex h-[56px] flex-1 items-center justify-center gap-2 overflow-hidden rounded-2xl border-[3px] border-black bg-neo-lime px-3 font-neo-display text-lg font-bold uppercase tracking-[0.12em] text-black shadow-hard-lg active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed"
+          className="relative flex h-[56px] flex-1 items-center justify-center gap-2 overflow-hidden rounded-2xl border-[3px] border-black bg-neo-lime px-3 font-neo-display text-lg font-bold uppercase tracking-[0.12em] text-black"
         >
           {shine && (
             <span
@@ -109,7 +110,7 @@ export function ResultsNextBar({
           )}
           {primary.icon && <span className="relative" aria-hidden="true">{primary.icon}</span>}
           <span className="relative truncate">{primary.label}</span>
-        </button>
+        </PressSurface>
       </div>
     </div>
   );

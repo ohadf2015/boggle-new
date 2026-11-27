@@ -89,10 +89,9 @@ beforeEach(() => {
 afterEach(() => { vi.clearAllMocks(); });
 
 describe('WordWheelGame hideCompetitive', () => {
-  it('renders the combo + rival slots by default (competitive mode)', () => {
+  it('renders the combo slot by default (competitive mode)', () => {
     renderGame();
     expect(screen.getByTestId('combo-slot')).toBeInTheDocument();
-    expect(screen.getByTestId('next-rival-slot')).toBeInTheDocument();
   });
 
   it('emits the game_started funnel event by default', () => {
@@ -103,7 +102,7 @@ describe('WordWheelGame hideCompetitive', () => {
   it('hides the combo + rival slots when hideCompetitive is set', () => {
     renderGame({ hideCompetitive: true, practice: true });
     expect(screen.queryByTestId('combo-slot')).toBeNull();
-    expect(screen.queryByTestId('next-rival-slot')).toBeNull();
+    expect(screen.queryByTestId('rival-marker')).toBeNull();
   });
 
   it('does NOT fetch the leaderboard when hideCompetitive is set', () => {

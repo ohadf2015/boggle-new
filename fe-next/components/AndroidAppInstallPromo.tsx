@@ -9,8 +9,9 @@
  * separate dismissal keys so dismissing one never silences the other.
  *
  * Two ways in:
- *  - the unsolicited auto-popup (gated by `shouldShowAndroidInstallPromo`,
- *    shown once per session after a delay, then silenced for 14 days), and
+ *  - the unsolicited auto-popup (gated by `shouldShowAndroidInstallPromo`, shown
+ *    only after a game finished this session, off play routes, once per session,
+ *    then silenced for 14 days), and
  *  - the user-initiated re-entry surfaces (the header menu row and the session
  *    pill) which open the SAME dialog via the shared store with their own
  *    `source` tag.
@@ -25,8 +26,7 @@ import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
 import { isOverlayQuietZoneActive } from '@/lib/overlayQuietZone';
-import { useExperiment } from '@/hooks/useExperiment';
-import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
+import { finishedGameThisSession, isPostGameMoment } from '@/components/android-install/postGameMoment';
 import {
   hasLexiClashInstalled,
   isCapacitorNative,
@@ -67,23 +67,9 @@ export default function AndroidAppInstallPromo() {
   const closePromo = useAndroidInstallStore((s) => s.closePromo);
   const showPill = useAndroidInstallStore((s) => s.showPill);
 
-  // exp-install-promo-after-first-game-v1 — auto-popup timing only. The pill and the
-  // menu entry (both user-initiated) are untouched by this experiment.
-  //
-  // KEEP RUNNING — do NOT ship the variant on CTR alone. 30d, per unique person:
-  // control 185 shown → 10 install clicks (5.4%); after-first-game 24 → 7 (29%).
-  // The CTR is 5x better, but the gate is *what* shrinks reach, so at 100% the
-  // variant projects to FEWER absolute installs than today's mix (~14/30d vs 28).
-  // A 5x CTR that halves installs is not a win when installs are the goal.
-  // Also unresolved: 234 of 443 shown-people land in a null flag bucket, so
-  // attribution is unreliable on more than half the traffic — fix exposure
-  // tagging before calling this experiment either way.
-  const { variant: promoTimingVariant, trackExposure: trackPromoTimingExposure } =
-    useExperiment('exp-install-promo-after-first-game-v1');
-  const requireEngagement = promoTimingVariant === 'after-first-game';
-
   // ── Unsolicited auto-popup gating ──────────────────────────────────────
   useEffect(() => {
+    finishedGameThisSession(); // snapshot the session's starting count before any game ends
     const baseInput = {
       ua: navigator.userAgent,
       isCapacitorNative: isCapacitorNative(),
@@ -95,7 +81,7 @@ export default function AndroidAppInstallPromo() {
       // MOUNT time would drop the promo for the rest of the page view instead of
       // delaying it (pitfalls class 4: a silent no-op that looks like "nothing to
       // do"). The zone is a DELAY, so it is read at fire time, where failing
-      // re-arms the loop. Same reasoning as `requireEngagement` below.
+      // re-arms the loop. Same reasoning as the post-game gate below.
       inGame: false,
       dismissedUntil: readInstallDismissedUntil(),
       sessionShown: Boolean(sessionStorage.getItem(SESSION_FLAG)),
@@ -131,15 +117,13 @@ export default function AndroidAppInstallPromo() {
           // (NewModesAnnouncement, etc.) showed between mount and this timer,
           // don't stack. (Class 1 — dual source of truth + async resolution.)
           if (wasPromoShownThisSession()) return;
-          // Variant gate, evaluated at FIRE time and re-armed — not once at mount.
-          // A one-shot check here would turn "hasn't played yet after 12s" into
-          // "never sees the promo at all", which reads as a variant win while
-          // actually being a silent no-op (Class 4). Re-arming keeps the variant a
-          // DELAY, not a suppression; it stops on show (session flag) or unmount.
+          // Post-game gate, re-read at FIRE time and re-armed, never decided once at
+          // mount: "no game finished yet" must delay the promo, not drop it (Class 4).
+          // It also keeps it off every play route, so it can't fire mid-round
+          // (WordCraft, a /multiplayer board) or over a results screen.
           // Storage is re-read here, not spread from `baseInput`: while the loop
           // spins the player can dismiss from the header menu row, and a frozen
-          // `dismissedUntil: null` would fire the auto-popup straight through an
-          // active 14-day cooldown. (Class 1 — dual source of truth.)
+          // `dismissedUntil: null` would fire through an active 14-day cooldown.
           if (!shouldShowAndroidInstallPromo({
             ...baseInput,
             isInstalled: installed,
@@ -150,8 +134,8 @@ export default function AndroidAppInstallPromo() {
             dismissedUntil: readInstallDismissedUntil(),
             sessionShown: Boolean(sessionStorage.getItem(SESSION_FLAG)),
             now: Date.now(),
-            requireEngagement,
-            gamesCompleted: readGamesCompletedCount(),
+            requireEngagement: true,
+            gamesCompleted: isPostGameMoment(pathname) ? 1 : 0,
             // Cookie sheet first: the Dialog portals above the in-tree consent UI and
             // traps focus, so ACCEPT ALL is unreachable until NOT NOW. Re-arm until
             // the visitor decides (same pattern as inGame).
@@ -165,10 +149,6 @@ export default function AndroidAppInstallPromo() {
           markPromoShown(); // Gate other promos from auto-opening
           openPromo('auto_popup');
           trackInstallPromoShown('auto_popup');
-          // Exposure fires HERE, not at mount: only visitors who genuinely reached a
-          // promo decision belong in the experiment, otherwise every ineligible
-          // pageview dilutes both buckets and the result is unreadable.
-          trackPromoTimingExposure();
         }, SHOW_DELAY_MS);
       };
       // LCP guard: only start the countdown after the visitor's first tap or
@@ -198,7 +178,7 @@ export default function AndroidAppInstallPromo() {
       if (timer) clearTimeout(timer);
       cleanupListeners?.();
     };
-  }, [pathname, openPromo, requireEngagement, trackPromoTimingExposure]);
+  }, [pathname, openPromo]);
 
   const handleDismiss = () => {
     trackInstallDismissed(source);

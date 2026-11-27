@@ -43,6 +43,27 @@ interface Particle {
   size: number;
 }
 
+const BOARD_SHADOW_PX = 8;
+
+type CellMask = { c0: number; c1: number; r0: number; r1: number } | null;
+
+export function boardCellMask(
+  rect: Pick<DOMRect, 'left' | 'top' | 'right' | 'bottom'> | null,
+  pixelSize: number,
+): CellMask {
+  if (!rect) return null;
+  return {
+    c0: Math.floor(rect.left / pixelSize),
+    c1: Math.ceil((rect.right + BOARD_SHADOW_PX) / pixelSize),
+    r0: Math.floor(rect.top / pixelSize),
+    r1: Math.ceil((rect.bottom + BOARD_SHADOW_PX) / pixelSize),
+  };
+}
+
+export function isMaskedCell(mask: CellMask, col: number, row: number): boolean {
+  return mask !== null && col >= mask.c0 && col < mask.c1 && row >= mask.r0 && row < mask.r1;
+}
+
 interface FireBottomEffectProps {
   isActive: boolean;
 }
@@ -133,6 +154,7 @@ export const FireBottomEffect: React.FC<FireBottomEffectProps> = ({ isActive }) 
       // --- Render to image data ---
       const data = imageData.data;
       data.fill(0);
+      const mask = boardCellMask(document.querySelector('.game-board-frame')?.getBoundingClientRect() ?? null, PIXEL_SIZE);
 
       for (const p of particles) {
         const color = PALETTE[p.heat];
@@ -141,7 +163,7 @@ export const FireBottomEffect: React.FC<FireBottomEffectProps> = ({ isActive }) 
           for (let dx = 0; dx < p.size; dx++) {
             const px = Math.round(p.x) + dx;
             const py = Math.round(p.y) + dy;
-            if (px < 0 || px >= cols || py < 0 || py >= rows) continue;
+            if (px < 0 || px >= cols || py < 0 || py >= rows || isMaskedCell(mask, px, py)) continue;
             const off = (py * cols + px) * 4;
             data[off] = Math.max(data[off], color[0]);
             data[off + 1] = Math.max(data[off + 1], color[1]);

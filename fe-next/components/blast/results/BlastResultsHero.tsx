@@ -3,6 +3,8 @@
 import type { ReactNode } from 'react';
 import { ArrowDown, ArrowUp, Crosshair, Star, Swords, TrendingUp, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CountUp } from '@/components/motion/CountUp';
+import { SpringProgress } from '@/components/motion/SpringProgress';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { useHeroCheer } from '@/lib/quickPlay/useHeroCheer';
@@ -109,10 +111,11 @@ export function BlastResultsHero({ view, t, locale, headline, subline, footer, s
 
         <p
           data-reveal="score"
+          data-testid="blast-results-score"
           className="font-neo-display text-6xl font-black tabular-nums text-neo-yellow [text-shadow:3px_3px_0_rgb(var(--neo-black))]"
           dir="ltr"
         >
-          {safeToLocaleString(view.score, locale)}
+          <CountUp value={view.score} delay={400} formatValue={(n) => safeToLocaleString(Math.round(n), locale)} className="text-6xl text-neo-yellow" />
         </p>
 
         {subline && (
@@ -165,12 +168,7 @@ function GoalLine({ view, t, locale }: { view: BlastResultsView; t: BlastTransla
         )}
       </div>
       {goal.kind !== 'lead' && (
-        <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full border-2 border-neo-black bg-neo-navy">
-          <div
-            className={cn('h-full origin-left rtl:origin-right', view.nearMiss ? 'bg-neo-pink' : 'bg-neo-yellow')}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+        <SpringProgress value={progress} max={100} label={text} tone={view.nearMiss ? 'pink' : 'yellow'} animateOnMount className="mt-1.5 h-2.5" />
       )}
     </div>
   );

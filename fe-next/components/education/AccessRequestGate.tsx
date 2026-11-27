@@ -8,6 +8,7 @@ import { resendEmailVerification } from '@/lib/supabase';
 import { latchSignupSource, trackGrowthEvent, trackSignupFunnel } from '@/utils/growthTracking';
 import { AccessRequestForm } from './AccessRequestForm';
 import { AccessRequestGoogleButton } from './AccessRequestGoogleButton';
+import { PressSurface } from '@/components/motion/PressSurface';
 import type { AccessApproval } from './AccessRequestHandoff';
 
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -18,9 +19,8 @@ const CTA_CLASS =
   'active:shadow-hard-pressed disabled:opacity-50 disabled:cursor-not-allowed transition';
 
 const EMAIL_CTA_CLASS =
-  'flex min-h-12 w-full items-center justify-center gap-2 rounded-neo border-neo-thick border-neo-cream/60 bg-neo-navy ' +
-  'px-4 py-3 font-neo-display text-base font-black text-neo-white text-balance shadow-hard transition-[box-shadow,transform] ' +
-  'duration-100 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed ' +
+  'flex min-h-[52px] w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-cream ' +
+  'px-4 py-3 font-neo-display text-base font-bold text-neo-navy shadow-neo-black ' +
   'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
 /**
@@ -90,45 +90,29 @@ export function AccessRequestGate({ onApproved }: { onApproved?: (approval: Acce
         /* telemetry must never break access request */
       }
     };
+    // The page h1 already says what this is: here it is only the two ways in, stacked.
     return (
-      <div className="text-neo-white">
-        <h2 className="font-neo-display text-2xl font-black tracking-[-0.02em]">
-          {t('education.access.auth_required_title')}
-        </h2>
-        <p className="mt-2 text-neo-white/80 max-sm:hidden">{t('education.access.auth_required_body')}</p>
-        <div className="mt-3 sm:mt-5">
-          <AccessRequestGoogleButton onTap={() => tapped('google')} />
-        </div>
-        <div className="my-3 flex items-center gap-3 sm:my-4" aria-hidden="true">
-          <span className="h-0.5 flex-1 bg-neo-cream/25" />
-          <span className="text-xs font-bold uppercase tracking-wider text-neo-white/60">
-            {t('auth.magicLink.divider')}
-          </span>
-          <span className="h-0.5 flex-1 bg-neo-cream/25" />
-        </div>
-        <button
-          type="button"
+      <div className="flex flex-col gap-3 text-neo-white">
+        <AccessRequestGoogleButton onTap={() => tapped('google')} />
+        <PressSurface
+          lip={4}
           onClick={() => {
             tapped('signup');
             setAuthMode('signup');
           }}
           className={EMAIL_CTA_CLASS}
         >
-          <span className="text-balance">
-            <Mail className="me-2 inline size-5 align-[-0.2em]" aria-hidden="true" />
-            {t('education.access.auth_required_cta')}
-          </span>
-        </button>
-        <p className="mt-2 text-center text-sm font-semibold text-neo-white/60">
-          {t('education.access.cta_micro')}
-        </p>
+          <Mail className="size-5 shrink-0" aria-hidden="true" />
+          <span className="text-balance">{t('education.access.auth_required_cta')}</span>
+        </PressSurface>
+        <p className="text-center text-sm font-semibold text-neo-white/60">{t('education.access.cta_micro')}</p>
         <button
           type="button"
           onClick={() => {
             tapped('signin');
             setAuthMode('signin');
           }}
-          className="mt-2 flex min-h-11 w-full items-center justify-center rounded-neo px-4 font-neo-display text-sm font-bold text-neo-white/85 underline decoration-neo-cream/40 underline-offset-4 hover:text-neo-white focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="flex min-h-11 w-full items-center justify-center rounded-neo px-4 font-neo-display text-sm font-bold text-neo-white/85 underline decoration-neo-cream/40 underline-offset-4 hover:text-neo-white focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           {t('education.access.auth_signin_cta')}
         </button>

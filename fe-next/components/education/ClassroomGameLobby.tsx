@@ -294,7 +294,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   if (lessons.length === 0) {
     return (
       <LobbyNoLessons
-        starterPacks={<StarterPacksSection onSelectPack={createLessonFromPack} language={classroom?.language} classroomId={selectedClassroomId} onRunSession={runSession} />}
+        starterPacks={<StarterPacksSection onSelectPack={createLessonFromPack} language={classroom?.language} classroomId={selectedClassroomId} onRunSession={runSession} showTrialChecklist />}
         isCreating={isCreatingFromPack}
         onCreateLesson={() => router.push(libraryHref(language, selectedClassroomId))}
       />

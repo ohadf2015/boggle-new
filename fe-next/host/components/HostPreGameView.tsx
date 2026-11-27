@@ -118,7 +118,8 @@ interface HostPreGameViewProps {
 
 type T = (path: string, params?: Record<string, string | number>) => string;
 
-const CARD = 'rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-2 min-[720px]:p-3 desktop-tall:p-4';
+// Sections sit straight on the lobby backdrop: spacing only, no panel chrome.
+const CARD = 'p-1 min-[720px]:p-2 desktop-tall:p-3';
 
 function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   const {
@@ -201,9 +202,10 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
     />
   );
 
-  const roster = (headerExtra?: React.ReactNode) => (
+  const roster = (headerExtra?: React.ReactNode, note?: React.ReactNode) => (
     // Never squeezed: a big room's grid caps and scrolls itself (deskWall), so seat names are never cut.
     <div className={cn(CARD, 'min-[720px]:flex min-[720px]:flex-col shrink-0')}>
+      {note}
       <PlayerRoster
         className="min-[720px]:min-h-0 min-[720px]:flex-1"
         players={lobby.seatedPlayers}
@@ -260,7 +262,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   );
 
   return (
-    <div className="h-full flex flex-col w-full bg-neo-navy text-neo-white relative lg:max-w-[calc(1280px*var(--mp-u,1))] lg:mx-auto">
+    <div className="h-full flex flex-col w-full text-neo-white relative lg:max-w-[calc(1280px*var(--mp-u,1))] lg:mx-auto">
       {lessonData && (
         <div className="shrink-0 flex items-center gap-2 px-3 py-1.5 bg-neo-purple/20 border-b-2 border-neo-purple/50 text-sm min-w-0">
           <BookOpen aria-hidden="true" className="w-4 h-4 text-neo-purple shrink-0" />
@@ -270,7 +272,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
         </div>
       )}
 
-      <header className="shrink-0 border-b-3 border-neo-black bg-neo-navy">
+      <header className="shrink-0 border-b-2 border-neo-black/70">
         <MpHudBar
           className="grid-cols-[auto_1fr_auto]"
           start={<LobbyExitButton onPress={onExitRoom} t={t} />}
@@ -339,9 +341,8 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
         ) : (
           <div data-testid="lobby-phone" className="flex flex-col">
             <div className="flex-1 flex flex-col gap-2 px-3 py-2 w-full max-w-[600px] mx-auto">
-              {statusLane}
               {onlineFriends}
-              {roster()}
+              {roster(undefined, statusLane)}
               {modePicker}
               {settingsSummary}
             </div>
@@ -350,12 +351,12 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
       </main>
       {/* Pinned siblings after the scroll region, so the CTA never scrolls away. */}
       {wide && (
-        <div data-testid="lobby-wide-footer" className="shrink-0 px-6 py-3 border-t-3 border-neo-black bg-neo-navy">
+        <div data-testid="lobby-wide-footer" className="shrink-0 px-6 py-3">
           <div className="mx-auto w-full max-w-[480px] tv:max-w-[720px]">{startButton}</div>
         </div>
       )}
       {!wide && (
-        <div data-testid="lobby-phone-footer" className="shrink-0 px-3 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
+        <div data-testid="lobby-phone-footer" className="shrink-0 px-3 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           <div className="max-w-[600px] mx-auto flex items-stretch gap-2">
             {!isPrivate && (
               <button

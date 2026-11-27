@@ -13,7 +13,7 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({ pla
 vi.mock('@/lib/native/webViewLayerFlash', () => ({ prefersStaticFullscreenOverlay: () => false }));
 vi.mock('@/components/Avatar', () => ({ default: ({ userId }: { userId: string }) => <i data-testid="countdown-avatar" data-user={userId} /> }));
 
-import { MpCountdownStage, __resetCountdownDupGuard, GO_HOLD_MS } from '../MpCountdownStage';
+import { MpCountdownStage, __resetCountdownDupGuard, GO_HOLD_MS, COUNT_STEP_MS } from '../MpCountdownStage';
 
 const t = (k: string) => k;
 /** One act per second: each step's timer is scheduled by the previous render's effect. */
@@ -64,7 +64,7 @@ describe('MpCountdownStage', () => {
     const three = screen.getByTestId('mp-countdown-numeral');
     expect(three).toHaveTextContent('3');
     expect(three.className).toContain('countPunch');
-    expect(three.className).toContain('text-[40vh]');
+    expect(three.className).toContain('text-[min(20vh,36vw)]');
     act(() => { vi.advanceTimersByTime(1000); });
     const two = screen.getByTestId('mp-countdown-numeral');
     expect(two).toHaveTextContent('2');
@@ -111,5 +111,48 @@ describe('MpCountdownStage', () => {
     );
     expect(screen.getAllByTestId('countdown-avatar')).toHaveLength(5);
     expect(screen.getByText('+2')).toBeInTheDocument();
+  });
+
+  describe('sequenced get-ready stage', () => {
+    it('keeps the timing the server waits on: 3 x 1s steps, then a 650ms GO', () => {
+      expect(COUNT_STEP_MS).toBe(1000);
+      expect(GO_HOLD_MS).toBe(650);
+    });
+
+    it('opens on the mode card: big icon, name, one rule line', () => {
+      render(<MpCountdownStage t={t} />);
+      const card = screen.getByTestId('mp-countdown-card');
+      expect(card).toContainElement(screen.getByTestId('mp-countdown-mode'));
+      expect(card).toContainElement(screen.getByTestId('mp-countdown-rule'));
+      expect(card).toContainElement(screen.getByTestId('mp-countdown-icon'));
+    });
+
+    it('a swipe mode demos a mini board swiping the local demo word', () => {
+      mode.value = 'classic';
+      render(<MpCountdownStage t={t} />);
+      expect(screen.getAllByTestId('mini-tile')).toHaveLength(9);
+      expect(screen.getByTestId('mini-chip')).toBeInTheDocument();
+    });
+
+    it('fills a ring around each numeral, re-keyed per step', () => {
+      render(<MpCountdownStage t={t} />);
+      const ring = screen.getByTestId('mp-countdown-ring');
+      expect(ring.children).toHaveLength(12);
+      act(() => { vi.advanceTimersByTime(1000); });
+      expect(screen.getByTestId('mp-countdown-ring')).not.toBe(ring);
+    });
+
+    it('players hop in one by one', () => {
+      render(<MpCountdownStage t={t} players={[{ username: 'a' }, { username: 'b' }, { username: 'c' }]} />);
+      const hops = screen.getAllByTestId('countdown-avatar').map((a) => a.closest('[data-hop]')?.getAttribute('data-hop'));
+      expect(hops).toEqual(['0', '1', '2']);
+    });
+
+    it('reduced motion: no ring fill animation, no hops', () => {
+      reduce.value = true;
+      render(<MpCountdownStage t={t} players={[{ username: 'a' }]} />);
+      expect(screen.getByTestId('mp-countdown-ring').className).not.toContain('ringFill');
+      expect(screen.getAllByTestId('countdown-avatar')[0].closest('[data-hop]')?.className ?? '').not.toContain('hopIn');
+    });
   });
 });

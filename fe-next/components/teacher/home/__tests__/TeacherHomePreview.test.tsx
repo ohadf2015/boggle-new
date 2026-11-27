@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, cleanup, within, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+
+vi.mock('@number-flow/react', () => ({ default: ({ value }: { value: number }) => <span>{value}</span> }));
 import { renderToString } from 'react-dom/server';
 
 vi.mock('@/contexts/LanguageContext', () => ({

@@ -9,12 +9,12 @@ import {
     Trophy, User as UserIcon, Settings as SettingsIcon, Users2, Gift, Target,
     BookOpen, Map as MapIcon, ShieldCheck,
 } from 'lucide-react';
-import { m, AnimatePresence } from 'framer-motion';
+import { GlobalBottomNavTab } from './GlobalBottomNavTab';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigation } from '../contexts/NavigationContext';
 import { useAuth } from '../contexts/AuthContext';
-import { navTierForPath, tierDotClass } from '@/lib/seasons/scoreTier';
+import { navTierForPath } from '@/lib/seasons/scoreTier';
 import { useSafeArea } from '../hooks/useSafeArea';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useDailyMissions } from '../hooks/useDailyMissions';
@@ -167,7 +167,7 @@ function resolveDynamic(cleanPath: string): DynamicSpec | null {
  * - Active indicator pill at top of active tab
  * - Spring-animated icon scale on active
  * - Per-tab accent colors with subtle glow
- * - transition-all on tab buttons for smooth state changes
+ * - Chunky press sink on every tab (GlobalBottomNavTab)
  * - pathsWithOwnNav: hides on routes that have their own navigation
  * - shouldHideOnCurrentPath logic prevents double-nav on sub-pages
  */
@@ -389,142 +389,19 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         >
             {/* dir="ltr" locks source-order → visual-order so Home stays rightmost in RTL too */}
             <div dir="ltr" className="flex items-center justify-around h-16 short:h-12 medium-short:h-14 relative">
-                {tabs.map((tab) => {
-                    const isActive = activeTab === tab.id;
-                    const Icon = tab.icon;
-
-                    return (
-                        <button
-                            key={tab.id}
-                            onClick={() => navigate(tab.id)}
-                            className={cn(
-                                "flex flex-col items-center justify-center relative",
-                                "min-w-[64px] min-h-[48px] short:min-h-[40px] medium-short:min-h-[44px]",
-                                "px-3 py-2 short:py-1 medium-short:py-1.5",
-                                "transition-all duration-150",
-                                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy rounded",
-                                isActive ? tab.color : "text-neo-white"
-                            )}
-                            aria-label={t(tab.labelKey)}
-                            aria-current={isActive ? 'page' : undefined}
-                        >
-                            {/* Glow background behind active icon */}
-                            <AnimatePresence>
-                                {isActive && (
-                                    <m.div
-                                        layoutId="tab-glow"
-                                        className={cn(
-                                            "absolute inset-0 rounded-xl",
-                                            tab.glowColor
-                                        )}
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
-                                    />
-                                )}
-                            </AnimatePresence>
-
-                            {/* Active indicator pill at top */}
-                            {isActive && (
-                                <m.div
-                                    layoutId="tab-indicator"
-                                    className={cn(
-                                        "absolute top-0 w-2 h-2 rounded-full -translate-y-1/2",
-                                        INDICATOR_COLORS[tab.id]
-                                    )}
-                                    transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
-                                />
-                            )}
-
-                            {/* Icon with scale animation */}
-                            <m.div
-                                animate={{
-                                    scale: isActive ? 1.15 : 1,
-                                    y: isActive ? -1 : 0,
-                                }}
-                                transition={{ type: 'spring' as const, damping: 12, stiffness: 300 }}
-                                className="relative z-10"
-                            >
-                                <Icon className="w-6 h-6 short:w-5 short:h-5 mb-0.5 short:mb-0" aria-hidden="true" />
-
-                                {/* Quest progress badge — circular ring on Quests tab */}
-                                {tab.id === 'quests' && questsCompleted > 0 && (
-                                    <span
-                                        className="absolute -top-1.5 -inset-e-2.5 flex items-center justify-center"
-                                        aria-label={t('quests.progress', { completed: questsCompleted, total: QUEST_TOTAL })}
-                                        data-testid="quest-progress-badge"
-                                    >
-                                        <svg width="18" height="18" viewBox="0 0 18 18" className="-rotate-90">
-                                            {/* Background ring */}
-                                            <circle
-                                                cx="9" cy="9" r="7"
-                                                fill="#1a1a2e"
-                                                stroke="rgba(255,255,255,0.15)"
-                                                strokeWidth="2.5"
-                                            />
-                                            {/* Progress arc */}
-                                            <circle
-                                                cx="9" cy="9" r="7"
-                                                fill="none"
-                                                stroke={questsCompleted === QUEST_TOTAL ? '#84cc16' : '#00FFFF'}
-                                                strokeWidth="2.5"
-                                                strokeLinecap="round"
-                                                strokeDasharray={2 * Math.PI * 7}
-                                                strokeDashoffset={2 * Math.PI * 7 * (1 - questsCompleted / QUEST_TOTAL)}
-                                            />
-                                        </svg>
-                                        {/* Count text */}
-                                        <span className={cn(
-                                            "absolute inset-0 flex items-center justify-center",
-                                            "text-[8px] font-black leading-none",
-                                            questsCompleted === QUEST_TOTAL ? "text-neo-lime" : "text-neo-white"
-                                        )}>
-                                            {questsCompleted}
-                                        </span>
-                                    </span>
-                                )}
-
-                                {/* Social badge — pending friend requests + unread messages */}
-                                {tab.id === 'friends' && socialBadgeCount > 0 && (
-                                    <span
-                                        className="absolute -top-1 -inset-e-2 flex items-center justify-center w-4 h-4 rounded-full bg-neo-pink border-2 border-neo-navy text-[8px] font-black text-neo-white leading-none"
-                                        aria-label={t('friends.socialBadge', { count: socialBadgeCount })}
-                                        data-testid="friend-social-badge"
-                                    >
-                                        {socialBadgeCount > 9 ? '9+' : socialBadgeCount}
-                                    </span>
-                                )}
-
-                                {/* Season tier dot — profile/account tab */}
-                                {tab.id === 'dynamic' && navTier && (
-                                    <span
-                                        className={cn(
-                                            'absolute -top-1 -inset-e-1.5 w-2.5 h-2.5 rounded-full border-2 border-neo-navy',
-                                            tierDotClass(navTier),
-                                        )}
-                                        aria-label={t(`rank.tier.${navTier}`)}
-                                        data-testid="profile-tier-dot"
-                                    />
-                                )}
-                            </m.div>
-
-                            {/* Label */}
-                            <m.span
-                                className={cn(
-                                    "text-[10px] short:text-[9px] font-bold uppercase tracking-wide relative z-10 short:hidden medium-short:text-[9px]",
-                                    isActive ? tab.color : "text-neo-white"
-                                )}
-                                animate={{
-                                    opacity: isActive ? 1 : 0.6,
-                                }}
-                                transition={{ duration: 0.15 }}
-                            >
-                                {t(tab.labelKey)}
-                            </m.span>
-                        </button>
-                    );
-                })}
+                {tabs.map((tab) => (
+                    <GlobalBottomNavTab
+                        key={tab.id}
+                        tab={tab}
+                        isActive={activeTab === tab.id}
+                        indicatorClass={INDICATOR_COLORS[tab.id]}
+                        onSelect={(id) => navigate(id as TabId)}
+                        questsCompleted={questsCompleted}
+                        questTotal={QUEST_TOTAL}
+                        socialBadgeCount={socialBadgeCount}
+                        navTier={navTier}
+                    />
+                ))}
             </div>
 
             {/* Auth Modal */}

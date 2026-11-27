@@ -86,11 +86,17 @@ describe('wordShapeFilter', () => {
 
   describe('vowel ratio (en/sv/es)', () => {
     it('rejects all-consonants en when len>=3', () => {
-      expect(isWordShapeWeird('xyz', 'en')).toEqual({ weird: true, reason: 'no_vowels' });
+      expect(isWordShapeWeird('bcdfg', 'en')).toEqual({ weird: true, reason: 'no_vowels' });
+    });
+
+    it('counts y as a vowel (dry, fly, gym, rhythm)', () => {
+      for (const w of ['dry', 'fly', 'gym', 'rhythm']) {
+        expect(isWordShapeWeird(w, 'en').weird).toBe(false);
+      }
     });
 
     it('rejects all-consonants sv when len>=3', () => {
-      expect(isWordShapeWeird('xyz', 'sv')).toEqual({ weird: true, reason: 'no_vowels' });
+      expect(isWordShapeWeird('xkz', 'sv')).toEqual({ weird: true, reason: 'no_vowels' });
     });
 
     it('rejects all-consonants es when len>=3', () => {

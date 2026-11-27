@@ -35,6 +35,7 @@ import { useHighlightStore } from '@/stores/highlightStore';
 import { rankMoments } from '@/lib/blast/highlightScoring';
 import type { Language } from '@/shared/types/game';
 import { BlastStartScreen } from './BlastStartScreen';
+import { PressSurface } from '@/components/motion/PressSurface';
 import { runBestWord } from '../results/blastResultsViewModel';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import { useGameExitGuard } from '@/hooks/useGameExitGuard';
@@ -398,18 +399,18 @@ export function BlastView() {
               </div>
             );
           })() : hasRealAdProvider ? (
-            <button
-              type="button"
+            <PressSurface
+              lip={2}
               data-testid="blast-claim-boost-button"
               onClick={() => setBuffModalOpen(true)}
-              className="group relative flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard-lg transition-[transform,background-color,box-shadow] [@media(hover:hover)]:hover:scale-105 hover:bg-neo-pink-light active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed"
+              className="relative flex shadow-neo-pink/40 items-center justify-center gap-2 rounded-neo border-2 border-neo-pink bg-transparent px-5 py-2 font-neo-display text-xs font-black uppercase tracking-wide text-neo-pink"
             >
-              <Gift className="h-5 w-5 animate-neo-wobble" strokeWidth={3} />
+              <Gift className="h-4 w-4" strokeWidth={3} />
               {t('blast.pregameBuff.claim')}
               <span className="absolute -top-2 -right-2 rounded-full border-2 border-black bg-neo-lime px-1.5 py-0.5 text-[9px] font-black uppercase text-neo-navy shadow-hard">
                 {t('common.free', 'Free')}
               </span>
-            </button>
+            </PressSurface>
           ) : null}
         </BlastStartScreen>
       )}

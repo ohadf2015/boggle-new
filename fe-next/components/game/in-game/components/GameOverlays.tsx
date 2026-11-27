@@ -2,7 +2,6 @@
 
 import { memo } from 'react';
 import { EarthquakeWarning, FireRoundIndicator, FireBottomEffect } from '@/components/earthquake';
-import KeyboardHintTooltip from '../../KeyboardHintTooltip';
 import { KeyboardShortcutsOverlay, KeyboardModeIndicator } from '@/components/keyboard';
 import { RoundEventOverlay, type RoundEventState } from './RoundEventOverlay';
 import { SpecialWordToast, type SpecialWordEvent } from './SpecialWordToast';
@@ -16,8 +15,6 @@ interface GameOverlaysProps {
 
   // Keyboard features
   isPlaying: boolean;
-  /** Valid words found so far; retires the "just type" hint after a typed one lands. */
-  acceptedCount: number;
   isDesktop: boolean;
   isTypingMode: boolean;
   isHelpOpen: boolean;
@@ -42,7 +39,6 @@ export const GameOverlays = memo<GameOverlaysProps>(function GameOverlays({
   fireRoundActive,
   fireRoundRemaining,
   isPlaying,
-  acceptedCount,
   isDesktop,
   isTypingMode,
   isHelpOpen,
@@ -61,11 +57,6 @@ export const GameOverlays = memo<GameOverlaysProps>(function GameOverlays({
 
       {/* Pixelated fire effect at bottom of screen */}
       <FireBottomEffect isActive={fireRoundActive} />
-
-      {/* Keyboard Input Hint - Desktop only */}
-      {isPlaying && (
-        <KeyboardHintTooltip acceptedCount={acceptedCount} t={t} />
-      )}
 
       {/* Keyboard Mode Indicator - Desktop only */}
       {isPlaying && isDesktop && (

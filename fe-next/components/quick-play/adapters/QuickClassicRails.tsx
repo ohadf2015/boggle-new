@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { ShellClock, ShellKeysCard, ShellStandings, ShellStats, ShellWordFeed, type ShellStat, type ShellT } from '@/components/game/shell';
+import { ShellKeysCard, ShellStandings, ShellWordFeed, type ShellT } from '@/components/game/shell';
 
 interface FoundWordLike {
   word: string;
@@ -11,16 +11,12 @@ interface FoundWordLike {
 
 interface QuickClassicLeftRailProps {
   t: ShellT;
-  remaining: number;
-  total: number;
-  score: number;
-  validWords: readonly FoundWordLike[];
   leaderboard: ReadonlyArray<{ username: string; score: number }>;
   selfUsername: string;
 }
 
 export const QuickClassicLeftRail = memo(function QuickClassicLeftRail({
-  t, remaining, total, score, validWords, leaderboard, selfUsername,
+  t, leaderboard, selfUsername,
 }: QuickClassicLeftRailProps) {
   const rows = useMemo(
     () =>
@@ -30,20 +26,10 @@ export const QuickClassicLeftRail = memo(function QuickClassicLeftRail({
       }),
     [leaderboard, selfUsername, t],
   );
-  const stats = useMemo<ShellStat[]>(
-    () => [
-      { id: 'score', label: t('gameShell.score') ?? '', value: score, tone: 'accent' },
-      { id: 'found', label: t('gameShell.found') ?? '', value: validWords.length },
-    ],
-    [t, score, validWords.length],
-  );
-
   return (
     <>
-      <ShellClock t={t} remaining={remaining} total={total} />
       {rows.length > 1 && <ShellStandings rows={rows} t={t} />}
-      <ShellStats title={t('gameShell.round') ?? ''} stats={stats} />
-      <ShellKeysCard t={t} />
+      <ShellKeysCard t={t} compact />
     </>
   );
 });

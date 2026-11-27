@@ -12,9 +12,9 @@ describe('classroom host results exit', () => {
     expect(screen.getByTestId('mp-results-leave')).toHaveTextContent('mpUi.results.backToClass');
   });
 
-  it('defaults to the arcade label', () => {
+  it('an arcade room leaves from the header, not the footer', () => {
     render(<MpFinalFooter isHost isReady={false} onRematch={vi.fn()} onLeave={vi.fn()} onShare={vi.fn()} t={t} />);
-    expect(screen.getByTestId('mp-results-leave')).toHaveTextContent('mpUi.results.leave');
+    expect(screen.queryByTestId('mp-results-leave')).toBeNull();
   });
 
   it('both results surfaces take the exit copy from resultsExitCopy, not hardcoded arcade keys', () => {

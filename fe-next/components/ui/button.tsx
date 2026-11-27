@@ -2,9 +2,16 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { AdaptiveMotion } from "../motion/AdaptiveMotion";
+import { usePress } from "../motion/usePress";
 
 import { cn } from "../../lib/utils";
-import { NEO_BLOCK_TONES, NEO_BUTTON, type NeoBlockTone, type NeoButtonVariant } from "./neoStyles";
+import { NEO_BLOCK_TONES, NEO_BUTTON, neoChunkyPress, type NeoBlockTone, type NeoButtonVariant } from "./neoStyles";
+
+const FLAT_SHADOW = "shadow-hard";
+const FLAT_HOVER = "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg";
+const FLAT_ACTIVE = "active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed";
+// twMerge reads shadow-hard-* as a colour, so the flat press is removed by name rather than merged over.
+const FLAT_PRESS = new Set(`${FLAT_SHADOW} ${FLAT_HOVER} ${FLAT_ACTIVE}`.split(" "));
 
 // Neo-Brutalist Button Variants
 // Features: Thick borders, hard shadows, physical press effect, uppercase text
@@ -14,11 +21,11 @@ const buttonVariants = cva(
     "inline-flex items-center justify-center gap-2 whitespace-nowrap",
     "text-sm font-bold uppercase tracking-wide",
     "border-3 border-neo-black rounded-neo",
-    "shadow-hard",
+    FLAT_SHADOW,
     "transition duration-100",
     // Press effect: translate to close shadow gap
-    "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg",
-    "active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed",
+    FLAT_HOVER,
+    FLAT_ACTIVE,
     // Focus styling
     "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-white dark:focus-visible:ring-offset-neo-navy",
     // Disabled state
@@ -87,6 +94,10 @@ const buttonVariants = cva(
   }
 );
 
+function chunkyButtonClasses(base: string): string {
+  return cn(base.split(" ").filter((c) => !FLAT_PRESS.has(c)), neoChunkyPress(4));
+}
+
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
@@ -95,11 +106,14 @@ export interface ButtonProps
   haptic?: boolean;
   /** Optional hover/tap micro-animation. Default 'none' adds zero wrapper/cost. */
   animation?: "none" | "pop";
+  press?: "default" | "chunky";
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, haptic = false, animation = "none", onClick, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, haptic = false, animation = "none", press = "default", onClick, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
+    const chunky = press === "chunky";
+    const pressProps = usePress<HTMLButtonElement>(props, props.disabled);
 
     const handleClick = React.useCallback(
       (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -113,10 +127,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const button = (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={chunky ? cn(chunkyButtonClasses(buttonVariants({ variant, size })), className) : cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         onClick={handleClick}
         {...props}
+        {...(chunky ? pressProps : null)}
       />
     );
 

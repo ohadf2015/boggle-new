@@ -50,6 +50,7 @@ describe('HomeWeekChallenge', () => {
     expect(screen.getByTestId('home-challenge-list')).toHaveTextContent('Planets');
     expect(screen.getByTestId('home-challenge-finished')).toHaveTextContent('"done":2,"total":3');
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '2');
+    expect(screen.getByRole('progressbar').querySelector('[data-part="fill"]')).not.toBeNull();
     expect(screen.getByTestId('home-challenge-results')).toHaveAttribute('href', '/en/teacher/reports?c=c1');
   });
 

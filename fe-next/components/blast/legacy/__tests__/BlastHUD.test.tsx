@@ -277,6 +277,18 @@ describe('BlastHUD — its own mute control', () => {
     expect(register).not.toHaveBeenCalled();
   });
 
+  it('given quick-play (a solo round on the multiplayer engine, no shell mute), then the HUD carries its own mute', async () => {
+    const { default: NavigationContext } = await import('@/contexts/NavigationContext');
+    const register = vi.fn(() => () => {});
+    render(
+      <NavigationContext.Provider value={{ registerHeaderAudioControl: register } as never}>
+        <BlastHUD {...baseProps} isMultiplayer ownMute />
+      </NavigationContext.Provider>,
+    );
+    expect(screen.getByTestId('blast-mute-btn')).toBeTruthy();
+    expect(register).toHaveBeenCalled();
+  });
+
   it('uses the easier warm-up bar on wave 1', () => {
     const { rerender } = render(<BlastHUD {...baseProps} waveNumber={1} tilesCleared={74} totalTiles={100} />);
     expect(screen.getByTestId('blast-progress-fill').getAttribute('data-goal-met')).toBe('false');

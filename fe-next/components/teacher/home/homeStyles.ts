@@ -1,5 +1,5 @@
 // One button and card vocabulary for Teacher Home, class setup and their states.
-import { NEO_BLOCK_TONES, NEO_BUTTON, NEO_QUIET_FOCUS as FOCUS, NEO_QUIET_PRESS as PRESS } from '@/components/ui/neoStyles';
+import { NEO_BLOCK_TONES, NEO_BUTTON, NEO_FOCUS, NEO_QUIET_FOCUS as FOCUS, NEO_QUIET_PRESS as PRESS, neoChunkyPress } from '@/components/ui/neoStyles';
 import { cn } from '@/lib/utils';
 
 export const SECONDARY_BUTTON = NEO_BUTTON.outlineLarge;
@@ -35,13 +35,19 @@ export const GAME_CARD_HOVER = [
 export const STICKER =
   'inline-flex -rotate-2 items-center gap-1.5 whitespace-nowrap rounded-neo border-[3px] border-neo-black px-2.5 py-0.5 font-neo-display text-sm font-black text-neo-black shadow-hard';
 
-/** The hero's secondary: still cyan, but a step shorter and flatter than the primary so Start reads first. */
-export const HERO_SECONDARY = cn(NEO_BUTTON.secondary, NEO_BLOCK_TONES.cyan, 'shadow-hard-lg min-h-[52px] w-full px-4 text-base sm:min-h-[56px] sm:text-lg [&_svg]:size-5');
-export const HERO_SECONDARY_WRAP = 'w-full items-stretch';
+/** A small secondary on the desk: an outlined pill with a thin cream lip, so Start stays the one big thing. Needs usePress for data-pressed. */
+export const HERO_CHIP = cn(
+  'inline-flex min-h-11 min-w-0 items-center justify-center gap-1.5 rounded-neo-pill border-2 border-neo-cream/50 bg-neo-navy-light px-3 font-neo-display text-[0.8125rem] font-bold sm:px-3.5 sm:text-sm text-neo-cream [&_svg]:size-4',
+  neoChunkyPress(2),
+  'shadow-neo-cream/30',
+  NEO_FOCUS,
+);
+export const HERO_SECONDARY = HERO_CHIP;
+export const HERO_SECONDARY_WRAP = 'contents';
 
 /** A calm one-line row under the hero: icon, words, chevron. */
+/** Use inside <PressSurface lip={4}>, which adds the lip and the press. */
 export const HOME_ROW = cn(
-  GAME_CARD,
-  GAME_CARD_HOVER,
+  'rounded-neo-lg border-[3px] border-neo-black bg-neo-navy-light',
   'group flex min-h-[60px] w-full min-w-0 items-center gap-3 px-4 py-2 text-start text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
 );

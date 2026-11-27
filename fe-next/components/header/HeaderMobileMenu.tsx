@@ -8,6 +8,8 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePlayerStyle } from '../../contexts/PlayerStyleContext';
 import { cn } from '../../lib/utils';
+import { neoChunkyPress } from '@/components/ui/neoStyles';
+import { usePress } from '@/components/motion/usePress';
 import AuthButton from '../auth/AuthButton';
 import MusicControls from '../MusicControls';
 import { ReportBugModal } from '../feedback/ReportBugModal';
@@ -144,6 +146,8 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const friendsBadgeCount = Math.max(0, friendsActivityCount - lastSeenFriendsCount);
 
     const [mounted, setMounted] = useState(false);
+    const signInPress = usePress<HTMLButtonElement>();
+    const menuPress = usePress<HTMLButtonElement>();
     useEffect(() => { setMounted(true); }, []);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
     const isRtl = language === 'he';
@@ -256,15 +260,13 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                 {mounted && !isAuthenticated && !loading && !cgLoading && !isCrazyGames && (
                     <button
                         onClick={onSignIn}
+                        {...signInPress}
                         className={cn(
                             "hidden min-[420px]:flex items-center gap-1 shrink-0",
                             "px-2.5 py-1.5 h-9 min-h-[36px]",
                             "bg-neo-cyan text-neo-black",
-                            "border-2 border-neo-black",
-                            "rounded-neo shadow-hard-sm",
-                            "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
-                            "active:translate-x-px active:translate-y-px active:shadow-none",
-                            "transition duration-100",
+                            "border-2 border-neo-black rounded-neo",
+                            neoChunkyPress(2),
                             "text-[11px] font-bold whitespace-nowrap"
                         )}
                         aria-label={t('auth.signIn')}
@@ -298,15 +300,13 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                         }
                         setShowMobileMenu(!showMobileMenu);
                     }}
+                    {...menuPress}
                     className={cn(
                         "relative flex items-center justify-center shrink-0",
                         "w-9 h-9 min-w-9 min-h-9 sm:w-11 sm:h-11 sm:min-w-[44px] sm:min-h-[44px]",
                         "bg-neo-cream text-neo-black",
-                        "border-2 sm:border-3 border-neo-black",
-                        "rounded-neo shadow-hard-sm",
-                        "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
-                        "active:translate-x-px active:translate-y-px active:shadow-none",
-                        "transition duration-100"
+                        "border-2 sm:border-3 border-neo-black rounded-neo",
+                        neoChunkyPress(2)
                     )}
                     aria-label={showMobileMenu ? t('common.closeMenu') : t('common.openMenu')}
                     aria-expanded={showMobileMenu}

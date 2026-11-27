@@ -19,6 +19,7 @@ import { MatchmakingOverlay } from '@/components/multiplayer/MatchmakingOverlay'
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { QuickPlaySeekingOverlay } from '@/components/multiplayer/QuickPlaySeekingOverlay';
 import { MpScreen } from './shell/MpScreen';
+import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 import { useMultiplayerFlowState } from './useMultiplayerFlowState';
 import { useRoomEndedOffer } from './useRoomEndedOffer';
 import ClassroomWaitStalled from '@/components/education/live/ClassroomWaitStalled';
@@ -173,6 +174,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
       <MpScreen
         testId={TEST_ID}
         header={header}
+        backdrop={<AmbientBackdrop theme="multiplayer" />}
         body={<QuickPlaySeekingOverlay t={t as (key: string) => string} onCancel={s.dismissSeeking} />}
       />
     );
@@ -221,6 +223,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
       <MpScreen
         testId={TEST_ID}
         header={header}
+        backdrop={<AmbientBackdrop theme="multiplayer" />}
         // The arenas body scrolls inside its region on short phones rather than
         // clipping behind the QUICK START footer; the page itself never scrolls.
         bodyScroll={heroOwnsScreen ? 'none' : 'inner'}

@@ -79,9 +79,9 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           data-testid="entry-create-side"
           onClick={online ? onCreateRoom : undefined}
           disabled={!online}
-          className="hidden lg:flex items-center justify-center gap-2 h-[calc(64px*var(--mp-u,1))] rounded-neo-lg border-3 border-neo-pink bg-neo-navy-light px-4 font-neo-display text-lg tv:text-2xl font-bold uppercase text-neo-pink shadow-hard transition-transform duration-100 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime disabled:opacity-60 disabled:cursor-not-allowed"
+          className="hidden lg:flex items-center justify-center gap-2 h-[calc(56px*var(--mp-u,1))] rounded-neo-lg border-2 border-neo-cream/40 px-4 font-neo-display text-base tv:text-2xl font-bold uppercase text-neo-white transition-transform duration-100 hover:border-neo-pink hover:text-neo-pink active:translate-y-0.5 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <Plus aria-hidden="true" className="h-5 w-5" />
+          <Plus aria-hidden="true" className="h-5 w-5 text-neo-pink" />
           {t('mpUi.entry.create')}
         </button>
         <CrazyGamesFriendsStrip />

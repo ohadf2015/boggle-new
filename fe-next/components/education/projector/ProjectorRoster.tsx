@@ -8,6 +8,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { Avatar as AvatarType } from '@/shared/types/game';
 import type { KickStatus } from '@/hooks/useKickStudent';
 import { cn } from '@/lib/utils';
+import { SpringProgress } from '@/components/motion/SpringProgress';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
 import { PRESS, tiltOf, type Translate } from '@/components/education/live/eduLiveStyles';
 import { STUDENT_CHIP, arrivalsSince, isArrivalBurst, recordArrivals, rosterTier } from './projectorLobbyModel';
@@ -120,20 +121,16 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
         {phonesConnected > 0 && (
           <div
             data-testid="projector-ready-count"
-            role="progressbar"
-            aria-valuenow={readyCount}
-            aria-valuemin={0}
-            aria-valuemax={phonesConnected}
-            aria-label={t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: phonesConnected })}
             className="flex min-w-[min(100%,12rem)] flex-1 items-center gap-[0.6em] font-neo-body font-bold text-neo-cream/85 text-[clamp(0.875rem,min(1.8cqw,2.2cqh),1.75rem)]"
           >
-            <span className="shrink-0 tabular-nums">{t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: phonesConnected })}</span>
-            <span className="relative h-[0.8em] min-w-0 flex-1 overflow-hidden rounded-neo border-[3px] border-neo-cream/60 bg-neo-navy">
-              <span
-                className="absolute inset-y-0 start-0 bg-neo-cream transition-[width] duration-500 ease-out motion-reduce:transition-none"
-                style={{ width: `${Math.round((readyCount / phonesConnected) * 100)}%` }}
-              />
-            </span>
+            <span aria-hidden="true" className="shrink-0 tabular-nums">{t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: phonesConnected })}</span>
+            <SpringProgress
+              value={readyCount}
+              max={phonesConnected}
+              label={t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: phonesConnected })}
+              tone="cream"
+              className="h-[0.8em] min-w-0 flex-1 border-[3px] border-neo-cream/60 bg-neo-navy"
+            />
           </div>
         )}
         {canEdit && (

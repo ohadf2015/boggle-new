@@ -113,6 +113,14 @@ describe('QuickPlayHub', () => {
     expect(fetchMock.mock.calls.filter((c) => String(c[0]).includes('/round'))).toHaveLength(1);
   });
 
+  it('the loading screen sits on the solo ambient backdrop instead of the halftone field', () => {
+    const { container } = render(<QuickPlayHub />);
+    expect(screen.queryByTestId('quick-hub-atmosphere')).toBeNull();
+    const backdrop = container.querySelector('[data-ambient]');
+    expect(backdrop).not.toBeNull();
+    expect(screen.getByTestId('quick-play-hub').className).toContain('isolate');
+  });
+
   it('a round that fails to load shows the error with a retry that fetches again', async () => {
     let fail = true;
     fetchMock.mockImplementation((url: string) => {
@@ -124,6 +132,8 @@ describe('QuickPlayHub', () => {
     });
     render(<QuickPlayHub startMode="blast" />);
     await waitFor(() => expect(screen.getByTestId('quick-load-error')).toBeTruthy());
+    fireEvent.pointerDown(screen.getByTestId('quick-load-retry'), { button: 0 });
+    expect(screen.getByTestId('quick-load-retry')).toHaveAttribute('data-pressed', 'true');
     fail = false;
     fireEvent.click(screen.getByTestId('quick-load-retry'));
     await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy(), { timeout: 3000 });

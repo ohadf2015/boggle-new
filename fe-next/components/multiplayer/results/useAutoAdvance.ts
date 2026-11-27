@@ -92,5 +92,9 @@ export function useAutoAdvance({ seconds, armed, paused, enabled, onFire, persis
     }
   }, []);
 
-  return { secondsLeft, active, cancel, clearCancel };
+  const restart = useCallback(() => {
+    if (!firedRef.current) setSecondsLeft(seconds);
+  }, [seconds]);
+
+  return { secondsLeft, active, cancel, clearCancel, restart };
 }

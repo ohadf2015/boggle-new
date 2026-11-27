@@ -108,4 +108,24 @@ describe('ArenaCTAStrip', () => {
     expect(screen.getByTestId('arena-quick-start')).not.toBeDisabled();
     expect(screen.getByTestId('arena-quick-start').textContent).toContain('roomList.quickStart');
   });
+
+  it('QUICK START is the one filled primary; CREATE is a quiet outline', () => {
+    render(<ArenaCTAStrip onQuickPlay={vi.fn()} onCreateRoom={vi.fn()} />);
+    const create = screen.getByTestId('arena-create-room');
+    expect(create.className).not.toMatch(/\bbg-neo-(?!navy\b)[a-z-]+(?![/\w])/);
+    expect(create.className).not.toMatch(/\bshadow-hard/);
+    expect(create.className).not.toMatch(/(^|\s)border-neo-pink\b/);
+  });
+
+  it('QUICK START sinks with the chunky press while held', () => {
+    render(<ArenaCTAStrip onQuickPlay={vi.fn()} onCreateRoom={vi.fn()} />);
+    const cta = screen.getByTestId('arena-quick-start');
+    fireEvent.pointerDown(cta, { button: 0 });
+    expect(cta).toHaveAttribute('data-pressed', 'true');
+  });
+
+  it('lets the backdrop show through the footer (no solid band)', () => {
+    render(<ArenaCTAStrip onQuickPlay={vi.fn()} onCreateRoom={vi.fn()} />);
+    expect(screen.getByTestId('arena-cta-strip').className).not.toMatch(/\bbg-neo-navy\b/);
+  });
 });

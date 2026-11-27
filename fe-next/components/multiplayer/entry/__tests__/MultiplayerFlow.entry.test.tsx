@@ -69,6 +69,11 @@ describe('MultiplayerFlow entry frame', () => {
     expect(screen.getByTestId('mp-entry-footer')).toContainElement(screen.getByTestId('arena-quick-start'));
   });
 
+  it('sits on the multiplayer ambient backdrop', () => {
+    render(<MultiplayerFlow {...props} />);
+    expect(screen.getByTestId('mp-entry').querySelector('[data-ambient]')).not.toBeNull();
+  });
+
   // Phone screenshot 2026-11-12: on a short phone under the app's ad banner the
   // empty state's bottom was clipped behind the footer. The arenas body now
   // scrolls inside its own region instead of clipping; the page never scrolls.

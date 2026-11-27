@@ -22,7 +22,7 @@ export const SoloPlayPrompt = memo<SoloPlayPromptProps>(function SoloPlayPrompt(
   return (
     <div
       data-testid="solo-play-prompt"
-      className={cn('flex items-center gap-2 min-w-0 rounded-neo border-2 border-neo-black bg-neo-navy-light ps-1 pe-2 py-1 shadow-hard-sm', className)}
+      className={cn('flex items-center gap-2 min-w-0 ps-1 pe-1 py-0.5', className)}
     >
       <span data-testid="solo-mascot" className="shrink-0 -rotate-6">
         <Mascot variant="waiting" size="xs" animated={false} alt="" className="!w-[calc(40px*var(--mp-u,1))] !h-[calc(40px*var(--mp-u,1))]" />

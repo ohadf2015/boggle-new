@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { join } from 'node:path';
 
@@ -34,7 +34,8 @@ describe('ResultsSocialSlot is mounted on every results screen', () => {
 describe('every results XP key has a publisher', () => {
   const files = execSync('git ls-files -- components app hooks lib', { cwd: ROOT, encoding: 'utf8' })
     .split('\n')
-    .filter(f => /\.tsx?$/.test(f) && !f.includes('__tests__'));
+    // The index still lists files deleted in the working tree until the deletion is committed.
+    .filter(f => /\.tsx?$/.test(f) && !f.includes('__tests__') && existsSync(join(ROOT, f)));
   const sources = files.map(f => readFileSync(join(ROOT, f), 'utf8'));
   const published = new Set(
     sources

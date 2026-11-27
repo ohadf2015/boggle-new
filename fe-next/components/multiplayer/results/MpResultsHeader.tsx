@@ -11,6 +11,7 @@ import { useBossActive } from '@/stores/classroomBossStore';
 import { cn } from '@/lib/utils';
 import { MODE_TONE } from './MpNextModeCard';
 import fx from './mpResults.module.css';
+import { SpringProgress } from '@/components/motion/SpringProgress';
 
 type TFn = (key: string, params?: Record<string, string | number>) => string;
 
@@ -59,14 +60,17 @@ export function MpResultsHeader({ branch, round, totalRounds, playedMode, onLeav
             </span>
             <span className="flex items-center gap-1.5">
               {playedMode && <span className={cn('text-[calc(11px*var(--mp-u,1))] font-bold uppercase tracking-wider', tone.text)}>{t(modeLabelKey)}</span>}
-              {branch === 'intermission' && totalRounds > 1 && (
-                <span aria-hidden="true" className="flex items-center gap-0.5">
-                  {Array.from({ length: totalRounds }, (_, i) => (
-                    <span key={i} className={cn('block w-[calc(6px*var(--mp-u,1))] h-[calc(6px*var(--mp-u,1))] rounded-full border border-neo-black', i < round ? 'bg-neo-lime' : 'bg-neo-white/20')} />
-                  ))}
-                </span>
-              )}
             </span>
+            {totalRounds > 1 && (
+              <SpringProgress
+                value={branch === 'final' ? totalRounds : round}
+                max={totalRounds}
+                segments={totalRounds}
+                animateOnMount
+                label={t('mpUi.results.roundDone', { round, total: totalRounds })}
+                className="mt-1 w-[calc(140px*var(--mp-u,1))]"
+              />
+            )}
           </span>
         )
       }

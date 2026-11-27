@@ -44,10 +44,10 @@ export function EditAvatarButton({ t, config, onSaved }: EditAvatarButtonProps) 
         type="button"
         onClick={() => setOpen(true)}
         data-testid="hp-edit-avatar"
-        className="flex h-9 w-9 items-center justify-center gap-1.5 rounded-full border-[3px] border-black bg-neo-cream font-neo-display text-sm font-bold text-black shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan lg:h-14 lg:w-auto lg:ps-4 lg:pe-5 lg:text-lg"
+        aria-label={label}
+        className="flex h-9 w-9 items-center justify-center rounded-full border-[3px] border-black bg-neo-cream text-black shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
       >
-        <Pencil className="h-4 w-4 shrink-0 lg:h-5 lg:w-5" strokeWidth={3} aria-hidden="true" />
-        <span className="sr-only lg:not-sr-only">{label}</span>
+        <Pencil className="h-4 w-4 shrink-0" strokeWidth={3} aria-hidden="true" />
       </button>
       <AvatarBuilderModal
         isOpen={open}

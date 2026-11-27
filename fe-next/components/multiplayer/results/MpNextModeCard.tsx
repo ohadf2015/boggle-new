@@ -1,15 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { Building2, Grid2x2, Grid3x3, RotateCw, Search, Shuffle, Target, Zap, type LucideIcon } from 'lucide-react';
-import { MpSheet } from '../shell/MpSheet';
 import { getModePresentation, type ModeColorFamily } from '@/lib/multiplayer/modePresentation';
 import type { GameModeOption } from '@/components/GameModeSelector';
+import { FALLBACK_MODE_ICON, MODE_ICONS } from '../round/roundModes';
+import { PressSurface } from '@/components/motion/PressSurface';
+import { PopIn } from '@/components/motion/PopIn';
 import { cn } from '@/lib/utils';
 
 type TFn = (key: string, params?: Record<string, string | number>) => string;
-
-const ICONS: Record<string, LucideIcon> = { Search, Zap, Target, RotateCw, Building2, Grid3x3, Grid2x2, Shuffle };
 
 /** Whole class strings per colour family (Tailwind must see them in source). */
 export const MODE_TONE: Record<ModeColorFamily, { card: string; icon: string; text: string }> = {
@@ -20,103 +18,85 @@ export const MODE_TONE: Record<ModeColorFamily, { card: string; icon: string; te
   orange: { card: 'border-neo-orange', icon: 'bg-neo-orange text-neo-black', text: 'text-neo-orange' },
 };
 
-/** The next-round modes a host can pick from results (same set the legacy bar offered). */
+export interface NextModeOption {
+  id: string;
+  color: ModeColorFamily;
+  icon: string;
+  labelKey: string;
+}
+
+/** The next-round modes a host can pick from results; the server relay accepts exactly these. */
 export const NEXT_MODES: GameModeOption[] = ['word-hunt', 'classic', 'wheel-rush', 'blast', 'random'];
 
+export const BOARD_NEXT_OPTIONS: NextModeOption[] = NEXT_MODES.map((id) => {
+  const p = getModePresentation(id);
+  return { id, color: p.color, icon: p.icon, labelKey: p.labelKey };
+});
+
 export interface MpNextModeCardProps {
-  /** The upcoming mode; null for a joiner who can't know it yet (host picks). */
-  mode: GameModeOption | null;
-  /** Host only: change it (opens a picker sheet). */
-  onChange?: (mode: GameModeOption) => void;
-  /** The picker sheet opened/closed (the screen pauses its auto-advance). */
-  onPickerOpenChange?: (open: boolean) => void;
+  /** The upcoming mode; null for a joiner before the host's pick arrives. */
+  mode: string | null;
+  options?: NextModeOption[];
+  /** Host (or teacher): pick with one tap. Without it the viewer just sees the pick. */
+  onChange?: (mode: string) => void;
   t: TFn;
   className?: string;
 }
 
-/**
- * NEXT MODE — in the mode's electric colour (modePresentation), so the format
- * change never lands as a surprise. The host taps it to swap the mode.
- */
-export function MpNextModeCard({ mode, onChange, onPickerOpenChange, t, className }: MpNextModeCardProps) {
-  const [picking, setPickingState] = useState(false);
-  const setPicking = (open: boolean) => {
-    setPickingState(open);
-    onPickerOpenChange?.(open);
-  };
-  const p = getModePresentation(mode);
-  const tone = MODE_TONE[mode ? p.color : 'purple'];
-  const Icon = ICONS[p.icon] ?? Shuffle;
-  const Tag = onChange ? 'button' : 'div';
+/** Host: one row of mode chips above START. Joiner: the pick, popping in each time it changes. */
+export function MpNextModeCard({ mode, options = BOARD_NEXT_OPTIONS, onChange, t, className }: MpNextModeCardProps) {
+  if (onChange) {
+    return (
+      <div data-testid="mp-next-mode" data-mode={mode ?? ''} className={cn('flex flex-col gap-[calc(6px*var(--mp-u,1))]', className)}>
+        <span id="mp-next-mode-label" className="text-center font-neo-display text-[calc(11px*var(--mp-u,1))] font-bold uppercase tracking-widest text-neo-white/60">
+          {t('mpUi.results.nextLabel')}
+        </span>
+        <div role="radiogroup" aria-labelledby="mp-next-mode-label" className="relative flex gap-[calc(6px*var(--mp-u,1))] overflow-x-auto px-0.5 pb-1.5 pt-0.5 [scrollbar-width:none]">
+          {options.map((o) => {
+            const active = o.id === mode;
+            const Icon = MODE_ICONS[o.icon] ?? FALLBACK_MODE_ICON;
+            return (
+              <PressSurface
+                key={o.id}
+                role="radio"
+                aria-checked={active}
+                data-testid={`mp-next-mode-option-${o.id}`}
+                lip={active ? 4 : 2}
+                onClick={() => onChange(o.id)}
+                className={cn(
+                  'flex-1 shrink-0 min-w-[calc(62px*var(--mp-u,1))] flex flex-col items-center justify-center gap-0.5 rounded-2xl border-2 px-1 py-[calc(6px*var(--mp-u,1))]',
+                  active ? cn(MODE_TONE[o.color].icon, 'border-neo-black') : 'border-neo-cream/25 bg-neo-navy-light text-neo-white/80 shadow-neo-black/60',
+                )}
+              >
+                <Icon aria-hidden="true" className="w-[calc(20px*var(--mp-u,1))] h-[calc(20px*var(--mp-u,1))]" />
+                <span className="max-w-full line-clamp-2 break-words text-center font-neo-display text-[calc(10px*var(--mp-u,1))] font-bold uppercase leading-[1.1]">{t(o.labelKey)}</span>
+              </PressSurface>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
 
+  const o = options.find((x) => x.id === mode);
+  const Icon = o ? MODE_ICONS[o.icon] ?? FALLBACK_MODE_ICON : FALLBACK_MODE_ICON;
   return (
-    <>
-      <Tag
-        type={onChange ? 'button' : undefined}
-        onClick={onChange ? () => setPicking(true) : undefined}
-        data-testid="mp-next-mode"
-        data-mode={mode ?? ''}
+    <div data-testid="mp-next-mode" data-mode={mode ?? ''} role="status" aria-live="polite" className={cn('flex justify-center', className)}>
+      <PopIn
+        key={mode ?? 'pending'}
         className={cn(
-          'flex items-center min-w-0 w-full text-start rounded-neo-lg border-[3px] bg-neo-navy-light shadow-hard-sm',
-          'gap-[calc(10px*var(--mp-u,1))] p-[calc(8px*var(--mp-u,1))]',
-          tone.card,
-          onChange && 'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
-          className,
+          'inline-flex items-center max-w-full min-w-0 rounded-full border-2 bg-neo-navy-light ps-1 pe-3 h-[calc(32px*var(--mp-u,1))] gap-[calc(6px*var(--mp-u,1))] text-[calc(12px*var(--mp-u,1))] font-bold uppercase',
+          o ? MODE_TONE[o.color].card : 'border-neo-cream/30',
         )}
       >
-        <span className={cn('shrink-0 grid place-items-center rounded-neo border-2 border-neo-black w-[calc(40px*var(--mp-u,1))] h-[calc(40px*var(--mp-u,1))]', tone.icon)}>
-          <Icon aria-hidden="true" className="w-[calc(22px*var(--mp-u,1))] h-[calc(22px*var(--mp-u,1))]" />
+        <span className={cn('shrink-0 grid place-items-center rounded-full border-2 border-neo-black w-[calc(24px*var(--mp-u,1))] h-[calc(24px*var(--mp-u,1))]', o ? MODE_TONE[o.color].icon : 'bg-neo-navy text-neo-white/70')}>
+          <Icon aria-hidden="true" className="w-[calc(14px*var(--mp-u,1))] h-[calc(14px*var(--mp-u,1))]" />
         </span>
-        <span className="min-w-0 flex-1 flex flex-col leading-tight">
-          <span className="text-[calc(10px*var(--mp-u,1))] font-bold uppercase tracking-widest text-neo-white/70">{t('mpUi.results.nextUp')}</span>
-          <span className={cn('font-neo-display font-bold uppercase truncate text-[calc(17px*var(--mp-u,1))]', tone.text)}>
-            {mode ? t(p.labelKey) : t('mpUi.results.hostPicking')}
-          </span>
-          {mode && <span className="truncate text-[calc(11px*var(--mp-u,1))] text-neo-white/80">{t(p.hookKey)}</span>}
+        <span className="shrink-0 tracking-wider text-neo-white/70">{t('mpUi.results.nextUp')}</span>
+        <span className={cn('font-neo-display truncate', o ? MODE_TONE[o.color].text : 'text-neo-white/70')}>
+          {o ? t(o.labelKey) : t('mpUi.results.hostPicking')}
         </span>
-        {onChange && (
-          <span className="shrink-0 rounded-full border-2 border-neo-black bg-neo-white px-2 py-0.5 text-[calc(10px*var(--mp-u,1))] font-bold uppercase text-neo-black">
-            {t('mpUi.results.tapToChange')}
-          </span>
-        )}
-      </Tag>
-      {onChange && (
-        <MpSheet open={picking} onClose={() => setPicking(false)} title={t('mpUi.results.chooseMode')} testId="mp-next-mode-sheet">
-          <div className="grid grid-cols-2 gap-2">
-            {NEXT_MODES.map((m) => {
-              const mp = getModePresentation(m);
-              const mt = MODE_TONE[mp.color];
-              const MIcon = ICONS[mp.icon] ?? Shuffle;
-              const active = m === mode;
-              return (
-                <button
-                  key={m}
-                  type="button"
-                  aria-pressed={active}
-                  data-testid={`mp-next-mode-option-${m}`}
-                  onClick={() => {
-                    onChange(m);
-                    setPicking(false);
-                  }}
-                  className={cn(
-                    'flex items-center gap-2 min-w-0 rounded-neo border-[3px] p-2 text-start',
-                    active ? cn(mt.card, 'bg-neo-navy shadow-hard-sm') : 'border-neo-cream/40 bg-neo-navy/60',
-                    m === 'random' && 'col-span-2',
-                  )}
-                >
-                  <span className={cn('shrink-0 grid place-items-center w-9 h-9 rounded-neo border-2 border-neo-black', mt.icon)}>
-                    <MIcon aria-hidden="true" className="w-5 h-5" />
-                  </span>
-                  <span className="min-w-0 flex flex-col leading-tight">
-                    <span className={cn('font-neo-display font-bold uppercase truncate', mt.text)}>{t(mp.labelKey)}</span>
-                    <span className="text-xs text-neo-white/80 truncate">{t(mp.hookKey)}</span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </MpSheet>
-      )}
-    </>
+      </PopIn>
+    </div>
   );
 }

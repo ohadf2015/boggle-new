@@ -47,6 +47,19 @@ describe('ClassSetupCreate', () => {
     api.assign.mockResolvedValue({ data: { id: 'asg-1' }, error: null });
   });
 
+  it('Given the details step, Then the form sits open on the page, not inside a boxed panel', () => {
+    render(<ClassSetupCreate />);
+    expect(screen.getByTestId('setup-step-details').innerHTML).not.toMatch(/shadow-hard-cyan-xl/);
+  });
+
+  it('Given the details step, Then Create class sinks into its lip on press and still submits', async () => {
+    render(<ClassSetupCreate />);
+    const create = screen.getByTestId('setup-start-live');
+    fireEvent.pointerDown(create, { button: 0 });
+    expect(create).toHaveAttribute('data-pressed', 'true');
+    expect(create).toHaveAttribute('type', 'submit');
+  });
+
   it('Given the details step, When "Start live" is tapped, Then the class is made, the picked pack is assigned to it, and the invite opens on that list without a second pack lesson', async () => {
     render(<ClassSetupCreate />);
     fireEvent.click(screen.getByTestId('setup-start-live'));

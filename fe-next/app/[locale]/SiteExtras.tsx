@@ -21,11 +21,6 @@ const DeferredLayoutWidgets = nextDynamic(() => import('@/components/DeferredLay
   ssr: false,
   loading: () => null,
 });
-// A/B lexiclash-hero-play-cta on SEO entry pages; renders nothing in control or for returning players.
-const EntryPlayNowBar = nextDynamic(() => import('@/components/experiments/EntryPlayNowBar'), {
-  ssr: false,
-  loading: () => null,
-});
 const SocialMediaPixels = nextDynamic(() => import('@/components/SocialMediaPixels'), {
   ssr: false,
   loading: () => null,
@@ -86,7 +81,6 @@ export default function SiteExtras({ lang }: SiteExtrasProps) {
       <DeferredLayoutWidgets />
       <FeedbackDevtoolsWidget lang={lang} />
       <DeferredGoogleOneTap />
-      <EntryPlayNowBar />
     </>
   );
 }

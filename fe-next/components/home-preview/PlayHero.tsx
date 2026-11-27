@@ -2,72 +2,54 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react';
-import { Play, Users } from 'lucide-react';
-import { ModeGlyph } from '@/components/quick-play/ModeGlyph';
-import { RandomGlyph } from '@/components/quick-play/RandomGlyph';
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
+import { Play } from 'lucide-react';
 import { QuickResultsRays, SparkleLoop } from '@/components/quick-play/QuickResultsFx';
 import { NODE_COLORS } from '@/components/quick-play/modeColors';
-import type { QuickMode } from '@/components/quick-play/types';
+import { HeroQuickLinks } from './HeroQuickLinks';
+import { ModeRail } from './ModeRail';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { setHeroAvatarProps, setHeroAvatarSlot } from './heroAvatarBridge';
-import { HeroQuickLinks } from './HeroQuickLinks';
 import { quickPlayHref } from '@/lib/quickPlay/startMode';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { quickRoundsPlayed } from '@/lib/quickPlay/guestProgress';
 import { firstGameRoute } from '@/lib/onboarding/firstGameRoute';
-import { useGrowthRadarFlag } from '@/hooks/useGrowthRadarFlag';
-import { HERO_PLAY_CTA_KEY, heroPrimaryIsSolo } from '@/lib/experiments/heroPlayCta';
+import { PressSurface } from '@/components/motion/PressSurface';
+import { MascotRig } from '@/components/motion/MascotRig';
 
-const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
-const KEY_TILT = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'];
 const EASE_OUT = 'cubic-bezier(0.22,1,0.36,1)';
-const PRESS = 'active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed';
-
-/** Touch phone: ornamental loops must not run for the whole time the home sits open. */
-function useCoarsePointer(): boolean {
-  const [coarse, setCoarse] = useState(false);
-  useLayoutEffect(() => {
-    const mq = window.matchMedia('(hover: none) and (pointer: coarse)');
-    const apply = () => setCoarse(mq.matches);
-    apply();
-    mq.addEventListener?.('change', apply);
-    return () => mq.removeEventListener?.('change', apply);
-  }, []);
-  return coarse;
-}
+const BREATH: Keyframe[] = [
+  { transform: 'scale(1)' },
+  { transform: 'scale(1.035)', offset: 0.12 },
+  { transform: 'scale(1)', offset: 0.24 },
+  { transform: 'scale(1)' },
+];
 
 interface PlayHeroProps {
   lang: string;
   t: (key: string, params?: Record<string, string | number>) => string;
   animate: boolean;
   avatar: { userId: string; customAvatar: CustomAvatarConfig | null } | null;
-  greeting: string;
+  /** The mascot's line; null until every input it depends on has resolved. */
+  bubble: string | null;
   streak: number;
   streakLoading: boolean;
-  /** Streak alive but today not played: the daily chip warns. */
   atRisk?: boolean;
-  /** Banked streak freezes, shown on the daily chip. */
-  freezes?: number;
   playedToday?: boolean;
   onAvatarSaved: (config: CustomAvatarConfig) => void;
   onPlay?: () => void;
 }
 
+const EASE_POP = 'cubic-bezier(0.34,1.56,0.64,1)';
+
 function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroProps, 'avatar' | 'animate' | 't' | 'onAvatarSaved'> & { loop: boolean }) {
   // The avatar UI (Avatar.tsx → AvatarRenderer → avatar/parts, and the edit
   // button → AvatarBuilderModal) must stay OUT of the landing module graph —
-  // LandingView.bundleGraph.test.ts. The stage publishes two bare slot <div>s
-  // and the avatar props on heroAvatarBridge; HeroAvatarIsland (runtime
-  // import() from HeroAvatarMount, outside LandingView's graph) portals the
-  // avatar trio and the edit button in after first paint. The slots carry the
-  // same fixed box the avatar fills, so the swap causes no CLS.
-  const avatarSlotCallback = useCallback((el: HTMLDivElement | null) => {
-    setHeroAvatarSlot('hero', el);
-  }, []);
-  const editSlotCallback = useCallback((el: HTMLDivElement | null) => {
-    setHeroAvatarSlot('heroEdit', el);
-  }, []);
+  // LandingView.bundleGraph.test.ts. This publishes bare slot <div>s and the
+  // avatar props on heroAvatarBridge; HeroAvatarIsland portals the face and the
+  // edit pencil in after first paint, into a fixed box (no CLS).
+  const avatarSlotCallback = useCallback((el: HTMLDivElement | null) => setHeroAvatarSlot('hero', el), []);
+  const editSlotCallback = useCallback((el: HTMLDivElement | null) => setHeroAvatarSlot('heroEdit', el), []);
 
   useEffect(() => {
     setHeroAvatarProps(avatar ? { userId: avatar.userId, customAvatar: avatar.customAvatar, t, onAvatarSaved } : null);
@@ -75,42 +57,23 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
   }, [avatar, t, onAvatarSaved]);
 
   return (
-    <div className="relative flex h-[132px] w-full items-center [@media(max-height:700px)]:h-[112px] justify-center lg:h-[300px] 2xl:h-[340px]">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40 lg:opacity-60">
+    <div className="relative">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-70 [mask-image:radial-gradient(closest-side,black_55%,transparent)]">
         <QuickResultsRays color={NODE_COLORS.classic.hex} spinning={loop} compact />
       </div>
       <SparkleLoop enabled={loop} />
       <div className="relative z-10">
-      <div className={`relative [@media(max-height:700px)]:scale-[0.7] ${animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}`}>
         <div className={loop ? 'animate-[qp-avatar-bob_2.8s_ease-in-out_0.9s_infinite]' : ''}>
           <div className="relative">
             {!avatar && (
-              // Signed-in profile still loading and no avatar from last time:
-              // a neutral disc holds the spot instead of an id-generated face.
-              <div
-                data-testid="hp-avatar-skeleton"
-                aria-hidden="true"
-                className={`absolute inset-0 rounded-full border-[3px] border-black/60 bg-neo-white/10 ${loop ? 'animate-pulse' : ''}`}
-              />
+              <div data-testid="hp-avatar-skeleton" aria-hidden="true" className="absolute inset-0 rounded-full border-[3px] border-black/60 bg-neo-white/10" />
             )}
-            <div
-              ref={avatar ? avatarSlotCallback : undefined}
-              data-testid="hp-avatar-slot"
-              className="h-[108px] w-[108px] lg:h-[190px] lg:w-[190px] 2xl:h-[220px] 2xl:w-[220px]"
-            />
+            <div ref={avatar ? avatarSlotCallback : undefined} data-testid="hp-avatar-slot" className="h-[104px] w-[104px] lg:h-[136px] lg:w-[136px]" />
           </div>
         </div>
-        <span
-          aria-hidden="true"
-          className={`absolute -bottom-2 left-1/2 -z-10 h-3 w-20 -translate-x-1/2 rounded-[50%] bg-black/45 lg:w-36 ${
-            loop ? 'animate-[qp-shadow-bob_2.8s_ease-in-out_0.9s_infinite]' : ''
-          }`}
-        />
-        <span
-          aria-hidden="true"
-          className="absolute -start-[40px] bottom-0 -z-10 -rotate-12 lg:-start-[60px] lg:bottom-0 2xl:-start-[70px]"
-        >
-          <span className={`block ${loop ? 'animate-[qp-avatar-bob_2.2s_ease-in-out_0.4s_infinite]' : ''}`}>
+        <span aria-hidden="true" className="absolute -bottom-1.5 left-1/2 -z-10 h-3 w-20 -translate-x-1/2 rounded-[50%] bg-black/45" />
+        <span aria-hidden="true" className="absolute -start-[46px] bottom-0 -rotate-12 lg:-start-[60px]">
+          <MascotRig state={animate ? 'hop' : 'idle'}>
             <Image
               src="/mascot/hello-nobg.webp"
               alt=""
@@ -119,67 +82,51 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
               data-testid="hp-mascot"
               loading="eager"
               unoptimized
-              className="h-[64px] w-[64px] drop-shadow-[0_3px_0_black] lg:h-[96px] lg:w-[96px] 2xl:h-[112px] 2xl:w-[112px]"
+              className="h-[60px] w-[60px] drop-shadow-[0_3px_0_black] lg:h-[80px] lg:w-[80px]"
             />
-          </span>
+          </MascotRig>
         </span>
+        {avatar && (
+          <div className="absolute -bottom-2 -end-2 z-20">
+            <div ref={editSlotCallback} data-testid="hp-edit-avatar-slot" />
+          </div>
+        )}
       </div>
-      {avatar && (
-        // The pencil sits just outside the face's lower-end rim, never on it. On a
-        // short phone the avatar renders at 0.7 (its circle is inset ~16px in the
-        // unscaled box), so the badge steps in with it, still outside the circle.
-        <div className="absolute -end-3 -bottom-3 z-20 [@media(max-height:700px)]:end-0 [@media(max-height:700px)]:bottom-0 lg:-end-24 lg:-bottom-7">
-          <div ref={editSlotCallback} data-testid="hp-edit-avatar-slot" />
-        </div>
-      )}
-      </div>
-      <span
-        aria-hidden="true"
-        data-testid="hp-timer-badge"
-        className="absolute end-[10%] top-2 z-20 rotate-6 whitespace-nowrap rounded-full border-2 border-black bg-neo-yellow px-2.5 py-1 font-neo-display text-sm font-bold leading-none text-black shadow-hard-sm lg:end-[14%] lg:top-[10%] lg:border-[3px] lg:px-3 lg:py-1.5 lg:text-xl lg:shadow-hard"
-      >
-        {t('homePlay.timerBadge')}
-      </span>
     </div>
   );
 }
 
-export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoading, atRisk = false, freezes = 0, playedToday = false, onAvatarSaved, onPlay }: PlayHeroProps) {
-  const coarse = useCoarsePointer();
+export function PlayHero({ lang, t, animate, avatar, bubble, streak, streakLoading, atRisk = false, playedToday = false, onAvatarSaved, onPlay }: PlayHeroProps) {
+  const [coarse, setCoarse] = useState(true);
+  useEffect(() => setCoarse(window.matchMedia?.('(hover: none) and (pointer: coarse)').matches ?? false), []);
   const loop = animate && !coarse;
-  const actionsRef = useRef<HTMLDivElement>(null);
-  const pulsed = useRef(false);
+  const heroRef = useRef<HTMLElement>(null);
+  const bubbleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!animate) return;
-    actionsRef.current?.querySelectorAll('[data-hero-row]').forEach((row, i) => {
-      row.animate?.([{ transform: 'translateY(14px)' }, { transform: 'none' }], { duration: 360, delay: i * 70, easing: EASE_OUT, fill: 'backwards' });
+    const hero = heroRef.current;
+    hero?.querySelectorAll('[data-hero-row]').forEach((row, i) => {
+      row.animate?.([{ transform: 'translateY(18px) scale(0.96)' }, { transform: 'none' }], { duration: 420, delay: i * 70, easing: EASE_POP, fill: 'backwards' });
     });
+    // A touch phone gets a few breaths, not a loop for as long as the home sits open.
+    const touch = window.matchMedia?.('(hover: none) and (pointer: coarse)').matches;
+    const breath = hero
+      ?.querySelector('[data-hero-breathe]')
+      ?.animate?.(BREATH, { duration: 3200, delay: 1400, iterations: touch ? 3 : Infinity, easing: 'ease-in-out' });
+    return () => breath?.cancel?.();
   }, [animate]);
 
-  // Daily status resolves after first paint; pulse once when it is known to be unplayed.
   useEffect(() => {
-    if (!animate || streakLoading || pulsed.current) return;
-    pulsed.current = true;
-    if (playedToday) return;
-    actionsRef.current
-      ?.querySelector('[data-testid="hp-chip-daily"]')
-      ?.animate?.([{ transform: 'scale(1)' }, { transform: 'scale(1.04)' }, { transform: 'scale(1)' }], { duration: 520, delay: 480, easing: EASE_OUT });
-  }, [animate, streakLoading, playedToday]);
-  // Funnel numerator for the landing PLAY→onboarding leak, restored: the
-  // play-first redesign (#1706) replaced FreshHero — which fired
-  // `fresh_hero_play` on this CTA — with this hero, and the event's main
-  // contributor went silent (read as "mounted-gate telemetry dead"). Same cta
-  // value as the old hero keeps before/after funnels comparable
-  // (FreshPlayLink convention). `opens_ftue` splits the leak cohorts: false =
-  // returning user navigating natively BY DESIGN (their clicks must not count
-  // as gate fall-through); true − onboarding_open_requested = the real
-  // mounted-gate loss. Fires on every click, handler or not — same
-  // "tracking is not gated on onPlay" semantics as FreshPlayLink.
-  // First-timers (no finished Quick Play round on this device) get the coached
-  // first game; everyone else keeps the instant random round. Decided after
-  // mount so server HTML and hydration agree on the default href.
-  const [playHref, setPlayHref] = useState(() => quickPlayHref(lang, 'random'));
+    if (!animate || !bubble) return;
+    bubbleRef.current?.animate?.([{ transform: 'scale(0.6)' }, { transform: 'none' }], { duration: 280, easing: EASE_POP });
+  }, [animate, bubble]);
+
+  // `fresh_hero_play` is the landing PLAY→onboarding funnel numerator; `opens_ftue`
+  // false = a returning user navigating natively, true − onboarding_open_requested =
+  // the mounted-gate loss. First-timers on this device get the coached first round,
+  // decided after mount so server HTML and hydration agree on the default href.
+  const [playHref, setPlayHref] = useState(() => quickPlayHref(lang, 'classic'));
   useEffect(() => {
     let first = false;
     try {
@@ -187,13 +134,8 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
     } catch {
       /* storage blocked: keep the plain round */
     }
-    setPlayHref(first ? firstGameRoute(lang) : quickPlayHref(lang, 'random'));
+    setPlayHref(first ? firstGameRoute(lang) : quickPlayHref(lang, 'classic'));
   }, [lang]);
-
-  // A/B (Growth Radar, lexiclash-hero-play-cta): new visitors only (onPlay is set just for
-  // them), so returning players are never exposed. Treatment turns the big primary button
-  // into a solo "Play now" in place (same size, no layout shift); control keeps friends.
-  const soloFirst = heroPrimaryIsSolo(useGrowthRadarFlag(HERO_PLAY_CTA_KEY, !!onPlay));
 
   const handlePlayClick = (e: MouseEvent<HTMLAnchorElement>) => {
     trackLandingCtaClick('fresh_hero_play', { opens_ftue: !!onPlay });
@@ -204,96 +146,55 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
 
   return (
     <section
+      ref={heroRef}
       aria-labelledby="hp-play-title"
-      className="relative overflow-hidden border-b-[3px] border-black lg:rounded-[28px] lg:border-[3px] lg:bg-neo-navy-elevated lg:shadow-hard-xl"
       data-testid="hp-hero"
+      className="relative mx-auto flex w-full max-w-[480px] flex-col gap-6 px-4 pb-2 pt-6 lg:max-w-[560px] lg:pt-10"
     >
-      <div className="relative mx-auto grid w-full max-w-md grid-cols-1 gap-3 px-4 pb-5 lg:max-w-none lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-8 lg:px-12 lg:py-7">
-        <AvatarStage avatar={avatar} animate={animate} loop={loop} t={t} onAvatarSaved={onAvatarSaved} />
-
-        <div className="relative z-10 flex min-w-0 flex-col gap-3 lg:gap-4">
-          <div className="text-center lg:text-start">
-            <p className="font-neo-display text-xs font-bold tracking-[0.14em] text-neo-lime/90 uppercase lg:text-base">
-              {greeting}
-            </p>
-            <h1
-              id="hp-play-title"
-              className="mt-0.5 font-neo-display text-[21px] font-bold [@media(max-height:700px)]:text-[19px] leading-[1.15] text-neo-cream [text-shadow:0_2px_0_black] lg:text-4xl 2xl:text-5xl"
-            >
-              {t('homePlay.heroLine')}
-            </h1>
-            <p className="mx-auto mt-1 max-w-sm text-[13px] leading-snug text-neo-white/70 [@media(max-height:700px)]:text-xs lg:mx-0 lg:mt-2 lg:max-w-xl lg:text-base">
-              {t('homePlay.intro')}
+      <div data-hero-row className="flex flex-col items-center gap-3">
+        <div className="relative flex w-full justify-center pt-2">
+          <AvatarStage avatar={avatar} animate={animate} loop={loop} t={t} onAvatarSaved={onAvatarSaved} />
+          <div
+            ref={bubbleRef}
+            className={`absolute start-[calc(50%+62px)] top-0 z-20 max-w-[136px] origin-bottom-left rounded-2xl border-[3px] border-black bg-neo-cream px-3 py-2 shadow-[0_3px_0_0] shadow-neo-black rtl:origin-bottom-right lg:start-[calc(50%+80px)] lg:max-w-[180px] ${bubble ? '' : 'invisible'}`}
+          >
+            <span aria-hidden="true" className="absolute -start-[8px] bottom-3 h-3.5 w-3.5 rotate-45 border-b-[3px] border-s-[3px] border-black bg-neo-cream rtl:-rotate-45" />
+            <p data-testid="hp-bubble" aria-live="polite" className="relative font-neo-display text-sm font-bold leading-snug text-black lg:text-base">
+              {bubble ?? ''}
             </p>
           </div>
-
-          <div ref={actionsRef} className="flex flex-col gap-2.5 lg:gap-4">
-            <div data-hero-row>
-              <Link
-                href={soloFirst ? playHref : `/${lang}/multiplayer?autoCreate=true`}
-                data-testid={soloFirst ? 'hp-play-now' : 'hp-play-friends'}
-                data-hero-primary
-                data-variant={soloFirst ? 'treatment' : 'control'}
-                onClick={soloFirst ? handlePlayClick : () => trackLandingCtaClick('home_play_friends')}
-                className={`flex h-[68px] min-w-0 items-center gap-3 rounded-2xl border-[3px] border-black bg-neo-pink ps-2.5 pe-3 text-black shadow-hard-lg ${PRESS} [@media(max-height:700px)]:h-[64px] lg:h-[96px] lg:gap-4 lg:rounded-3xl lg:ps-4`}
-              >
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-black bg-black text-neo-pink lg:h-16 lg:w-16 lg:rounded-2xl">
-                  {soloFirst ? (
-                    <Play className="h-6 w-6 lg:h-9 lg:w-9" strokeWidth={2.75} aria-hidden="true" />
-                  ) : (
-                    <Users className="h-6 w-6 lg:h-9 lg:w-9" strokeWidth={2.75} aria-hidden="true" />
-                  )}
-                </span>
-                <span className="flex min-w-0 flex-col items-start leading-none">
-                  <span className="truncate font-neo-display text-[21px] font-bold lg:text-3xl">{t(soloFirst ? 'homePlay.playNow' : 'homePlay.friendsPlay')}</span>
-                  <span className="mt-1 line-clamp-2 text-xs leading-tight font-bold lg:text-base">{t(soloFirst ? 'homePlay.playNowSub' : 'homePlay.friendsSub')}</span>
-                </span>
-              </Link>
-            </div>
-
-            <div data-hero-row>
-              <HeroQuickLinks lang={lang} t={t} streak={streak} streakLoading={streakLoading} atRisk={atRisk} freezes={freezes} playedToday={playedToday} />
-            </div>
-
-          </div>
-
-          <div>
-            <p className="mb-2 text-center text-xs font-bold text-neo-white/60 lg:text-start lg:text-base">{t('homePlay.pickMode')}</p>
-            <ul className="grid grid-cols-5 gap-2 lg:gap-3" data-testid="hp-keycaps">
-              {MODES.map((mode, i) => (
-                <li key={mode}>
-                  <Link
-                    href={quickPlayHref(lang, mode)}
-                    className={`flex aspect-square flex-col items-center lg:aspect-auto lg:h-24 justify-center gap-1 rounded-2xl border-[3px] border-black text-black shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${NODE_COLORS[mode].bg} ${KEY_TILT[i]} ${
-                      animate ? 'animate-[qp-card-in_0.55s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''
-                    }`}
-                    style={animate ? { animationDelay: `${300 + i * 90}ms` } : undefined}
-                  >
-                    <ModeGlyph mode={mode} size={30} className="lg:h-10 lg:w-10" />
-                    <span className="max-w-full px-0.5 text-center font-neo-display text-[clamp(9px,2.8vw,13px)] font-bold leading-none tracking-tight lg:text-base lg:tracking-normal">
-                      {t(`quickPlay.solo.mode.${mode}`)}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <Link
-                  href={playHref}
-                  data-testid="hp-play"
-                  onClick={handlePlayClick}
-                  className={`flex aspect-square flex-col items-center lg:aspect-auto lg:h-24 justify-center gap-1 rounded-2xl border-[3px] border-black bg-neo-yellow text-black shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${KEY_TILT[MODES.length % KEY_TILT.length]} ${
-                    animate ? 'animate-[qp-card-in_0.55s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''
-                  }`}
-                  style={animate ? { animationDelay: `${300 + MODES.length * 90}ms` } : undefined}
-                >
-                  <RandomGlyph size={30} className="lg:h-10 lg:w-10" />
-                  <span className="max-w-full px-0.5 text-center font-neo-display text-[clamp(9px,2.8vw,13px)] font-bold leading-none tracking-tight lg:text-base lg:tracking-normal">{t('homePlay.random')}</span>
-                </Link>
-              </li>
-            </ul>
-          </div>
-
         </div>
+        <div className="text-center">
+          <h1 id="hp-play-title" className="text-balance font-neo-display text-[19px] font-bold leading-tight text-neo-cream lg:text-2xl">
+            {t('homePlay.heroLine')}
+          </h1>
+          <p className="mt-0.5 text-xs text-neo-white/60 lg:text-sm">{t('homePlay.intro')}</p>
+        </div>
+      </div>
+
+      <div data-hero-row>
+        <div data-hero-breathe>
+          <PressSurface asChild lip={6}>
+            <Link
+              href={playHref}
+              data-testid="hp-play-now"
+              data-hero-primary
+              onClick={handlePlayClick}
+              className="flex h-[72px] w-full items-center justify-center gap-3 rounded-3xl border-[3px] border-black bg-neo-lime px-4 font-neo-display text-[28px] font-bold tracking-wide text-black uppercase [@media(max-height:700px)]:h-[64px] lg:h-[84px] lg:text-4xl"
+            >
+              <Play className="h-8 w-8 shrink-0 fill-current" strokeWidth={2.75} aria-hidden="true" />
+              <span className="truncate">{t('homePlay.playNow')}</span>
+            </Link>
+          </PressSurface>
+        </div>
+      </div>
+
+      <div data-hero-row>
+        <HeroQuickLinks lang={lang} t={t} animate={animate} streak={streak} streakLoading={streakLoading} atRisk={atRisk} playedToday={playedToday} />
+      </div>
+
+      <div data-hero-row>
+        <ModeRail lang={lang} t={t} />
       </div>
     </section>
   );

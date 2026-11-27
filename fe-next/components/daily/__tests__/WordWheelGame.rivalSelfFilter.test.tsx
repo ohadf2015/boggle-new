@@ -115,23 +115,25 @@ describe('WordWheelGame rival self-filter + day scoping', () => {
     expect(url).toContain('/leaderboard/2026-06-20/');
   });
 
-  it('excludes the current player (by id) from the next-rival pill', async () => {
+  it('excludes the current player (by id) from the next-rival marker', async () => {
     mockLeaderboard([
       { score: 50, display_name: 'SelfPlayer', player_id: 'me' },
       { score: 80, display_name: 'RealRival', player_id: 'other' },
     ]);
     renderGame({ puzzleDate: '2026-06-20', currentPlayerId: 'me' });
-    await waitFor(() => expect(screen.getByText('RealRival')).toBeInTheDocument());
+    // The nearest player above is the one to chase: SelfPlayer (50) would be it if self weren't filtered.
+    await waitFor(() => expect(screen.getByTestId('rival-marker')).toHaveAttribute('data-rival', 'RealRival'));
     expect(screen.queryByText('SelfPlayer')).toBeNull();
   });
 
-  it('excludes the current guest (by fingerprint) from the next-rival pill', async () => {
+  it('excludes the current guest (by fingerprint) from the next-rival marker', async () => {
     mockLeaderboard([
       { score: 50, display_name: 'SelfGuest', player_id: null, guest_fingerprint: 'fp1' },
       { score: 80, display_name: 'RealRival', player_id: 'other', guest_fingerprint: 'fp2' },
     ]);
     renderGame({ puzzleDate: '2026-06-20', currentGuestFingerprint: 'fp1' });
-    await waitFor(() => expect(screen.getByText('RealRival')).toBeInTheDocument());
+    // The nearest player above is the one to chase: SelfGuest (50) would be it if self weren't filtered.
+    await waitFor(() => expect(screen.getByTestId('rival-marker')).toHaveAttribute('data-rival', 'RealRival'));
     expect(screen.queryByText('SelfGuest')).toBeNull();
   });
 });

@@ -8,6 +8,10 @@ import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { parseWordLength } from '../_utils/wordListData';
 import { nLetterWordsMetadata, NLetterWordsView } from '../_nletter/NLetterWordsView';
 import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
+import { Stagger } from '@/components/motion/PopIn';
+import { PressGroup } from '../_components/PressGroup';
+import { HeroBand } from '../_components/HeroBand';
+import { PRIMARY_CTA, CHIP, SECTION_LABEL } from '../_components/wordStyles';
 
 // /words/{n}-letter-words (e.g. 3-letter-words) is served by THIS dynamic route and
 // delegated to NLetterWordsView. It used to be a sibling [n]-letter-words route, but two
@@ -157,7 +161,6 @@ export default async function WordExplorerPage({ params }: PageParams) {
   const displayWord = word.toUpperCase();
   const points = getBasePoints(word);
   const letterFreq = getLetterFrequency(word);
-  // Word explorer labels are hardcoded (not in translation files yet — will add with i18n pass)
 
   const scoringTiers = [
     { combo: 0, label: 'No combo', score: points },
@@ -193,144 +196,110 @@ export default async function WordExplorerPage({ params }: PageParams) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schemaJson }} />
 
-      <div className="min-h-screen bg-neo-navy text-neo-white">
-        <div className="max-w-2xl mx-auto px-4 py-8">
+      <PressGroup className="min-h-screen bg-neo-navy text-neo-white">
+        <HeroBand className="max-w-2xl">
           <TopBackLink className="mb-4" />
 
-          {/* Navigation */}
-          <div className="mb-6">
-            <Link href={`/${locale}/tools/word-solver`} className="text-neo-cyan text-sm hover:underline">
-              ← Word Solver
-            </Link>
+          <h1 className="text-5xl font-neo-display font-black text-neo-yellow tracking-wider">
+            {displayWord}
+          </h1>
+          <div className="flex items-center gap-3 mt-2">
+            <span className={`inline-block px-3 py-1 rounded-neo border-2 border-neo-black text-sm font-bold ${isValid ? 'bg-neo-lime text-neo-black' : 'bg-neo-red text-neo-white'}`}>
+              {isValid ? 'Valid' : 'Not Valid'}
+            </span>
+            <span className="text-neo-cream/70">
+              {word.length} letters
+            </span>
+            <span className="text-neo-cyan font-bold">
+              {points} pts
+            </span>
           </div>
 
-          {/* Word header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-neo-display font-black text-neo-yellow tracking-wider">
-              {displayWord}
-            </h1>
-            <div className="flex items-center gap-3 mt-2">
-              <span className={`inline-block px-3 py-1 rounded-neo border-2 border-neo-black text-sm font-bold ${isValid ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
-                {isValid ? 'Valid' : 'Not Valid'}
-              </span>
-              <span className="text-slate-400">
-                {word.length} letters
-              </span>
-              <span className="text-neo-cyan font-bold">
-                {points} pts
-              </span>
-            </div>
-          </div>
-
-          {/* Points breakdown */}
-          <div className="bg-neo-navy border-2 border-neo-black rounded-neo p-4 mb-6 shadow-hard-sm">
-            <h2 className="text-sm font-bold text-neo-cyan uppercase tracking-wider mb-3">
-              Scoring
-            </h2>
-            <div className="space-y-2">
-              {scoringTiers.map(tier => (
-                <div key={tier.combo} className="flex items-center justify-between text-sm">
-                  <span className="text-slate-400">{tier.label}</span>
-                  <span className="font-bold text-neo-white">{tier.score} pts</span>
-                </div>
-              ))}
-              <div className="flex items-center justify-between text-sm border-t border-slate-700/50 pt-2">
-                <span className="text-slate-400">Fire Round (2x)</span>
-                <span className="font-bold text-neo-orange">{points * 2} pts</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Letter tiles */}
-          <div className="bg-neo-navy border-2 border-neo-black rounded-neo p-4 mb-6 shadow-hard-sm">
-            <h2 className="text-sm font-bold text-neo-cyan uppercase tracking-wider mb-3">
-              Letters
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {word.toUpperCase().split('').map((letter, i) => (
-                <div
-                  key={`${letter}-${i}`}
-                  className="w-10 h-10 bg-neo-navy-light border-2 border-neo-black rounded-neo flex items-center justify-center font-neo-display font-black text-lg text-neo-yellow shadow-hard-sm"
-                >
-                  {letter}
-                </div>
-              ))}
-            </div>
-            {letterFreq.some(l => l.count > 1) && (
-              <div className="mt-3 text-xs text-slate-500">
-                Repeated: {letterFreq.filter(l => l.count > 1).map(l => `${l.letter} ×${l.count}`).join(', ')}
-              </div>
-            )}
-          </div>
-
-          <InlineBannerAd webZone="content-page" className="mb-6" />
-
-          {/* Word facts */}
-          <div className="bg-neo-navy border-2 border-neo-black rounded-neo p-4 mb-6 shadow-hard-sm">
-            <h2 className="text-sm font-bold text-neo-cyan uppercase tracking-wider mb-3">
-              Word Facts
-            </h2>
-            <dl className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-slate-400">Length</dt>
-                <dd className="font-bold">{word.length} letters</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-slate-400">Unique Letters</dt>
-                <dd className="font-bold">{letterFreq.length}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-slate-400">Starts With</dt>
-                <dd className="font-bold">{word[0].toUpperCase()}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-slate-400">Ends With</dt>
-                <dd className="font-bold">{word[word.length - 1].toUpperCase()}</dd>
-              </div>
-            </dl>
-          </div>
-
-          {/* Related searches — internal linking for SEO */}
-          <div className="mb-8">
-            <h2 className="text-sm font-bold text-neo-cyan uppercase tracking-wider mb-3">
-              Explore More
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              <Link
-                href={`/${locale}/tools/word-solver?length=${word.length}`}
-                className="text-sm bg-neo-navy-light border border-slate-700 rounded-neo px-3 py-1.5 hover:border-neo-cyan transition-colors"
+          <Stagger dir={/[\u0590-\u05FF]/.test(word) ? 'rtl' : 'ltr'} className="flex flex-wrap gap-2 mt-5">
+            {displayWord.split('').map((letter, i) => (
+              <div
+                key={`${letter}-${i}`}
+                className="w-12 h-12 bg-neo-navy-light border-2 border-neo-black rounded-neo flex items-center justify-center font-neo-display font-black text-xl text-neo-yellow shadow-[0_3px_0_0] shadow-neo-cream/20"
               >
-                {word.length}-letter words
-              </Link>
-              <Link
-                href={`/${locale}/tools/word-solver?starts=${word[0].toLowerCase()}`}
-                className="text-sm bg-neo-navy-light border border-slate-700 rounded-neo px-3 py-1.5 hover:border-neo-cyan transition-colors"
-              >
-                Words starting with {word[0].toUpperCase()}
-              </Link>
-              <Link
-                href={`/${locale}/daily`}
-                className="text-sm bg-neo-navy-light border border-slate-700 rounded-neo px-3 py-1.5 hover:border-neo-cyan transition-colors"
-              >
-                Daily Challenge
-              </Link>
-            </div>
-          </div>
+                {letter}
+              </div>
+            ))}
+          </Stagger>
+          {letterFreq.some(l => l.count > 1) && (
+            <p className="mt-2 text-xs text-neo-cream/60">
+              Repeated: {letterFreq.filter(l => l.count > 1).map(l => `${l.letter} ×${l.count}`).join(', ')}
+            </p>
+          )}
 
-          {/* CTA */}
-          <div className="text-center">
-            <Link
-              href={`/${locale}/quick-play`}
-              className="inline-block bg-neo-yellow text-neo-black font-neo-display font-black px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-y-0.5 transition-[box-shadow,translate,scale,rotate,transform]"
-            >
+          <div className="mt-6">
+            <Link href={`/${locale}/quick-play`} data-press data-primary-cta className={PRIMARY_CTA}>
               Play Now →
             </Link>
-            <p className="text-slate-500 text-xs mt-2">
+            <p className="text-neo-cream/60 text-xs mt-3">
               Can you find this word on the grid?
             </p>
           </div>
+        </HeroBand>
+
+        <div className="max-w-2xl mx-auto px-4 pb-10">
+          <section className="border-2 border-neo-black rounded-neo bg-neo-navy-light/50 p-4 mb-8">
+            <h2 className={`${SECTION_LABEL} mb-3`}>Scoring</h2>
+            <div className="space-y-2">
+              {scoringTiers.map(tier => (
+                <div key={tier.combo} className="flex items-center justify-between text-sm">
+                  <span className="text-neo-cream/70">{tier.label}</span>
+                  <span className="font-bold text-neo-white">{tier.score} pts</span>
+                </div>
+              ))}
+              <div className="flex items-center justify-between text-sm border-t border-neo-cream/15 pt-2">
+                <span className="text-neo-cream/70">Fire Round (2x)</span>
+                <span className="font-bold text-neo-orange">{points * 2} pts</span>
+              </div>
+            </div>
+          </section>
+
+          <InlineBannerAd webZone="content-page" className="mb-8" />
+
+          <section className="mb-8">
+            <h2 className={`${SECTION_LABEL} mb-3`}>Word Facts</h2>
+            <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+              <div className="flex justify-between">
+                <dt className="text-neo-cream/70">Length</dt>
+                <dd className="font-bold">{word.length} letters</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-neo-cream/70">Unique Letters</dt>
+                <dd className="font-bold">{letterFreq.length}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-neo-cream/70">Starts With</dt>
+                <dd className="font-bold">{word[0].toUpperCase()}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-neo-cream/70">Ends With</dt>
+                <dd className="font-bold">{word[word.length - 1].toUpperCase()}</dd>
+              </div>
+            </dl>
+          </section>
+
+          {/* Related searches — internal linking for SEO */}
+          <section>
+            <h2 className={`${SECTION_LABEL} mb-3`}>Explore More</h2>
+            <div className="flex flex-wrap gap-2">
+              {[
+                [`/${locale}/tools/word-solver?length=${word.length}`, `${word.length}-letter words`],
+                [`/${locale}/tools/word-solver?starts=${word[0].toLowerCase()}`, `Words starting with ${word[0].toUpperCase()}`],
+                [`/${locale}/daily`, 'Daily Challenge'],
+                [`/${locale}/tools/word-solver`, 'Word Solver'],
+              ].map(([href, label]) => (
+                <Link key={href} href={href} data-press className={`${CHIP} text-sm px-3 py-1.5`}>
+                  {label}
+                </Link>
+              ))}
+            </div>
+          </section>
         </div>
-      </div>
+      </PressGroup>
     </>
   );
 }

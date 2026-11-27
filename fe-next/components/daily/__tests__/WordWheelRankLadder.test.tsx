@@ -32,11 +32,19 @@ describe('WordWheelRankLadder', () => {
     expect(Number(track.getAttribute('aria-valuenow'))).toBe(90);
   });
 
-  it('names the next rival to pass in a reserved slot when rivals are on', () => {
+  it('names the next rival to pass in a reserved slot on the wide ladder', () => {
+    render(
+      <WordWheelRankLadder t={t} score={10} thresholds={th} showRival rivals={[{ name: 'Ava', score: 20 }]} variant="wide" />,
+    );
+    expect(screen.getByTestId('next-rival-slot').textContent).toMatch(/pointsToPass.*"count":10.*"name":"Ava"/);
+  });
+
+  it('on the phone bar the rival is a marker on the track, with no label line', () => {
     render(
       <WordWheelRankLadder t={t} score={10} thresholds={th} showRival rivals={[{ name: 'Ava', score: 20 }]} />,
     );
-    expect(screen.getByTestId('next-rival-slot').textContent).toMatch(/pointsToPass.*"count":10.*"name":"Ava"/);
+    expect(screen.queryByTestId('next-rival-slot')).toBeNull();
+    expect(screen.getByTestId('rival-marker')).toBeInTheDocument();
   });
 
   it('opens the full rank list behind one tap', () => {

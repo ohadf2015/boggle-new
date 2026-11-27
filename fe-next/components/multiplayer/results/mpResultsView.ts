@@ -163,14 +163,9 @@ export function readyTally(players: ReadyPlayer[], readyUsernames: string[]): { 
   return { ready: readySet.size, total, readySet };
 }
 
-/**
- * NEXT UP for this viewer. Only the host's device knows the next mode: the
- * server learns it at `startGame`, so a joiner's store still holds its
- * 'random' default. A joiner gets null ("host is picking"), never a guess
- * that would read SURPRISE MODE while the host's own card reads CLASSIC.
- */
-export function nextModeForViewer<M extends string>({ isHost, hostPick }: { isHost: boolean; hostPick: M }): M | null {
-  return isHost ? hostPick : null;
+/** A joiner's store holds a 'random' default, so they see only the relayed pick, or null ("host is picking") before it lands. */
+export function nextModeForViewer<M extends string>({ isHost, hostPick, relayed = null }: { isHost: boolean; hostPick: M; relayed?: M | null }): M | null {
+  return isHost ? hostPick : relayed;
 }
 
 export function showInlineSignup(_input: {
@@ -182,4 +177,59 @@ export function showInlineSignup(_input: {
   // t_39705c3f: results_inline converted 0 of 39 guests in 14d. The post-game
   // ask is the soft sheet (non-MP) or mp_sheet — not a second inline card.
   return false;
+}
+
+export interface VerdictInput {
+  rank: number;
+  total: number;
+  score: number;
+  /** Someone else shares my rank. */
+  tied: boolean;
+  /** Nobody in the room scored. */
+  allZero: boolean;
+  series?: boolean;
+  /** The teacher hid placings: no verdict about rank. */
+  calm?: boolean;
+}
+
+/** One verdict per result: the headline key, the mascot's face, and whether a rank badge belongs on it. */
+export function mpVerdict({ rank, total, score, tied, allZero, series = false, calm = false }: VerdictInput): { key: string; mood: MascotMood; badge: boolean } {
+  if (calm) return { key: 'mpUi.results.headCalm', mood: 'cheer', badge: false };
+  if (allZero) return { key: 'mpUi.results.headAllZero', mood: 'think', badge: false };
+  if (rank <= 1 && score > 0) {
+    if (tied) return { key: 'mpUi.results.headTiedFirst', mood: 'cheer', badge: true };
+    return { key: series ? 'mpUi.results.headSeriesWon' : 'mpUi.results.winner', mood: 'victory', badge: true };
+  }
+  if (tied) return { key: 'mpUi.results.headTiedPlace', mood: 'think', badge: true };
+  if (series) return { key: 'mpUi.results.seriesPlace', mood: mascotFor(rank, total, score), badge: true };
+  if (total >= 2 && rank >= total) return { key: 'mpUi.results.headTough', mood: 'oops', badge: true };
+  return { key: 'mpUi.results.headPlace', mood: mascotFor(rank, total, score), badge: true };
+}
+
+export interface GuestAskPlan {
+  /** "Pick a name for the board" (PublicNamePrompt). */
+  namePrompt: boolean;
+  /** "Sign in to keep your XP" (GuestSaveCard, signup trigger results_card). */
+  saveCard: boolean;
+  /** Something a guest would have seen here was held back (tracked on mp_results_viewed). */
+  deferred: boolean;
+}
+
+/**
+ * Which asks a guest gets on the MP results screen, by MP game of the session.
+ * Nov 23-26: of 30 guests who left after game 1, 21 saw the name prompt and 18
+ * the save card stacked on the replay countdown. results_card: 175 shown, 0
+ * signups in 14d. So game 1 shows only the countdown; game 2 adds the name
+ * (the mp_sheet signup ask lands on game 2 too); the save card waits for game 3.
+ */
+export function guestAskPlan({ isGuest, isClassroom, sessionGame }: {
+  isGuest: boolean;
+  isClassroom: boolean;
+  /** 1 = this results screen is the guest's first MP game this session. */
+  sessionGame: number;
+}): GuestAskPlan {
+  if (!isGuest || isClassroom) return { namePrompt: true, saveCard: true, deferred: false };
+  const namePrompt = sessionGame >= 2;
+  const saveCard = sessionGame >= 3;
+  return { namePrompt, saveCard, deferred: !namePrompt || !saveCard };
 }

@@ -12,7 +12,7 @@
  * number without waiting for a transition (Pitfall Class 5).
  */
 
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, within } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 const fireVictoryConfetti = vi.fn();
@@ -72,12 +72,16 @@ describe('WordCoverageGlance — the sweep', () => {
 
   it('paints the real width with no staging asked for', () => {
     render(glance());
-    expect(screen.getByTestId('coverage-fill')).toHaveStyle({ width: '50%' });
+    const bar = within(screen.getByTestId('coverage-meter')).getByRole('progressbar');
+    expect(bar).toHaveAttribute('aria-valuenow', '2');
+    expect(bar.querySelector('[data-part="fill"]')).not.toBeNull();
   });
 
   it('starts the meter empty only when the reveal explicitly holds it', () => {
     render(glance({ fill: false }));
-    expect(screen.getByTestId('coverage-fill')).toHaveStyle({ width: '0%' });
+    const bar = within(screen.getByTestId('coverage-meter')).getByRole('progressbar');
+    expect(bar.querySelector('[data-part="fill"]')).toBeNull();
+    expect(bar).toHaveAttribute('aria-valuenow', '2');
   });
 
   it('shows no sweep tag short of every word', () => {

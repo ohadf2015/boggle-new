@@ -63,10 +63,19 @@ describe('Teacher Home: one primary, chunky blocks', () => {
     expect(limeFills(screen.getByTestId('teacher-home'))).toEqual([screen.getByTestId('home-start-live')]);
   });
 
-  it('Then the desk is pink and the one big secondary is cyan so it stands out on it', () => {
+  it('Then the desk is open on the backdrop (no colour slab) and the secondary is a small outlined chip', () => {
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('home-hero').className).toMatch(/(^|\s)bg-neo-pink(\s|$)/);
-    expect(screen.getByTestId('rehearse-with-bots').className).toMatch(/(^|\s)bg-neo-cyan(\s|$)/);
+    expect(screen.getByTestId('home-hero').className).not.toMatch(/(^|\s)bg-neo-(pink|purple)(\s|$)/);
+    const rehearse = screen.getByTestId('rehearse-with-bots');
+    expect(rehearse.className).not.toMatch(/(^|\s)bg-neo-cyan(\s|$)/);
+    expect(rehearse.className).toMatch(/rounded-neo-pill/);
+  });
+
+  it('Then Home has exactly one primary and the class code is a chip, never six letter tiles', () => {
+    render(<TeacherDashboard />);
+    expect(screen.getByTestId('teacher-home').querySelectorAll('[data-hero="true"]')).toHaveLength(1);
+    expect(screen.queryAllByTestId('home-desk-code-tile')).toHaveLength(0);
+    expect(screen.getByTestId('home-desk-code')).toHaveTextContent('K7Q2');
   });
 
   it('Given three classes, Then the hero switcher picks the class and no class list stacks under the sessions', () => {
@@ -98,7 +107,7 @@ describe('Teacher Home: one primary, chunky blocks', () => {
   it('Then the class name is white on the panel, not a lime headline', () => {
     render(<TeacherDashboard />);
     const title = screen.getByRole('heading', { level: 2, name: '5B - English' });
-    expect(title.className).toContain('text-white');
+    expect(title.className).toContain('text-neo-white');
     expect(title.className).not.toMatch(/text-neo-lime/);
   });
 

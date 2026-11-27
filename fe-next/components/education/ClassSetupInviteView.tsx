@@ -8,7 +8,8 @@ import { EduMascot } from '@/components/education/EduMascot';
 import { cn } from '@/lib/utils';
 import { RosterSeats } from '@/components/teacher/hq/RosterSeats';
 import type { RosterStudent } from '@/components/teacher/hq/rosterModel';
-import { NB_ADVANCED, NB_BLOCK, NB_LINK as QUIET_LINK, NB_PANEL_POP, NB_PRIMARY as PRIMARY_BUTTON, NB_SECONDARY as SECONDARY_BUTTON, NB_STICKER } from '@/components/teacher/nb/nbStyles';
+import { NB_ADVANCED, NB_BLOCK, NB_LINK as QUIET_LINK, NB_PANEL_POP, NB_PRIMARY_FACE, NB_SECONDARY_FACE, NB_STICKER } from '@/components/teacher/nb/nbStyles';
+import { PressSurface } from '@/components/motion/PressSurface';
 import { CelebrationBurst } from '@/components/education/motion';
 import { ClassSetupInviteCode, type InviteChannel } from './ClassSetupInviteCode';
 import { ClassReadyGuide } from './ClassReadyGuide';
@@ -91,16 +92,16 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
   const wordsShown = wordsOpen || wordsAttention;
 
   const projector = (
-    <button
-      type="button"
+    <PressSurface
+      lip={projectorLeads ? 6 : 4}
       data-testid="setup-projector"
       data-hero={projectorLeads ? 'true' : 'false'}
       onClick={onOpenProjector}
-      className={cn(projectorLeads ? PRIMARY_BUTTON : SECONDARY_BUTTON, 'w-full', projectorLeads && 'min-h-[72px] text-2xl', showPlay && 'max-sm:hidden')}
+      className={cn(projectorLeads ? NB_PRIMARY_FACE : NB_SECONDARY_FACE, 'w-full', projectorLeads && 'min-h-[72px] text-2xl', showPlay && 'max-sm:hidden')}
     >
       <MonitorPlay className={projectorLeads ? 'size-6' : 'size-5'} aria-hidden="true" />
       {t('eduShell.setup.showProjector')}
-    </button>
+    </PressSurface>
   );
 
   const hero = showPlay

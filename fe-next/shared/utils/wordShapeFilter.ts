@@ -11,7 +11,7 @@ const MIN_LEN = 2;
 const MAX_LEN = 15;
 const MAX_REPEAT_RUN = 3;
 
-const EN_SV_ES_VOWELS = new Set('aeiouáéíóúüäöå');
+const EN_SV_ES_VOWELS = new Set('aeiouyáéíóúüäöå');
 const VOWEL_CHECK_LANGS = new Set<Language>(['en', 'sv', 'es', 'fr', 'de']);
 
 const NON_LETTER_PATTERNS: Record<Language, RegExp> = {

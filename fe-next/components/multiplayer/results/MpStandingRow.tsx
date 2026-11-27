@@ -6,6 +6,7 @@ import Avatar from '@/components/Avatar';
 import { MpRowFriendAction } from './MpGuestAddChip';
 import { RecordHolderCrown } from '@/components/records/RecordHolderCrown';
 import { cn } from '@/lib/utils';
+import AnimatedCounter from '@/components/ui/AnimatedCounter';
 import { podiumTier, type MpStandingRow } from './mpStandings';
 import fx from './mpResults.module.css';
 import { CROWN_SRC, ResultArt, SPOTLIGHT_SRC } from './MpResultArt';
@@ -160,7 +161,7 @@ export const MpStandingRowItem = forwardRef<HTMLLIElement, MpStandingRowItemProp
         data-testid="mp-standing-score"
         className={cn('shrink-0 font-neo-display font-bold tabular-nums', first ? 'text-[calc(32px*var(--mp-u,1))]' : 'text-[calc(24px*var(--mp-u,1))]')}
       >
-        {r.score}
+        {anim ? <AnimatedCounter value={r.score} previousValue={0} delay={first ? 250 : 0} className="!text-[length:inherit] text-current" /> : r.score}
       </span>
     </li>
   );

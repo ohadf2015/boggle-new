@@ -2,7 +2,7 @@
 
 import { createElement, useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { Check, ChevronDown, ExternalLink, Loader2, Play, Plus, RotateCcw, Users } from 'lucide-react';
+import { Check, ChevronDown, ExternalLink, Loader2, Play, Plus, RotateCcw, Share2, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -11,14 +11,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { PressSurface } from '@/components/motion/PressSurface';
+import { neoChunkyPress } from '@/components/ui/neoStyles';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { HomeShareSheet } from './HomeShareSheet';
-import { HomeJoinCard } from './HomeJoinCard';
-import { MascotBubble } from '../nb/MascotBubble';
-import { NB_BLOCK, NB_PANEL, NB_PRIMARY, NB_STICKER } from '../nb/nbStyles';
-import { QUIET_LINK } from './homeStyles';
+import { HomeGreeting } from './HomeGreeting';
+import { NB_PRIMARY_FACE, NB_STICKER, NB_BLOCK } from '../nb/nbStyles';
+import { HERO_CHIP } from './homeStyles';
 
-const PRIMARY_SLOT = cn(NB_PRIMARY, 'min-h-[72px] w-full whitespace-nowrap text-2xl sm:min-h-[84px] sm:text-3xl');
+const PRIMARY_PRESS = cn(NB_PRIMARY_FACE, 'min-h-[72px] w-full whitespace-nowrap text-2xl sm:min-h-[84px] sm:max-w-md sm:text-3xl');
 const MENU_ROW = 'min-h-[44px] font-neo-body font-semibold text-neo-cream';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -41,14 +42,12 @@ export interface HomeHeroProps {
   onStart?: () => void;
   language: string;
   t: T;
-  /** The one big secondary action under Start. */
+  /** A small secondary chip beside Pick a different game. */
   rehearse?: ReactNode;
   meta?: ReactNode;
-  /** The greeting in the mascot's bubble on Home; the class language sticker on its own page. */
+  /** The greeting line on Home; the class language sticker on its own page. */
   eyebrow?: string | null;
-  /** What the mascot says under the greeting. */
-  cue?: string | null;
-  /** The desk colour: pink on Home, purple on the class page. */
+  /** Kept for the class page's caller; the desk itself no longer paints a colour. */
   tone?: 'pink' | 'purple';
   /** 2 on Home, where the greeting is the page heading; 1 on the class page. */
   titleLevel?: 1 | 2;
@@ -69,9 +68,9 @@ export interface HomeHeroProps {
   testIds?: { start?: string; code?: string; share?: string };
 }
 
-/** The class desk: a colour panel with the class, one huge Start, one big secondary and the yellow join card; on Home the mascot greets above it. */
+/** The class desk, open on the page backdrop: class name, one quiet line with the code chip, one huge Start, and small secondaries. */
 export function HomeHero({
-  classrooms, selectedId, onSelect, onStart, language, t, rehearse, meta, eyebrow, cue, titleLevel = 2, tone = 'pink',
+  classrooms, selectedId, onSelect, onStart, language, t, rehearse, meta, eyebrow, titleLevel = 2, tone = 'pink',
   newClassHref, classesHref, classPageLink = true, joinGoal, capLabel, replay, startHref, onShare, testIds,
 }: HomeHeroProps) {
   const selected = classrooms.find((c) => c.id === selectedId) ?? classrooms[0];
@@ -86,83 +85,67 @@ export function HomeHero({
 
   const heading = createElement(
     `h${titleLevel}`,
-    { id: 'home-hero-title', className: 'min-w-0 font-neo-display text-3xl font-black leading-tight text-white sm:text-5xl [@media(max-height:820px)]:sm:text-4xl' },
+    { id: 'home-hero-title', className: 'min-w-0 font-neo-display text-3xl font-black leading-tight text-neo-white sm:text-5xl' },
     <ClassMenu classrooms={classrooms} selected={selected} onSelect={onSelect} capLabel={capLabel} newClassHref={newClassHref} classesHref={classesHref} classPageHref={classPageLink && selected ? `/${language}/teacher/classroom/${selected.id}` : undefined} t={t} />,
   );
-  const greetingHeader = titleLevel === 2 && (eyebrow || cue) ? (
-    <header data-testid="home-greeting-row" className="min-w-0">
-      <MascotBubble pose="welcome" size={72} className="min-w-0 lg:[&>img]:size-20">
-        {eyebrow ? <h1 suppressHydrationWarning className="font-neo-display text-lg font-black leading-tight text-neo-black sm:text-xl">{eyebrow}</h1> : null}
-        {cue ? <p data-testid="home-coach-cue" suppressHydrationWarning className="font-neo-body text-sm font-semibold leading-snug text-neo-black/80 sm:text-base">{cue}</p> : null}
-      </MascotBubble>
-    </header>
-  ) : null;
+  const playIcon = pending
+    ? <Loader2 className="size-7 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+    : null;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3 sm:gap-4">
-    {greetingHeader}
-    <section data-testid="home-hero" data-tone={tone} aria-labelledby="home-hero-title" className={cn(NB_PANEL, NB_BLOCK[tone], 'relative flex flex-col justify-center @container/hero')}>
-      <div
-        data-testid="home-hero-grid"
-        className="grid grid-cols-[minmax(0,1fr)] gap-4 p-3 sm:gap-5 sm:p-6 @3xl/hero:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] @3xl/hero:grid-rows-[auto_1fr] @3xl/hero:gap-x-8 @3xl/hero:p-8 [@media(max-height:820px)]:gap-3 [@media(max-height:820px)]:@3xl/hero:p-5"
-      >
-        <div className="flex min-w-0 flex-col gap-1.5 @3xl/hero:col-start-1 @3xl/hero:row-start-1">
-          {titleLevel === 1 && eyebrow ? (
-            <p className={cn(NB_STICKER, NB_BLOCK.cream, 'self-start')}>{eyebrow}</p>
-          ) : null}
+    <div className="flex min-w-0 flex-col gap-5 sm:gap-6">
+      {titleLevel === 2 && eyebrow ? <HomeGreeting greeting={eyebrow} /> : null}
+      <section data-testid="home-hero" data-tone={tone} aria-labelledby="home-hero-title" className="flex min-w-0 flex-col gap-4">
+        <div className="flex min-w-0 flex-col gap-2">
+          {titleLevel === 1 && eyebrow ? <p className={cn(NB_STICKER, NB_BLOCK.cream, 'self-start')}>{eyebrow}</p> : null}
           {heading}
-          {meta ? <div data-testid="home-hero-meta-row" className="mt-1">{meta}</div> : null}
+          <div data-testid="home-hero-meta-row" className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
+            {meta}
+            {code ? (
+              <CodeChip code={code} onShare={() => (onShare ? onShare() : setShareOpen(true))} t={t} testIds={testIds} />
+            ) : null}
+          </div>
+          {joinGoal ? <div data-testid="home-join-goal-line">{joinGoal}</div> : null}
         </div>
 
-        <div data-testid="home-hero-start-row" className="flex flex-col items-stretch gap-3 @3xl/hero:col-start-1 @3xl/hero:row-start-2 @3xl/hero:self-end">
+        <div data-testid="home-hero-start-row" className="flex min-w-0 flex-col items-stretch gap-3">
           {replay?.kind === 'pending' ? (
-            <div data-testid="home-start-pending" aria-busy="true" className={cn(PRIMARY_SLOT, 'cursor-progress opacity-80')}>
+            <div data-testid="home-start-pending" aria-busy="true" className={cn(PRIMARY_PRESS, neoChunkyPress(6), 'cursor-progress opacity-80')}>
               <Loader2 className="size-6 animate-spin motion-reduce:animate-none" aria-hidden="true" />
               <span className="sr-only">{t('eduShell.home.loop.loading')}</span>
             </div>
           ) : replay?.kind === 'ready' ? (
-            <Link href={replay.href} data-testid={testIds?.start ?? 'home-play-again'} data-hero="true" data-magnet aria-busy={pending || undefined} onClick={begin} className={cn(PRIMARY_SLOT, 'group animate-edu-shine')}>
-              <span aria-hidden="true" className="edu-shine-track" />
-              {pending ? (
-                <Loader2 className="size-6 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" />
-              ) : (
-                <RotateCcw className="edu-wiggle-on-hover size-7 shrink-0" strokeWidth={3} aria-hidden="true" />
-              )}
-              <span className="flex min-w-0 flex-col items-start leading-tight">
-                <span>{t('eduShell.home.loop.playAgain')}</span>
-                {replay.detail ? <span data-testid="home-play-again-detail" className="max-w-full truncate font-neo-body text-sm font-bold opacity-80">{replay.detail}</span> : null}
-              </span>
-            </Link>
+            <PressSurface asChild lip={6} className={cn(PRIMARY_PRESS, 'group animate-edu-shine')}>
+              <Link href={replay.href} data-testid={testIds?.start ?? 'home-play-again'} data-hero="true" data-magnet aria-busy={pending || undefined} onClick={begin}>
+                <span aria-hidden="true" className="edu-shine-track" />
+                {playIcon ?? <RotateCcw className="edu-wiggle-on-hover size-7 shrink-0" strokeWidth={3} aria-hidden="true" />}
+                <span className="flex min-w-0 flex-col items-start leading-tight">
+                  <span>{t('eduShell.home.loop.playAgain')}</span>
+                  {replay.detail ? <span data-testid="home-play-again-detail" className="max-w-full truncate font-neo-body text-sm font-bold opacity-80">{replay.detail}</span> : null}
+                </span>
+              </Link>
+            </PressSurface>
           ) : (
-            <Link href={startHref ?? pickHref} data-testid={testIds?.start ?? 'home-start-live'} data-hero="true" data-magnet aria-busy={pending || undefined} onClick={begin} className={cn(PRIMARY_SLOT, 'group animate-edu-shine')}>
-              <span aria-hidden="true" className="edu-shine-track" />
-              {pending ? (
-                <Loader2 className="size-6 animate-spin motion-reduce:animate-none" aria-hidden="true" />
-              ) : (
-                <Play className="edu-wiggle-on-hover size-7 fill-current" aria-hidden="true" />
-              )}
-              {t('eduShell.home.startLive')}
-            </Link>
+            <PressSurface asChild lip={6} className={cn(PRIMARY_PRESS, 'group animate-edu-shine')}>
+              <Link href={startHref ?? pickHref} data-testid={testIds?.start ?? 'home-start-live'} data-hero="true" data-magnet aria-busy={pending || undefined} onClick={begin}>
+                <span aria-hidden="true" className="edu-shine-track" />
+                {playIcon ?? <Play className="edu-wiggle-on-hover size-7 fill-current" aria-hidden="true" />}
+                {t('eduShell.home.startLive')}
+              </Link>
+            </PressSurface>
           )}
-          {rehearse}
-          {replay?.kind === 'ready' ? (
-            <Link href={startHref ?? pickHref} data-testid="home-pick-game" className={cn(QUIET_LINK, 'self-center text-white/90 hover:text-white')}>
-              {t('eduShell.home.loop.pickGame')}
-            </Link>
+          {rehearse || replay?.kind === 'ready' ? (
+            <div data-testid="home-hero-chips" className="flex min-w-0 flex-wrap items-center gap-2">
+              {rehearse}
+              {replay?.kind === 'ready' ? (
+                <PressSurface asChild lip={2} className={HERO_CHIP}>
+                  <Link href={startHref ?? pickHref} data-testid="home-pick-game">{t('eduShell.home.loop.pickGame')}</Link>
+                </PressSurface>
+              ) : null}
+            </div>
           ) : null}
         </div>
-
-        {code ? (
-          <HomeJoinCard
-            code={code}
-            joinGoal={joinGoal}
-            onShare={() => (onShare ? onShare() : setShareOpen(true))}
-            t={t}
-            testIds={testIds}
-            className="@3xl/hero:col-start-2 @3xl/hero:row-span-2 @3xl/hero:row-start-1 @3xl/hero:self-center"
-          />
-        ) : null}
-      </div>
+      </section>
 
       {selected && code && !onShare ? (
         <HomeShareSheet
@@ -173,7 +156,26 @@ export function HomeHero({
           t={t}
         />
       ) : null}
-    </section>
+    </div>
+  );
+}
+
+/** "Class code K7Q2WM · Share": the six big tiles live in the share sheet and on the projector, where students read them. */
+function CodeChip({ code, onShare, t, testIds }: { code: string; onShare: () => void; t: T; testIds?: HomeHeroProps['testIds'] }) {
+  return (
+    <div data-testid="home-join-row" className="inline-flex min-w-0">
+      <PressSurface
+        lip={2}
+        data-testid={testIds?.share ?? 'home-share-code'}
+        aria-haspopup="dialog"
+        aria-label={`${t('eduShell.home.shareCode')}: ${code}`}
+        onClick={onShare}
+        className={cn(HERO_CHIP, 'gap-2')}
+      >
+        <span className="font-neo-body text-xs font-bold text-neo-cream/75">{t('academy.hq.classCode')}</span>
+        <code data-testid={testIds?.code ?? 'home-desk-code'} dir="ltr" className="font-neo-display text-base font-black tracking-wider text-neo-cream">{code}</code>
+        <Share2 className="size-4 shrink-0" aria-hidden="true" />
+      </PressSurface>
     </div>
   );
 }

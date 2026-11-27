@@ -23,7 +23,7 @@ interface WordWheelRankLadderProps {
   rivals: LadderRival[];
   showRival?: boolean;
   /** bar = phone strip, wide = desktop hero strip, list = desktop side panel. */
-  variant?: 'bar' | 'wide' | 'list';
+  variant?: 'bar' | 'wide' | 'list' | 'chip';
 }
 
 const SPRING = { type: 'spring', stiffness: 260, damping: 26 } as const;
@@ -104,6 +104,16 @@ export default function WordWheelRankLadder({
     prevIndexRef.current = index;
   }, [index]);
 
+  if (variant === 'chip') {
+    return (
+      <p data-testid="rank-chip" data-rank-index={index} className="mx-auto flex max-w-full items-center gap-1.5 truncate rounded-full bg-neo-cream/10 px-3 py-1 font-neo-display text-sm font-bold text-neo-cream/80">
+        <span className="text-neo-lime">{rankName}</span>
+        {toNext > 0 && <span aria-hidden>·</span>}
+        {toNext > 0 && <span className="truncate">{t('wordWheel.rank.toNext', { count: toNext, rank: t(`wordWheel.rank.${WHEEL_RANKS[index + 1]}`) })}</span>}
+      </p>
+    );
+  }
+
   if (variant === 'list') {
     return (
       <div data-testid="rank-ladder" data-rank-index={index} className="w-full flex flex-col gap-3">
@@ -147,6 +157,8 @@ export default function WordWheelRankLadder({
         {nextRival && (
           <m.span
             aria-hidden
+            data-testid="rival-marker"
+            data-rival={nextRival.name}
             className="absolute top-1/2 -translate-y-1/2 ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-full ring-2 ring-neo-pink bg-neo-navy z-[1]"
             initial={false}
             animate={{ insetInlineStart: `${rivalPos * 100}%` }}
@@ -229,7 +241,7 @@ export default function WordWheelRankLadder({
             ? t('wordWheel.rank.toNext', { count: toNext, rank: t(`wordWheel.rank.${WHEEL_RANKS[index + 1]}`) })
             : t('wordWheel.rank.top')}
         </span>
-        {showRival && (
+        {showRival && wide && (
           <span
             data-testid="next-rival-slot"
             className="min-w-0 flex items-center justify-end gap-1 text-neo-pink font-bold whitespace-nowrap"

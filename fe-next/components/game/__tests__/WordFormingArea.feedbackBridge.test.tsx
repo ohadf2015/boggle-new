@@ -68,7 +68,7 @@ describe('WordFormingArea — feedback bridge on submit', () => {
 
     // The pill must bridge — the word stays, the empty placeholder must NOT appear.
     expect(screen.getByText('CAT')).toBeInTheDocument();
-    expect(screen.queryByText('···')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('word-forming-empty')).not.toBeInTheDocument();
   });
 
   it('shows and holds the feedback note after submit (does not disappear immediately)', () => {
@@ -96,7 +96,7 @@ describe('WordFormingArea — feedback bridge on submit', () => {
     act(() => { vi.advanceTimersByTime(6000); });
     expect(screen.queryByText('✓')).not.toBeInTheDocument();
     expect(screen.queryByText('CAT')).not.toBeInTheDocument();
-    expect(screen.getByText('···')).toBeInTheDocument();
+    expect(screen.getByTestId('word-forming-empty')).toBeInTheDocument();
   });
 
   it('rejection feedback clears faster than accepted (does not linger 5s)', () => {
@@ -112,7 +112,7 @@ describe('WordFormingArea — feedback bridge on submit', () => {
     // Gone shortly after — well before the accepted 5s window.
     act(() => { vi.advanceTimersByTime(700); });
     expect(screen.queryByText('✗')).not.toBeInTheDocument();
-    expect(screen.getByText('···')).toBeInTheDocument();
+    expect(screen.getByTestId('word-forming-empty')).toBeInTheDocument();
 
     // Accepted on the same component still uses the longer 5s window.
     rerender(<WordFormingArea word="" letterCount={0} feedback={accepted('CAT')} compact />);
@@ -162,6 +162,6 @@ describe('WordFormingArea — feedback bridge on submit', () => {
 
     act(() => { vi.advanceTimersByTime(2000); });
     expect(screen.queryByText('CAT')).not.toBeInTheDocument();
-    expect(screen.getByText('···')).toBeInTheDocument();
+    expect(screen.getByTestId('word-forming-empty')).toBeInTheDocument();
   });
 });

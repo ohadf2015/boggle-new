@@ -17,7 +17,7 @@ vi.mock('../PublicNamePrompt', () => ({ PublicNamePrompt: () => <div data-testid
 vi.mock('@/components/progression/NewRecordBanner', () => ({ NewRecordBanner: () => <div data-testid="slot-record" /> }));
 vi.mock('@/components/records/WorldRecordChip', () => ({ WorldRecordChip: ({ subMode }: { subMode?: string }) => <div data-testid="slot-world">{subMode}</div> }));
 vi.mock('@/components/progression/NextUnlockTeaser', () => ({
-  NextUnlockTeaser: ({ xp }: { xp?: { gained: number; total?: number | null } | null }) => <div data-testid="slot-unlock">{xp ? `${xp.gained}/${xp.total ?? '-'}` : ''}</div>,
+  NextUnlockTeaser: ({ xp, holdGuestSave }: { xp?: { gained: number; total?: number | null } | null; holdGuestSave?: boolean }) => <div data-testid="slot-unlock" data-hold={holdGuestSave ? 'yes' : 'no'}>{xp ? `${xp.gained}/${xp.total ?? '-'}` : ''}</div>,
 }));
 vi.mock('@/components/rivals/RivalCard', () => ({ RivalCard: ({ rival }: { rival: { name: string } }) => <div data-testid="slot-rival">{rival.name}</div> }));
 
@@ -40,6 +40,18 @@ describe('ResultsSocialSlot', () => {
     await waitFor(() => expect(screen.getByTestId('slot-rival').textContent).toBe('Bea'));
     const ids = Array.from(container.querySelectorAll('[data-testid^="slot-"]')).map((e) => e.getAttribute('data-testid'));
     expect(ids).toEqual(['slot-record', 'slot-world', 'slot-rival', 'slot-name', 'slot-unlock']);
+  });
+
+  it('Given holdNamePrompt and holdGuestSave, Then the name prompt is left out and the teaser is told to hold the guest card', () => {
+    render(<ResultsSocialSlot mode="multiplayer" score={10} holdNamePrompt holdGuestSave />);
+    expect(screen.queryByTestId('slot-name')).toBeNull();
+    expect(screen.getByTestId('slot-unlock').getAttribute('data-hold')).toBe('yes');
+  });
+
+  it('Given no holds, Then the name prompt shows and the guest card is not held', () => {
+    render(<ResultsSocialSlot mode="multiplayer" score={10} />);
+    expect(screen.getByTestId('slot-name')).toBeTruthy();
+    expect(screen.getByTestId('slot-unlock').getAttribute('data-hold')).toBe('no');
   });
 
   it('Given a publishing mode, Then the slot publishes the run record with the pre-run best', () => {

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Heart, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PressSurface } from '@/components/motion/PressSurface';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { relicArt } from '@/components/adventure/play/run/art';
@@ -31,6 +32,7 @@ export function HomeAdventureCard() {
     : `${title}: ${t('landing.adventureModeDesc')}`;
 
   return (
+    <PressSurface asChild lip={4}>
     <Link
       href={href}
       prefetch={false}
@@ -46,8 +48,7 @@ export function HomeAdventureCard() {
         launch?.start(e, { href, tone: 'lime', title: t('landing.adventureMode'), art: ART });
       }}
       className={cn(
-        'group relative flex h-28 items-center gap-3 overflow-hidden rounded-2xl border-[3px] border-black bg-neo-lime p-2.5 pe-3 text-neo-navy shadow-hard lg:rounded-3xl lg:shadow-hard-lg',
-        'transition-[transform,box-shadow] duration-100 hover:-translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
+        'group relative flex h-28 items-center gap-3 overflow-hidden rounded-2xl border-[3px] border-black bg-neo-lime p-2.5 pe-3 text-neo-navy lg:rounded-3xl',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
         'lg:h-40 lg:gap-5 lg:p-3 lg:pe-5',
       )}
@@ -107,6 +108,7 @@ export function HomeAdventureCard() {
         </span>
       )}
     </Link>
+    </PressSurface>
   );
 }
 

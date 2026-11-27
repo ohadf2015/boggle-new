@@ -31,12 +31,8 @@ import {
 } from '@/lib/androidInstall/installCooldown';
 import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
 import { useInGameSurface } from '@/lib/inGameSurface';
-import {
-  isCapacitorNative,
-  isDesktopInstallContext,
-  isStandaloneDisplay,
-} from '@/utils/androidApp';
-import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
+import { isCapacitorNative, isStandaloneDisplay } from '@/utils/androidApp';
+import { finishedGameThisSession, otherPromoTookSession } from './postGameMoment';
 import {
   trackInstallPillClick,
   trackInstallPillDismissed,
@@ -54,6 +50,7 @@ const HIDDEN_KEY = 'android_app_install_pill_hidden';
 const NATIVE_SETTLE_MS = 1500;
 
 export default function AndroidInstallPill() {
+  'use no memo'; // render reads storage and the DOM (session promo slot, returning home); the compiler would cache them
   const { t } = useLanguage();
   const pillVisible = useAndroidInstallStore((s) => s.pillVisible);
   const openPromo = useAndroidInstallStore((s) => s.openPromo);
@@ -116,16 +113,16 @@ export default function AndroidInstallPill() {
     typeof document !== 'undefined' &&
     document.documentElement.getAttribute('data-home') === 'returning';
 
-  // Desktop visitors need a phone to install, so ask only once they have finished a game.
-  // Re-read on route and round changes so a game finished on this page view counts.
-  const [desktopBeforeFirstGame, setDesktopBeforeFirstGame] = useState(true);
+  // Never on first paint: only once a game has finished in this session. Re-read on
+  // route and round changes so a game finished on this page view counts.
+  const [gameDone, setGameDone] = useState(false);
   useEffect(() => {
-    setDesktopBeforeFirstGame(isDesktopInstallContext() && readGamesCompletedCount() < 1);
+    setGameDone(finishedGameThisSession());
   }, [pathname, inGame]);
 
   const shown =
     pillVisible && eligible && !sessionHidden && routeAllowed && !inGame && !onAdventure && !onReturningHome &&
-    !desktopBeforeFirstGame;
+    gameDone && !otherPromoTookSession();
 
   // Track the impression once per appearance.
   useEffect(() => {

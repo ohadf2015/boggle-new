@@ -138,9 +138,9 @@ describe('Teacher Home ready-to-run rail', () => {
 });
 
 describe('Teacher Home greeting cue, week mascot and Pro strip', () => {
-  it('Given an earlier game, Then the greeting carries one coach cue from real data', () => {
+  it('Given an earlier game, Then the greeting stays one line, with no coach cue under it', () => {
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('home-coach-cue').textContent).toMatch(/^eduShell\.home\.cue\.season\./);
+    expect(screen.queryByTestId('home-coach-cue')).toBeNull();
   });
 
   it('Given a free teacher, Then the Teacher Pro offer is one compact strip under the desk with no bullet list', () => {

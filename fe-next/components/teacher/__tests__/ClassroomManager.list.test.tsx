@@ -125,13 +125,13 @@ describe('ClassroomManager — class list', () => {
       expect(within(screen.getByTestId('classroom-card-fact')).getByTestId('card-activity')).toHaveTextContent('cls-1');
     });
 
-    it('Then every card has one lime Start as its only primary action', () => {
+    it('Then the page has one lime Start (the first class) and every other card keeps Start as a secondary', () => {
       state.classrooms = [mk(1), mk(2), mk(3)];
       render(<ClassroomManager />);
-      for (const card of screen.getAllByTestId('classroom-card')) {
-        const lime = Array.from(card.querySelectorAll('a, button')).filter((a) => /(^|\s)bg-neo-lime(\s|$)/.test(a.className));
-        expect(lime).toEqual([within(card).getByTestId('classroom-card-start-game')]);
-      }
+      const cards = screen.getAllByTestId('classroom-card');
+      const lime = Array.from(document.querySelectorAll('a, button')).filter((a) => /(^|\s)bg-neo-lime(\s|$)/.test(a.className));
+      expect(lime).toEqual([within(cards[0]).getByTestId('classroom-card-start-game')]);
+      for (const card of cards.slice(1)) expect(within(card).getByTestId('classroom-card-start-game')).toBeInTheDocument();
     });
 
     it('Then the card leads with Start a game and keeps Assign and Report in its menu', async () => {

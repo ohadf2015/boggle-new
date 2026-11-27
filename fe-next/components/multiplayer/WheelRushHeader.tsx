@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Crown, LogOut, Zap } from 'lucide-react';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { Crown, X, Zap } from 'lucide-react';
+import { GameTimerBar, HUD_EXIT_BUTTON } from '@/components/game/hud/GameHud';
 import { MpRoundMute } from '@/components/multiplayer/round/MpRoundMute';
 import Avatar from '@/components/Avatar';
-import CircularTimer from '@/components/ui/CircularTimer';
 import { cn } from '@/lib/utils';
 import { selectClosestRival } from '@/lib/wheelRush/closestRival';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
@@ -30,15 +29,6 @@ interface Props {
 }
 
 /** Relative progress bar (score / leader's score). Hidden during fog so it can't leak masked scores. */
-const ProgressBar: React.FC<{ ratio: number; tone: 'self' | 'opp' }> = ({ ratio, tone }) => (
-  <div className="mt-1 h-1.5 w-full rounded-full bg-neo-black/40 overflow-hidden">
-    <div
-      className={cn('h-full rounded-full transition-[width] duration-500', tone === 'self' ? 'bg-neo-black/70' : 'bg-neo-lime')}
-      style={{ width: `${Math.round(Math.max(0, Math.min(1, ratio)) * 100)}%` }}
-    />
-  </div>
-);
-
 export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogActive, remainingTime, totalTime, onQuit, t }) => {
   const self = useMemo(() => leaderboard.find(p => p.username === username), [leaderboard, username]);
   // Surface a SINGLE rival — the opponent nearest in score — so the player
@@ -56,124 +46,67 @@ export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogAct
   // the leader score. Hidden during fog so the pulse can't leak proximity.
   const isCloseRace = !fogActive && maxScore > 0 && !!rival && Math.abs(selfScore - rival.score) / leaderScore <= 0.08;
 
-  // CircularTimer needs a positive duration. Fall back to a safe envelope:
-  // prefer caller's totalTime, else cover current remaining, else 90s (current MP default).
   const timerDuration = Math.max(1, totalTime ?? Math.max(remainingTime ?? 0, 90));
 
   return (
     <div className="flex flex-col gap-2 shrink-0 pt-[env(safe-area-inset-top)] w-full max-w-2xl mx-auto">
-      {/* Row 1 — opponent progress rail + timer + quit */}
-      <div className="flex items-stretch gap-2">
-        <div
-          data-testid="wheel-opponent-rail"
-          className="flex items-stretch gap-1.5 overflow-x-auto flex-1 min-w-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {opponents.map(p => {
-            const connected = p.presenceStatus ? p.presenceStatus === 'active' : true;
-            return (
-              <div
-                key={p.username}
-                data-testid={`wheel-opp-${p.username}`}
-                className={cn(
-                  'shrink-0 w-28 px-2 py-1 rounded-neo border-2 bg-neo-navy-light shadow-hard',
-                  isCloseRace && p.username === rival?.username
-                    ? 'border-neo-orange motion-safe:animate-pulse'
-                    : 'border-neo-black',
-                )}
-              >
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span data-testid={`wheel-opp-avatar-${p.username}`} className="relative shrink-0">
-                    <Avatar pixelSize={22} customAvatar={p.avatar?.customAvatar} userId={p.username} disableEffects className="rounded-full" />
-                    <span
-                      className={cn(
-                        'absolute -bottom-0.5 -end-0.5 w-2 h-2 rounded-full border border-neo-black',
-                        connected ? 'bg-neo-lime' : 'bg-neo-cream/30',
-                      )}
-                    />
-                  </span>
-                  <span dir="auto" translate="no" className="notranslate font-neo-display font-bold text-[11px] text-neo-white truncate">{p.username}</span>
-                </div>
-                <div className="flex items-baseline justify-between mt-0.5">
-                  {fogActive ? (
-                    <span className="font-neo-display font-black text-sm text-neo-cyan tracking-wider">???</span>
-                  ) : (
-                    <span translate="no" className="notranslate font-neo-display font-black text-sm text-neo-white tabular-nums">{p.score}</span>
-                  )}
-                  {!fogActive && (p.wordCount ?? 0) > 0 && (
-                    <span className="text-[10px] text-neo-white tabular-nums">{p.wordCount}w</span>
-                  )}
-                </div>
-                {!fogActive && <ProgressBar ratio={p.score / leaderScore} tone="opp" />}
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          {typeof remainingTime === 'number' && (
-            <div
-              data-testid="wheel-rush-timer"
-              aria-label={t('wordWheel.timeLeft')}
-              className="shrink-0"
-            >
-              <CircularTimer
-                duration={timerDuration}
-                initialRemainingTime={Math.max(0, remainingTime)}
-                isPlaying
-                size={52}
-                strokeWidth={4}
-                colorFamily="cyan"
-                warningAt={15}
-                criticalAt={5}
-                timerKey={timerDuration}
-              />
-            </div>
+      <div data-testid="wheel-hud-row" className="flex h-14 items-center gap-2.5">
+        <button type="button" data-testid="wheel-rush-leave" onClick={onQuit} aria-label={t('common.quit')} className={HUD_EXIT_BUTTON}>
+          <X className="h-5 w-5" strokeWidth={3} aria-hidden />
+        </button>
+        {typeof remainingTime === 'number' ? (
+          <div data-testid="wheel-rush-timer" className="flex min-w-0 flex-1">
+            <GameTimerBar remaining={Math.max(0, remainingTime)} total={timerDuration} />
+          </div>
+        ) : <div className="flex-1" />}
+        <span
+          data-testid="wheel-self-badge"
+          className={cn(
+            'inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border-2 bg-neo-lime ps-1 pe-3 text-neo-black shadow-[0_3px_0_rgb(var(--neo-black))]',
+            isCloseRace ? 'border-neo-orange motion-safe:animate-pulse' : 'border-neo-black',
           )}
-          <MpRoundMute />
-          <button
-            type="button"
-            data-testid="wheel-rush-leave"
-            onClick={onQuit}
-            aria-label={t('common.quit')}
-            className="inline-flex size-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white/80 shadow-hard-sm transition-transform duration-150 ease-out hover:text-neo-white active:scale-[.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
-          >
-            <DirectionalIcon icon={LogOut} mirror className="size-4" />
-          </button>
-        </div>
+        >
+          <span data-testid="wheel-self-avatar" className="shrink-0">
+            <Avatar pixelSize={28} customAvatar={self?.avatar?.customAvatar} userId={username} disableEffects className="rounded-full" />
+          </span>
+          {isLeader && <Crown className="h-3.5 w-3.5" aria-hidden />}
+          {isCloseRace && (
+            <Zap data-testid="wheel-close-race-indicator" aria-label={t('wordWheel.closeRace')} className="h-3.5 w-3.5 text-neo-orange motion-safe:animate-pulse" />
+          )}
+          <span dir="auto" translate="no" className="notranslate sr-only">{self?.username ?? username}</span>
+          <span data-testid="wheel-self-score" translate="no" className="notranslate font-neo-display text-xl font-bold leading-none tabular-nums">
+            {selfScore}
+          </span>
+        </span>
+        <MpRoundMute />
       </div>
 
-      {/* Row 2 — prominent self score bar */}
-      <div
-        data-testid="wheel-self-badge"
-        className={cn(
-          'flex items-center gap-2.5 px-3 py-1.5 rounded-neo border-3 bg-neo-lime text-neo-black shadow-hard-lg',
-          isCloseRace ? 'border-neo-orange motion-safe:animate-pulse' : 'border-neo-black',
-        )}
-      >
-        <span data-testid="wheel-self-avatar" className="shrink-0">
-          <Avatar pixelSize={34} customAvatar={self?.avatar?.customAvatar} userId={username} disableEffects className="rounded-full" />
-        </span>
-        <div className="flex flex-col min-w-0 flex-1">
-          <span className="flex items-center gap-1 text-[11px] font-neo-display font-bold uppercase tracking-wide opacity-70">
-            {isLeader && <Crown className="w-3 h-3" />}
-            {isCloseRace && (
-              <Zap
-                data-testid="wheel-close-race-indicator"
-                aria-label={t('wordWheel.closeRace')}
-                className="w-3 h-3 text-neo-orange motion-safe:animate-pulse"
-              />
-            )}
-            <span dir="auto" translate="no" className="notranslate truncate">{self?.username ?? username}</span>
-          </span>
-          {!fogActive && <ProgressBar ratio={selfScore / leaderScore} tone="self" />}
-        </div>
-        <span
-          data-testid="wheel-self-score"
-          translate="no"
-          className="notranslate font-neo-display font-black text-3xl leading-none tabular-nums shrink-0"
-        >
-          {selfScore}
-        </span>
+      {/* The one rival nearest in score, as a slim chip under the HUD. */}
+      <div data-testid="wheel-opponent-rail" className="flex justify-center">
+        {opponents.map(p => {
+          const connected = p.presenceStatus ? p.presenceStatus === 'active' : true;
+          return (
+            <div
+              key={p.username}
+              data-testid={`wheel-opp-${p.username}`}
+              className={cn(
+                'flex max-w-full items-center gap-2 rounded-full border-2 bg-neo-navy-light py-1 ps-1 pe-3 shadow-[0_3px_0_rgb(var(--neo-black))]',
+                isCloseRace && p.username === rival?.username ? 'border-neo-orange motion-safe:animate-pulse' : 'border-neo-black',
+              )}
+            >
+              <span data-testid={`wheel-opp-avatar-${p.username}`} className="relative shrink-0">
+                <Avatar pixelSize={24} customAvatar={p.avatar?.customAvatar} userId={p.username} disableEffects className="rounded-full" />
+                <span className={cn('absolute -bottom-0.5 -end-0.5 h-2 w-2 rounded-full border border-neo-black', connected ? 'bg-neo-lime' : 'bg-neo-cream/30')} />
+              </span>
+              <span dir="auto" translate="no" className="notranslate min-w-0 truncate font-neo-display text-sm font-bold text-neo-white">{p.username}</span>
+              {fogActive ? (
+                <span className="font-neo-display text-sm font-black tracking-wider text-neo-cyan">???</span>
+              ) : (
+                <span translate="no" className="notranslate font-neo-display text-sm font-black tabular-nums text-neo-white">{p.score}</span>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

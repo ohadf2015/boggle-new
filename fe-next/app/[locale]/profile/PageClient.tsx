@@ -1,15 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { m } from 'framer-motion';
-import { ArrowLeft, LayoutDashboard, BarChart3, Trophy, Gem, Sparkles, Star, Lock } from 'lucide-react';
-import { LevelRing } from '@/components/profile/LevelRing';
+import { LayoutDashboard, BarChart3, Trophy, Gem } from 'lucide-react';
+import { ProfileGuestHero } from '@/components/profile/ProfileGuestHero';
+import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 import { useRouter } from 'next/navigation';
 import { useQueryState, parseAsStringLiteral } from 'nuqs';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import { Button } from '@/components/ui/button';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SupporterInterestCard } from '@/components/monetization/SupporterInterestCard';
@@ -29,7 +28,6 @@ import { useXpByMode } from '@/hooks/useXpByMode';
 import CreatorProfileStats from '@/components/ugc/CreatorProfileStats';
 import { getCreatorStats } from '@/utils/creatorRewards';
 import { EmailPreferences } from '@/components/settings/EmailPreferences';
-import { cn } from '@/lib/utils';
 import { getSession } from '@/utils/session';
 
 // Profile components (index is mocked wholesale by page tests — new showcase
@@ -164,93 +162,18 @@ export default function ProfilePageClient(): React.JSX.Element {
   // Not authenticated - show sign in prompt
   if (!loading && !isAuthenticated) {
     return (
-      <div className="flex flex-col h-full page-content-safe bg-neo-navy">
+      <div className="relative isolate flex flex-col h-full page-content-safe bg-neo-navy">
+        <AmbientBackdrop theme="profile" />
         <AutoHideHeader />
-        <div className="max-w-md mx-auto px-4 py-6 sm:py-8 w-full">
-          <m.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden bg-neo-navy-light border-3 border-neo-black rounded-neo-xl shadow-hard-lg p-6 pt-8 text-center"
-          >
-            {/* Identity banner — segmented full-palette bar */}
-            <div className="absolute top-0 inset-x-0 h-2.5 flex" aria-hidden>
-              {['bg-neo-lime', 'bg-neo-cyan', 'bg-neo-pink', 'bg-neo-purple', 'bg-neo-yellow'].map((c) => (
-                <span key={c} className={cn('flex-1 relative', c)}>
-                  <span className="absolute inset-0 texture-halftone-comic opacity-30 mix-blend-overlay" />
-                </span>
-              ))}
-            </div>
-
-            {/* Locked HQ orb — a teaser of the level ring they'll earn */}
-            <div className="relative mx-auto w-fit mt-2 mb-5">
-              <LevelRing percent={68} size={88} color="cyan" ariaLabel={t('profile.title')}>
-                <div className="w-full h-full rounded-full bg-neo-navy border-2 border-neo-black flex items-center justify-center">
-                  <Sparkles className="w-9 h-9 text-neo-cyan" strokeWidth={2.25} />
-                </div>
-              </LevelRing>
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 bg-neo-cyan text-neo-black border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-0.5 leading-none">
-                <span className="text-[8px] font-black uppercase tracking-[0.15em] opacity-70">{t('xp.level')}</span>
-                <span className="font-neo-display font-black text-sm">?</span>
-              </div>
-            </div>
-
-            <h2 className="text-3xl font-black font-neo-display uppercase tracking-tight text-neo-white mb-2">
-              {t('profile.title')}
-            </h2>
-            <p className="text-base text-gray-300 mb-5 font-neo-body">
-              {t('auth.upgradePrompt')}
-            </p>
-
-            {/* Teaser stat tiles — locked, hinting at what fills in */}
-            <div className="grid grid-cols-3 gap-2 mb-6">
-              {[
-                { icon: <Star strokeWidth={2.5} className="w-4 h-4" />, label: t('profile.totalScore'), color: 'text-neo-cyan' },
-                { icon: <Trophy strokeWidth={2.5} className="w-4 h-4" />, label: t('profile.wins'), color: 'text-neo-pink' },
-                { icon: <Gem strokeWidth={2.5} className="w-4 h-4" />, label: t('profile.achievements'), color: 'text-neo-lime' },
-              ].map((tile) => {
-                const tappable = lockedTileVariant === 'tappable';
-                return (
-                  <div
-                    key={tile.label}
-                    className={cn(
-                      'relative bg-neo-black/40 border-2 border-neo-black rounded-neo px-2 py-2.5',
-                      tappable && 'cursor-pointer active:scale-95 transition-transform',
-                    )}
-                    {...(tappable
-                      ? {
-                          role: 'button',
-                          tabIndex: 0,
-                          onClick: handleLockedTileTap,
-                          onKeyDown: (e: React.KeyboardEvent) => {
-                            if (e.key === 'Enter' || e.key === ' ') handleLockedTileTap();
-                          },
-                        }
-                      : {})}
-                  >
-                    <span className={cn('inline-flex mb-1', tile.color)}>{tile.icon}</span>
-                    <p className="text-[9px] font-black uppercase tracking-[0.1em] text-neo-white truncate leading-none">{tile.label}</p>
-                    <div className="mt-1 flex items-center justify-center gap-1 text-gray-500">
-                      <Lock className="w-3 h-3" />
-                      <span className="font-neo-display font-black text-base">—</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              {!isOnCrazyGamesPlatform && (
-                <Button onClick={() => setShowAuthModal(true)} variant="cyan" haptic animation="pop">
-                  {t('auth.signIn')}
-                </Button>
-              )}
-              <Button variant="outline" onClick={() => router.push(`/${language}`)} haptic>
-                <ArrowLeft className="me-2 rtl:rotate-180" />
-                {t('profile.backToGame')}
-              </Button>
-            </div>
-          </m.div>
-          <div className="mt-6">
+        <div className="max-w-md mx-auto px-4 pt-8 pb-6 w-full">
+          <ProfileGuestHero
+            canSignIn={!isOnCrazyGamesPlatform}
+            tilesTappable={lockedTileVariant === 'tappable'}
+            onSignIn={() => setShowAuthModal(true)}
+            onLockedTileTap={handleLockedTileTap}
+            onPlay={() => router.push(`/${language}`)}
+          />
+          <div className="mt-12">
             <CosmeticCollection rankTier={cosmeticRankTier} streakDays={0} coins={0} />
           </div>
         </div>
@@ -305,7 +228,8 @@ export default function ProfilePageClient(): React.JSX.Element {
   );
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 relative bg-neo-navy">
+    <div className="flex-1 flex flex-col min-h-0 relative isolate bg-neo-navy">
+      <AmbientBackdrop theme="profile" />
       <AutoHideHeader />
       <ProfileShowcaseLayout
         stage={stage}

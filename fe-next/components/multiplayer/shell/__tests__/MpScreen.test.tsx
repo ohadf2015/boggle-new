@@ -63,6 +63,15 @@ describe('MpScreen — the one no-scroll frame every MP state renders in', () =>
   });
 });
 
+describe('MpScreen backdrop', () => {
+  it('paints the backdrop slot behind the rows in its own stacking context', () => {
+    render(<MpScreen testId="s" backdrop={<div data-testid="bd" />} body={<div>B</div>} />);
+    const root = screen.getByTestId('s');
+    expect(root.className).toMatch(/\bisolate\b/);
+    expect(root.firstElementChild).toBe(screen.getByTestId('bd'));
+  });
+});
+
 describe('MpHudBar', () => {
   it('renders start / center / end slots', () => {
     render(<MpHudBar start={<span>S</span>} center={<span>C</span>} end={<span>E</span>} />);

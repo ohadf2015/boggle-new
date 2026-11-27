@@ -8,7 +8,7 @@
  */
 
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import { m, useReducedMotion } from 'framer-motion';
+import { SpringProgress } from '@/components/motion/SpringProgress';
 import { Check, Download, Loader2, RotateCcw, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -219,11 +219,11 @@ export function SectionTitle({ children }: { children: ReactNode }) {
 /** Accuracy as a number AND a bar — the number carries meaning, the bar scans. */
 export function AccuracyBar({ value }: { value: number }) {
   const pct = Math.max(0, Math.min(100, value));
-  const tone = pct >= 80 ? 'bg-neo-lime' : pct >= 50 ? 'bg-neo-cyan' : 'bg-neo-pink';
+  const tone = pct >= 80 ? 'lime' : pct >= 50 ? 'cyan' : 'pink';
   return (
     <span className="inline-flex items-center gap-2">
-      <span aria-hidden="true" className="relative h-2 w-14 overflow-hidden bg-neo-cream/15 sm:w-20">
-        <span className={cn('absolute inset-y-0 start-0', tone)} style={{ width: `${pct}%` }} />
+      <span aria-hidden="true" className="w-14 sm:w-20">
+        <SpringProgress value={pct} max={100} label={`${value}%`} tone={tone} animateOnMount className="h-2 rounded-none border-0 bg-neo-cream/15" />
       </span>
       <span className="tabular-nums">{value}%</span>
     </span>
@@ -232,26 +232,10 @@ export function AccuracyBar({ value }: { value: number }) {
 
 /** The one animated moment on a report: the mastery bar fills on arrival. */
 export function MasteryMeter({ percent, label }: { percent: number; label: string }) {
-  const reduce = useReducedMotion();
   return (
     <div>
       <p className="mb-2 text-sm font-bold text-neo-white tabular-nums">{label}</p>
-      <div
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={percent}
-        aria-label={label}
-        className="h-5 overflow-hidden rounded-neo border-2 border-neo-cream bg-neo-navy shadow-hard-sm"
-      >
-        <m.div
-          className="h-full origin-left bg-neo-lime rtl:origin-right"
-          style={{ width: `${percent}%` }}
-          initial={reduce ? false : { scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
-        />
-      </div>
+      <SpringProgress value={percent} max={100} label={label} animateOnMount className="h-5 border-neo-cream bg-neo-navy shadow-hard-sm" />
     </div>
   );
 }

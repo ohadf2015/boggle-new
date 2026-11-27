@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { usePress } from '@/components/motion/usePress';
 import { useRouter } from 'next/navigation';
 import { Bot, Loader2, MonitorSmartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -40,6 +41,7 @@ export function RehearseWithBotsButton({ classroomId, source, language, t, showN
   const router = useRouter();
   const { user } = useAuth();
   const [pending, setPending] = useState(false);
+  const press = usePress<HTMLButtonElement>({}, pending);
 
   const rehearse = async () => {
     if (pending) return;
@@ -65,6 +67,7 @@ export function RehearseWithBotsButton({ classroomId, source, language, t, showN
         disabled={pending}
         aria-busy={pending || undefined}
         title={showNote ? undefined : t('education.projectorLobby.rehearsePrivate')}
+        {...(buttonClassName ? press : null)}
         className={buttonClassName ?? cn(QUIET_LINK, compact && 'max-sm:min-w-11 max-sm:justify-center max-sm:border-2 max-sm:border-neo-cream/40 max-sm:no-underline')}
       >
         {pending ? (

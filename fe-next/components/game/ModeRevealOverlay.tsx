@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { PopIn } from '@/components/motion/PopIn';
 import { useModeFirstSeen, type IntroMode } from '@/hooks/useModeFirstSeen';
 import ModeIntroCard from './ModeIntroCard';
 
@@ -50,35 +50,20 @@ const ModeRevealOverlay: React.FC<ModeRevealOverlayProps> = ({
   return (
     // Solid full-screen layer like MpCountdownStage: the board behind it is not
     // interactive until GO, so it must not be visible (GR #11487 rage clicks).
-    <div data-testid="mode-reveal" className="fixed inset-0 z-[10000] bg-neo-navy flex items-center justify-center overflow-hidden">
-      <AdaptiveAnimatePresence>
-        <AdaptiveMotion.div
-          key="mode-reveal"
-          initial={{ scale: 0.3, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 1.5, opacity: 0 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-          className="flex flex-col items-center gap-4"
-        >
-          {showRound && (
-            <div
-              data-testid="round-splash"
-              className="text-3xl font-neo-display font-bold text-neo-pink uppercase tracking-widest animate-neo-pop"
-            >
-              {t('countdown.round', { number: displayRound! })}
-            </div>
-          )}
-          <div className="text-7xl font-neo-display font-black text-neo-lime uppercase tracking-wider drop-shadow-[0_0_40px_rgba(163,230,53,0.5)]">
-            {modeLabel}
-          </div>
-          <AdaptiveMotion.div
-            initial={{ width: 0 }}
-            animate={{ width: '80%' }}
-            transition={{ delay: 0.3, duration: 0.6, ease: 'easeOut' }}
-            className="h-1 bg-neo-lime rounded-full"
-          />
-        </AdaptiveMotion.div>
-      </AdaptiveAnimatePresence>
+    <div data-testid="mode-reveal" className="fixed inset-0 z-[10000] bg-neo-navy flex items-center justify-center overflow-hidden px-4">
+      <PopIn className="flex w-full max-w-sm flex-col items-center gap-3 rounded-[28px] border-3 border-neo-black bg-neo-navy-light px-5 py-8 text-center shadow-[0_6px_0_rgb(var(--neo-black))] tv:max-w-2xl tv:py-14">
+        {showRound && (
+          <span
+            data-testid="round-splash"
+            className="rounded-full border-2 border-neo-black bg-neo-pink px-4 py-1 font-neo-display text-lg font-bold uppercase tracking-widest text-neo-black shadow-[0_3px_0_rgb(var(--neo-black))] tv:text-3xl"
+          >
+            {t('countdown.round', { number: displayRound! })}
+          </span>
+        )}
+        <span className="max-w-full break-words font-neo-display text-5xl font-bold uppercase text-neo-lime tv:text-8xl">
+          {modeLabel}
+        </span>
+      </PopIn>
     </div>
   );
 };

@@ -47,6 +47,18 @@ describe('BlastMPLeaderboard', () => {
     expect(screen.getByText('#5')).toBeInTheDocument();
   });
 
+  it('phone-width strip: the top two plus you, rival names truncating inside chips that share the row', () => {
+    const { container } = render(<BlastMPLeaderboard leaderboard={LB} username="erin" t={t} />);
+    const pills = container.querySelectorAll('[aria-label^="#"]');
+    expect(pills).toHaveLength(3);
+    expect(pills[2].getAttribute('data-me')).toBe('true');
+    expect(pills[0].className).toContain('flex-1');
+    expect(container.querySelector('[data-testid="blast-mp-leaderboard"] > div')?.className).not.toContain('overflow-x-auto');
+    // On phones my chip is just rank + score, so rivals keep readable names.
+    expect(screen.getByText('YOU').className).toContain('max-sm:sr-only');
+    expect(container.querySelector('[data-testid="blast-mp-gap"]')?.getAttribute('class')).toContain('max-sm:hidden');
+  });
+
   it('marks the leader (#1) row distinctly', () => {
     const { container } = render(<BlastMPLeaderboard leaderboard={LB} username="bob" t={t} />);
     // Leader pill carries a data flag the others don't.

@@ -5,6 +5,7 @@ import { Check, RotateCcw, Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { ResultsNextBar } from '@/components/results/stage/ResultsNextBar';
+import { PressSurface } from '@/components/motion/PressSurface';
 import { ModeGlyph } from './ModeGlyph';
 import { NODE_COLORS } from './modeColors';
 import { QUICK_MODES, type QuickMode } from './types';
@@ -92,8 +93,11 @@ export function QuickResultsModeSwitch({
   compact?: boolean;
 }) {
   const { t } = useLanguage();
+  const caption = t('quickPlay.solo.pickNextMode', 'Next round');
   return (
     <div
+      role="group"
+      aria-label={caption}
       className={
         compact
           ? 'flex flex-col gap-1.5'
@@ -101,24 +105,26 @@ export function QuickResultsModeSwitch({
       }
       data-testid="quick-next-mode-picker"
     >
-      <span className="font-neo-display text-[10px] uppercase tracking-[0.18em] text-neo-white/55">
-        {t('quickPlay.solo.pickNextMode', 'Next round')}
-      </span>
+      {!compact && (
+        <span className="font-neo-display text-[10px] uppercase tracking-[0.18em] text-neo-white/55">{caption}</span>
+      )}
       <div className={`grid gap-2 ${compact ? 'grid-cols-3' : 'grid-cols-4'}`}>
         {QUICK_MODES.map((mode) => {
           const isCurrent = mode === currentMode;
           // NEXT BOARD already replays the current mode.
           if (isCurrent && compact) return null;
           return (
-            <button
+            <PressSurface
               key={mode}
-              type="button"
+              lip={2}
               data-testid={`quick-next-mode-${mode}`}
               data-current={isCurrent || undefined}
               onClick={() => onNextRound(mode)}
-              className={`relative flex ${compact ? 'h-[48px]' : 'h-[60px]'} min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl border-[3px] border-black px-1 font-neo-display text-[11px] font-bold tracking-wide text-black shadow-hard-sm transition-transform active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
-                NODE_COLORS[mode].bg
-              } ${isCurrent ? '' : 'saturate-[0.85]'}`}
+              className={
+                compact
+                  ? `relative flex h-11 min-w-0 flex-row items-center justify-center gap-1.5 rounded-xl border-2 border-neo-white/25 bg-neo-navy-elevated px-1 shadow-neo-white/20 font-neo-display text-xs font-bold tracking-wide ${NODE_COLORS[mode].text}`
+                  : `relative flex h-[60px] min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl border-[3px] border-black px-1 font-neo-display text-[11px] font-bold tracking-wide text-black ${NODE_COLORS[mode].bg}`
+              }
             >
               {isCurrent && (
                 <span
@@ -128,9 +134,9 @@ export function QuickResultsModeSwitch({
                   <RotateCcw className="h-3 w-3" strokeWidth={3} />
                 </span>
               )}
-              <ModeGlyph mode={mode} size={20} />
-              <span className="max-w-full truncate">{t(`quickPlay.solo.mode.${mode}`)}</span>
-            </button>
+              <ModeGlyph mode={mode} size={compact ? 16 : 20} />
+              <span className="min-w-0 truncate">{t(`quickPlay.solo.mode.${mode}`)}</span>
+            </PressSurface>
           );
         })}
       </div>

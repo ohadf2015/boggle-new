@@ -22,7 +22,6 @@ import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
 import { updateActiveGameExtras } from '@/utils/abandonOnPagehide';
 import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
-import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
 import { liveVerdict } from '@/lib/wordWheel/liveVerdict';
 import { claimPointer } from '@/lib/wordWheel/claimPointer';
 import WordWheelRankLadder from './WordWheelRankLadder';
@@ -40,7 +39,9 @@ import { useWheelDragHint } from './wheel/useWheelDragHint';
 import { useWheelMascotStages } from './wheel/useWheelMascotStages';
 import { useWheelLetterInput } from './wheel/useWheelLetterInput';
 import WordWheelFoundWords from './WordWheelFoundWords';
+import { useFirstWheelHint } from './WordWheelHintFlag';
 import WordWheelHud from './WordWheelHud';
+import WheelGameHud from './wheel/WheelGameHud';
 import WordWheelLiveRanks from './WordWheelLiveRanks';
 import { GameShell, ShellKeysCard, SHELL_MEDIA } from '@/components/game/shell';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -58,7 +59,7 @@ const TAP_IDLE_SUBMIT_MS = 2500;
 
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
   puzzle, duration, onComplete, onValidateWord, onQuickVerdict, onEffect, language, paused = false, practice = false,
-  hideModeCoach = false,
+  hideModeCoach = false, lessonHud = false,
   hideCompetitive = false, rivals: rivalsOverride, onWordFound,
   puzzleDate, currentPlayerId = null, currentGuestFingerprint = null, onExit,
   bonuses = false, goldLetter: goldProp = null,
@@ -67,6 +68,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const goldIndex = goldLetter ? puzzle.outerLetters.indexOf(goldLetter) : -1;
   const isGoldenWord = useWheelGoldenWord(puzzle.puzzleDate, puzzle.language, !practice);
   const { t } = useLanguage();
+  const firstRoundHint = useFirstWheelHint();
   const inShell = useMediaQuery(SHELL_MEDIA);
   const prefersReducedMotion = useReducedMotion() ?? false;
   // Builder direction follows the wheel's letters, not the UI locale.
@@ -331,7 +333,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     [bonuses, practice, duration, puzzle.puzzleDate, puzzle.language],
   );
 
-  const hud = (
+  const hud = lessonHud ? (
+    <WheelGameHud clock={clock} duration={duration} score={score} onExit={onExit} />
+  ) : (
     <WordWheelHud
       t={t}
       clock={clock}
@@ -354,7 +358,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       thresholds={thresholds}
       rivals={rivals}
       showRival={showRivalLayer}
-      variant={inShell ? 'wide' : 'bar'}
+      variant={inShell ? 'wide' : lessonHud ? 'chip' : 'bar'}
     />
   );
 
@@ -366,6 +370,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       variant={inShell ? 'panel' : 'strip'}
       reducedMotion={prefersReducedMotion}
       pulse={pulse}
+      quietEmpty={lessonHud}
     />
   );
 
@@ -405,12 +410,13 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         acceptedGold={lastWordScore?.gold ?? false}
         acceptedId={scoreFlyId}
         reducedMotion={prefersReducedMotion}
-        hint={wordsFound.length === 0}
+        hint={firstRoundHint && wordsFound.length === 0}
         live={liveVerdict(builtLetters.map(bl => bl.letter).join(''), puzzle.centerLetter, wordsFound, onQuickVerdict)}
         pending={pendingLetter}
         celebrating={celebration !== null}
         banner={<WheelRushCelebration celebration={celebration} t={t} prefersReduced={prefersReducedMotion} delay={0.2} className="inset-0 items-center" />}
         className="shrink-0"
+        keyboardOnlySubmit={lessonHud}
       />
       <WheelDisc
         orbitRef={wheelContainerRef}
@@ -435,7 +441,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         onPressedChange={setPendingLetter}
         goldIndex={goldIndex >= 0 ? goldIndex : null}
       >
-        {!paused && !inShell && <GameMascotReactions {...mascotProps} personality="quiet" persistent slotClassName={WHEEL_ORBIT_MASCOT_SLOT} />}
+        {!paused && !inShell && !lessonHud && <GameMascotReactions {...mascotProps} personality="quiet" persistent slotClassName={WHEEL_ORBIT_MASCOT_SLOT} />}
       </WheelDisc>
 
       <WheelActionBar
@@ -483,7 +489,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         translate="no"
       >
         {wheelCluster}
-        {!paused && <KeyboardHintTooltip acceptedCount={wordsFound.length} t={t} />}
         {!paused && inShell && <GameMascotReactions {...mascotProps} personality="full" slotClassName={WHEEL_MASCOT_SLOT} stages={mascotStage.stages} />}
       </div>
     </GameShell>

@@ -69,9 +69,9 @@ describe('BlastTileFirstUseCallout — single-player auto-dismiss', () => {
 });
 
 describe('BlastTileFirstUseCallout — placement', () => {
-  it('hangs below the board instead of covering its top rows', () => {
+  it('sits in the slot under the board in normal flow, never floating over the board or the word pill', () => {
     render(<BlastTileFirstUseCallout type="bomb" onDismiss={vi.fn()} />);
     const wrapper = screen.getByTestId('blast-tile-first-use').parentElement!;
-    expect(wrapper.className).toContain('top-full');
+    expect(wrapper.className).not.toMatch(/\babsolute\b|top-full/);
   });
 });

@@ -4,7 +4,10 @@ import { calculateWordScore } from '@/shared/utils/scoring';
 export type WordLength = 3 | 4 | 5 | 6 | 7 | 8;
 export const VALID_LENGTHS: WordLength[] = [3, 4, 5, 6, 7, 8];
 export type Letter = string;
-export const VALID_LETTERS: Letter[] = 'abcdefghijklmnopqrstuvwxyz'.split('');
+// A letter whose seed list is empty (x, once proper nouns were dropped) gets no page and no links.
+export const VALID_LETTERS: Letter[] = 'abcdefghijklmnopqrstuvwxyz'
+  .split('')
+  .filter((l) => (seedWords.byLetter[l as keyof typeof seedWords.byLetter] ?? []).length > 0);
 
 /** Base LexiClash score for a word using canonical scoring */
 export function getWordScore(word: string): number {
@@ -52,6 +55,6 @@ export function parseWordLength(raw: string): WordLength | null {
 /** Validate that a letter param is a single a-z character. */
 export function parseLetter(raw: string): Letter | null {
   const l = raw.toLowerCase();
-  if (l.length === 1 && /^[a-z]$/.test(l)) return l as Letter;
+  if (VALID_LETTERS.includes(l)) return l;
   return null;
 }

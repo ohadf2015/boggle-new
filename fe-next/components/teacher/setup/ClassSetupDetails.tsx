@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Check, ChevronDown, Loader2 } from 'lucide-react';
+import { PressSurface } from '@/components/motion/PressSurface';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/lib/supabase/education/types';
 import type { StarterLessonPack } from '@/lib/education/starterLessonPacks';
@@ -10,7 +11,7 @@ import { LanguagePicker } from '@/components/education/pickers/LanguagePicker';
 import { nativeLanguageName } from '@/components/education/pickers/nativeLanguageName';
 import { languageFlag } from '@/lib/i18n/languageLabels';
 import { EduMascot } from '@/components/education/EduMascot';
-import { NB_ADVANCED, NB_BLOCK, NB_INPUT, NB_LINK, NB_PANEL_POP, NB_PRIMARY, NB_SECONDARY, NB_STICKER } from '../nb/nbStyles';
+import { NB_ADVANCED, NB_BLOCK, NB_INPUT, NB_LINK, NB_PRIMARY_FACE, NB_SECONDARY, NB_STICKER } from '../nb/nbStyles';
 import { SetupCodePreview } from './SetupCodePreview';
 import { GRADE_BANDS, type GradeBand } from './classSetupDefaults';
 import { StarterPackRow } from './StarterPackRow';
@@ -66,7 +67,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
       }}
       className="flex flex-col gap-3"
     >
-      <div className={cn(NB_PANEL_POP.cyan, 'flex flex-col gap-5 p-4 sm:gap-6 sm:p-8')}>
+      <div className="flex flex-col gap-5 py-2 sm:gap-6">
         <div className="flex items-center gap-3">
           <EduMascot moment="success" size={96} className="size-14 shrink-0 drop-shadow-[3px_3px_0_rgb(var(--neo-black))] sm:size-20" />
           <h1 data-wipe className="font-neo-display text-4xl font-black leading-none text-neo-cream sm:text-5xl">{t('eduShell.setup.title')}</h1>
@@ -168,13 +169,14 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
           </p>
         ) : null}
 
-        <button
+        <PressSurface
+          lip={6}
           type="submit"
           data-testid="setup-start-live"
           data-hero="true"
           disabled={busy !== null}
           aria-busy={busy === 'live' || undefined}
-          className={cn(NB_PRIMARY, 'min-h-[72px] w-full text-3xl', busy === 'done' && 'disabled:opacity-100')}
+          className={cn(NB_PRIMARY_FACE, 'min-h-[72px] w-full text-3xl', busy === 'done' && 'disabled:opacity-100')}
         >
           {busy === 'live' ? <Loader2 className="size-7 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : null}
           {busy === 'done' ? <Check className="size-7" strokeWidth={3} aria-hidden="true" /> : null}
@@ -183,7 +185,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
             : busy === 'done'
               ? t('eduShell.setup.readyTitle')
               : t(errorKey ? 'eduShell.setup.retry' : 'eduShell.setup.createClass')}
-        </button>
+        </PressSurface>
         {props.onCreateOnly ? (
           <button
             type="button"

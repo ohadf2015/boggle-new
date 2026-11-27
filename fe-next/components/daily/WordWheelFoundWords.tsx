@@ -14,6 +14,8 @@ interface WordWheelFoundWordsProps {
   reducedMotion?: boolean;
   /** An "already found" resubmit: that word pulses where it sits. */
   pulse?: { word: string; id: number } | null;
+  /** Hide the empty "0" count (the game HUD already shows progress). */
+  quietEmpty?: boolean;
 }
 
 type Pulse = WordWheelFoundWordsProps['pulse'];
@@ -49,7 +51,7 @@ function AllWords({ words, lastFound, columns, reducedMotion = false, large = fa
 }
 
 export default function WordWheelFoundWords({
-  t, words, lastFound, variant = 'strip', reducedMotion = false, pulse = null,
+  t, words, lastFound, variant = 'strip', reducedMotion = false, pulse = null, quietEmpty = false,
 }: WordWheelFoundWordsProps) {
   const [open, setOpen] = useState(false);
   const newestFirst = [...words].reverse();
@@ -90,6 +92,20 @@ export default function WordWheelFoundWords({
     );
   }
 
+  if (words.length === 0) {
+    return (
+      <div data-testid="found-words-slot" className="relative w-full h-11 shrink-0 z-20 flex items-center justify-end px-3">
+        {!quietEmpty && (<span
+          data-testid="found-count"
+          aria-label={t('wordWheel.strip.label', { count: 0 })}
+          className="min-w-6 h-6 px-1.5 grid place-items-center rounded-full border-2 border-neo-white/20 text-neo-white/50 text-xs font-black tabular-nums"
+        >
+          0
+        </span>)}
+      </div>
+    );
+  }
+
   return (
     <div data-testid="found-words-slot" className="relative w-full h-11 shrink-0 z-20">
       <button
@@ -100,10 +116,7 @@ export default function WordWheelFoundWords({
         className="w-full h-11 flex items-center gap-2 px-3 rounded-neo border-2 border-neo-white/15 bg-neo-black/35 text-start touch-manipulation"
       >
         <div className="flex-1 min-w-0 overflow-hidden flex items-center gap-3 whitespace-nowrap [mask-image:linear-gradient(to_right,#000_80%,transparent)] rtl:[mask-image:linear-gradient(to_left,#000_80%,transparent)]">
-          {words.length === 0 ? (
-            <span className="text-neo-white/45 text-sm font-semibold">{t('wordWheel.strip.empty')}</span>
-          ) : (
-            newestFirst.map(w => (
+          {newestFirst.map(w => (
               <m.span
                 key={pulseKey(w, pulse)}
                 data-testid="found-word"
@@ -119,8 +132,7 @@ export default function WordWheelFoundWords({
               >
                 {w}
               </m.span>
-            ))
-          )}
+            ))}
         </div>
         <m.span
           key={words.length}
@@ -136,11 +148,7 @@ export default function WordWheelFoundWords({
       </button>
       {open && (
         <div className="absolute top-full inset-x-0 mt-2 max-h-[46svh] overflow-y-auto p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard-lg">
-          {words.length === 0 ? (
-            <p className="text-neo-white/55 text-sm font-semibold">{t('wordWheel.strip.empty')}</p>
-          ) : (
-            <AllWords words={words} lastFound={lastFound} columns="grid-cols-2" reducedMotion={reducedMotion} pulse={pulse} />
-          )}
+          <AllWords words={words} lastFound={lastFound} columns="grid-cols-2" reducedMotion={reducedMotion} pulse={pulse} />
         </div>
       )}
     </div>

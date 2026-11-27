@@ -8,7 +8,8 @@ import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip'
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 import { ACCENT, EducationSectionRenderer } from '@/components/education/EducationLandingSections';
 import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
-import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
+import { PressSurface } from '@/components/motion/PressSurface';
+import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 import { EducationLandingReveal } from '@/components/education/EducationLandingReveal';
 import { GeoFaqList } from '@/components/seo/GeoFaqList';
 import {
@@ -66,7 +67,8 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
   ) : null;
 
   return (
-    <main className="relative min-h-dvh overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
+    <main className="relative isolate min-h-dvh overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
+      <AmbientBackdrop theme="student" className="max-lg:hidden bottom-auto h-dvh" />
       {jsonLd.map((node) => (
         <JsonLd key={node['@id']} data={node} />
       ))}
@@ -74,11 +76,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <TopBackLink className="mb-6" />
 
-        {heroBanner && (
-          <EducationHeroBanner title={heroBanner.title} subtitle={heroBanner.subtitle} />
-        )}
-
-        <header className={heroBanner ? 'mt-12 max-w-4xl' : 'max-w-4xl'}>
+        <header className="max-w-4xl">
           {hero.tag && (
             <span className="mb-5 inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-purple px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-white shadow-hard">
               {hero.tag}
@@ -101,17 +99,14 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
             {hero.subtitle}
           </p>
 
-          {/* The no-account path, once, above the fold. Placed in the template rather
-              than in each page so the six teacher-moment landings that share it all
-              get the same entry point — the hero CTAs below route to pages that ask
-              for an account first. */}
-          <NoAccountCta locale={locale} className="mt-8" copy={content.noAccountCopy} />
-
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4">
-            <Link
-              href={`/${locale}${hero.primaryCta.href}`}
-              className={`rounded-neo border-4 border-neo-black ${a.fill} ${a.ink} px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider shadow-hard-lg transition-transform duration-150 ease-out hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white`}
+            <PressSurface
+              asChild
+              lip={6}
+              data-hero-primary
+              className={`rounded-neo border-4 border-neo-black ${a.fill} ${a.ink} px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white`}
             >
+            <Link href={`/${locale}${hero.primaryCta.href}`}>
               <span className="block text-base sm:text-lg">{hero.primaryCta.label}</span>
               {hero.primaryCta.sublabel && (
                 <span className="block text-xs font-bold uppercase tracking-widest opacity-70">
@@ -119,12 +114,15 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
                 </span>
               )}
             </Link>
+            </PressSurface>
 
             {hero.secondaryCta && (
-              <Link
-                href={`/${locale}${hero.secondaryCta.href}`}
-                className="rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white"
+              <PressSurface
+                asChild
+                lip={2}
+                className="rounded-neo border-3 border-neo-cream/40 bg-transparent px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-neo-cream/30 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white"
               >
+              <Link href={`/${locale}${hero.secondaryCta.href}`}>
                 <span className="block text-base sm:text-lg">{hero.secondaryCta.label}</span>
                 {hero.secondaryCta.sublabel && (
                   <span className="block text-xs font-bold uppercase tracking-widest opacity-70">
@@ -132,6 +130,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
                   </span>
                 )}
               </Link>
+              </PressSurface>
             )}
           </div>
 
@@ -142,7 +141,19 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
               ))}
             </ul>
           )}
+
+          {/* Once per landing, after the teacher actions: the hero CTAs ask for an account, this path does not. */}
+          <NoAccountCta locale={locale} className="mt-10" copy={content.noAccountCopy} />
         </header>
+
+        {/* Older landings carried a second headline + lede in an image banner above the H1.
+            Where that lede is its own copy it stays, as plain text under the hero. */}
+        {heroBanner?.subtitle && heroBanner.subtitle !== hero.subtitle && (
+          <section className="mt-14 max-w-3xl">
+            <h2 className="font-neo-display text-2xl font-black uppercase leading-tight sm:text-3xl">{heroBanner.title}</h2>
+            <p className="mt-3 text-base leading-relaxed text-neo-white/80 sm:text-lg">{heroBanner.subtitle}</p>
+          </section>
+        )}
 
         {/*
           Answer-first block. Self-contained enough that an AI answer engine can

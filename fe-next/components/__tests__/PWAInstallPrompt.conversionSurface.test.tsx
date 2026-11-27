@@ -34,6 +34,7 @@ vi.mock('@/utils/platform', () => ({ isNative: () => false }));
 // Past the "show after 2nd game" threshold, so the only thing standing between the
 // beforeinstallprompt event and a visible overlay is the conversion-surface guard.
 vi.mock('@/utils/gamesCompletedCount', () => ({ readGamesCompletedCount: () => 5 }));
+vi.mock('next/navigation', () => ({ usePathname: () => '/en' }));
 
 /** Fire the real event the component listens for, then let its state settle. */
 async function firePromptable() {
@@ -48,6 +49,9 @@ async function firePromptable() {
 describe('PWAInstallPrompt on a conversion surface', () => {
   beforeEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
+    // A game finished earlier this session (count 4 -> 5), so only the guard under test can hide it.
+    sessionStorage.setItem('games_completed_at_session_start', '4');
     document.body.classList.remove('conversion-surface');
     navState.isInGame = false;
     // Desktop Chrome UA: the Android and iOS branches both bail before the listener.

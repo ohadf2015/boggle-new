@@ -23,7 +23,6 @@ vi.mock('@/components/GridComponent', async () => {
   return { default: Grid };
 });
 vi.mock('@/components/RoomChat', () => ({ default: () => null }));
-vi.mock('@/components/game/KeyboardHintTooltip', () => ({ default: () => <div data-testid="keyboard-speed-tip" /> }));
 const { leadSounds } = vi.hoisted(() => ({ leadSounds: { milestone: vi.fn(), brk: vi.fn() } }));
 vi.mock('@/hooks/useLeadChangeDetection', () => ({
   useLeadChangeDetection: () => ({ type: 'took-lead', id: 1 }),
@@ -122,12 +121,12 @@ describe('InGameScreen mpChrome — play surface only', () => {
     expect(leadSounds.brk).not.toHaveBeenCalled();
   });
 
-  it('no SPEED TIP popover over the board (the round keeps its one-line keyboard hint)', () => {
+  it('no keyboard popover over the board in any round: the one-line keyboard hint is the only one', () => {
     const { unmount } = render(<InGameScreen {...props({ mpChrome: false })} />);
-    expect(screen.getByTestId('keyboard-speed-tip')).toBeInTheDocument();
+    expect(screen.queryByTestId('type-word-hint')).toBeNull();
     unmount();
     render(<InGameScreen {...props()} />);
-    expect(screen.queryByTestId('keyboard-speed-tip')).toBeNull();
+    expect(screen.queryByTestId('type-word-hint')).toBeNull();
   });
 
   it('a special word never pops a card over the board (the round\'s banner lane announces it)', () => {

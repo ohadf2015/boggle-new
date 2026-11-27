@@ -41,7 +41,7 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
 vi.mock('framer-motion', async (orig) => ({ ...(await orig<typeof import('framer-motion')>()), useReducedMotion: () => h.reduced }));
 vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: false, toggle: () => {}, label: 'Mute', title: 'Mute' }) }));
 vi.mock('@/contexts/NavigationContext', () => ({ useRegisterHeaderAudioControl: () => {} }));
-vi.mock('@/components/ui/AnimatedCounter', () => ({ __esModule: true, default: ({ value }: { value: number }) => <span>{value}</span> }));
+vi.mock('@/components/ui/AnimatedCounter', () => { const C = ({ value }: { value: number }) => <span>{value}</span>; return { __esModule: true, default: C, AnimatedCounter: C }; });
 vi.mock('next/dynamic', () => ({ __esModule: true, default: () => () => null }));
 vi.mock('@/components/auth/InlineSignupCard', () => ({
   __esModule: true,

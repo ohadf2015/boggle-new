@@ -125,6 +125,11 @@ describe('handleLocaleRedirect — root always rewrites (never 301)', () => {
     expect(res._status).toBeUndefined();
     expect((res as { _headers: Record<string, string> })._headers['vary']).toMatch(/Accept-Language/i);
     expect((res as { _headers: Record<string, string> })._headers['vary']).toMatch(/Cookie/i);
+
+    // Next's renderer then overwrites Vary with its RSC list — the pin must hold.
+    res.setHeader('Vary', 'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding');
+    expect((res as { _headers: Record<string, string> })._headers['vary']).toMatch(/Accept-Language/i);
+    expect((res as { _headers: Record<string, string> })._headers['vary']).toMatch(/Cookie/i);
   });
 
   it('serves x-default /en to SEO crawlers (sitemap canonical)', () => {

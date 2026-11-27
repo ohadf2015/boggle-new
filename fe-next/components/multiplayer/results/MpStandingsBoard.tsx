@@ -15,6 +15,7 @@ export interface MpStandingsBoardProps {
   /** Is the row at visual position `pos` (1 = top) revealed yet? */
   isRevealed: (pos: number) => boolean;
   onShowAll?: () => void;
+  layout?: 'fit' | 'list';
   t: TFn;
   className?: string;
 }
@@ -29,7 +30,7 @@ const CHIP = 'rounded-full bg-neo-navy-light border-2 border-neo-cream/40 px-3 p
  * rows are the series ladder: the crown is the champion's and each row carries
  * its round points (`roundScore`) under the name.
  */
-function MpStandingsBoardImpl({ rows, hiddenCount, gapBeforeLast = false, isRevealed, onShowAll, t, className }: MpStandingsBoardProps) {
+function MpStandingsBoardImpl({ rows, hiddenCount, gapBeforeLast = false, isRevealed, onShowAll, layout = 'fit', t, className }: MpStandingsBoardProps) {
   return (
     <ol data-testid="mp-standings" className={cn('flex flex-col justify-center min-h-0 gap-[calc(6px*var(--mp-u,1))]', className)}>
       {rows.map((r, i) => (
@@ -43,7 +44,7 @@ function MpStandingsBoardImpl({ rows, hiddenCount, gapBeforeLast = false, isReve
               ···
             </li>
           )}
-          <MpStandingRowItem row={r} shown={isRevealed(i + 1)} layout="fit" t={t} />
+          <MpStandingRowItem row={r} shown={isRevealed(i + 1)} layout={layout} t={t} />
         </Fragment>
       ))}
       {hiddenCount > 0 && (onShowAll ? (
