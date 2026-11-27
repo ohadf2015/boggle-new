@@ -84,7 +84,7 @@ export function TrialFirstSessionChecklist({
                 data-status={step.status}
                 className={cn(
                   'flex min-w-0 flex-col justify-between gap-3 rounded-neo border-2 px-3 py-2.5',
-                  isCurrent ? 'border-neo-lime bg-neo-lime/10' : 'border-edu-line',
+                  isCurrent ? 'border-neo-black bg-edu-tile shadow-edu-lip-sm' : 'border-edu-line',
                 )}
               >
                 <div className="flex items-center gap-3">

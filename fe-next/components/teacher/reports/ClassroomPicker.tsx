@@ -14,10 +14,10 @@ interface PickerClass {
 
 // Full class strings so Tailwind can see them; order matches the home class list.
 const ACCENTS = [
-  { tile: 'bg-neo-purple text-black', glow: 'hover:shadow-hard-purple' },
-  { tile: 'bg-neo-cyan text-black', glow: 'hover:shadow-hard-cyan' },
-  { tile: 'bg-neo-pink text-black', glow: 'hover:shadow-hard-pink' },
-  { tile: 'bg-neo-lime text-black', glow: 'hover:shadow-hard-lime' },
+  { tile: 'bg-neo-purple text-black' },
+  { tile: 'bg-neo-cyan text-black' },
+  { tile: 'bg-neo-pink text-black' },
+  { tile: 'bg-neo-yellow text-black' },
 ] as const;
 
 export const accentFor = (i: number) => ACCENTS[i % ACCENTS.length];
@@ -27,7 +27,7 @@ const SPRING = { type: 'spring', stiffness: 380, damping: 26 } as const;
 function StudentCount({ count }: { count: number }) {
   const { t } = useLanguage();
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-edu-line bg-neo-black/30 px-2.5 py-0.5 text-sm font-bold text-edu-ink tabular-nums">
+    <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-edu-line bg-edu-tile px-2.5 py-0.5 text-sm font-bold text-edu-ink tabular-nums">
       <Users aria-hidden="true" className="size-4" />
       <span className="sr-only">{t('teacher.reports.metrics.totalStudents')}: </span>
       {count}
@@ -66,16 +66,16 @@ export function ClassroomPicker({
               whileHover={reduce ? undefined : { y: -4, rotate: i % 2 ? 0.6 : -0.6 }}
               whileTap={reduce ? undefined : { y: 2, scale: 0.98 }}
               transition={SPRING}
-              className={`group relative flex min-h-28 w-full items-center gap-4 rounded-neo-lg border-2 ${shown ? 'border-neo-lime' : 'border-edu-line'} bg-edu-surface/95 p-4 text-start shadow-hard transition-shadow duration-150 ${accent.glow} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan`}
+              className={`group relative flex min-h-32 w-full items-center gap-4 rounded-neo-xl border-[3px] border-edu-line bg-edu-surface p-4 text-start shadow-edu-lip sm:gap-5 sm:p-5 ${shown ? 'ring-4 ring-neo-lime ring-offset-2 ring-offset-edu-page' : ''} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan`}
             >
               <span
                 aria-hidden="true"
-                className={`grid size-16 shrink-0 place-items-center rounded-neo border-2 border-black font-neo-display text-2xl font-black shadow-hard-sm ${accent.tile}`}
+                className={`grid size-20 shrink-0 place-items-center rounded-neo-lg border-[3px] border-neo-black font-neo-display text-3xl font-black ${accent.tile}`}
               >
                 <bdi>{classBadge(c.name)}</bdi>
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block break-words font-neo-display text-xl font-bold leading-tight text-edu-ink">
+                <span className="block break-words font-neo-display text-xl font-black leading-tight text-edu-ink sm:text-2xl">
                   <bdi>{c.name}</bdi>
                 </span>
                 {shown ? (
@@ -89,7 +89,7 @@ export function ClassroomPicker({
                   </span>
                 )}
               </span>
-              <span className="grid size-11 shrink-0 place-items-center rounded-neo border-2 border-edu-line text-edu-ink transition-transform duration-200 group-hover:translate-x-1 rtl:group-hover:-translate-x-1">
+              <span className="grid size-11 shrink-0 place-items-center rounded-neo border-[3px] border-edu-line bg-edu-surface text-edu-ink transition-transform duration-200 group-hover:translate-x-1 rtl:group-hover:-translate-x-1">
                 <DirectionalIcon icon={ChevronRight} className="size-6" />
               </span>
             </m.button>

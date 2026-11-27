@@ -142,7 +142,7 @@ export function ProgressDigestDashboard({
                 {digest.topMissedWords.map((word) => (
                   <li
                     key={word}
-                    className="rounded-neo border-2 border-neo-pink bg-neo-pink/15 px-3 py-1 font-neo-display text-sm font-bold text-edu-ink"
+                    className="rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-1 font-neo-display text-sm font-bold text-edu-ink"
                   >
                     {word}
                   </li>

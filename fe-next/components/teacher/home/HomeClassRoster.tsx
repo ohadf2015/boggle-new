@@ -137,7 +137,7 @@ export function HomeClassRoster({ rows, failed, language, nowMs, t, className, o
                     key={r.id}
                     className={cn(
                       'group/row flex items-center gap-2 border-s-4 px-3 transition-colors duration-150 motion-reduce:transition-none sm:px-4',
-                      selected ? 'border-neo-cyan bg-neo-cyan/15' : 'border-transparent hover:bg-neo-cyan/[0.07]',
+                      selected ? 'border-neo-black bg-neo-cyan/25' : 'border-transparent hover:bg-neo-cyan/[0.07]',
                     )}
                   >
                     <button

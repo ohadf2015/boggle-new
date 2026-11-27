@@ -112,7 +112,7 @@ export function ReportsPreview({ v }: { v?: string }) {
     return (
       <ReportsShell>
         <div className="mx-auto w-full max-w-5xl">
-          <h1 className="mb-4 font-neo-display text-2xl font-bold text-edu-ink sm:text-3xl">{t('teacher.reports.title')}</h1>
+          <h1 className="mb-5 font-neo-display text-4xl font-black leading-none text-edu-ink [overflow-wrap:anywhere] sm:text-6xl">{t('teacher.reports.title')}</h1>
           <ClassroomPicker classrooms={classes} onSelect={noop} />
         </div>
       </ReportsShell>
@@ -128,7 +128,7 @@ export function ReportsPreview({ v }: { v?: string }) {
         lockedTitle={
           <div className="mx-auto mb-4 flex w-full max-w-5xl flex-col gap-4 sm:mb-6">
             <div>
-              <h1 className="font-neo-display text-2xl font-bold leading-tight text-edu-ink sm:text-3xl">{t('teacher.reports.title')}</h1>
+              <h1 className="font-neo-display text-4xl font-black leading-none text-edu-ink [overflow-wrap:anywhere] sm:text-6xl">{t('teacher.reports.title')}</h1>
               <p className="mt-1 max-w-prose text-sm leading-snug text-edu-ink sm:text-base">{t('teacher.reports.lockedValue')}</p>
             </div>
             <ReportsFreeInsightsView free={classes[0]} others={classes.slice(1)}>

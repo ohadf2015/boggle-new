@@ -127,7 +127,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
   if (error) {
     return (
       <Shell embedded={embedded} title={t('teacher.reports.arc.title')} subtitle={t('teacher.reports.arc.subtitle')}>
-        <p role="alert" className="rounded-neo border-2 border-neo-pink bg-neo-pink/15 px-3 py-2 text-sm font-bold text-edu-ink">
+        <p role="alert" className="rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-2 text-sm font-bold text-edu-ink">
           {t('teacher.reports.error')}
         </p>
       </Shell>
@@ -154,7 +154,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
               <li
                 key={w.word}
                 data-testid="class-arc-stuck-chip"
-                className="inline-flex items-baseline gap-2 rounded-neo border-2 border-neo-pink bg-neo-pink/15 px-3 py-1.5"
+                className="inline-flex items-baseline gap-2 rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-1.5"
               >
                 <span className="font-bold text-edu-ink" dir="auto">{w.display}</span>
                 <span className="text-xs font-bold text-edu-ink/70 tabular-nums">
@@ -169,7 +169,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
           {status === 'done' ? (
             <p
               data-testid="class-arc-assigned"
-              className="inline-flex items-center gap-2 rounded-neo border-2 border-neo-lime bg-neo-lime/15 px-3 py-2 text-sm font-black text-edu-ink"
+              className="inline-flex items-center gap-2 rounded-neo border-2 border-neo-black bg-neo-lime px-3 py-2 text-sm font-black text-edu-ink"
             >
               <Check className="size-4 shrink-0 text-edu-lime-ink" aria-hidden="true" />
               {t('teacher.reports.arc.followUpDone')}
@@ -248,9 +248,9 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
 /** Colour + count + word: the pill never relies on colour alone. */
 function TrendPill({ tone, count, label }: { tone: 'lime' | 'cyan' | 'pink'; count: number; label: string }) {
   const tones = {
-    lime: 'border-neo-lime bg-neo-lime/15 text-edu-lime-ink',
-    cyan: 'border-neo-cyan bg-neo-cyan/15 text-edu-cyan-ink',
-    pink: 'border-neo-pink bg-neo-pink/15 text-edu-pink-ink',
+    lime: 'border-neo-black bg-neo-lime text-neo-black',
+    cyan: 'border-neo-black bg-neo-cyan text-neo-black',
+    pink: 'border-neo-black bg-neo-pink text-neo-black',
   } as const;
   return (
     <span title={label} className={cn('inline-flex items-center gap-1 rounded-neo border-2 px-1.5 py-0.5', tones[tone])}>
@@ -269,7 +269,7 @@ function Shell({ embedded, title, subtitle, children }: { embedded: boolean; tit
     >
       <h2 className={embedded ? 'sr-only' : 'flex items-center gap-2 font-neo-display text-xl font-bold text-edu-ink'}>
         {!embedded && (
-          <span className="grid size-8 shrink-0 place-items-center rounded-neo border-2 border-neo-cyan bg-neo-cyan/15">
+          <span className="grid size-8 shrink-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-cyan">
             <BookMarked className="size-4 text-edu-cyan-ink" aria-hidden="true" />
           </span>
         )}

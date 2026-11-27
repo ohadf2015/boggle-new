@@ -5,10 +5,10 @@ import { BookMarked, ChevronDown, ClipboardCheck, FileText, History, type Lucide
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const ACCENTS = {
-  cyan: 'border-neo-cyan bg-neo-cyan/15 text-edu-cyan-ink',
-  lime: 'border-neo-lime bg-neo-lime/15 text-edu-lime-ink',
-  pink: 'border-neo-pink bg-neo-pink/15 text-edu-pink-ink',
-  purple: 'border-neo-purple bg-neo-purple/15 text-edu-purple-ink',
+  cyan: 'border-neo-black bg-neo-cyan text-neo-black',
+  lime: 'border-neo-black bg-neo-lime text-neo-black',
+  pink: 'border-neo-black bg-neo-pink text-neo-black',
+  purple: 'border-neo-black bg-neo-purple text-neo-black',
 } as const;
 
 interface ReportDisclosureProps {

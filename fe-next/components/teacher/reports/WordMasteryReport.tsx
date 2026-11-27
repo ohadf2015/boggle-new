@@ -61,7 +61,7 @@ export function WordMasteryReport({ classroomId, classroomName, onStudentClick }
   if (state.status === 'error') {
     return (
       <Shell>
-        <p role="alert" className="rounded-neo border-2 border-neo-pink bg-neo-pink/15 px-3 py-2 text-sm font-bold text-edu-ink">
+        <p role="alert" className="rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-2 text-sm font-bold text-edu-ink">
           {t('eduPro.mastery.error')}
         </p>
       </Shell>

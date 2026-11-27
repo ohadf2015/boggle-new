@@ -33,9 +33,9 @@ export interface StudentArcViewProps {
 const TREND_ORDER: Record<WordTrend, number> = { stuck: 0, improving: 1, insufficient: 2, mastered: 3 };
 
 const TREND_CHIP: Record<WordTrend, string> = {
-  mastered: 'border-neo-lime bg-neo-lime/15 text-edu-lime-ink',
-  improving: 'border-neo-cyan bg-neo-cyan/15 text-edu-cyan-ink',
-  stuck: 'border-neo-pink bg-neo-pink/15 text-edu-pink-ink',
+  mastered: 'border-neo-black bg-neo-lime text-neo-black',
+  improving: 'border-neo-black bg-neo-cyan text-neo-black',
+  stuck: 'border-neo-black bg-neo-pink text-neo-black',
   insufficient: 'border-edu-line bg-edu-ink/10 text-edu-ink/70',
 };
 
@@ -74,7 +74,7 @@ export function StudentArcView({ studentId, classroomId, studentName }: StudentA
   if (error) {
     return (
       <section className={PANEL}>
-        <p role="alert" className="rounded-neo border-2 border-neo-pink bg-neo-pink/15 px-3 py-2 text-sm font-bold text-edu-ink">
+        <p role="alert" className="rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-2 text-sm font-bold text-edu-ink">
           {t('teacher.reports.error')}
         </p>
       </section>
@@ -122,7 +122,7 @@ export function StudentArcView({ studentId, classroomId, studentName }: StudentA
       {arc.mastery.stuckWords.length > 0 && (
         <p
           data-testid="student-arc-requeue"
-          className="mb-4 rounded-neo border-2 border-neo-cyan bg-neo-cyan/10 px-3 py-2 text-xs font-bold text-edu-ink/90"
+          className="mb-4 rounded-neo border-2 border-neo-black bg-neo-cyan px-3 py-2 text-xs font-bold text-edu-ink/90"
         >
           {t('teacher.reports.arc.requeueStudent', { name: studentName ?? '' })}
         </p>

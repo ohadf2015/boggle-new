@@ -18,7 +18,7 @@ export default function ShareToDiscoverSwitch({ checked, onChange, issues = [], 
     <div
       className={cn(
         'flex items-start gap-3 rounded-neo border-2 p-3 transition-colors',
-        checked ? 'border-neo-lime bg-neo-lime/10' : 'border-edu-line bg-neo-black/20',
+        checked ? 'border-neo-black bg-neo-lime' : 'border-edu-line bg-neo-black/20',
       )}
     >
       <Globe2 className={cn('mt-0.5 size-5 shrink-0', checked ? 'text-edu-lime-ink' : 'text-edu-ink/60')} aria-hidden="true" />

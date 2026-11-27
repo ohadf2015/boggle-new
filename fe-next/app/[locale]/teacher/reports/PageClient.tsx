@@ -201,7 +201,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   if (!selectedClassroomId) {
     view = (
       <>
-        <h1 data-wipe className="mb-2 font-neo-display text-3xl font-bold leading-tight text-edu-ink sm:text-4xl">
+        <h1 data-wipe className="mb-3 font-neo-display text-4xl font-black leading-none text-edu-ink [overflow-wrap:anywhere] sm:text-6xl">
           {t('teacher.reports.title')}
         </h1>
         <p data-testid="reports-value-line" dir="auto" className="mb-5 max-w-prose text-base leading-snug text-edu-ink/85 max-sm:hidden">

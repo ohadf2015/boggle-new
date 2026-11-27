@@ -58,7 +58,7 @@ export function ReportsLockedTitle({ onWeekStatus }: { onWeekStatus?: (status: F
   return (
     <div className={FRAME}>
       <div>
-        <h1 className="font-neo-display text-2xl font-bold leading-tight text-edu-ink sm:text-3xl">{t('teacher.reports.title')}</h1>
+        <h1 className="font-neo-display text-4xl font-black leading-none text-edu-ink [overflow-wrap:anywhere] sm:text-6xl">{t('teacher.reports.title')}</h1>
         <p data-testid="reports-locked-value" className="mt-1 max-w-prose text-sm leading-snug text-edu-ink sm:text-base">
           {t('teacher.reports.lockedValue')}
         </p>
