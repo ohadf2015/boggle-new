@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { avatarPngSrc } from '@/components/AvatarLite';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { HolidayKey } from '@/lib/holidays/calendar';
@@ -9,7 +10,7 @@ import { holidayShareCard, shareHolidayCard } from './holidayShareCard';
 
 export default function HolidayShareButton({ holiday, day }: { holiday: HolidayKey; day: number }) {
   const { t, language } = useLanguage();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [busy, setBusy] = useState(false);
   const hanukkah = holiday === 'hanukkah';
   const total = hanukkah ? 8 : 12;
@@ -32,7 +33,7 @@ export default function HolidayShareButton({ holiday, day }: { holiday: HolidayK
         total,
         headline,
         footer,
-        avatarUrl: user ? `/api/avatar/png/${user.id}/v/${Date.now()}` : null,
+        avatarUrl: avatarPngSrc(user?.id, profile?.avatar_config, undefined, profile?.updated_at),
       });
       if (!blob) return;
       const result = await shareHolidayCard(blob, headline, `${window.location.origin}/${language}/daily`);
