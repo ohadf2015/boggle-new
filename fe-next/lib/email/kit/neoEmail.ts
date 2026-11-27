@@ -43,6 +43,8 @@ export interface NeoEmail {
   preheader: string;
   accent: NeoAccent;
   art?: NeoArt;
+  /** Site-relative path to an opaque hero picture shown in place of `art`, framed as a sticker. */
+  artPath?: string;
   /** Sticker label above the headline, e.g. "For teachers". */
   kicker: string;
   headline: string;
@@ -116,9 +118,13 @@ export function renderNeoEmail(e: NeoEmail): string {
   const align = e.dir === 'rtl' ? 'right' : 'left';
   const accent = NEO_ACCENTS[e.accent];
   const base = e.assetBase ?? EMAIL_SITE;
-  const art = e.art
-    ? `<td class="neo-art" width="190" align="center" valign="bottom" style="padding:16px 12px 0 12px;"><img src="${base}/email/art/${e.art}.png" width="170" alt="" style="display:block;width:170px;max-width:100%;height:auto;border:0;"></td>`
-    : '';
+  const artCell = (src: string, frame: string, pad: string) =>
+    `<td class="neo-art${frame ? ' neo-art-framed' : ''}" width="190" align="center" valign="${frame ? 'middle' : 'bottom'}" style="padding:${pad};"><img src="${src}" width="170" alt="" style="display:block;width:170px;max-width:100%;height:auto;${frame || 'border:0;'}"></td>`;
+  const art = e.artPath
+    ? artCell(`${base}${e.artPath}`, `border:3px solid ${NEO_COLORS.black};border-radius:12px;margin:0 auto;`, '18px 14px')
+    : e.art
+      ? artCell(`${base}/email/art/${e.art}.png`, '', '16px 12px 0 12px')
+      : '';
   const secondary = e.secondary
     ? `<p style="margin:16px 0 0 0;font-family:${BODY};font-size:15px;"><a href="${escapeHtml(e.secondary.href)}" style="color:${NEO_COLORS.ink};font-weight:700;text-decoration:underline;">${escapeHtml(e.secondary.label)}</a></p>`
     : '';
@@ -135,7 +141,7 @@ export function renderNeoEmail(e: NeoEmail): string {
   const html = `<!doctype html>
 <html dir="${e.dir}" lang="${e.lang}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light only">
-<style>@media (max-width:520px){.neo-art{display:block!important;width:100%!important;padding:16px 0 0 0!important}.neo-hero{display:block!important;width:100%!important;text-align:center!important}.neo-pad{padding-left:20px!important;padding-right:20px!important}.neo-h1{font-size:28px!important}.neo-btn{display:block!important}}</style></head>
+<style>@media (max-width:520px){.neo-art{display:block!important;width:100%!important;padding:16px 0 0 0!important}.neo-hero{display:block!important;width:100%!important;text-align:center!important}.neo-pad{padding-left:20px!important;padding-right:20px!important}.neo-h1{font-size:28px!important}.neo-btn{width:100%!important}.neo-art-framed{padding:18px 0!important}}</style></head>
 <body style="margin:0;padding:0;background:${NEO_COLORS.page};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(e.preheader)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${NEO_COLORS.page};">

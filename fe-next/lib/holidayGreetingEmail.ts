@@ -1,37 +1,14 @@
 import { Resend } from 'resend';
-import { render } from '@react-email/components';
-import HolidayGreetingEmail, { getHolidayGreetingSubject, holidayCtaUrl } from '@/emails/holidayGreeting';
-import { asHolidayEmailLanguage, type HolidayEmailLanguage } from '@/emails/holidayGreeting.strings';
+import { getHolidayGreetingSubject, holidayCtaUrl, holidayGreeting } from '@/lib/email/templates/holidayGreeting';
+import { asHolidayEmailLanguage, type HolidayEmailLanguage } from '@/lib/email/templates/holidayGreeting.copy';
 import type { HolidayKey } from '@/lib/holidays/calendar';
 import { defaultHoliday, resolveRegion } from '@/lib/holidays/region';
 import { COUNTRY_TO_LANGUAGE } from '@/lib/reengagementEmail';
 import { withTimeout, isEmailServiceConfigured } from '@/lib/email';
 
-export { holidayCtaUrl };
+export { holidayCtaUrl, getHolidayGreetingSubject };
 
 export const HOLIDAY_KEYS_FOR_EMAIL: readonly HolidayKey[] = ['hanukkah', 'christmas'];
-
-const NAME_SENTINEL = '__LEXI_RECIPIENT_NAME__';
-const UNSUB_SENTINEL = 'https://__lexi_unsubscribe_sentinel__/';
-
-const htmlEntities: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-const htmlEscape = (s: string) => s.replace(/[&<>"']/g, (c) => htmlEntities[c]);
-
-const renderCache = new Map<string, Promise<string>>();
-
-function cachedTemplate(holiday: HolidayKey, language: HolidayEmailLanguage): Promise<string> {
-  const key = `${holiday}:${language}`;
-  const existing = renderCache.get(key);
-  if (existing) return existing;
-  const p = render(
-    HolidayGreetingEmail({ holiday, language, recipientName: NAME_SENTINEL, unsubscribeUrl: UNSUB_SENTINEL })
-  ).catch((err) => {
-    renderCache.delete(key);
-    throw err;
-  });
-  renderCache.set(key, p);
-  return p;
-}
 
 export async function generateHolidayGreetingHtml(params: {
   holiday: HolidayKey;
@@ -39,14 +16,7 @@ export async function generateHolidayGreetingHtml(params: {
   recipientName: string;
   unsubscribeUrl: string;
 }): Promise<{ subject: string; html: string }> {
-  const language = asHolidayEmailLanguage(params.language);
-  const template = await cachedTemplate(params.holiday, language);
-  const html = template
-    .split(NAME_SENTINEL)
-    .join(htmlEscape(params.recipientName))
-    .split(UNSUB_SENTINEL)
-    .join(params.unsubscribeUrl);
-  return { subject: getHolidayGreetingSubject(language, params.holiday, params.recipientName), html };
+  return holidayGreeting(params);
 }
 
 const EXTRA_COUNTRY_LANGUAGES: Record<string, HolidayEmailLanguage> = { RU: 'ru', BY: 'ru', KZ: 'ru' };

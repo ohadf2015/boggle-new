@@ -88,5 +88,12 @@ describe('renderNeoEmail', () => {
     expect(en).not.toContain('Hiragino');
     expect(en).toContain('text-transform:uppercase');
   });
+
+  it('given an artPath, it shows that image from the asset base instead of the stock art', () => {
+    const html = renderNeoEmail({ ...base, art: undefined, artPath: '/holidays/email-hanukkah.png', assetBase: 'http://localhost:3000' });
+    expect(html).toContain('src="http://localhost:3000/holidays/email-hanukkah.png"');
+    expect(html).not.toContain('/email/art/');
+    expect(html).toContain('class="neo-art neo-art-framed"');
+  });
 });
 

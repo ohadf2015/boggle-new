@@ -1,23 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const h = vi.hoisted(() => ({ send: vi.fn(), renders: 0 }));
+const h = vi.hoisted(() => ({ send: vi.fn() }));
 
 vi.mock('resend', () => ({
   Resend: class {
     emails = { send: h.send };
   },
 }));
-
-vi.mock('@react-email/components', async (importOriginal) => {
-  const mod = await importOriginal<typeof import('@react-email/components')>();
-  return {
-    ...mod,
-    render: (...args: Parameters<typeof mod.render>) => {
-      h.renders++;
-      return mod.render(...args);
-    },
-  };
-});
 
 vi.mock('@/backend/utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 
@@ -29,7 +18,7 @@ import {
   holidayEmailLanguage,
   planHolidayGreeting,
 } from '../holidayGreetingEmail';
-import { HOLIDAY_EMAIL_LANGUAGES } from '@/emails/holidayGreeting.strings';
+import { HOLIDAY_EMAIL_LANGUAGES } from '@/lib/email/templates/holidayGreeting.copy';
 
 const UNSUB = 'https://www.lexiclash.live/api/email/unsubscribe?token=abc';
 const HOLIDAYS = ['hanukkah', 'christmas'] as const;
@@ -61,13 +50,6 @@ describe('holiday greeting email', () => {
       });
     }
   }
-
-  it('given the same holiday and language twice, it renders the template once', async () => {
-    const before = h.renders;
-    await generateHolidayGreetingHtml({ holiday: 'christmas', language: 'sv', recipientName: 'A', unsubscribeUrl: UNSUB });
-    await generateHolidayGreetingHtml({ holiday: 'christmas', language: 'sv', recipientName: 'B', unsubscribeUrl: UNSUB });
-    expect(h.renders - before).toBe(0);
-  });
 
   it('escapes the recipient name', async () => {
     const { html } = await generateHolidayGreetingHtml({

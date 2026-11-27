@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateHolidayGreetingHtml, HOLIDAY_KEYS_FOR_EMAIL } from '@/lib/holidayGreetingEmail';
-import { asHolidayEmailLanguage } from '@/emails/holidayGreeting.strings';
+import { asHolidayEmailLanguage } from '@/lib/email/templates/holidayGreeting.copy';
 import type { HolidayKey } from '@/lib/holidays/calendar';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 
