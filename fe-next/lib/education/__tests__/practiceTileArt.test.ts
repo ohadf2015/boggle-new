@@ -5,9 +5,9 @@ import { practiceTileArt } from '../practiceTileArt';
 
 describe('practiceTileArt posters', () => {
   it.each([
-    ['blitz', 'bg-neo-pink'],
-    ['flashcard', 'bg-neo-cyan'],
-    ['spelling', 'bg-neo-yellow'],
+    ['blitz', '#ff1493'],
+    ['flashcard', '#00ffff'],
+    ['spelling', '#ffe135'],
   ])(
     'gives %s its accent-background poster that exists on disk',
     (id, field) => {

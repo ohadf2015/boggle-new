@@ -24,11 +24,14 @@
  * bug rather than a mascot.
  */
 
-/** Modes with bespoke poster art, with the flat field colour each poster is painted on. */
+/**
+ * Modes with bespoke poster art. `field` is the colour baked into the image, not a theme token:
+ * the cosy theme remaps the neo accents, and a remapped frame would show a seam around the poster.
+ */
 const POSTER_ART: Record<string, { src: string; field: string }> = {
-  blitz: { src: '/mascot/teacher/practice-blitz-sky.webp', field: 'bg-neo-pink' },
-  flashcard: { src: '/mascot/teacher/practice-flashcard-sky.webp', field: 'bg-neo-cyan' },
-  spelling: { src: '/mascot/teacher/practice-spelling-sky.webp', field: 'bg-neo-yellow' },
+  blitz: { src: '/mascot/teacher/practice-blitz-sky.webp', field: '#ff1493' },
+  flashcard: { src: '/mascot/teacher/practice-flashcard-sky.webp', field: '#00ffff' },
+  spelling: { src: '/mascot/teacher/practice-spelling-sky.webp', field: '#ffe135' },
 };
 
 /** Transparent mascot per tile for everything without a poster. */
@@ -70,7 +73,7 @@ export type PracticeArtKind = 'poster' | 'chip';
 export interface PracticeTileArt {
   src: string;
   kind: PracticeArtKind;
-  /** Poster only: the frame fill, matching the poster's own field so it letterboxes seamlessly. */
+  /** Poster only: the poster's own field colour, so the frame letterboxes it without a seam. */
   field?: string;
 }
 

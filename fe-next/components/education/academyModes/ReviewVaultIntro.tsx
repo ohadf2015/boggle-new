@@ -175,7 +175,6 @@ export function ReviewVaultIntro({
           type="button"
           data-testid={loading ? 'review-start-pending' : 'review-start'}
           disabled={loading}
-          whileTap={{ scale: 0.95 }}
           onClick={onStart}
           className={cn(
             INTRO_CTA,

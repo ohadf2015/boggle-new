@@ -68,7 +68,7 @@ describe('PracticePickerTile contrast', () => {
     const art = screen.getByTestId('practice-tile-art-blitz');
     const frame = art.closest('[data-poster-frame]')!;
     expect(art.className).toContain('object-contain');
-    expect(frame.className).toContain('bg-neo-pink');
+    expect(frame).toHaveStyle({ backgroundColor: '#ff1493' });
     expect(frame.className).toContain('flex-1');
     expect(frame.className).not.toContain('absolute');
   });

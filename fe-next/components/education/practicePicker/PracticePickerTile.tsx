@@ -82,7 +82,8 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
       {art.kind === 'poster' ? (
         <span
           data-poster-frame=""
-          className={cn('relative block min-h-0 flex-1 overflow-hidden', art.field, !tile.ready && 'grayscale')}
+          className={cn('relative block min-h-0 flex-1 overflow-hidden', !tile.ready && 'grayscale')}
+          style={{ backgroundColor: art.field }}
         >
           <Image
             data-testid={`practice-tile-art-${tile.id}`}

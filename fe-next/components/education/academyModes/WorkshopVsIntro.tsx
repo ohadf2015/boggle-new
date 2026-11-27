@@ -212,7 +212,6 @@ export function WorkshopVsIntro({
           data-testid={loading ? 'workshop-play-pending' : 'workshop-play'}
           disabled={starting || loading}
           onClick={onPlay}
-          whileTap={{ scale: 0.95 }}
           className={cn(
             INTRO_CTA,
             'text-3xl [@media(orientation:landscape)_and_(max-height:520px)]:text-2xl! lg:text-[clamp(1.75rem,min(3.4vw,5.5vh),4.5rem)]',

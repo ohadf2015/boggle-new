@@ -11,13 +11,14 @@ import { WorkshopVsIntro } from '../WorkshopVsIntro';
 import { ReviewVaultIntro } from '../ReviewVaultIntro';
 import ReviewCardView from '../ReviewCardView';
 import { LessonWordTile } from '../WorkshopPanels';
+import { WorkshopBoardSkin } from '../WorkshopSkin';
 import type { ReviewCard } from '@/lib/education/missedWordsReview';
 
 const noop = () => {};
 
 function expectFlatLime(el: HTMLElement) {
   expect(el.getAttribute('style') ?? '').not.toMatch(/gradient/);
-  expect(el).toHaveClass('bg-neo-lime', 'shadow-edu-lip');
+  expect(el).toHaveClass('bg-neo-lime', 'shadow-edu-lip', 'active:translate-y-[3px]');
 }
 
 describe('academy intro buttons are flat classroom buttons', () => {
@@ -51,5 +52,12 @@ describe('academy intro buttons are flat classroom buttons', () => {
     for (const chip of screen.getAllByTestId('workshop-lesson-word')) {
       expect(chip.getAttribute('style') ?? '').not.toMatch(/gradient|rgba/);
     }
+  });
+
+  it('workshop board letter tiles, claims, gold cells and the score rope are flat fills', () => {
+    const { container } = render(<WorkshopBoardSkin reduce />);
+    const rules = (container.querySelector('style')?.textContent ?? '').split('}').filter((r) => /data-tile-state="(placed|pending)"|data-claim="|data-wk-gold|wc-bar-fill|cell-invite/.test(r));
+    expect(rules.length).toBeGreaterThan(4);
+    for (const rule of rules) expect(rule).not.toMatch(/gradient/);
   });
 });
