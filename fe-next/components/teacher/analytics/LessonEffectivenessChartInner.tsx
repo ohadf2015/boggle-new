@@ -9,14 +9,15 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp } from 'lucide-react';
 
-// Neo-brutalist chart colors
-const CHART_COLORS = {
-  avgXpGain: '#00FFFF', // neo-cyan
-  completionRate: '#FF1493', // neo-pink
-  grid: '#333333',
-  text: '#FFFFFF',
-  tooltip: '#1a1a2e',
-  tooltipBorder: '#00FFFF',
+export const CHART_COLORS = {
+  avgXpGain: '#00FFFF',
+  completionRate: '#FF1493',
+  avgXpGainInk: 'var(--edu-cyan-ink)',
+  completionRateInk: 'var(--edu-pink-ink)',
+  grid: 'var(--edu-line)',
+  text: 'var(--edu-ink)',
+  tooltip: 'var(--edu-surface)',
+  tooltipBorder: 'var(--edu-line)',
 };
 
 // Custom tooltip component (must be outside render)
@@ -33,7 +34,7 @@ const CustomTooltip = ({ active, payload, t }: CustomTooltipProps) => {
 
   return (
     <div
-      className="bg-edu-surface border-neo border-neo-cyan shadow-hard p-3 rounded-neo"
+      className="border-neo shadow-hard p-3 rounded-neo"
       style={{ backgroundColor: CHART_COLORS.tooltip, borderColor: CHART_COLORS.tooltipBorder }}
     >
       <p className="text-edu-ink font-neo-body font-bold mb-2">{data.lessonName}</p>
@@ -114,7 +115,7 @@ export function LessonEffectivenessChart({ classroomId }: LessonEffectivenessCha
             data={effectiveness}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+            <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} strokeOpacity={0.2} />
             <XAxis
               dataKey="lessonName"
               stroke={CHART_COLORS.text}
@@ -122,25 +123,25 @@ export function LessonEffectivenessChart({ classroomId }: LessonEffectivenessCha
             />
             <YAxis
               yAxisId="left"
-              stroke={CHART_COLORS.avgXpGain}
+              stroke={CHART_COLORS.avgXpGainInk}
               style={{ fontSize: '12px', fontFamily: 'Rubik' }}
               label={{
                 value: t('education.analytics.avgXpGain'),
                 angle: -90,
                 position: 'insideLeft',
-                style: { fill: CHART_COLORS.avgXpGain, fontFamily: 'Rubik', fontSize: '14px' },
+                style: { fill: CHART_COLORS.avgXpGainInk, fontFamily: 'Rubik', fontSize: '14px' },
               }}
             />
             <YAxis
               yAxisId="right"
               orientation="right"
-              stroke={CHART_COLORS.completionRate}
+              stroke={CHART_COLORS.completionRateInk}
               style={{ fontSize: '12px', fontFamily: 'Rubik' }}
               label={{
                 value: t('education.analytics.completionRate'),
                 angle: 90,
                 position: 'insideRight',
-                style: { fill: CHART_COLORS.completionRate, fontFamily: 'Rubik', fontSize: '14px' },
+                style: { fill: CHART_COLORS.completionRateInk, fontFamily: 'Rubik', fontSize: '14px' },
               }}
             />
             <Tooltip content={<CustomTooltip t={t} />} />
