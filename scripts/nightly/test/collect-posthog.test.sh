@@ -66,6 +66,23 @@ assert "all severities in [0,1]"              '[ "$(jq "[.signals[] | select(.se
 assert "all magnitudes numeric"               '[ "$(jq "[.signals[] | select(.magnitude|type!=\"number\")] | length" "$OUT")" = "0" ]'
 assert "fingerprints all set"                 '[ "$(jq "[.signals[] | select(.fingerprint==\"\")] | length" "$OUT")" = "0" ]'
 
+echo "collect-posthog: ErrorTrackingQuery excludes growthradar.app cross-tenant noise"
+rm -f "$OUT" "$BIN/curl.args"
+cat > "$BIN/curl" <<'STUB2'
+#!/bin/bash
+echo "$*" >> "$(dirname "$0")/curl.args"
+if echo "$*" | grep -q 'ErrorTrackingQuery'; then
+  echo '{"columns":["id","name","description","status","aggregations"],"results":[]}'
+else
+  echo '{"columns":[],"results":[]}'
+fi
+STUB2
+chmod +x "$BIN/curl"
+PATH="$BIN:$PATH" POSTHOG_PERSONAL_API_KEY=k POSTHOG_PROJECT_ID=1 POSTHOG_HOST=https://x \
+  INTEL_ROOT="$INTEL_ROOT" INTEL_DIR="$INTEL_DIR" bash "$COL" >/dev/null
+assert "ErrorTrackingQuery request excludes growthradar.app via \$current_url filter" \
+  'grep -q "growthradar.app" "$BIN/curl.args"'
+
 echo "collect-posthog: degrade when token unset"
 rm -f "$OUT"
 ( unset POSTHOG_PERSONAL_API_KEY POSTHOG_PROJECT_ID

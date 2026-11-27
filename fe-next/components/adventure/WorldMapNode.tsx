@@ -10,6 +10,7 @@ import type { MasteryTier } from '@/types/adventure';
 import { MasteryBadge } from './MasteryBadge';
 import { LEVELS_PER_WORLD, getWorldGlow, type WorldConfig } from '@/lib/adventure';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { WorldOrbitingLetters } from './WorldMapDecorations';
 import WorldRouteStrip from './play/variants/WorldRouteStrip';
 import { rampOf } from './play/variants/trailLayout';
@@ -166,7 +167,13 @@ export const WorldNode = memo(function WorldNode({
           )}
 
           <AdaptiveMotion.button
-            onClick={isUnlocked ? onClick : () => setShowStarGate(true)}
+            onClick={isUnlocked ? onClick : () => {
+              setShowStarGate(true);
+              // Locked orb dispatches no onClick to the parent — same
+              // dead-click gap practice_tile_locked_tapped closed. Rage
+              // clicks on /adventure had no event to attribute them to.
+              trackGrowthEvent('adventure_locked_world_tapped', { worldId: world.id });
+            }}
             data-testid={`world-${world.id}`}
             aria-current={isNextWorld ? 'step' : undefined}
             aria-label={isUnlocked

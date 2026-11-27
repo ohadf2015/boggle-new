@@ -39,14 +39,14 @@ describe('word solver results region (layout shift)', () => {
 
     // Then the region already exists with its reserved height
     expect(region()).not.toBeNull();
-    expect(region()!.className).toContain('min-h-[50vh]');
+    expect(region()!.className).toContain('h-[50dvh]');
   });
 
   it('keeps the reserved space when the search finds nothing', async () => {
     render(<WordSolverPageClient />);
     search('qx');
     await act(async () => { api.resolve!({ words: [], total: 0, capped: false }); });
-    expect(region()!.className).toContain('min-h-[50vh]');
+    expect(region()!.className).toContain('h-[50dvh]');
   });
 
   it('shows errors inside the reserved region instead of above it', async () => {
@@ -54,6 +54,18 @@ describe('word solver results region (layout shift)', () => {
     search('stare');
     await act(async () => { api.reject!(new Error('boom')); });
     expect(region()!.textContent).toContain('boom');
-    expect(region()!.className).toContain('min-h-[50vh]');
+    expect(region()!.className).toContain('h-[50dvh]');
+  });
+
+  it('caps the region at a fixed height with internal scroll, so a large result list never shifts the page below it', async () => {
+    render(<WordSolverPageClient />);
+    search('aeiou');
+    const manyWords = Array.from({ length: 500 }, (_, i) => `word${i}`);
+    await act(async () => { api.resolve!({ words: manyWords, total: 500, capped: true }); });
+    // Fixed height (not min-height): the box never grows past its reserved size,
+    // no matter how many results land -- overflow scrolls inside it instead.
+    expect(region()!.className).toContain('h-[50dvh]');
+    expect(region()!.className).not.toContain('min-h-[50vh]');
+    expect(region()!.className).toContain('overflow-y-auto');
   });
 });

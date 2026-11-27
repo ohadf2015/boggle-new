@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
 import { Delete, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -6,6 +6,8 @@ import { useBackspaceKey } from '@/hooks/useBackspaceKey';
 import { HoldHintBubble } from '@/components/game/HoldHintBubble';
 import { ACTION_BAR, ACTION_ROUND, ACTION_ROUND_CLASSROOM, actionPrimary } from '@/components/game/hud/actionBar';
 import { useClassroomBoard } from '@/components/education/live/classroomBoard';
+import { useExperiment } from '@/hooks/useExperiment';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -20,6 +22,20 @@ interface WheelActionBarProps {
   submitIcon?: React.ReactNode;
 }
 
+// exp-wordwheel-short-word-feedback-v1: 'shake' keeps Submit tappable on a too-short word so the tap answers instead of dead-clicking.
+function useShortWordFeedback(hasLetters: boolean, canSubmit: boolean) {
+  const { variant, trackExposure } = useExperiment('exp-wordwheel-short-word-feedback-v1');
+  useEffect(() => { trackExposure(); }, [trackExposure]);
+  const [shake, setShake] = useState(false);
+  const active = variant === 'shake' && hasLetters && !canSubmit;
+  const onShortAttempt = () => {
+    trackGrowthEvent('wordwheel_short_word_tap', { variant });
+    setShake(true);
+    setTimeout(() => setShake(false), 350);
+  };
+  return { active, shake, onShortAttempt };
+}
+
 /** Clear, submit and backspace under the wheel. */
 const WheelActionBar: React.FC<WheelActionBarProps> = ({
   t, hasLetters, canSubmit, isValidating, onClear, onSubmit, onBackspace, submitIcon,
@@ -29,6 +45,7 @@ const WheelActionBar: React.FC<WheelActionBarProps> = ({
   const reducedMotion = useReducedMotion();
   const classroom = useClassroomBoard();
   const round = classroom ? ACTION_ROUND_CLASSROOM : ACTION_ROUND;
+  const shortWord = useShortWordFeedback(hasLetters, canSubmit);
   return (
   <div
     data-testid="word-wheel-action-bar"
@@ -43,12 +60,12 @@ const WheelActionBar: React.FC<WheelActionBarProps> = ({
 
     <m.button
       type="button"
-      onClick={onSubmit}
-      disabled={isValidating || !canSubmit}
+      onClick={canSubmit ? onSubmit : shortWord.onShortAttempt}
+      disabled={isValidating || !(canSubmit || shortWord.active)}
       data-ready={String(ready)}
       className={cn(actionPrimary(ready, { classroom }), 'inline-flex items-center justify-center gap-2')}
-      animate={isValidating ? { opacity: [1, 0.6, 1] } : ready && !reducedMotion ? { scale: [1, 1.12, 1] } : { scale: 1 }}
-      transition={isValidating ? { duration: 0.6, repeat: Infinity } : { duration: 0.24, ease: 'easeOut' }}
+      animate={shortWord.shake ? { x: [0, -6, 6, -4, 4, 0] } : isValidating ? { opacity: [1, 0.6, 1] } : ready && !reducedMotion ? { scale: [1, 1.12, 1] } : { scale: 1 }}
+      transition={shortWord.shake ? { duration: 0.35 } : isValidating ? { duration: 0.6, repeat: Infinity } : { duration: 0.24, ease: 'easeOut' }}
     >
       {submitIcon}
       {t('wordWheel.submit')}

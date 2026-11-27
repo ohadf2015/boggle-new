@@ -36,7 +36,7 @@ exports[`CrosswordVersus classroom skin > arcade over: the main game keeps its e
   "font-neo-body text-[10px] tabular-nums text-neo-cream/60",
   "mt-1 h-1.5 w-full overflow-hidden rounded-full bg-black/40",
   "h-full rounded-full bg-neo-cyan transition-[width]",
-  "pointer-events-none absolute inset-x-0 top-14 z-20 flex justify-center",
+  "pointer-events-none absolute inset-x-0 top-14 z-20 flex flex-col items-center gap-1",
   "rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-2 font-neo-display font-bold text-black shadow-hard",
 ]
 `;

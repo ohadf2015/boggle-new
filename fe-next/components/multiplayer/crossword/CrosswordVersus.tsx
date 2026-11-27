@@ -121,6 +121,7 @@ function CrosswordRace({
   const railHidden = pressure ? isLeaderboardHidden(pressure) : false;
   const clockHidden = pressure ? isStudentTimerHidden(pressure) : false;
   const myRank = standings.find((s) => s.username === username);
+  const amIWinner = standings[0]?.username === username;
   useCrosswordHardwareKeys(game, puzzle.rtl, !solved);
 
   // Report progress on each newly-solved word + on final solve (word-granularity,
@@ -214,14 +215,21 @@ function CrosswordRace({
         )}
       </div>
 
-      {/* Race-over / you-solved banner (non-blocking — grid stays visible) */}
+      {/* Race-over / you-solved banner (non-blocking — grid stays visible).
+          A non-winner used to see only the winner's name (same as last place) —
+          add their own final rank so a close 2nd doesn't read as a plain loss. */}
       {(raceOver || solved) && (
-        <div className="pointer-events-none absolute inset-x-0 top-14 z-20 flex justify-center">
+        <div className="pointer-events-none absolute inset-x-0 top-14 z-20 flex flex-col items-center gap-1">
           <div className="rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-2 font-neo-display font-bold text-black shadow-hard" role="status">
             {raceOver
-              ? (standings[0]?.username === username ? t('crossword.mp.youWin') : t('crossword.mp.winner', { winner: standings[0]?.username ?? '' }))
+              ? (amIWinner ? t('crossword.mp.youWin') : t('crossword.mp.winner', { winner: standings[0]?.username ?? '' }))
               : t('crossword.mp.youFinished')}
           </div>
+          {raceOver && !amIWinner && myRank && (
+            <div data-testid="crossword-final-rank" dir="ltr" className="rounded-neo border-2 border-black bg-neo-navy-light px-3 py-1 font-neo-body text-xs font-bold text-neo-white shadow-hard">
+              {t('crossword.mp.yourRank', 'You placed')} #{myRank.rank}{t('crossword.mp.statSeparator', '/')}{standings.length}
+            </div>
+          )}
         </div>
       )}
     </div>

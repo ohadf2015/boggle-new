@@ -78,6 +78,10 @@ export type GrowthEvent =
   | 'game_abandoned'
   | 'game_abandon_attempted'
   | 'mode_selected'
+  // A locked practice tile is a native `disabled` button — a tap on it
+  // dispatches nothing, which rage-click detection flags with no event to
+  // attribute it to (same gap quickstart_play_clicked closed for /multiplayer).
+  | 'practice_tile_locked_tapped'
   | 'wordcraft_card_pick_shown'
   | 'wordcraft_card_picked'
   // FTUE quick-start screen (props/multiplayer entry). Rageclicks were showing
@@ -94,6 +98,10 @@ export type GrowthEvent =
   //   candidate for "11 of 20 daily players placed one word and left".
   | 'wordtower_scramble_used'
   | 'wordtower_wall_reached'
+  // A locked Adventure world orb dispatches no onClick to the parent (same
+  // dead-click gap practice_tile_locked_tapped closed) — rage clicks on
+  // /adventure had no event to attribute them to.
+  | 'adventure_locked_world_tapped'
   // Blast board load gate (t_67330c55): the MP "Generating grid..." spinner had
   // no telemetry, so 20 rage-click sessions/14d were invisible. wait fires once
   // per mount when the spinner clears, stuck once if still waiting at 15s.
@@ -215,9 +223,14 @@ export type GrowthEvent =
   | 'avatar_part_changed'
   | 'avatar_saved'
   | 'avatar_unlock_revealed'
+  // Avatar randomize dice tap — homepage's top rage-click signal (reach 14,
+  // 2026-11-22) is all on this button with no event to attribute it to.
+  | 'avatar_randomize_clicked'
   | 'hint_used'
   | 'wordwheel_drag_hint_shown'
   | 'wordwheel_drag_hint_dismissed'
+  // exp-wordwheel-short-word-feedback-v1: Submit tapped while the built word is <3 letters.
+  | 'wordwheel_short_word_tap'
   // Conversion
   | 'signup_prompt_shown'
   | 'signup_prompt_clicked'

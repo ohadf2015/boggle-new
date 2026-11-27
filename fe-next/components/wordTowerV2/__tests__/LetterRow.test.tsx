@@ -91,7 +91,14 @@ describe('LetterRow', () => {
     const p = row({ selected: [0, 1, 2], placing: true });
     fireEvent.click(screen.getByLabelText('wordTower.crane.drop'));
     expect(p.onDrop).toHaveBeenCalledTimes(1);
-    expect((screen.getByLabelText('wordTower.a11y.tile:ק') as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByLabelText('wordTower.a11y.tile:ק').getAttribute('aria-disabled')).toBe('true');
+  });
+
+  it('given a floor on the hook, when a tray tile is tapped, then nothing is selected (blocked, not silently ignored by the DOM)', () => {
+    const p = row({ selected: [0, 1, 2], placing: true });
+    fireEvent.click(screen.getByLabelText('wordTower.a11y.tile:ק'));
+    expect(p.onSelectTile).not.toHaveBeenCalled();
+    expect(p.onDeselectTile).not.toHaveBeenCalled();
   });
 });
 

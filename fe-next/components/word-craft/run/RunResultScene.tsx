@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { PowerCard } from '@/lib/word-craft/run/powerCards';
+import { RARITY_CHIP } from './PowerCardView';
 
 interface RunResultSceneProps {
   cleared: boolean;
@@ -50,7 +51,8 @@ export function RunResultScene({ cleared, runTotal, activeCards, onRestart }: Ru
             {activeCards.map((c) => (
               <span
                 key={c.id}
-                className="rounded-neo border-neo bg-neo-navy-light px-2 py-0.5 text-xs font-neo-body text-neo-cyan"
+                data-testid={`run-result-card-${c.id}`}
+                className={`rounded-neo border-neo border-black px-2 py-0.5 text-xs font-neo-display font-bold ${RARITY_CHIP[c.rarity]}`}
               >
                 {t(`wordcraft.run.card.${c.id}.name`)}
               </span>

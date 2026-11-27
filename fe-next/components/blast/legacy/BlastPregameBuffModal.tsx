@@ -57,7 +57,7 @@ export function BlastPregameBuffModal({ isOpen, onPick, onSkip, t }: BlastPregam
               {t('blast.pregameBuff.title')}
             </h2>
             <p className="font-neo-body text-sm text-neo-white">
-              {t('blast.pregameBuff.body')}
+              {t(canShowAd ? 'blast.pregameBuff.body' : 'blast.pregameBuff.bodyNoAd')}
             </p>
 
             <div className="grid w-full grid-cols-3 gap-3 pt-2">

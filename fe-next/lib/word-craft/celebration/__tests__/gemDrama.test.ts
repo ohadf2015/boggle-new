@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { planGemDrama, clampGemDramaForCosy } from '../gemDrama';
+import { planGemDrama, clampGemDramaForCosy, dramaForTransmuteResult } from '../gemDrama';
 
 describe('planGemDrama', () => {
   it('chip rarity → minimal plan (no freeze, no fullscreen burst)', () => {
@@ -40,5 +40,20 @@ describe('clampGemDramaForCosy', () => {
     expect(clampGemDramaForCosy(shard)).toEqual(shard);
     const chip = planGemDrama({ rarity: 1 });
     expect(clampGemDramaForCosy(chip)).toEqual(chip);
+  });
+});
+
+describe('dramaForTransmuteResult', () => {
+  it('chip→shard transmute (rarity 1) reads as the shard tier', () => {
+    const plan = dramaForTransmuteResult(1);
+    expect(plan.tier).toBe('shard');
+    expect(plan.sharedFxPreset).toBe('sparkle');
+  });
+
+  it('shard→crown transmute (rarity 2) reads as the crown tier — same big moment as a board pickup', () => {
+    const plan = dramaForTransmuteResult(2);
+    expect(plan.tier).toBe('crown');
+    expect(plan.freezeFrameMs).toBeGreaterThanOrEqual(200);
+    expect(plan.sharedFxPreset).toBe('celebration');
   });
 });

@@ -58,9 +58,9 @@ describe('projector results paint above the projector lobby', () => {
     expect(topZ(screen)).toBeGreaterThan(PROJECTOR_LOBBY_Z);
   });
 
-  it('paints its own opaque navy ground, so the lobby cannot show through', () => {
+  it('paints its own opaque page ground, so the lobby cannot show through', () => {
     const screen = read('components/education/live/EduHostResults.tsx');
-    expect(screen).toContain('bg-neo-navy');
+    expect(screen).toContain('bg-edu-page');
     // Class 5: the cream/dark pair flashes cream on a lazy mount. A dark-only
     // game surface hardcodes navy.
     expect(screen).not.toContain('bg-neo-cream');

@@ -1,0 +1,3 @@
+status: shipped
+files_touched: docs/nightly/ideas/2026-11-24.md, docs/nightly/ideas/2026-11-24-reddit.md, docs/nightly/reports/2026-11-24.md (appended Lane 4 section)
+next_steps: Reddit helper down again (jq parse failed, stale 2026-06-01 snapshot, OAuth unset) - founder one-time fix via pull-reddit-snapshot.sh or OAuth setup, not lane work. Sealed-bid mode confirmed removed end-to-end 2026-10-08 (6aa2b1954) but still listed in founder admin-beta rotation and was re-pitched 2026-11-23 - lane 5 and the standing admin-beta target list should drop it. Two fresh polish ideas surfaced for wheel-rush (combo/heat indicator) and brain-drill (cross-session streak+freeze), both grounded against live code, neither a dupe of pending ledger entries.

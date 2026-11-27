@@ -5115,6 +5115,7 @@ const ru = {
         "subtitle": "Это имя увидит весь класс на доске.",
         "placeholder": "Введите имя",
         "submit": "Войти в игру",
+        "submitting": "Входим…",
         "roomLabel": "Комната {{code}}"
       },
       "classroomLessonLabel": "{{classroom}} · игра идёт: {{lesson}}",
@@ -8239,6 +8240,7 @@ const ru = {
       "youWin": "Победа в гонке за тобой!",
       "wins": "выигрывает гонку!",
       "winner": "{winner} выигрывает гонку!",
+      "yourRank": "Твоё место",
       "statSeparator": "/",
       "statPercent": "{percent}%"
     },
@@ -16007,7 +16009,11 @@ const ru = {
       "homeCta": "Смотреть эту неделю"
     },
     "proPowered": {"hint": "Входит в ваш тариф Teacher Pro"},
-    "trialUsage": {"lead": "За пробный период:", "games_one": "{count} игра с классом", "games_few": "{count} игры с классом", "games_many": "{count} игр с классом", "games_other": "{count} игры с классом", "students_one": "{count} ученик под наблюдением", "students_few": "{count} ученика под наблюдением", "students_many": "{count} учеников под наблюдением", "students_other": "{count} ученика под наблюдением", "practice_one": "{count} тренировка", "practice_few": "{count} тренировки", "practice_many": "{count} тренировок", "practice_other": "{count} тренировки"}
+    "trialUsage": {"lead": "За пробный период:", "games_one": "{count} игра с классом", "games_few": "{count} игры с классом", "games_many": "{count} игр с классом", "games_other": "{count} игры с классом", "students_one": "{count} ученик под наблюдением", "students_few": "{count} ученика под наблюдением", "students_many": "{count} учеников под наблюдением", "students_other": "{count} ученика под наблюдением", "practice_one": "{count} тренировка", "practice_few": "{count} тренировки", "practice_many": "{count} тренировок", "practice_other": "{count} тренировки"},
+    "schoolBulkCta": {
+      "text": "Используете это во всей школе?",
+      "link": "Узнать цены для школ"
+    }
   },
   "ugc": {
     "createBoard": "Создать доску",
@@ -17551,7 +17557,6 @@ const ru = {
     "minLetters": "Мин {min} букв",
     "scoreLabel": "Очки",
     "timeLeft": "Осталось времени",
-    "closeRace": "Гонка почти равна!",
     "gameOver": "Время вышло!",
     "submit": "ОТПРАВИТЬ",
     "alreadyFoundBonus": "Найдено снова (+{points})",
@@ -17560,6 +17565,8 @@ const ru = {
     "missingLetter": "Не хватает: {letter}",
     "streakBadge": "{count} подряд!",
     "onFireBadge": "{count} подряд, в ударе!",
+    "chipLockedLabel": "{word}, засчитано, {score} очков",
+    "chipClosedLabel": "{word}, занято соперником",
     "closeRace": "Плотная гонка",
     "inputPlaceholder": "Введи слово…",
     "firstHint": "Жми или веди — в каждом слове есть {letter}",
@@ -18484,6 +18491,7 @@ const ru = {
         "titleLost": "Плитки закончились",
         "subtitleWon": "Ты собрал все самоцветы для короны. Охота завершена.",
         "subtitleLost": "Мешок опустел раньше, чем ты закончил. Попробуй ещё раз.",
+        "subtitleLostClose": "Так близко — одна корона не хватило!",
         "restart": "Новая охота",
         "crownsCaption": "Собрано корон: {{n}}/4"
       },
@@ -19792,18 +19800,21 @@ const ru = {
     "continueModal": {
       "title": "Не останавливайся!",
       "body": "У тебя кончились ходы. Посмотри короткую рекламу, чтобы продолжить забег.",
+      "bodyNoAd": "У тебя кончились ходы. Реклама сейчас недоступна — можно завершить забег здесь.",
       "cta": "Посмотреть рекламу за +{moves} ходов",
       "decline": "Завершить забег"
     },
     "retryWaveModal": {
       "title": "Волна {wave}: так близко!",
       "body": "Ты очистил {percent}%. Посмотри рекламу, чтобы повторить волну {wave}. Прошлые волны сохранятся.",
+      "bodyNoAd": "Ты очистил {percent}%. Реклама сейчас недоступна — можно начать с волны 1.",
       "cta": "Смотреть рекламу · повторить волну {wave}",
       "decline": "Начать с волны 1"
     },
     "pregameBuff": {
       "title": "Зарядиться?",
       "body": "Выбери буст, посмотри короткую рекламу и начни этот забег с преимуществом.",
+      "bodyNoAd": "Сейчас бусты недоступны — можно пропустить и сразу начать забег.",
       "shield": "Щит",
       "bomb": "Бомба",
       "combo2x": "2x комбо",
@@ -19997,7 +20008,9 @@ const ru = {
       "sweating": "Нервный талисман ждёт конца обратного отсчёта",
       "celebrating": "Праздничный талисман с трофеем",
       "sadSmile": "Талисман с утешающей улыбкой",
-      "neutral": "Весёлый талисман, готовый к следующей волне"
+      "neutral": "Весёлый талисман, готовый к следующей волне",
+      "mute": "Выключить реакции талисмана",
+      "unmute": "Включить реакции талисмана"
     },
     "archetypes": {
       "normal": "Стандартная волна",

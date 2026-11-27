@@ -44,6 +44,10 @@ export function trackAvatarSaved(before: CustomAvatarConfig, after: CustomAvatar
   trackGrowthEvent('avatar_saved', { changedCount: countChangedFields(before, after), rarityMax: getConfigRarity(after) });
 }
 
+export function trackAvatarRandomizeClicked(variant: string): void {
+  trackGrowthEvent('avatar_randomize_clicked', { variant });
+}
+
 export function trackAvatarUnlockRevealed(unlocks: readonly LevelUnlock[], level: number): void {
   if (unlocks.length === 0) return;
   trackGrowthEvent('avatar_unlock_revealed', {

@@ -119,6 +119,23 @@ describe('POST /api/subscription/cancel-reason', () => {
     expect(recordTeacherTrialFunnelStep).not.toHaveBeenCalled();
   });
 
+  it('skips the event for the known analytics-rig user prefixes but still stores the answer', async () => {
+    for (const id of ['14f10c13-aaaa-4bbb-8ccc-ddddeeeeffff', '1f0715b5-aaaa-4bbb-8ccc-ddddeeeeffff']) {
+      vi.clearAllMocks();
+      isNativeAppUserAgent.mockReturnValue(false);
+      checkTeacherSubscription.mockResolvedValue(cancelledTrial);
+      updateSelect.mockResolvedValue({ data: [{ lemon_squeezy_subscription_id: 'sub_1' }], error: null });
+      isQaEmail.mockReturnValue(false);
+      isAnyTestAccount.mockResolvedValue(false);
+      getAuthedUser.mockResolvedValue({ id, email: 'teacher@school.de' });
+      const res = await POST(req({ reason: 'too_expensive' }));
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({ ok: true, recorded: true });
+      expect(captureProFunnelServerEvent).not.toHaveBeenCalled();
+      expect(recordTeacherTrialFunnelStep).not.toHaveBeenCalled();
+    }
+  });
+
   it('refuses a signed-out request', async () => {
     getAuthedUser.mockResolvedValue(null);
     expect((await POST(req({ reason: 'too_expensive' }))).status).toBe(401);

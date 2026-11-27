@@ -12,6 +12,7 @@
  * Zero client dependencies. Do not import posthog-js here.
  */
 
+import { ANALYTICS_TEST_USER_PREFIXES } from '@/lib/education/analyticsExclusions';
 import { teacherAssignHref } from '@/hooks/useTeacherDashboardDeepLink';
 import { teacherHostHref } from './teacherHostHref';
 
@@ -40,7 +41,7 @@ export const TRIAL_FIRST_SESSION_STEP_INDEX: Record<TrialFirstSessionStepId, 1 |
 /** HogQL fragment for reads of teacher_activation_step_completed. */
 export const TEACHER_ACTIVATION_ANALYTICS_EXCLUSIONS = {
   cookielessPrefix: 'cookieless_',
-  testUserPrefixes: ['14f10c13', '1f0715b5'],
+  testUserPrefixes: ANALYTICS_TEST_USER_PREFIXES,
 } as const;
 
 /**

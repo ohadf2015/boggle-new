@@ -642,7 +642,12 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     prepareAd,
     error,
     rewardAmount,
-    canShowAd: !adFreeRoute && !dailyLimitReached && !(isPlaceholder && !isDev),
+    // hasMounted-gated: shouldUseAdMob resolves synchronously in render (no
+    // mount-gate), so isPlaceholder can already be false on the very first
+    // render while dailyLimitReached is still the pre-effect SSR default — a
+    // capped player would see canShowAd flash true then flip false once the
+    // real daily-cap effect resolves.
+    canShowAd: hasMounted && !adFreeRoute && !dailyLimitReached && !(isPlaceholder && !isDev),
     viewsToday: dailyViewCount,
     maxViews: MAX_DAILY_AD_VIEWS,
     isDailyLimitReached: dailyLimitReached,

@@ -5,6 +5,7 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { isNativeAppUserAgent } from '@/lib/native/nativeHandoff';
 import { isQaEmail } from '@/backend/utils/educationRoundTelemetry';
 import { isAnyTestAccount } from '@/lib/education/eduTestAccount';
+import { isAnalyticsTestUserId } from '@/lib/education/analyticsExclusions';
 import {
   buildTrialCancelReasonSelectedEvent,
   captureProFunnelServerEvent,
@@ -27,8 +28,9 @@ import { isCancelReason } from '@/lib/education/teacherCancelRetention';
  * Once per subscription: the write is `cancel_reason IS NULL`-guarded, so the
  * row itself is the dedupe key (a second tap is a no-op, not a duplicate) and
  * `trial_cancel_reason_selected` fires only when the write actually landed.
- * QA accounts (@lexiclash.test / profiles.is_test_account) still store their
- * answer but never emit the event, per the QA-pollution guards.
+ * QA accounts (@lexiclash.test / profiles.is_test_account) and the known
+ * analytics-rig user prefixes still store their answer but never emit the
+ * event, per the QA-pollution guards.
  */
 
 export async function POST(request: NextRequest) {
@@ -74,7 +76,10 @@ export async function POST(request: NextRequest) {
 
   const subscriptionId = (data[0] as { lemon_squeezy_subscription_id?: string | null } | null)
     ?.lemon_squeezy_subscription_id;
-  const isTestAccount = isQaEmail(user.email) || (await isAnyTestAccount(admin, [user.id]));
+  const isTestAccount =
+    isQaEmail(user.email) ||
+    isAnalyticsTestUserId(user.id) ||
+    (await isAnyTestAccount(admin, [user.id]));
   if (!isTestAccount) {
     try {
       captureProFunnelServerEvent(

@@ -58,4 +58,11 @@ describe('RemoveAdsProbe', () => {
     fireEvent.click(screen.getByRole('button', { name: 'settings.removeAds.button' }));
     expect(screen.getByText('settings.removeAds.comingSoon')).toBeInTheDocument();
   });
+
+  it('tags events with a custom surface instead of the settings default', () => {
+    render(<RemoveAdsProbe isDarkMode={false} surface="practice_results" />);
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('iap_viewed', { surface: 'practice_results' });
+    fireEvent.click(screen.getByRole('button', { name: 'settings.removeAds.button' }));
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('iap_tapped', { surface: 'practice_results', intent: 'remove_ads' });
+  });
 });
