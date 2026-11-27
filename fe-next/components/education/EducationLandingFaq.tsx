@@ -34,13 +34,13 @@ export function EducationLandingFaq({ locale, items }: { locale: string; items: 
         <div className="mt-5 divide-y-2 divide-neo-navy/15 overflow-hidden rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard lg:mt-0">
           {items.map((item) => (
             <details key={item.question} className="group">
-              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 text-start text-sm font-bold text-neo-navy group-open:bg-neo-white sm:py-3.5 sm:text-base hover:bg-neo-white/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-neo-navy [&::-webkit-details-marker]:hidden">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 text-start text-sm font-bold text-neo-navy group-open:bg-edu-paper sm:py-3.5 sm:text-base hover:bg-edu-paper/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-neo-navy [&::-webkit-details-marker]:hidden">
                 <span>{item.question}</span>
                 <span aria-hidden className="shrink-0 text-xl font-black transition-transform duration-150 group-open:rotate-45 motion-reduce:transition-none">
                   +
                 </span>
               </summary>
-              <p className="bg-neo-white px-4 pb-4 text-sm leading-relaxed text-neo-navy/80">{item.answer}</p>
+              <p className="bg-edu-paper px-4 pb-4 text-sm leading-relaxed text-neo-navy/80">{item.answer}</p>
             </details>
           ))}
         </div>

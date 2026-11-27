@@ -41,7 +41,7 @@ export function EducationHero({ setupPending = false }: { setupPending?: boolean
   const { t, language } = useLanguage();
 
   return (
-    <section data-testid="education-hero" className="relative isolate overflow-hidden border-b-3 border-edu-line bg-edu-surface">
+    <section data-testid="education-hero" className="relative isolate overflow-hidden border-b-3 border-edu-line bg-edu-page">
       <AmbientBackdrop theme="student" className="max-lg:hidden" />
       <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-start gap-6 px-4 pb-8 pt-5 sm:px-6 sm:pt-8 lg:grid-cols-[minmax(0,30rem)_minmax(0,1fr)] lg:gap-x-12 xl:grid-cols-[minmax(0,34rem)_minmax(0,1fr)] xl:gap-x-14 lg:gap-y-10 lg:px-8 lg:pb-12 lg:pt-12">
         <div className="text-center lg:max-w-[34rem] lg:pt-4 lg:text-start">

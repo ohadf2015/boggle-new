@@ -71,7 +71,7 @@ export function LandingModes() {
               <Image src={mode.poster} alt="" aria-hidden="true" width={32} height={32} className="absolute inset-0 size-full object-contain object-bottom" />
             </span>
             <span className="font-neo-display text-sm font-black text-edu-ink">{t(mode.nameKey)}</span>
-            <DeliveryTag delivery={mode.delivery} t={t} className="bg-edu-ink/15" />
+            <DeliveryTag delivery={mode.delivery} t={t} />
           </li>
         ))}
       </ul>

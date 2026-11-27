@@ -19,7 +19,6 @@ import { LandingHeader } from '@/components/education/landing/LandingHeader';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { MascotRig } from '@/components/motion/MascotRig';
-import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 import { accessHandoffHref, type AccessApproval } from '@/components/education/AccessRequestHandoff';
 
 const TRUST = [
@@ -192,8 +191,8 @@ export function PageClient() {
 
           {/* No `priority`: the h1 is the LCP; the mascot is a fixed box, so it never shifts it. */}
           {showPitch && (
-            <div aria-hidden="true" className="relative isolate flex justify-center overflow-hidden rounded-3xl border-2 border-neo-cyan/70 bg-neo-cyan/10 py-3">
-              <AmbientBackdrop theme="teacher" density="lively" hill={false} />
+            <div aria-hidden="true" dir="ltr" data-testid="access-art" className="relative isolate flex items-center justify-center gap-3 py-3 sm:gap-5">
+              <span className="edu-tile size-14 -rotate-12 bg-neo-pink text-3xl sm:size-16 sm:text-4xl">A</span>
               <MascotRig state="hop">
                 <Image
                   src="/mascot/teacher/teacher-hero.webp"
@@ -205,6 +204,7 @@ export function PageClient() {
                   className="h-[136px] w-[136px] drop-shadow-[0_4px_0_black] sm:h-[176px] sm:w-[176px]"
                 />
               </MascotRig>
+              <span className="edu-tile size-14 rotate-12 bg-neo-cyan text-3xl sm:size-16 sm:text-4xl">B</span>
             </div>
           )}
 

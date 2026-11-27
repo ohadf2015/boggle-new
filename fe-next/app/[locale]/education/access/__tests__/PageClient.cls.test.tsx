@@ -69,4 +69,12 @@ describe('access PageClient — CLS reserve while access is loading', () => {
     expect(src).toMatch(/min-h-\[220px\]/);
     expect(src).not.toMatch(/already_approved/);
   });
+
+  it('Given the sky page, Then the mascot stands between chunky A/B tiles, not in a faded cyan box', () => {
+    render(<PageClient />);
+    const art = screen.getByTestId('access-art');
+    expect(art.className).not.toMatch(/bg-neo-cyan\/\d+|border-neo-cyan\/\d+/);
+    expect(art.querySelectorAll('.edu-tile')).toHaveLength(2);
+    expect(readFileSync(join(__dirname, '..', 'page.tsx'), 'utf8')).not.toMatch(/bg-neo-cyan\/10/);
+  });
 });
