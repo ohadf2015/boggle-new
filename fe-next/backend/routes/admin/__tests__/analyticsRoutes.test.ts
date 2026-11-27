@@ -59,7 +59,7 @@ describe('analyticsRoutes', () => {
 
       const result = await fetchCohortRetention(mockSupabase as never, 8);
 
-      expect(mockRpc).toHaveBeenCalledWith('admin_cohort_retention', { weeks: 8 });
+      expect(mockRpc).toHaveBeenCalledWith('admin_cohort_retention', { weeks: 8, p_tz: 'UTC' });
       expect(result).toHaveLength(2);
       expect(result[0].retention_pct).toBe(100);
       expect(result[1].retention_pct).toBe(40);
@@ -115,7 +115,7 @@ describe('analyticsRoutes', () => {
     it('calls admin_signup_growth with the week window', async () => {
       mockRpc.mockResolvedValue({ data: [{ week: '2026-11-02', signups: 15, total: 905 }], error: null });
       const result = await fetchSignupGrowth(mockSupabase as never, 26);
-      expect(mockRpc).toHaveBeenCalledWith('admin_signup_growth', { weeks: 26 });
+      expect(mockRpc).toHaveBeenCalledWith('admin_signup_growth', { weeks: 26, p_tz: 'UTC' });
       expect(result[0].total).toBe(905);
     });
 

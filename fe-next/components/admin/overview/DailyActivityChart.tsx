@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { withViewerTz } from '@/lib/admin/viewerTimeZone';
 import { cachedAdminJson } from '@/lib/admin/adminJsonCache';
 import {
   ResponsiveContainer,
@@ -44,7 +45,7 @@ export function DailyActivityChart({ authToken }: DailyActivityChartProps) {
     setData(null);
     setError(null);
 
-    cachedAdminJson<{ daily?: DailyPoint[] }>(`/api/admin/activity/daily?days=${days}`, authToken)
+    cachedAdminJson<{ daily?: DailyPoint[] }>(withViewerTz(`/api/admin/activity/daily?days=${days}`), authToken)
       .then((json) => {
         if (cancelled) return;
         setData(json.daily ?? []);

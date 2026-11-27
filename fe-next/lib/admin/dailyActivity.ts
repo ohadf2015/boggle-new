@@ -12,8 +12,8 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { fetchAllRows } from './fetchAllRows';
+import { addLocalDays, localDateOf, zonedMidnightUtc } from './viewerTimeZone';
 
-const DAY_MS = 86_400_000;
 const ANON_USERS_PER_PAGE = 1000;
 const ANON_USERS_MAX_PAGES = 10;
 
@@ -81,17 +81,19 @@ interface BuildInput {
   testIds: Set<string>;
   /** Auth users flagged is_anonymous; excluded from signups only, not from games. */
   anonymousIds?: Set<string>;
+  /** IANA timezone for calendar days; UTC when omitted. */
+  timeZone?: string;
   games: GameRow[];
   guestGames: GuestRow[];
   signups: SignupRow[];
 }
 
-const dayOf = (iso: string) => iso.slice(0, 10);
-
-export function buildDailyActivity({ days, nowMs, testIds, anonymousIds, games, guestGames, signups }: BuildInput): DailyActivityRow[] {
+export function buildDailyActivity({ days, nowMs, testIds, anonymousIds, timeZone = 'UTC', games, guestGames, signups }: BuildInput): DailyActivityRow[] {
+  const dayOf = (iso: string) => localDateOf(Date.parse(iso), timeZone);
   const byDay = new Map<string, { games: number; guestGames: number; players: Set<string>; guests: Set<string>; signups: number }>();
+  const today = localDateOf(nowMs, timeZone);
   for (let i = days - 1; i >= 0; i--) {
-    byDay.set(dayOf(new Date(nowMs - i * DAY_MS).toISOString()), { games: 0, guestGames: 0, players: new Set(), guests: new Set(), signups: 0 });
+    byDay.set(addLocalDays(today, -i), { games: 0, guestGames: 0, players: new Set(), guests: new Set(), signups: 0 });
   }
   for (const g of games) {
     const d = byDay.get(dayOf(g.created_at));
@@ -121,10 +123,9 @@ export function buildDailyActivity({ days, nowMs, testIds, anonymousIds, games, 
   }));
 }
 
-export async function fetchDailyActivity(supabase: SupabaseClient, days: number, nowMs = Date.now()): Promise<DailyActivityRow[]> {
-  const since = new Date(nowMs - (days - 1) * DAY_MS);
-  since.setUTCHours(0, 0, 0, 0);
-  const sinceIso = since.toISOString();
+export async function fetchDailyActivity(supabase: SupabaseClient, days: number, nowMs = Date.now(), timeZone = 'UTC'): Promise<DailyActivityRow[]> {
+  const today = localDateOf(nowMs, timeZone);
+  const sinceIso = new Date(zonedMidnightUtc(addLocalDays(today, -(days - 1)), timeZone)).toISOString();
 
   const [tests, games, guests, signups, anonymousIds] = await Promise.all([
     fetchAllRows<{ id: string }>((from, to) => supabase.from('profiles').select('id').eq('is_test_account', true).order('id').range(from, to)),
@@ -152,6 +153,7 @@ export async function fetchDailyActivity(supabase: SupabaseClient, days: number,
     nowMs,
     testIds: new Set(tests.data.map((r) => r.id)),
     anonymousIds,
+    timeZone,
     games: games.data,
     guestGames: guests.error ? [] : guests.data,
     signups: signups.data,

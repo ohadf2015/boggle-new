@@ -1,3 +1,5 @@
+import { withViewerTz } from './viewerTimeZone';
+
 const TTL_MS = 60_000;
 const store = new Map<string, { at: number; p: Promise<unknown> }>();
 
@@ -21,9 +23,14 @@ export const DRILL_URLS = [
   '/api/admin/analytics/revenue',
 ] as const;
 
+const TZ_PREFIXES = ['/api/admin/activity/daily', '/api/admin/analytics/signup-growth'];
+
 /** Warm the closed drill-down sections so opening one is instant. */
 export function prefetchDrillSections(token: string): void {
-  for (const url of DRILL_URLS) cachedAdminJson(url, token).catch(() => {});
+  for (const url of DRILL_URLS) {
+    const path = TZ_PREFIXES.some((p) => url.startsWith(p)) ? withViewerTz(url) : url;
+    cachedAdminJson(path, token).catch(() => {});
+  }
 }
 
 export function clearAdminJsonCache(): void {

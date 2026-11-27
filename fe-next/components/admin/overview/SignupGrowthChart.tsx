@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { cachedAdminJson } from '@/lib/admin/adminJsonCache';
+import { withViewerTz } from '@/lib/admin/viewerTimeZone';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -31,7 +32,7 @@ export function SignupGrowthChart({ authToken }: { authToken: string }) {
 
   useEffect(() => {
     let cancelled = false;
-    cachedAdminJson<{ data?: { growth?: GrowthPoint[] } }>('/api/admin/analytics/signup-growth?weeks=26', authToken)
+    cachedAdminJson<{ data?: { growth?: GrowthPoint[] } }>(withViewerTz('/api/admin/analytics/signup-growth?weeks=26'), authToken)
       .then((json) => {
         if (!cancelled) setData(json.data?.growth ?? []);
       })

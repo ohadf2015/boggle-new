@@ -8,6 +8,7 @@
 import { DAY_MS } from './eduMetrics';
 import { createFindings, type Finding } from './findings';
 import { dayPace, momentum, pctChange, sum, trailingZeros } from './seriesStats';
+import { addLocalDays, localDateOf } from './viewerTimeZone';
 
 /** 1 = today so far against yesterday. */
 export type PulseWindow = 1 | 7 | 30;
@@ -33,6 +34,8 @@ export interface GrowthWeek {
 export interface PulseInput {
   nowMs: number;
   windowDays: PulseWindow;
+  /** IANA timezone for calendar days; UTC when omitted. */
+  timeZone?: string;
   /** Up to 2x the window of daily rows; days with no row count as zero. */
   daily: DailyPoint[];
   growth: GrowthWeek[];
@@ -79,31 +82,30 @@ const MIN_CHECKOUTS_TO_JUDGE = 3;
 const SPARK_WEEKS = 8;
 const SPARK_DAYS = 7;
 
-const dayKey = (ms: number) => new Date(ms).toISOString().slice(0, 10);
-
 /** One value per day for the last `days` days ending today, oldest first; gaps are zero. */
-function series(daily: DailyPoint[], nowMs: number, days: number, pick: (p: DailyPoint) => number): { dates: string[]; values: number[] } {
+function series(daily: DailyPoint[], nowMs: number, days: number, pick: (p: DailyPoint) => number, timeZone: string): { dates: string[]; values: number[] } {
   const byDate = new Map(daily.map((p) => [p.date, p]));
-  const dates = Array.from({ length: days }, (_, i) => dayKey(nowMs - (days - 1 - i) * DAY_MS));
+  const today = localDateOf(nowMs, timeZone);
+  const dates = Array.from({ length: days }, (_, i) => addLocalDays(today, -(days - 1 - i)));
   return { dates, values: dates.map((d) => { const row = byDate.get(d); return row ? pick(row) : 0; }) };
 }
 
-function dayTile(daily: DailyPoint[], nowMs: number, w: number, pick: (p: DailyPoint) => number, mean = false): PulseTile & { dates: string[] } {
+function dayTile(daily: DailyPoint[], nowMs: number, w: number, pick: (p: DailyPoint) => number, mean = false, timeZone = 'UTC'): PulseTile & { dates: string[] } {
   const n = Math.max(w * 2, SPARK_DAYS);
-  const { dates, values } = series(daily, nowMs, n, pick);
+  const { dates, values } = series(daily, nowMs, n, pick, timeZone);
   const agg = (xs: number[]) => (mean ? Math.round(sum(xs) / w) : sum(xs));
   const current = agg(values.slice(n - w));
   const prior = agg(values.slice(n - 2 * w, n - w));
   const keep = Math.max(w, SPARK_DAYS);
   const tile = { current, prior, pct: pctChange(current, prior), spark: values.slice(-keep), dates: dates.slice(-keep) };
   if (w !== 1) return tile;
-  return { ...tile, ...dayPace(current, prior, nowMs) };
+  return { ...tile, ...dayPace(current, prior, nowMs, timeZone) };
 }
 
-function signupTile(growth: GrowthWeek[], daily: DailyPoint[], nowMs: number, windowDays: PulseWindow): PulseTile | null {
+function signupTile(growth: GrowthWeek[], daily: DailyPoint[], nowMs: number, windowDays: PulseWindow, timeZone = 'UTC'): PulseTile | null {
   if (windowDays === 1) {
     if (!daily.some((p) => p.signups !== undefined)) return null;
-    const t = dayTile(daily, nowMs, 1, (p) => p.signups ?? 0);
+    const t = dayTile(daily, nowMs, 1, (p) => p.signups ?? 0, false, timeZone);
     return { current: t.current, prior: t.prior, pct: t.pct, spark: t.spark, projected: t.projected };
   }
   const weeks = windowDays === 7 ? 1 : 4;
@@ -119,12 +121,13 @@ function signupTile(growth: GrowthWeek[], daily: DailyPoint[], nowMs: number, wi
 
 export function buildPulse(input: PulseInput): Pulse {
   const { nowMs, windowDays: w, daily, stats, revenue, health } = input;
-  const games = dayTile(daily, nowMs, w, (p) => p.totalGames);
-  const players = dayTile(daily, nowMs, w, (p) => p.totalUniquePlayers, true);
-  const signups = signupTile(input.growth, daily, nowMs, w);
+  const timeZone = input.timeZone ?? 'UTC';
+  const games = dayTile(daily, nowMs, w, (p) => p.totalGames, false, timeZone);
+  const players = dayTile(daily, nowMs, w, (p) => p.totalUniquePlayers, true, timeZone);
+  const signups = signupTile(input.growth, daily, nowMs, w, timeZone);
 
   const partialDayView = w === 1;
-  const signedIn = sum(series(daily, nowMs, w, (p) => p.games).values);
+  const signedIn = sum(series(daily, nowMs, w, (p) => p.games, timeZone).values);
   const signedInShare = games.current > 0 ? Math.round((signedIn / games.current) * 100) : null;
   const monthly = stats?.activity.uniquePlayersMonth ?? 0;
   const stickinessPct = !partialDayView && stats && monthly > 0 ? Math.round((players.current / monthly) * 100) : null;

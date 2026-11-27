@@ -19,6 +19,7 @@ import { GuestActivityPanel } from '@/components/admin/analytics/GuestActivityPa
 import { AuthSessionsPanel } from '@/components/admin/analytics/AuthSessionsPanel';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { withViewerTz } from '@/lib/admin/viewerTimeZone';
 
 interface CohortRow {
   cohort_week: string;
@@ -60,7 +61,7 @@ export default function AnalyticsPageClient() {
     const headers = { Authorization: `Bearer ${authToken}` };
 
     const [cohortsRes, funnelRes, churnRes] = await Promise.allSettled([
-      fetch('/api/admin/analytics/cohorts?weeks=12', { headers }).then(r => r.json()),
+      fetch(withViewerTz('/api/admin/analytics/cohorts?weeks=12'), { headers }).then(r => r.json()),
       fetch('/api/admin/analytics/funnel', { headers }).then(r => r.json()),
       fetch('/api/admin/analytics/churn-risk?days=14&limit=10', { headers }).then(r => r.json()),
     ]);

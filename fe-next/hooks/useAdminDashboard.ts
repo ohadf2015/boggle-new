@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { fetchAdminJson, useAdminPoll } from './useAdminPoll';
+import { withViewerTz } from '@/lib/admin/viewerTimeZone';
 
 const ADMIN_API_BASE = '/api/admin';
 const REFRESH_INTERVAL = 30_000;
@@ -37,7 +38,7 @@ export function useAdminDashboard(authToken: string | null): AdminDashboardData 
 
     try {
       const [statsData, healthData] = await Promise.allSettled([
-        fetchAdminJson<StatsData>(`${ADMIN_API_BASE}/stats`, authToken),
+        fetchAdminJson<StatsData>(withViewerTz(`${ADMIN_API_BASE}/stats`), authToken),
         fetchAdminJson<HealthData>(`${ADMIN_API_BASE}/system/health`, authToken),
       ]);
 
