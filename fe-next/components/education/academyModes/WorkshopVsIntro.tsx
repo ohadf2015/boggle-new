@@ -194,8 +194,7 @@ export function WorkshopVsIntro({
                 <li
                   key={w}
                   data-testid="workshop-lesson-word"
-                  className="flex h-[calc(var(--chip-fs)*1.25+10px)] items-center gap-[0.3em] rounded-neo border-[3px] border-neo-black pe-[0.55em] ps-[0.3em] font-neo-display text-[length:var(--chip-fs)] font-black leading-[1.25] text-neo-black"
-                  style={{ background: 'linear-gradient(180deg, color-mix(in srgb, var(--neo-yellow) 30%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-red) 10%, var(--neo-yellow)) 60%, color-mix(in srgb, var(--neo-lime) 50%, var(--neo-orange-hover)) 100%)', boxShadow: 'inset 0 2px 0 rgb(var(--neo-white)), inset 0 -3px 0 color-mix(in srgb, var(--neo-lime-dark) 40%, var(--neo-cozy-dark)), 2px 3px 0 rgb(var(--neo-black))' }}
+                  className="flex h-[calc(var(--chip-fs)*1.25+10px)] items-center gap-[0.3em] rounded-neo border-[3px] border-neo-black pe-[0.55em] ps-[0.3em] font-neo-display text-[length:var(--chip-fs)] font-black leading-[1.25] text-neo-black bg-neo-yellow shadow-edu-lip-sm"
                 >
                   {/* Each word is literally a gold coin: the stakes read on the pill itself, not only in the label. */}
                   <Coins aria-hidden className="h-[1.1em] w-[1.1em] shrink-0" strokeWidth={2.75} />
@@ -214,28 +213,11 @@ export function WorkshopVsIntro({
           disabled={starting || loading}
           onClick={onPlay}
           whileTap={{ scale: 0.95 }}
-          animate={
-            reduce || starting || loading
-              ? undefined
-              : {
-                  boxShadow: [
-                    '6px 6px 0 rgb(var(--neo-black)), 0 0 18px rgba(255,20,147,0.45)',
-                    '6px 6px 0 rgb(var(--neo-black)), 0 0 46px rgba(255,20,147,0.95)',
-                    '6px 6px 0 rgb(var(--neo-black)), 0 0 18px rgba(255,20,147,0.45)',
-                  ],
-                }
-          }
-          transition={reduce ? undefined : { duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
           className={cn(
             INTRO_CTA,
             'text-3xl [@media(orientation:landscape)_and_(max-height:520px)]:text-2xl! lg:text-[clamp(1.75rem,min(3.4vw,5.5vh),4.5rem)]',
           )}
-          style={{
-            background: 'linear-gradient(180deg, color-mix(in srgb, var(--neo-yellow) 70%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-cozy) 30%, var(--neo-yellow-hover)) 45%, color-mix(in srgb, var(--neo-yellow-hover) 40%, var(--neo-orange-hover)) 100%)',
-            boxShadow: '6px 6px 0 rgb(var(--neo-black)), 0 0 30px rgba(255,20,147,0.7)',
-          }}
         >
-          <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-edu-paper/60" />
           <Swords className="relative h-[1.1em] w-[1.1em] shrink-0" aria-hidden />
           <span className="relative">{loading ? t('common.loading', 'Loading…') : t('academy.modes.workshop.battle', 'Battle!')}</span>
         </m.button>

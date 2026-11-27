@@ -21,7 +21,6 @@ export function LessonWordTile({ word, found, size = 'md' }: { word: string; fou
         size === 'lg' ? 'px-3 py-1.5 text-xl 2xl:text-2xl' : 'px-2 py-0.5 text-sm sm:text-base lg:px-3 lg:py-1 lg:text-2xl',
         found ? 'bg-neo-yellow' : 'bg-neo-cream',
       )}
-      style={found ? { boxShadow: '3px 3px 0 rgb(var(--neo-black)), 0 0 16px rgba(255,214,0,0.8)' } : { backgroundImage: 'linear-gradient(180deg, color-mix(in srgb, var(--neo-yellow-hover) 5%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-cozy-muted) 30%, var(--neo-cream)) 100%)' }}
     >
       {found ? <Check className="h-4 w-4 shrink-0" aria-hidden /> : <Star className="h-3 w-3 shrink-0 fill-current opacity-60" aria-hidden />}
       <span>{word}</span>
