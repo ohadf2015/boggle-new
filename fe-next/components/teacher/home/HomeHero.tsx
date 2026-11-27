@@ -18,7 +18,7 @@ import { HomeShareSheet } from './HomeShareSheet';
 import { HomeGreeting } from './HomeGreeting';
 import { EduMascot } from '@/components/education/EduMascot';
 import { NB_PRIMARY_FACE, NB_STICKER, NB_BLOCK } from '../nb/nbStyles';
-import { HERO_CHIP, HERO_PICK } from './homeStyles';
+import { DESK_CODE, HERO_CHIP, HERO_PICK } from './homeStyles';
 
 const PRIMARY_PRESS = cn(NB_PRIMARY_FACE, 'min-h-[72px] w-full whitespace-nowrap text-2xl sm:min-h-[84px] sm:max-w-md sm:text-3xl');
 const MENU_ROW = 'min-h-[44px] font-neo-body font-semibold text-edu-ink';
@@ -200,11 +200,7 @@ function CodeChip({ code, big, onShare, t, testIds }: { code: string; big: boole
         aria-haspopup="dialog"
         aria-label={`${t('eduShell.home.shareCode')}: ${code}`}
         onClick={onShare}
-        className={cn(
-          HERO_CHIP,
-          'gap-2',
-          big && 'min-h-0 flex-col items-start gap-1.5 rounded-neo-lg border-[3px] px-3 py-2 sm:px-3 lg:items-center',
-        )}
+        className={big ? DESK_CODE : cn(HERO_CHIP, 'gap-2')}
       >
         <span className={cn('flex items-center gap-1.5 font-neo-body font-bold text-edu-ink/75', big ? 'text-sm' : 'text-xs')}>
           {t('academy.hq.classCode')}

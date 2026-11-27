@@ -30,3 +30,14 @@ describe('<HqProjectorSheet>', () => {
     expect(onClose).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('HqProjectorSheet on the sky page', () => {
+  it('Then the board stands on the sky page with no arena art, and the code reads as one cream tile per letter', () => {
+    render(<HqProjectorSheet classroom={{ id: 'c1', name: '5B', join_code: 'AB12CD' }} onClose={vi.fn()} />);
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.className).toContain('bg-edu-page');
+    expect(dialog.querySelector('img')).toBeNull();
+    expect(screen.getAllByTestId('hq-projector-code-tile').map((el) => el.textContent)).toEqual(['A', 'B', '1', '2', 'C', 'D']);
+    expect(screen.getByTestId('hq-projector-code-card').className).toContain('edu-card');
+  });
+});

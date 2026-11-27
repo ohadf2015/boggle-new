@@ -45,6 +45,14 @@ export const HERO_CHIP = cn(
   EDU_FOCUS,
 );
 
+/** Home's code button: the "Class code" label over big letter tiles, squared with a lip. Needs usePress for data-pressed. */
+export const DESK_CODE = cn(
+  'inline-flex min-w-0 flex-col items-start gap-1.5 rounded-neo-lg border-[3px] border-edu-line bg-edu-surface px-3 py-2 text-edu-ink lg:items-center',
+  neoChunkyPress(4),
+  'shadow-edu-line',
+  EDU_FOCUS,
+);
+
 // A second action on the desk: a white pressable tile whose leading icon becomes a coloured square.
 const HERO_TILE = cn(
   'inline-flex min-h-14 min-w-0 items-center gap-3 rounded-neo-lg border-[3px] border-edu-line bg-edu-surface px-3 py-2 text-start font-neo-display text-base font-black leading-tight text-edu-ink sm:text-lg',

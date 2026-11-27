@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
 import { m } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
 import { X } from "lucide-react";
@@ -19,9 +18,8 @@ export interface HqProjectorSheetProps {
 }
 
 /**
- * "Open projector": the class code at back-row size on the arena art, one QR,
- * and the seats filling as students join. A dark-only surface — hardcoded
- * navy, never a cream/dark pair that flashes on lazy mount (pitfall class 5).
+ * "Open projector": the class code at back-row size as letter tiles, one QR,
+ * and the seats filling as students join, on the sky page.
  * Portalled to <body> so no transformed ancestor can re-anchor `fixed`.
  */
 export function HqProjectorSheet({
@@ -64,22 +62,12 @@ export function HqProjectorSheet({
       data-hq-sheet="projector"
       className="fixed inset-0 z-[120] flex flex-col overflow-hidden bg-edu-page"
     >
-      <Image
-        src="/images/education/arena-lobby-bg.webp"
-        alt=""
-        aria-hidden="true"
-        fill
-        sizes="100vw"
-        className="pointer-events-none select-none object-cover opacity-70"
-      />
-      <div className="absolute inset-0 bg-edu-surface/40" aria-hidden="true" />
-
       <button
         type="button"
         data-testid="hq-projector-close"
         onClick={onClose}
         aria-label={t("common.close")}
-        className="absolute end-4 top-[max(1rem,env(safe-area-inset-top))] z-10 flex size-12 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream text-black shadow-hard"
+        className="absolute end-4 top-[max(1rem,env(safe-area-inset-top))] z-10 flex size-12 items-center justify-center rounded-neo border-[3px] border-neo-black bg-edu-surface text-neo-black shadow-edu-lip-sm"
       >
         <X className="size-6" strokeWidth={3} aria-hidden="true" />
       </button>
@@ -88,51 +76,58 @@ export function HqProjectorSheet({
         initial={reduced ? false : { scale: 0.9, y: 16 }}
         animate={{ scale: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 380, damping: 26 }}
-        className="relative z-[1] m-auto flex w-full max-w-5xl flex-col items-center gap-[2.5vh] px-4 text-center"
+        className="relative z-[1] m-auto flex w-full max-w-[min(92vw,1400px)] flex-col items-center gap-[2.5vh] px-4 text-center"
       >
         <h2
           id="hq-projector-title"
-          className="font-neo-display text-2xl font-black uppercase tracking-tight text-edu-ink drop-shadow-[0_3px_0_#000] sm:text-4xl"
+          className="font-neo-display text-3xl font-black tracking-tight text-edu-ink [overflow-wrap:anywhere] sm:text-5xl"
         >
           {t("academy.hq.projectorTitle", "Join {name}", {
             name: classroom.name,
           })}
         </h2>
 
-        <div className="flex flex-col items-center gap-[3vw] md:flex-row">
-          <div className="rounded-neo-xl border-4 border-neo-black bg-neo-yellow px-[4vw] py-[2vh] shadow-hard-2xl">
-            <p className="font-neo-display text-sm font-black uppercase tracking-widest text-black/70 sm:text-lg">
+        <div
+          data-testid="hq-projector-code-card"
+          className="edu-card flex w-full flex-col items-center gap-[2.5vh] px-[3vw] py-[3vh] md:flex-row md:justify-center md:gap-[3vw]"
+        >
+          <div className="flex min-w-0 flex-col items-center gap-[2vh]">
+            <p className="font-neo-display text-base font-black text-edu-ink/75 sm:text-2xl">
               {t("academy.hq.classCode", "Class code")}
             </p>
+            <p dir="ltr" className="flex gap-[0.8vw]">
+              {[...classroom.join_code].map((ch, i) => (
+                <span
+                  key={i}
+                  data-testid="hq-projector-code-tile"
+                  className="edu-tile size-[clamp(2.75rem,min(5.5vw,10vh),6.5rem)] text-[clamp(1.75rem,min(4vw,7.5vh),4.75rem)] leading-none"
+                >
+                  {ch}
+                </span>
+              ))}
+            </p>
             <p
+              data-testid="hq-projector-address"
               dir="ltr"
-              className="font-mono text-[clamp(3rem,11vw,9rem)] font-black leading-none tracking-[0.1em] text-black"
+              className="rounded-neo-lg border-[3px] border-neo-black bg-neo-pink px-4 py-1.5 font-neo-display text-lg font-black text-neo-black shadow-edu-lip-sm sm:text-3xl"
             >
-              {classroom.join_code}
+              {address}
             </p>
           </div>
           {origin ? (
             <div
               data-testid="hq-projector-qr"
-              className="rounded-neo-lg border-4 border-neo-black bg-edu-paper p-3 shadow-hard-xl"
+              className="shrink-0 rounded-neo-lg border-[3px] border-neo-black bg-edu-paper p-3 shadow-edu-lip-sm"
             >
               <QRCodeSVG
                 value={joinUrl}
                 size={220}
                 level="M"
-                className="size-[min(38vw,30vh)]"
+                className="size-[min(30vw,32vh)]"
               />
             </div>
           ) : null}
         </div>
-
-        <p
-          data-testid="hq-projector-address"
-          dir="ltr"
-          className="rounded-neo border-3 border-edu-line bg-edu-surface px-4 py-2 font-neo-body text-base font-black text-edu-ink shadow-hard sm:text-2xl"
-        >
-          {address}
-        </p>
 
         <div className="flex flex-col items-center gap-2">
           <RosterSeats
@@ -141,8 +136,9 @@ export function HqProjectorSheet({
             reduced={reduced}
             seats={10}
             size={52}
+            className="max-w-full flex-wrap justify-center"
           />
-          <p className="font-neo-display text-lg font-black uppercase text-edu-lime-ink sm:text-2xl">
+          <p className="font-neo-display text-lg font-black text-edu-ink sm:text-2xl">
             {students.length > 0
               ? `${students.length} ${t("academy.hq.joinedLabel", "joined")}`
               : t("academy.hq.nobodyYet", "No one yet — share the code")}

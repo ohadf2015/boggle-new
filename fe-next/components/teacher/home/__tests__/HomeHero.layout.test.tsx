@@ -67,6 +67,13 @@ describe('<HomeHero> layout', () => {
     expect(share).toHaveAccessibleName('eduShell.home.shareCode: AB12CD');
   });
 
+  it('Given Home, Then the code button is a squared tile card, never a pill around the letter tiles', () => {
+    renderHero();
+    const share = screen.getByTestId('home-share-code');
+    expect(share.className).toContain('rounded-neo-lg');
+    expect(share.className).not.toContain('rounded-neo-pill');
+  });
+
   it('Then Start is the one marked hero action and the secondaries share one row beside each other', () => {
     renderHero({ replay: { kind: 'ready', href: '/again', detail: 'Word Hunt' } });
     expect(document.querySelectorAll('[data-hero="true"]')).toHaveLength(1);
