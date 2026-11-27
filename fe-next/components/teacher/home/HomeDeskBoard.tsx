@@ -43,7 +43,7 @@ export function HomeDeskBoard({ roster, memberCount, onOpenResults, readyLabel, 
   const counts = !wide && rows && rows.length > 0 ? rosterCounts(rows) : null;
   const split = Boolean(counts) || missedShown;
   const note = readyLabel
-    ? <span data-testid="home-ready-chip" className="truncate font-neo-body text-xs font-bold text-edu-ink/80">{readyLabel}</span>
+    ? <span data-testid="home-ready-chip" className="truncate font-neo-body text-xs font-bold text-edu-ink/80 sm:text-sm">{readyLabel}</span>
     : readyEmpty
       ? <span data-testid="home-ready-empty" className="truncate font-neo-body text-xs font-bold text-edu-ink/80">{readyEmpty}</span>
       : null;
@@ -91,22 +91,22 @@ export function HomeDeskBoard({ roster, memberCount, onOpenResults, readyLabel, 
           </button>
         ) : null}
         <PressSurface
-          lip={2}
+          lip={split ? 2 : 4}
           data-testid="home-open-results"
           aria-haspopup="dialog"
           aria-label={resultsName}
           onClick={onOpenResults}
           className={cn(
             'group flex min-h-11 items-center gap-2 rounded-neo border-2 border-edu-line bg-edu-page px-3 text-start text-edu-ink shadow-edu-line focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
-            split ? 'shrink-0' : 'min-h-[60px] min-w-0 flex-1 bg-edu-surface',
+            split ? 'shrink-0' : 'min-h-[72px] min-w-0 flex-1 gap-3 rounded-neo-lg border-[3px] bg-edu-surface px-4',
           )}
         >
-          {split ? null : <BarChart3 className="size-6 shrink-0 text-edu-purple-ink" strokeWidth={2.5} aria-hidden="true" />}
+          {split ? null : <BarChart3 className="box-content size-6 shrink-0 rounded-neo border-[3px] border-neo-black bg-neo-cyan p-1.5 text-neo-black" strokeWidth={2.5} aria-hidden="true" />}
           <span className="flex min-w-0 flex-1 flex-col">
-            <span className="font-neo-display text-sm font-black leading-tight">{t('eduShell.home.seeResults')}</span>
+            <span className={cn('font-neo-display font-black leading-tight', split ? 'text-sm' : 'text-lg sm:text-xl')}>{t('eduShell.home.seeResults')}</span>
             {split ? null : note}
           </span>
-          <ChevronRight className="size-4 shrink-0 rtl:-scale-x-100" aria-hidden="true" />
+          <ChevronRight className={cn('shrink-0 rtl:-scale-x-100', split ? 'size-4' : 'size-6')} strokeWidth={split ? 2 : 3} aria-hidden="true" />
         </PressSurface>
       </div>
       {split && note ? <p className="px-2">{note}</p> : null}

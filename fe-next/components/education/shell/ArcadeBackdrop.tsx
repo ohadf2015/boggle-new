@@ -35,6 +35,9 @@ function ShapeSvg({ shape }: { shape: Shape }) {
   );
 }
 
+/** Decor that belongs to the dark pages only: a sky page reads as plain sky. */
+export const HIDE_ON_SKY = '[[data-edu-theme=sky]_&]:hidden';
+
 export function ArcadeBackdrop({ className }: { className?: string }) {
   return (
     <div
@@ -42,6 +45,7 @@ export function ArcadeBackdrop({ className }: { className?: string }) {
       aria-hidden="true"
       className={cn(
         'pointer-events-none absolute inset-0 -z-10 overflow-hidden',
+        HIDE_ON_SKY,
         '[background-image:radial-gradient(color-mix(in_srgb,var(--neo-cream)_9%,transparent)_1.5px,transparent_1.6px)] [background-size:28px_28px]',
         className,
       )}

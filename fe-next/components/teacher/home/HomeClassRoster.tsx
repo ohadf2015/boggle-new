@@ -5,7 +5,7 @@ import { ClipboardList, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarLite, { type AvatarLiteConfig } from '@/components/AvatarLite';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { GAME_CARD, GHOST_BUTTON, OUTLINE_BUTTON, SKELETON, STICKER } from './homeStyles';
+import { GHOST_BUTTON, OUTLINE_BUTTON, SKELETON, STICKER } from './homeStyles';
 import { RosterDrawer, RosterSheet, STATUS_RING, StatusDot, StatusPill } from './HomeRosterDetail';
 import { HomeRosterMeter } from './HomeRosterMeter';
 import { rosterAccuracy, rosterCounts, rosterFilter, type RosterRow, type RosterStatus } from './rosterModel';
@@ -22,10 +22,10 @@ const CELL = {
   xp: 'col-start-2 row-span-2 row-start-1 text-end @md/roster:col-start-3 @md/roster:row-span-1 @[40rem]/list:col-start-4',
   words: 'hidden text-end @md/roster:col-start-4 @md/roster:row-start-1 @md/roster:block @[40rem]/list:col-start-5',
 } as const;
-const NUM = 'font-neo-body text-sm font-semibold tabular-nums text-edu-ink/80';
+const NUM = 'font-neo-body text-sm font-bold tabular-nums text-edu-ink sm:text-base';
 // Fixed width on every row and the header so the columns line up whether or not a row has an action.
 const ACTION_SLOT = 'flex w-11 shrink-0 justify-end @[36rem]/list:w-28';
-const HEAD = 'truncate whitespace-nowrap font-neo-body text-[0.7rem] font-bold uppercase tracking-wide text-edu-ink/55';
+const HEAD = 'truncate whitespace-nowrap font-neo-body text-xs font-bold text-edu-ink/75 sm:text-sm';
 
 export interface HomeClassRosterProps {
   /** null while the read is in flight or failed. */
@@ -55,13 +55,13 @@ export function HomeClassRoster({ rows, failed, language, nowMs, t, className, o
   const close = () => setOpenId(null);
 
   return (
-    <section data-testid="home-roster" aria-labelledby="home-roster-title" className={cn(GAME_CARD, '@container/roster flex min-h-0 flex-col overflow-hidden', className)}>
-      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b-2 border-edu-line/10 px-3 py-2 sm:px-4">
-        <h2 id="home-roster-title" data-accent-decor className={cn(STICKER, 'bg-neo-purple text-base text-neo-cream')}>
+    <section data-testid="home-roster" aria-labelledby="home-roster-title" className={cn('@container/roster flex min-h-0 flex-col overflow-hidden rounded-neo-xl border-[3px] border-edu-line bg-edu-surface shadow-edu-lip', className)}>
+      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b-2 border-edu-line/15 px-3 py-2.5 sm:px-4">
+        <h2 id="home-roster-title" data-accent-decor className={cn(STICKER, 'rotate-0 bg-neo-pink text-lg text-neo-black')}>
           {t('eduShell.home.roster.title')}
         </h2>
         {counts && rows && rows.length > 0 ? (
-          <p data-testid="home-roster-summary" className="flex flex-wrap items-center gap-x-3 gap-y-1 font-neo-body text-xs font-bold text-edu-ink/80 sm:text-sm">
+          <p data-testid="home-roster-summary" className="flex flex-wrap items-center gap-x-3 gap-y-1 font-neo-body text-sm font-bold text-edu-ink sm:text-base">
             {STATUSES.filter((s) => counts[s] > 0).map((s) => {
               const label = (
                 <>
@@ -151,7 +151,7 @@ export function HomeClassRoster({ rows, failed, language, nowMs, t, className, o
                         <span data-testid="home-roster-avatar-ring" data-status={r.status} className={cn('shrink-0 rounded-full ring-[3px] ring-offset-2 ring-offset-edu-surface', STATUS_RING[r.status])}>
                           <AvatarLite userId={r.id} customAvatar={r.avatarConfig as AvatarLiteConfig | null} pixelSize={30} className="block" />
                         </span>
-                        <span dir="auto" className={cn('truncate font-neo-body text-[0.95rem] font-black', selected ? 'text-edu-cyan-ink' : 'text-edu-ink')}>{r.name}</span>
+                        <span dir="auto" className={cn('truncate font-neo-display text-base font-black sm:text-lg', selected ? 'text-edu-cyan-ink' : 'text-edu-ink')}>{r.name}</span>
                       </span>
                       <span data-col="status" className={cn(CELL.status, 'flex min-w-0 items-center')}>
                         <StatusPill status={r.status} label={t(`eduShell.home.roster.statusShort.${r.status}`)} />
@@ -170,7 +170,7 @@ export function HomeClassRoster({ rows, failed, language, nowMs, t, className, o
                         )}
                       </span>
                       <span data-col="xp" className={CELL.xp}>
-                        <span data-testid="home-roster-xp" className="inline-flex items-center gap-1 rounded-full border-2 border-neo-yellow/50 bg-neo-yellow/10 px-2 py-px font-neo-display text-sm font-black tabular-nums text-edu-yellow-ink">
+                        <span data-testid="home-roster-xp" className="inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-yellow px-2.5 py-px font-neo-display text-sm font-black tabular-nums text-neo-black">
                           <Zap className="size-3.5 shrink-0 fill-current" aria-hidden="true" />
                           {r.xp.toLocaleString(language)}
                         </span>

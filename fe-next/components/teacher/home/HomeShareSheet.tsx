@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Printer, Projector } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
-import { NeoButton } from '@/components/ui/button';
+import { EDU_BUTTON } from '@/components/education/eduNeoStyles';
 import { ClassSetupInviteCode } from '@/components/education/ClassSetupInviteCode';
 import { useInviteShare } from '@/components/education/useInviteShare';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
@@ -40,9 +40,9 @@ export function HomeShareSheet({ classroom, open, onOpenChange, uiLanguage, t }:
           closeButtonLabel={t('common.close')}
           closeButtonVariant="minimal"
           style={{ backgroundImage: 'none' }}
-          className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-auto border-2 border-edu-line bg-edu-surface p-5 text-edu-ink dark:border-edu-line dark:bg-edu-surface sm:max-w-lg"
+          className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-auto border-[3px] border-edu-line bg-edu-surface p-5 text-edu-ink shadow-edu-lip dark:border-edu-line dark:bg-edu-surface sm:max-w-lg"
         >
-          <DialogTitle className="pe-12 font-neo-display text-xl font-black normal-case tracking-normal text-edu-ink">{t('eduShell.home.shareTitle')}</DialogTitle>
+          <DialogTitle className="pe-12 font-neo-display text-2xl font-black normal-case tracking-normal text-edu-ink">{t('eduShell.home.shareTitle')}</DialogTitle>
           <DialogDescription dir="auto" className="font-neo-body text-sm text-edu-ink/75">{classroom.name}</DialogDescription>
           {open ? (
             <ClassSetupInviteCode
@@ -54,10 +54,10 @@ export function HomeShareSheet({ classroom, open, onOpenChange, uiLanguage, t }:
               t={t}
             />
           ) : null}
-          <NeoButton variant="secondary" data-testid="home-share-board" onClick={() => setBoardOpen(true)} className="w-full">
+          <button type="button" data-testid="home-share-board" onClick={() => setBoardOpen(true)} className={`${EDU_BUTTON.secondary} w-full`}>
             <Projector className="size-5" aria-hidden="true" />
             {t('academy.hq.openProjector')}
-          </NeoButton>
+          </button>
           <Link
             href={`/${language}/teacher/join-sheet?code=${encodeURIComponent(classroom.join_code)}&name=${encodeURIComponent(classroom.name)}`}
             target="_blank"

@@ -93,14 +93,18 @@ function TabIndicator({ index, count, chunky = false }: { index: number; count: 
         data-testid="education-tab-indicator"
         className={cn(
           'h-8 w-14 rounded-full border-[2px]',
-          // Teacher tabs: a chunky cream pill with a black outline and hard shadow. Never lime:
+          // Teacher tabs: a chunky purple pill with a black outline and hard shadow. Never lime:
           // lime belongs to the page's one main button.
-          chunky ? 'border-neo-black bg-neo-cream shadow-hard' : 'border-edu-line bg-edu-surface',
+          chunky ? 'border-neo-black bg-neo-purple shadow-hard' : 'border-edu-line bg-edu-surface',
         )}
       />
     </div>
   );
 }
+
+// Teacher sidebar items are pressable tiles: outline, solid lip, a press that sinks into the lip.
+const SIDE_TILE =
+  'min-h-[56px] rounded-neo-lg border-[3px] px-3.5 text-lg font-black shadow-edu-lip-sm [&>svg]:size-6 active:translate-y-[3px] active:scale-100 active:shadow-none motion-reduce:active:translate-y-0';
 
 function sideClasses(active: boolean, chunky = false) {
   return cn(
@@ -109,8 +113,8 @@ function sideClasses(active: boolean, chunky = false) {
     FOCUS,
     chunky
       ? active
-        ? 'border-[3px] border-neo-black bg-neo-cream text-neo-black shadow-hard-lg'
-        : 'border-[3px] border-transparent text-edu-ink hover:border-edu-line hover:bg-edu-surface hover:shadow-hard-lg'
+        ? cn(SIDE_TILE, 'border-neo-black bg-neo-purple text-white')
+        : cn(SIDE_TILE, 'border-edu-line bg-edu-surface text-edu-ink hover:bg-edu-tile')
       : active
         ? 'border-[2px] border-transparent border-s-[3px] border-s-neo-lime bg-edu-surface text-edu-ink'
         : 'border-[2px] border-transparent text-edu-ink hover:bg-edu-surface',
@@ -173,7 +177,9 @@ export function EducationNav({ nav, t, variant, brand, account, plan, className 
         className={cn(
           // Desktop only (`lg` = 1024); short enough never to scroll.
           'hidden shrink-0 lg:flex w-60 flex-col gap-1.5 overflow-hidden',
-          'border-e-[3px] border-edu-line bg-edu-surface px-3 py-4',
+          chunky
+            ? 'm-3 me-0 gap-3 rounded-neo-xl border-[3px] border-edu-line bg-edu-surface px-3 py-4 shadow-edu-lip'
+            : 'border-e-[3px] border-edu-line bg-edu-surface px-3 py-4',
           className,
         )}
       >

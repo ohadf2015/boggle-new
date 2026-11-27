@@ -53,7 +53,7 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row', plan
           className={cn(
             'flex items-center gap-2.5 rounded-neo text-start transition-[colors,transform] duration-150 active:scale-[0.97]',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface',
-            variant === 'row' ? 'min-h-[48px] w-full px-2 py-1.5 hover:bg-edu-surface' : 'size-11 justify-center',
+            variant === 'row' ? 'min-h-[56px] w-full rounded-neo-lg border-[3px] border-edu-line bg-edu-surface px-2.5 py-1.5 shadow-edu-lip-sm hover:bg-edu-tile active:translate-y-[3px] active:scale-100 active:shadow-none' : 'size-11 justify-center',
           )}
         >
           <AvatarLite
@@ -63,7 +63,7 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row', plan
           />
           {variant === 'row' ? (
             <>
-              <span dir="auto" className="min-w-0 flex-1 truncate font-neo-body text-sm font-bold text-edu-ink">
+              <span dir="auto" className="min-w-0 flex-1 truncate font-neo-display text-base font-black text-edu-ink">
                 {name || t('eduShell.account.fallbackName')}
               </span>
               {plan === 'pro' || plan === 'trial' ? (
@@ -75,7 +75,7 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row', plan
                   label={t(plan === 'pro' ? 'eduShell.nav.pro' : 'teacher.plan.trialActive')}
                 />
               ) : null}
-              <ChevronsUpDown className="size-4 shrink-0 text-edu-ink/70" aria-hidden="true" />
+              <ChevronsUpDown className="size-5 shrink-0 text-edu-ink" aria-hidden="true" />
             </>
           ) : null}
         </DropdownMenuTrigger>

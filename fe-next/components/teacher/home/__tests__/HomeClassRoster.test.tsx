@@ -41,12 +41,13 @@ describe('<HomeClassRoster>', () => {
     expect(within(rows[2]).getByTestId('home-roster-pill')).toHaveAttribute('data-status', 'idle');
   });
 
-  it('Given the status column, Then each status is a filled pill and only Behind is solid', () => {
+  it('Given the status column, Then every status is a solid outlined chip in its own colour', () => {
     renderRoster();
     const pills = screen.getAllByTestId('home-roster-pill');
-    expect(pills[0]).toHaveClass('bg-neo-lime/20');
-    expect(pills[1]).toHaveClass('bg-neo-yellow', 'text-neo-black');
-    expect(pills[2]).toHaveClass('bg-edu-ink/15');
+    expect(pills[0]).toHaveClass('bg-neo-lime', 'text-neo-black', 'border-neo-black');
+    expect(pills[1]).toHaveClass('bg-neo-yellow', 'text-neo-black', 'border-neo-black');
+    expect(pills[2]).toHaveClass('bg-edu-surface', 'text-edu-ink', 'border-edu-line');
+    for (const pill of pills) expect(pill.className).not.toMatch(/bg-neo-\w+\/\d+/);
   });
 
   it('Given a row, Then the name and XP are bold enough to scan', () => {
@@ -59,15 +60,19 @@ describe('<HomeClassRoster>', () => {
     expect(xp.querySelector('svg')).not.toBeNull();
   });
 
-  it('Given a row, Then it reads like a game roster: the avatar wears a ring in its status color and the meter is chunky and striped', () => {
+  it('Given a row, Then it reads like a game roster: the avatar wears a ring in its status color, the meter is a solid outlined bar and XP a solid yellow chip', () => {
     renderRoster();
     const rings = screen.getAllByTestId('home-roster-avatar-ring');
     expect(rings.map((r) => r.dataset.status)).toEqual(['done', 'late', 'idle']);
     expect(rings[0].className).toMatch(/ring-neo-lime/);
     expect(rings[1].className).toMatch(/ring-neo-yellow/);
     const [fill] = screen.getAllByTestId('home-roster-meter-fill');
-    expect(fill.className).toContain('edu-stripes');
+    expect(fill.className).not.toContain('edu-stripes');
+    expect(fill.className).toContain('bg-neo-cyan');
     expect(fill.parentElement!.className).toMatch(/border-2/);
+    expect(fill.parentElement!.className).toContain('bg-edu-surface');
+    const xp = screen.getAllByTestId('home-roster-xp')[0];
+    expect(xp).toHaveClass('bg-neo-yellow', 'text-neo-black', 'border-neo-black');
     for (const pill of screen.getAllByTestId('home-roster-pill')) expect(pill.className).toMatch(/border-2/);
   });
 

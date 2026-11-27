@@ -36,14 +36,24 @@ export const GAME_CARD_HOVER = [
 export const STICKER =
   'inline-flex -rotate-2 items-center gap-1.5 whitespace-nowrap rounded-neo border-[3px] border-neo-black px-2.5 py-0.5 font-neo-display text-sm font-black text-neo-black shadow-hard';
 
-/** A small secondary on the desk: an outlined pill with a thin cream lip, so Start stays the one big thing. Needs usePress for data-pressed. */
+/** The class-code button: an outlined pill with a thin lip. Needs usePress for data-pressed. */
 export const HERO_CHIP = cn(
   'inline-flex min-h-11 min-w-0 items-center justify-center gap-1.5 rounded-neo-pill border-2 border-edu-line bg-edu-surface px-3 font-neo-display text-[0.8125rem] font-bold sm:px-3.5 sm:text-sm text-edu-ink [&_svg]:size-4',
   neoChunkyPress(2),
   'shadow-edu-line',
   EDU_FOCUS,
 );
-export const HERO_SECONDARY = HERO_CHIP;
+
+// A second action on the desk: a white pressable tile whose leading icon becomes a coloured square.
+const HERO_TILE = cn(
+  'inline-flex min-h-14 min-w-0 items-center gap-3 rounded-neo-lg border-[3px] border-edu-line bg-edu-surface px-3 py-2 text-start font-neo-display text-base font-black leading-tight text-edu-ink sm:text-lg',
+  '[&>svg]:box-content [&>svg]:size-6 [&>svg]:shrink-0 [&>svg]:rounded-neo [&>svg]:border-[3px] [&>svg]:border-neo-black [&>svg]:p-1.5 [&>svg]:text-neo-black',
+  neoChunkyPress(4),
+  'shadow-edu-line',
+  EDU_FOCUS,
+);
+export const HERO_SECONDARY = cn(HERO_TILE, '[&>svg]:bg-neo-cyan');
+export const HERO_PICK = cn(HERO_TILE, '[&>svg]:bg-neo-yellow');
 export const HERO_SECONDARY_WRAP = 'contents';
 
 /** A calm one-line row under the hero: icon, words, chevron. */

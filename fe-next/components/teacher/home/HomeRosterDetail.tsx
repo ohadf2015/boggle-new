@@ -17,8 +17,8 @@ import { StreakFlame } from '@/components/streak/StreakFlame';
 type T = (key: string, params?: Record<string, string | number>) => string;
 
 export const STATUS_DOT: Record<RosterStatus, string> = {
-  done: 'bg-neo-lime',
-  late: 'bg-neo-yellow',
+  done: 'border-2 border-neo-black bg-neo-lime',
+  late: 'border-2 border-neo-black bg-neo-yellow',
   idle: 'border-2 border-edu-line bg-transparent',
 };
 
@@ -28,16 +28,15 @@ export function StatusDot({ status, className }: { status: RosterStatus; classNa
       aria-hidden="true"
       data-testid="home-roster-dot"
       data-status={status}
-      className={cn('inline-block size-2.5 shrink-0 rounded-full', STATUS_DOT[status], className)}
+      className={cn('inline-block size-3 shrink-0 rounded-full', STATUS_DOT[status], className)}
     />
   );
 }
 
-// Only Behind is solid so the eye lands on who needs help, not on the many who played.
 const STATUS_PILL: Record<RosterStatus, string> = {
-  done: 'border-neo-lime/60 bg-neo-lime/20 text-edu-lime-ink',
-  late: 'border-neo-black bg-neo-yellow text-neo-black shadow-hard-sm',
-  idle: 'border-edu-line bg-edu-ink/15 text-edu-ink/90',
+  done: 'border-neo-black bg-neo-lime text-neo-black',
+  late: 'border-neo-black bg-neo-yellow text-neo-black',
+  idle: 'border-edu-line bg-edu-surface text-edu-ink',
 };
 
 export const STATUS_RING: Record<RosterStatus, string> = {
@@ -51,7 +50,7 @@ export function StatusPill({ status, label }: { status: RosterStatus; label: str
     <span
       data-testid="home-roster-pill"
       data-status={status}
-      className={cn('inline-block max-w-full truncate rounded-full border-2 px-2 py-px font-neo-body text-xs font-black', STATUS_PILL[status])}
+      className={cn('inline-block max-w-full truncate rounded-full border-2 px-2.5 py-px font-neo-body text-xs font-black sm:text-sm', STATUS_PILL[status])}
     >
       {label}
     </span>

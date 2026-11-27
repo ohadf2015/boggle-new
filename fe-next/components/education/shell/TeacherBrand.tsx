@@ -26,10 +26,10 @@ export function TeacherBrand({
     >
       <EduMascot moment="welcome" size={compact ? 36 : 44} className={compact ? 'size-9 shrink-0' : 'size-11 shrink-0'} />
       <span className="flex min-w-0 flex-col leading-none">
-        <span className={cn('truncate font-neo-display font-black text-edu-ink', compact ? 'text-lg' : 'text-xl')}>
+        <span className={cn('truncate font-neo-display font-black text-edu-ink', compact ? 'text-lg' : 'text-2xl')}>
           {t('eduShell.brand.name')}
         </span>
-        <span className="truncate font-neo-display text-xs font-bold text-edu-ink/70">{t('eduShell.brand.tagline')}</span>
+        <span className={cn('truncate font-neo-display font-bold text-edu-ink/70', compact ? 'text-xs' : 'mt-0.5 text-sm')}>{t('eduShell.brand.tagline')}</span>
       </span>
     </Link>
   );

@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
+import { HIDE_ON_SKY } from '@/components/education/shell/ArcadeBackdrop';
 import { cn } from '@/lib/utils';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import ClassroomManager from '@/components/teacher/ClassroomManager';
@@ -52,7 +53,7 @@ function ClassesShell({ children }: { children: React.ReactNode }) {
       scrollRegionLabel={t('teacher.nav.classes')}
       contentClassName={cn(CLASSES_CONTENT_CLASS, 'relative isolate')}
     >
-      <AmbientBackdrop theme="teacher" density="calm" />
+      <AmbientBackdrop theme="teacher" density="calm" className={HIDE_ON_SKY} />
       {children}
     </EducationShell>
   );

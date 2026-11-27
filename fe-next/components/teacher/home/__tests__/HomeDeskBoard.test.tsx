@@ -108,6 +108,15 @@ describe('<HomeDeskBoard>', () => {
     expect(results).toHaveAccessibleName(expect.stringContaining('eduShell.home.focus.barLabel'));
   });
 
+  it('Given a wide screen, Then See results is one white outlined row whose chart icon sits in a cyan square', () => {
+    wide.value = true;
+    render(<HomeDeskBoard {...props({ readyLabel: '9 of 22 scored 80%+' })} />);
+    const results = screen.getByTestId('home-open-results');
+    expect(results.className).toContain('border-[3px]');
+    expect(results.className).toContain('bg-edu-surface');
+    expect(results.querySelector('svg[class*="bg-neo-cyan"]')).not.toBeNull();
+  });
+
   it('Given a free teacher with no roster, Then the strip is just the results entry', () => {
     render(<HomeDeskBoard {...props({ roster: null })} />);
     expect(within(screen.getByTestId('home-weekly-reports')).getAllByRole('button')).toHaveLength(1);
