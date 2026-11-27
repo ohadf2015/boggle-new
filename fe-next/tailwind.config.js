@@ -44,6 +44,20 @@ module.exports = {
     },
     extend: {
       colors: {
+        // Classroom sky skin (app/edu-sky.css): dark by default, sky under data-edu-theme="sky".
+        edu: {
+          page: "var(--edu-page)",
+          surface: "var(--edu-surface)",
+          tile: "var(--edu-tile)",
+          ink: "var(--edu-ink)",
+          line: "var(--edu-line)",
+          "lime-ink": "var(--edu-lime-ink)",
+          "cyan-ink": "var(--edu-cyan-ink)",
+          "yellow-ink": "var(--edu-yellow-ink)",
+          "pink-ink": "var(--edu-pink-ink)",
+          "purple-ink": "var(--edu-purple-ink)",
+          "orange-ink": "var(--edu-orange-ink)",
+        },
         // Neo-Brutalist Color Palette - 4 Primary Colors with Tonal Variations
         // Primary: lime, Secondary: pink, Tertiary: cyan, Quaternary: purple
         neo: {
@@ -243,6 +257,8 @@ module.exports = {
       },
       // Hard Shadow Utilities (NO blur - Neo-Brutalist style, cleaned-up: lighter offsets)
       boxShadow: {
+        'edu-lip': 'var(--edu-lip)',
+        'edu-lip-sm': 'var(--edu-lip-sm)',
         'hard-sm': '1px 1px 0px rgb(var(--neo-black))',
         'hard': '2px 2px 0px rgb(var(--neo-black))',
         'hard-md': '2px 2px 0px rgb(var(--neo-black))',

@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { EducationLandingFaq } from '@/components/education/EducationLandingFaq';
+import { EduSkyScope } from '@/components/education/EduSkyScope';
+import { EDU_SKY_VIEWPORT } from '@/lib/education/eduSkyViewport';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { translateKey } from '@/lib/i18n/serverTranslate';
 import {
@@ -31,6 +33,8 @@ import { educationPageLabel } from '@/lib/seo/educationPageLinks';
 // commit) and cost every visitor a server render. ISR matches /education/for-schools.
 export const revalidate = 3600;
 
+export const viewport = EDU_SKY_VIEWPORT;
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   return generatePageMetadata({ seoKey: 'educationHub', path: '/education', locale });
@@ -50,7 +54,7 @@ export default async function EducationPage({ params }: { params: Promise<{ loca
   // JSON.stringify escapes content for <script> context; same pattern as
   // app/[locale]/guides/page.tsx:73 and components/seo/FaqPageJsonLd.tsx.
   return (
-    <>
+    <EduSkyScope>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
@@ -64,7 +68,7 @@ export default async function EducationPage({ params }: { params: Promise<{ loca
         faq={<EducationLandingFaq locale={locale} items={content.faq} />}
       />
       <EducationResourceLinks locale={locale} />
-    </>
+    </EduSkyScope>
   );
 }
 

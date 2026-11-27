@@ -46,3 +46,21 @@ describe('getMpInGamePlaceholderClass', () => {
     expect(cls).not.toContain('bg-neo-cream');
   });
 });
+
+describe('classroom variant', () => {
+  it('paints the classroom page token, never cream, with no colour transition', () => {
+    for (const gameMode of ['classic', 'blast', 'wheel-rush', 'word-hunt']) {
+      const cls = getMpInGameContainerClass(gameMode, { classroom: true });
+      expect(cls).toContain('bg-edu-page');
+      expect(cls).not.toContain('bg-neo-navy');
+      expect(cls).not.toContain('bg-neo-cream');
+      expect(cls).not.toContain('transition-colors');
+    }
+    expect(getMpInGamePlaceholderClass({ classroom: true })).toContain('bg-edu-page');
+  });
+
+  it('leaves the main game navy when the flag is off', () => {
+    expect(getMpInGameContainerClass('classic', { classroom: false })).toBe(getMpInGameContainerClass('classic'));
+    expect(getMpInGamePlaceholderClass()).toContain('bg-neo-navy');
+  });
+});

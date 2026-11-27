@@ -1,0 +1,140 @@
+/*
+  Classroom "sky" skin. The edu-* tokens default to the dark app, so a component
+  shared with the main game or an SEO page renders as before. An in-scope route
+  root carries data-edu-theme="sky" (EduSkyScope); html:has() flips the tokens for
+  the whole document, so portals, dialogs and the toaster follow.
+
+  Loaded after globals.css. Tokens live in the utilities layer because the app's
+  :root and body rules sit there; primitives sit in components so utilities win.
+*/
+@layer utilities {
+  :root {
+    --edu-page: var(--neo-navy);
+    --edu-surface: var(--neo-navy-light);
+    --edu-tile: var(--neo-cream);
+    --edu-ink: rgb(var(--neo-white));
+    --edu-line: var(--neo-cream);
+    --edu-lime-ink: var(--neo-lime);
+    --edu-cyan-ink: var(--neo-cyan);
+    --edu-yellow-ink: var(--neo-yellow);
+    --edu-pink-ink: var(--neo-pink);
+    --edu-purple-ink: var(--neo-purple);
+    --edu-orange-ink: var(--neo-orange);
+    --edu-lip: 3px 3px 0 rgb(var(--neo-black));
+    --edu-lip-sm: 2px 2px 0 rgb(var(--neo-black));
+  }
+
+  html:has([data-edu-theme='sky']) {
+    --edu-page: #9ed8ff;
+    --edu-surface: #ffffff;
+    --edu-tile: #fff6e3;
+    --edu-ink: #101114;
+    --edu-line: #101114;
+    --edu-lime-ink: #3d5c00;
+    --edu-cyan-ink: #005f6b;
+    --edu-yellow-ink: #6b4a00;
+    --edu-pink-ink: #b0105f;
+    --edu-purple-ink: #5b21b6;
+    --edu-orange-ink: #a8380a;
+    --edu-lip: 0 5px 0 #101114;
+    --edu-lip-sm: 0 3px 0 #101114;
+
+    --background: var(--edu-page);
+    --foreground: var(--edu-ink);
+    --card: var(--edu-surface);
+    --card-foreground: var(--edu-ink);
+    --popover: var(--edu-surface);
+    --popover-foreground: var(--edu-ink);
+    --secondary-foreground: var(--edu-ink);
+    --muted: var(--edu-tile);
+    --muted-foreground: rgb(16 17 20 / 0.7);
+    --border: var(--edu-line);
+    --input: var(--edu-surface);
+
+    color-scheme: light;
+    background-color: var(--edu-page);
+  }
+
+  html:has([data-edu-theme='sky']) body {
+    background-color: var(--edu-page);
+    background-image: none;
+    color: var(--edu-ink);
+  }
+}
+
+@layer components {
+  .edu-card {
+    background-color: var(--edu-surface);
+    color: var(--edu-ink);
+    border: 3px solid var(--edu-line);
+    border-radius: 1rem;
+    box-shadow: var(--edu-lip);
+  }
+
+  .edu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.625rem 1.25rem;
+    border: 3px solid var(--edu-line);
+    border-radius: 0.875rem;
+    background-color: var(--edu-surface);
+    color: var(--edu-ink);
+    font-family: var(--font-fredoka), 'Fredoka', var(--font-rubik), sans-serif;
+    font-weight: 700;
+    box-shadow: var(--edu-lip-sm);
+    transition: transform 90ms ease-out, box-shadow 90ms ease-out;
+  }
+
+  .edu-btn:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: none;
+  }
+
+  .edu-btn-primary {
+    background-color: var(--neo-lime);
+    color: #101114;
+    border-color: #101114;
+  }
+
+  .edu-tile {
+    display: inline-grid;
+    place-items: center;
+    background-color: var(--edu-tile);
+    color: #101114;
+    border: 3px solid #101114;
+    border-radius: 0.75rem;
+    box-shadow: var(--edu-lip-sm);
+    font-family: var(--font-fredoka), 'Fredoka', var(--font-rubik), sans-serif;
+    font-weight: 700;
+  }
+
+  /* Reward moments only. Static: nothing here animates. */
+  .edu-rays-dark {
+    background-color: var(--neo-navy);
+    background-image: repeating-conic-gradient(
+      from 0deg at 50% 60%,
+      rgb(0 255 255 / 0.2) 0deg 9deg,
+      transparent 9deg 22.5deg
+    );
+    color: rgb(var(--neo-white));
+  }
+
+  .edu-rays-gold {
+    background-color: #fff6e3;
+    background-image: repeating-conic-gradient(
+      from 0deg at 50% 60%,
+      rgb(255 225 53 / 0.75) 0deg 9deg,
+      transparent 9deg 22.5deg
+    );
+    color: #101114;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .edu-btn {
+      transition: none;
+    }
+  }
+}
