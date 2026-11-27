@@ -83,6 +83,7 @@ const SECTIONS = [
       { href: '/legal', labelKey: 'legal.title', fallback: 'Legal' },
       { href: '/legal/privacy', labelKey: 'legal.privacyPolicy', fallback: 'Privacy Policy' },
       { href: '/legal/terms', labelKey: 'legal.termsOfService', fallback: 'Terms of Service' },
+      { href: '/legal/refund', labelKey: 'legal.refundPolicy', fallback: 'Refund Policy' },
       { href: '/legal/cookies', labelKey: 'footer.cookiePolicy', fallback: 'Cookie Policy' },
       { href: '/legal/disclaimer', labelKey: 'sitemap.disclaimer', fallback: 'Disclaimer' },
       { href: '/accessibility', labelKey: 'sitemap.accessibility', fallback: 'Accessibility' },
