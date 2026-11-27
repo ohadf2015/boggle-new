@@ -145,7 +145,7 @@ export default function HowToPlayPageClient({ locale, children }: HowToPlayPageC
                     </div>
                     <div className="order-1 flex justify-center lg:order-2">
                         <div className="flex w-full max-w-[16rem] -rotate-1 justify-center rounded-neo-lg border-3 border-neo-black bg-neo-purple p-3 shadow-hard-xl sm:max-w-sm sm:p-5 lg:max-w-md lg:p-8">
-                            <Image src={art.src} alt={art.alt} width={art.width} height={art.height} priority sizes="(min-width: 1024px) 384px, 256px" className="h-auto max-h-32 w-auto sm:max-h-56 lg:max-h-80" />
+                            <Image src={art.src} alt={art.alt} width={art.width} height={art.height} priority sizes="(min-width: 1024px) 384px, 256px" className="h-32 w-auto sm:h-56 lg:h-80" />
                         </div>
                     </div>
                 </header>

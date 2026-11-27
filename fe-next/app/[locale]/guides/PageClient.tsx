@@ -235,6 +235,7 @@ export default function GuidesIndexPageClient({ children }: { children?: React.R
         />
 
         <TileGrid
+          headingLevel={2}
           items={content.guides.map((guide) => {
             const Icon = iconMap[guide.icon];
             return {

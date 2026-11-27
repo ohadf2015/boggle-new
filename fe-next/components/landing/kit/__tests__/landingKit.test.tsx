@@ -67,6 +67,11 @@ describe('landing kit', () => {
     expect(screen.getByRole('link', { name: /linked/i })).toHaveAttribute('href', '/en/daily');
   });
 
+  it('tile titles take the heading level the page outline needs', () => {
+    render(<TileGrid headingLevel={2} items={[{ title: 'Solver' }]} />);
+    expect(screen.getByRole('heading', { level: 2, name: 'Solver' })).toBeInTheDocument();
+  });
+
   it('check list renders every item', () => {
     render(<CheckList items={['a', 'b', 'c']} />);
     expect(screen.getAllByRole('listitem')).toHaveLength(3);

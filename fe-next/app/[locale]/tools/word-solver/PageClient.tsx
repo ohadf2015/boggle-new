@@ -89,7 +89,7 @@ export default function WordSolverPageClient({ children }: { children?: React.Re
             </h1>
             <p className="max-w-xl text-lg leading-relaxed text-neo-white/85">{content.subtitle}</p>
             <div className="hidden -rotate-2 self-start rounded-neo-lg border-3 border-neo-black bg-neo-purple p-6 shadow-hard-xl lg:mt-4 lg:block">
-              <Image src={art.src} alt={art.alt} width={art.width} height={art.height} sizes="224px" className="h-auto max-h-64 w-auto" />
+              <Image src={art.src} alt={art.alt} width={art.width} height={art.height} sizes="224px" className="h-64 w-auto" />
             </div>
           </div>
 

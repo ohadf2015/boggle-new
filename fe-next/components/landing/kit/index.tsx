@@ -156,7 +156,7 @@ export function LandingHero({
               height={art.height}
               priority
               sizes="(min-width: 1024px) 384px, 256px"
-              className="h-auto max-h-36 w-auto max-w-full object-contain sm:max-h-56 lg:max-h-80"
+              className="h-36 w-auto max-w-full object-contain sm:h-56 lg:h-80"
             />
           </div>
         </div>
@@ -238,11 +238,15 @@ export function TileGrid({
   items,
   columns = 3,
   variant = 'color',
+  headingLevel = 3,
 }: {
+  /** 2 when the tiles are the page's first sections */
+  headingLevel?: 2 | 3;
   items: TileItem[];
   columns?: keyof typeof COLS;
   variant?: 'color' | 'paper';
 }) {
+  const Heading = `h${headingLevel}` as const;
   return (
     <div className={cn('grid gap-4', COLS[columns])}>
       {items.map((item, i) => {
@@ -256,7 +260,7 @@ export function TileGrid({
             {variant === 'paper' && <span aria-hidden className={cn('h-3 border-b-3 border-neo-black', TONE_BG[tone])} />}
             <span className="flex flex-col gap-1.5 p-5">
               {item.icon}
-              <h3 className="font-neo-display text-xl font-bold leading-tight">{item.title}</h3>
+              <Heading className="font-neo-display text-xl font-bold leading-tight">{item.title}</Heading>
               {item.body && <span className="text-[15px] leading-relaxed">{item.body}</span>}
             </span>
           </>
@@ -450,7 +454,7 @@ export function CtaBand({
         {actions && <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-center">{actions}</div>}
       </div>
       {art && (
-        <Image src={art.src} alt={art.alt} width={art.width} height={art.height} sizes="192px" className="h-auto max-h-40 w-auto lg:max-h-48" />
+        <Image src={art.src} alt={art.alt} width={art.width} height={art.height} sizes="192px" className="h-40 w-auto lg:h-48" />
       )}
     </section>
   );

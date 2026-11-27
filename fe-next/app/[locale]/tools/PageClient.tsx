@@ -54,7 +54,7 @@ export default function ToolsHubPageClient({ children }: { children?: React.Reac
           art={LANDING_ART.solver('')}
           artTone="cyan"
         />
-        <TileGrid items={tools} columns={tools.length > 1 ? 3 : 2} />
+        <TileGrid headingLevel={2} items={tools} columns={tools.length > 1 ? 3 : 2} />
         {children}
       </LandingPage>
     </div>

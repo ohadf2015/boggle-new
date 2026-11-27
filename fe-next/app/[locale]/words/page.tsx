@@ -107,7 +107,7 @@ export default async function WordsHubPage({ params }: PageParams) {
         </div>
         <div className="hidden justify-center lg:flex">
           <div className="-rotate-1 rounded-neo-lg border-3 border-neo-black bg-neo-yellow p-8 shadow-hard-xl">
-            <Image src={heroArt.src} alt={heroArt.alt} width={heroArt.width} height={heroArt.height} priority sizes="384px" className="h-auto max-h-80 w-auto" />
+            <Image src={heroArt.src} alt={heroArt.alt} width={heroArt.width} height={heroArt.height} priority sizes="384px" className="h-80 w-auto" />
           </div>
         </div>
       </HeroBand>

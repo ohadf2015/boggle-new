@@ -407,7 +407,8 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
           <FaqList
             items={[1, 2, 3, 4, 5, 6]
               .map((i) => ({ q: t(`showcase3d.faqQ${i}`, ''), a: t(`showcase3d.faqA${i}`, '') }))
-              .filter((f) => f.q && f.a)}
+              .filter((f) => f.q && f.a)
+              .map((f) => ({ q: <h3>{f.q}</h3>, a: f.a }))}
           />
         </Section>
 
