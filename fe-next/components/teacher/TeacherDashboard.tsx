@@ -37,6 +37,7 @@ import { useHomeWeekLoop } from './home/useHomeWeekLoop';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
+import { useTrialFirstSession } from '@/hooks/useTrialFirstSession';
 import { useTeacherWeekStats } from '@/hooks/useTeacherWeekStats';
 import { useTeacherLiveGameRunning } from '@/hooks/useTeacherLiveGameRunning';
 import { useClassStudentPreview } from '@/hooks/useClassStudentPreview';
@@ -109,6 +110,20 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
     '';
 
   const assign = useAssignCreator(deepLink.openAssignment, language);
+  const firstSession = useTrialFirstSession({
+    teacherId: user?.id,
+    locale: language,
+    status: pro.status,
+    known: pro.known,
+    loading: proLoading || classroomsLoading,
+    classrooms,
+    classroomsReady: !classroomsLoading && !classroomsError,
+    liveStarted: activation.progress.liveStarted,
+    gamesPlayed: Object.keys(week.summary?.lastPlayedAt ?? {}).length,
+    classroomId: effectiveId || null,
+    assignmentRefreshKey: assign.open ? 'open' : 'closed',
+    onOpenAssignment: () => assign.openWith(),
+  });
   const [lessonsOpen, setLessonsOpen] = useState(() => deepLink.reviewWords.length > 0);
   const welcomeKind = useCheckoutReturn(searchParams?.get('checkout') === 'success', pro);
 
@@ -294,7 +309,7 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
       error={Boolean(classroomsError)}
       onRetry={() => void classroomsState.refresh?.()}
       hasClasses={hasClasses}
-      welcome={!proLoading ? <TeacherHqWelcome welcomeKind={welcomeKind} grant={pro.grant} trialExpires={pro.trialExpires ?? pro.periodEnd} /> : null}
+      welcome={!proLoading ? <TeacherHqWelcome welcomeKind={welcomeKind} grant={pro.grant} trialExpires={pro.trialExpires ?? pro.periodEnd} session={firstSession} /> : null}
       onboarding={
         <div className="flex min-w-0 flex-col gap-4">
           <HomeOnboardingCard

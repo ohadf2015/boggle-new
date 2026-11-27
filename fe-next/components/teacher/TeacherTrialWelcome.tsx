@@ -2,6 +2,7 @@
 
 import { isCheckoutRedirectPending } from '@/lib/education/checkoutReturn';
 import { useState } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { polarTrialDaysLeft } from '@/lib/education/polarTrial';
 import { cn } from '@/lib/utils';
@@ -16,7 +17,23 @@ import { planEndDate } from '@/components/teacher/TeacherProTrialCanceledBanner'
  * with a card and converts on its own, so there is nothing to buy here: a
  * second checkout would be a second subscription.
  */
-export function TeacherTrialWelcome({ trialExpires, onReturnPage = false }: { trialExpires: string | null; onReturnPage?: boolean }) {
+export function TeacherTrialWelcome({
+  trialExpires,
+  onReturnPage = false,
+  nextHref,
+  nextLabelKey,
+  onEngage,
+  onAbandon,
+}: {
+  trialExpires: string | null;
+  onReturnPage?: boolean;
+  /** Current activation step. Deep-links into an existing flow. */
+  nextHref?: string;
+  nextLabelKey?: string;
+  onEngage?: () => void;
+  /** Welcome closed without taking the step. */
+  onAbandon?: () => void;
+}) {
   const { t, language } = useLanguage();
   const [open, setOpen] = useState(
     () => onReturnPage || typeof window === 'undefined' || !isCheckoutRedirectPending(window.sessionStorage, window.location.pathname),
@@ -25,8 +42,9 @@ export function TeacherTrialWelcome({ trialExpires, onReturnPage = false }: { tr
   const days = polarTrialDaysLeft(trialExpires, nowMs);
   const isRTL = language === 'he';
 
-  const close = () => {
+  const close = (abandoned: boolean) => {
     setOpen(false);
+    if (abandoned) onAbandon?.();
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
       url.searchParams.delete('checkout');
@@ -77,9 +95,28 @@ export function TeacherTrialWelcome({ trialExpires, onReturnPage = false }: { tr
           </p>
         </div>
         <div className={NB_DIALOG_FOOTER}>
-          <button type="button" data-testid="teacher-trial-welcome-dismiss" onClick={close} className={NB_PRIMARY}>
-            {t('teacher.proWelcome.cta')}
-          </button>
+          {nextHref ? (
+            <Link
+              href={nextHref}
+              data-testid="teacher-trial-welcome-step"
+              onClick={() => {
+                onEngage?.();
+                close(false);
+              }}
+              className={NB_PRIMARY}
+            >
+              {t(nextLabelKey ?? 'teacher.proWelcome.cta')}
+            </Link>
+          ) : (
+            <button type="button" data-testid="teacher-trial-welcome-dismiss" onClick={() => close(false)} className={NB_PRIMARY}>
+              {t('teacher.proWelcome.cta')}
+            </button>
+          )}
+          {nextHref ? (
+            <button type="button" data-testid="teacher-trial-welcome-dismiss" onClick={() => close(true)} className="mt-2 min-h-11 font-neo-body text-sm font-bold text-neo-cream/80 underline underline-offset-4">
+              {t('eduShell.firstSession.later')}
+            </button>
+          ) : null}
         </div>
       </div>
     </div>

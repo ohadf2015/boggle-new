@@ -23007,6 +23007,32 @@ const es = {
         }
       }
     },
+    "firstSession": {
+      "title": "Pon a tu clase a jugar hoy",
+      "subtitle": "Cuatro pasos. Tu prueba de Teacher Pro está activa.",
+      "progress": "{done} de {total}",
+      "dismiss": "Cerrar lista de pasos",
+      "later": "Ahora no",
+      "schedule": "Programar para la clase",
+      "steps": {
+        "create_classroom": {
+          "title": "Crear una clase",
+          "cta": "Crear clase"
+        },
+        "add_students": {
+          "title": "Añade a tus primeros alumnos",
+          "cta": "Añadir alumnos"
+        },
+        "create_assignment": {
+          "title": "Crea la primera tarea",
+          "cta": "Crear tarea"
+        },
+        "first_live_game": {
+          "title": "Juega o programa una partida en vivo",
+          "cta": "Empezar partida en vivo"
+        }
+      }
+    },
     "setup": {
       "strip": {
         "share": "Compartir el código",

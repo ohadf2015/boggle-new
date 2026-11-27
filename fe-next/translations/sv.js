@@ -22995,6 +22995,32 @@ const sv = {
         }
       }
     },
+    "firstSession": {
+      "title": "Få igång klassen i dag",
+      "subtitle": "Fyra steg. Din provperiod på Teacher Pro är i gång.",
+      "progress": "{done} av {total}",
+      "dismiss": "Stäng checklistan",
+      "later": "Inte nu",
+      "schedule": "Schemalägg till lektionen",
+      "steps": {
+        "create_classroom": {
+          "title": "Skapa ett klassrum",
+          "cta": "Skapa klassrum"
+        },
+        "add_students": {
+          "title": "Lägg till de första eleverna",
+          "cta": "Lägg till elever"
+        },
+        "create_assignment": {
+          "title": "Skapa den första uppgiften",
+          "cta": "Skapa uppgift"
+        },
+        "first_live_game": {
+          "title": "Kör eller schemalägg ett livespel",
+          "cta": "Kör ett livespel"
+        }
+      }
+    },
     "setup": {
       "strip": {
         "share": "Dela koden",
