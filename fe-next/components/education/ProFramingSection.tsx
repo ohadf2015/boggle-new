@@ -41,7 +41,7 @@ export function ProFramingSection({ cta }: { cta?: ReactNode } = {}) {
           </div>
 
           {/* Pro Tier */}
-          <div className="rounded-neo border-3 border-neo-yellow bg-edu-surface p-4 text-edu-ink shadow-hard sm:p-5">
+          <div className="rounded-neo border-3 border-edu-line bg-edu-surface p-4 text-edu-ink shadow-edu-lip sm:p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="inline-flex items-center gap-1.5 font-neo-display text-xl font-black text-edu-ink">
