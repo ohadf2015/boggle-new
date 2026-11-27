@@ -158,9 +158,9 @@ export default function StudentProfilePageClient() {
               {['a', 'b', 'c'].map((id) => <div key={id} className="h-16 rounded-[14px] bg-edu-ink/10 motion-safe:animate-pulse" />)}
             </div>
           ) : fresh ? (
-            <div data-testid="profile-first-step" className={cn(CARD, 'flex items-center gap-3')} style={toneStyle('night', { shadow: 3, trim: 2 })}>
+            <div data-testid="profile-first-step" className={cn(CARD, 'flex flex-wrap items-center gap-3')} style={toneStyle('night', { shadow: 3, trim: 2 })}>
               <Medallion tone="gold" size={48} shadow={2}><span className="text-2xl leading-none" aria-hidden="true">🚀</span></Medallion>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-[11rem] flex-1">
                 <p dir="auto" className={cn('font-neo-display text-lg font-black leading-tight text-edu-ink')}>
                   {t('academy.pages.profileFirstTitle', 'Your first lesson starts your level')}
                 </p>
@@ -170,7 +170,7 @@ export default function StudentProfilePageClient() {
               </div>
               <Link
                 href={nextHref}
-                className={cn(pressClasses(2), 'inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 font-neo-display text-sm font-black uppercase text-neo-black')}
+                className={cn(pressClasses(2), 'inline-flex min-h-12 w-full shrink-0 items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 font-neo-display text-sm font-black uppercase text-neo-black sm:w-auto')}
               >
                 <Play className="size-4 rtl:-scale-x-100" aria-hidden />
                 {t('academy.pages.awardsEmptyCta', 'Play a lesson')}
