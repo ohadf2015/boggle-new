@@ -87,6 +87,11 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
   stray data-lc-cta, for-schools top-bar link, clientBoundary list. Fixing now; then tsc/build/suite/prod shots/review v3.
 - 17:25: education review fixed + committed (14936 related tests green). Running `~/.cache/lexiclash/lp1127/final-gate.sh`
   (tsc, build, prod shots, review page, full suite, eslint, seo freeze). Then publish review v3 and report.
+- 18:00 final gate: tsc 0, build OK, 322 shots parity OK (4 explained), BE green, FE 13 fails = teacher tests flaky
+  under full-run load (pass alone, 106/106) + rls.test needs live DB. BLOCKER: seo freeze check flags ~12 pages
+  because any `title:` key in body data counts as a snippet line (false positive). Fixing the detector in a
+  separate branch `fix/seo-freeze-metadata-scope` (detector looks only inside metadata/const TITLE/DESCRIPTION).
+  Merged origin/master (edu sky #2204) into this branch cleanly.
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
