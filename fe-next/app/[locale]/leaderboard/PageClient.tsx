@@ -1,6 +1,7 @@
 'use client';
 
 // Note: Dynamic rendering is set in page.tsx (server component)
+import HolidayHideSpot from '@/components/holidays/hunt/HolidayHideSpot';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import dynamic from 'next/dynamic';
@@ -177,6 +178,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
 
   return (
     <FriendStatusProvider>
+    <HolidayHideSpot slot="leaderboard" />
     <PageLayout onRefresh={handleRefresh} padding="md" maxWidth="4xl">
       <div className="py-4">
         <header className="mb-5 flex flex-wrap items-center gap-3">

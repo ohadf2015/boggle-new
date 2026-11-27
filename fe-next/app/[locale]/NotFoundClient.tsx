@@ -1,5 +1,7 @@
 'use client';
 
+import PermanentEgg from '@/components/holidays/eggs/PermanentEgg';
+import HolidayHideSpot from '@/components/holidays/hunt/HolidayHideSpot';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -49,6 +51,7 @@ export default function NotFoundClient() {
 
   return (
     <div className="flex-1 flex items-center justify-center bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 relative overflow-hidden">
+      <HolidayHideSpot slot="notFound" />
       {/* Animated background decoration - floating letters */}
       <div className="absolute inset-0 pointer-events-none opacity-10">
         <div className="absolute top-[10%] left-[10%] text-6xl font-black text-neo-lime animate-float font-neo-display">?</div>
@@ -59,6 +62,7 @@ export default function NotFoundClient() {
 
       <div className="text-center max-w-md relative z-10">
         {/* Interactive Mascot - confused, becomes thoughtful on hover, helpful on click */}
+        <PermanentEgg kind="lost_latke" className="mb-4" />
         <div className="mb-8 animate-neo-pop">
           <InteractiveMascot
             variant="confused"

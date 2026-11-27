@@ -42,6 +42,8 @@ export const LANDING_NAMESPACES = [
   'friends',
   'notifications',
   'gift',
+  // Holiday event card + holiday avatar parts render on the home page (Dec windows).
+  'holiday',
   'season',
   'xp',
   'music',

@@ -1,5 +1,6 @@
 'use client';
 
+import { publishHolidayFromResponse, themedHolidayNow } from '@/lib/holidays/dailyClient';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -125,6 +126,8 @@ export function useWinnerOnboarding() {
         if (pending.result.hintsUnlocked !== undefined) bodyData.hintsUnlocked = pending.result.hintsUnlocked;
         if (pending.result.efficiencyScore !== undefined) bodyData.efficiencyScore = pending.result.efficiencyScore;
 
+        const holiday = themedHolidayNow();
+        if (holiday) bodyData.holiday = holiday;
         const response = await fetch('/api/daily-challenge/word-hunt/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...(await bearerHeader()) },
@@ -133,6 +136,7 @@ export function useWinnerOnboarding() {
 
         if (response.ok) {
           logger.info('Successfully submitted pending daily result after onboarding');
+          publishHolidayFromResponse(response);
         } else {
           const errorText = await response.text();
           logger.warn('Failed to submit pending daily result:', errorText);

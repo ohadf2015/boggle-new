@@ -121,6 +121,11 @@ async function appendPart(supabase: SupabaseClient, playerId: string, key: strin
   return false;
 }
 
+/** Add one part to profiles.premium_avatar_parts under the snapshot lock; false when the lock kept losing. */
+export async function grantPremiumPart(supabase: SupabaseClient, playerId: string, key: string): Promise<boolean> {
+  return appendPart(supabase, playerId, key, (await readProfile(supabase, playerId)).parts);
+}
+
 /** The item a chest already granted, for showing it again; null when none (never throws). */
 export async function readChestPart(supabase: SupabaseClient, playerId: string, source: ChestDropSource, sourceKey: string): Promise<ChestItemDrop | null> {
   try {

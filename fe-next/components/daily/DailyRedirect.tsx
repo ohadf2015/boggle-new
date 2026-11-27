@@ -1,5 +1,6 @@
 'use client';
 
+import HolidayHideSpot from '@/components/holidays/hunt/HolidayHideSpot';
 import { Suspense, useEffect, useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -70,6 +71,7 @@ export default function DailyRedirect() {
 
   return (
     <div className="flex-1 flex flex-col bg-neo-navy min-h-screen page-content-safe">
+      <HolidayHideSpot slot="daily" />
       <Header />
       <DailyChallengeLanding
         onSelectWordHunt={() => router.push(`/${language}/daily/word-hunt`)}

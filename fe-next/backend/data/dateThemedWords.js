@@ -9,6 +9,7 @@
  */
 
 const easter = require('date-easter');
+const { isHanukkah, isChristmasWindow } = require('./winterHolidayWindows');
 
 // Day of week themes (0 = Sunday, 6 = Saturday)
 const dayOfWeekThemes = {
@@ -378,7 +379,9 @@ const holidayWords = {
     en: ['CHRISTMAS', 'SANTA', 'GIFT', 'TREE', 'SNOW', 'JINGLE', 'CAROL', 'MERRY', 'REINDEER', 'STOCKING', 'ORNAMENT', 'CELEBRATION'],
     sv: ['JULAFTON', 'JULTOMTE', 'JULKLAPP', 'JULGRAN', 'SNO', 'JULSTJARNA', 'JULBORD', 'GLOGG', 'PEPPARKAKOR', 'JULSKINKOR', 'JULMUSIK', 'JULSTAMNING'],
     es: ['NAVIDAD', 'REGALOS', 'ARBOL', 'NIEVE', 'VILLANCICOS', 'BELEN', 'NOCHEBUENA', 'FAMILIA', 'TURRON', 'DECORACION', 'CELEBRACION', 'FELICIDADES'],
-    ja: ['聖夜', '降誕', '贈物', '樅木', '聖誕', '祝祭', '冬至', '雪景', '鈴音', '装飾', '祝福', '歓喜']
+    ja: ['聖夜', '降誕', '贈物', '樅木', '聖誕', '祝祭', '冬至', '雪景', '鈴音', '装飾', '祝福', '歓喜'],
+    he: ['מתנה', 'שלג', 'כוכב', 'אורות', 'פעמונ', 'גרב', 'סנטה', 'חורפ', 'קישוט', 'עוגיה', 'שוקו', 'חגיגה'],
+    ru: ['ЕЛКА', 'ПОДАРОК', 'СНЕГ', 'ЗВЕЗДА', 'ГИРЛЯНДА', 'ИГРУШКА', 'МОРОЗ', 'САНТА', 'ПРАЗДНИК', 'ОЛЕНЬ', 'СНЕЖИНКА', 'ЧУДО']
   },
   threeKings: {
     es: ['REYES', 'MAGOS', 'REGALOS', 'CAMELLO', 'ESTRELLA', 'ORO', 'MIRRA', 'INCIENSO', 'ROSCON', 'CABALGATA', 'TRADICION', 'ILUSIONES']
@@ -403,7 +406,12 @@ const holidayWords = {
     he: ['סוכה', 'לולב', 'אתרוג', 'הדס', 'ערבה', 'חג', 'שמחה', 'אורחימ', 'סככ', 'ארבעת', 'המינימ', 'הושענא']
   },
   hanukkah: {
-    he: ['חנוכה', 'נר', 'חנוכיה', 'סביבונ', 'סופגניה', 'לביבה', 'שמנ', 'נס', 'אור', 'מכבימ', 'הדלקה', 'מתנות']
+    he: ['חנוכה', 'נר', 'חנוכיה', 'סביבונ', 'סופגניה', 'לביבה', 'שמנ', 'נס', 'אור', 'מכבימ', 'הדלקה', 'מתנות'],
+    en: ['HANUKKAH', 'MENORAH', 'CANDLE', 'DREIDEL', 'LATKE', 'GELT', 'OIL', 'LIGHT', 'MIRACLE', 'DONUT', 'EIGHT', 'NIGHTS'],
+    es: ['JANUCA', 'MENORA', 'VELA', 'PERINOLA', 'LUZ', 'ACEITE', 'MILAGRO', 'OCHO', 'NOCHES', 'FIESTA', 'MONEDAS', 'CANDELABRO'],
+    sv: ['CHANUKKA', 'LJUS', 'LJUSSTAKE', 'SNURRA', 'OLJA', 'MUNK', 'MYNT', 'FEST', 'LJUSFEST', 'MIRAKEL', 'KANDELABER', 'UNDER'],
+    ja: ['燭台', '灯火', '奇跡', '八夜', '光祭', '祝祭', '蝋燭', '聖火', '金貨', '祈願', '神殿', '油壺'],
+    ru: ['ХАНУКА', 'МЕНОРА', 'СВЕЧА', 'ВОЛЧОК', 'ОГОНЬ', 'МАСЛО', 'ЧУДО', 'СВЕТ', 'ПОНЧИК', 'МОНЕТА', 'ВОСЕМЬ', 'ПРАЗДНИК']
   },
   purim: {
     he: ['פורימ', 'תחפושת', 'המנ', 'אסתר', 'מרדכי', 'מגילה', 'משלוח', 'מנות', 'רעשנ', 'שמחה', 'משתה', 'עוגניות']
@@ -486,9 +494,6 @@ function getCurrentTheme(language, date = new Date()) {
     }
     if (isDateInDynamicRange(date, hebrewHolidays.sukkot.start, hebrewHolidays.sukkot.end)) {
       return { nameKey: 'theme.sukkot', emoji: '🌿', words: getWords('sukkot'), isHoliday: true };
-    }
-    if (isDateInDynamicRange(date, hebrewHolidays.hanukkah.start, hebrewHolidays.hanukkah.end)) {
-      return { nameKey: 'theme.hanukkah', emoji: '🕎', words: getWords('hanukkah'), isHoliday: true };
     }
     if (isDateInDynamicRange(date, hebrewHolidays.purim.start, hebrewHolidays.purim.end)) {
       return { nameKey: 'theme.purim', emoji: '🎭', words: getWords('purim'), isHoliday: true };
@@ -605,10 +610,13 @@ function getCurrentTheme(language, date = new Date()) {
     return { nameKey: 'theme.lucia', emoji: '🕯️', words: getWords('lucia'), isHoliday: true };
   }
 
-  // CHRISTMAS (Dec 25) - All languages
-  if (isNearFixedDate(date, 11, 25)) {
-    return { nameKey: 'theme.christmas', emoji: '🎄', words: getWords('christmas'), isHoliday: true };
+  const christmas = { nameKey: 'theme.christmas', emoji: '🎄', words: getWords('christmas'), isHoliday: true };
+  const christmasNow = isChristmasWindow(date);
+  if (christmasNow && lang !== 'he') return christmas;
+  if (isHanukkah(date, (y) => getHebrewHolidayDates(y).hanukkah.start)) {
+    return { nameKey: 'theme.hanukkah', emoji: '🕎', words: getWords('hanukkah'), isHoliday: true };
   }
+  if (christmasNow) return christmas;
 
   // ========== Fall back to day of week theme ==========
   const dayOfWeek = date.getDay();

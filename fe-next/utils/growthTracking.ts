@@ -48,6 +48,8 @@ import {
 } from '@/utils/activationGate';
 import { trackRetentionPlay } from '@/lib/retention/tracking';
 import { signalGameEnded } from '@/lib/ads/gameEndSignal';
+import { markHolidayPlayed } from '@/lib/holidayEvent/markHolidayPlayed';
+import { noteHolidayGame } from '@/lib/holidays/holidayClient';
 import { consumeAccountFirstGamePending } from '@/lib/retention/accountFirstGame';
 import {
   stampFirstWinClockStart,
@@ -1887,6 +1889,8 @@ export const trackGameEnd = (
   // results_inline signup CTA gate: only after a real game_completed.
   if (completed) {
     markGameCompletedSignal();
+    void markHolidayPlayed();
+    void noteHolidayGame(wordCount);
     // Once per fresh account. No-op when no signup armed it.
     const firstAccountGame = consumeAccountFirstGamePending();
     if (firstAccountGame) {

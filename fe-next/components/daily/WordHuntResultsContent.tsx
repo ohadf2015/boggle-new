@@ -9,6 +9,7 @@
  * leaderboard, and more options.
  */
 
+import HolidayDailyResults from './holiday/HolidayDailyResults';
 import React, { useEffect, useMemo, useState } from 'react';
 import { m } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
@@ -195,6 +196,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   );
   const answerNode = (
     <>
+      <HolidayDailyResults puzzleDate={puzzleDate} language={language} />
       <ResultDisplay
         solved={result.solved}
         attemptsUsed={result.attemptsUsed}

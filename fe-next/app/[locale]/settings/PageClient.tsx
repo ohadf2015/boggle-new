@@ -1,5 +1,7 @@
 'use client';
 
+import PermanentEgg from '@/components/holidays/eggs/PermanentEgg';
+import HolidayHideSpot from '@/components/holidays/hunt/HolidayHideSpot';
 import React from 'react';
 import { m } from 'framer-motion';
 import { ArrowLeft, Volume2, VolumeX, Music, Bell, Eye, Sparkles, Zap, Languages, Monitor, MessageSquare, ChevronRight, Coffee } from 'lucide-react';
@@ -185,6 +187,7 @@ export default function SettingsPageClient(): React.JSX.Element {
         ? 'bg-neo-navy'
         : 'bg-linear-to-br from-neo-cream via-white to-neo-cream'
     )}>
+      <HolidayHideSpot slot="settings" />
       <AutoHideHeader />
 
       <div className={cn(
@@ -551,6 +554,7 @@ export default function SettingsPageClient(): React.JSX.Element {
           <p className={cn('text-xs', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
             {t('settings.savedAutomatically')}
           </p>
+          <PermanentEgg kind="snowman" className="mt-2" />
         </m.div>
       </div>
     </div>

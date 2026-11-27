@@ -5,6 +5,7 @@
  * Combines daily missions + weekly quest in an RPG-inspired layout.
  */
 
+import HolidayHideSpot from '@/components/holidays/hunt/HolidayHideSpot';
 import Header from '@/components/Header';
 import { QuestHub } from '@/components/quests/QuestHub';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,6 +15,7 @@ export default function QuestsPageClient() {
 
   return (
     <div className="flex-1 flex flex-col bg-neo-navy min-h-screen page-content-safe">
+      <HolidayHideSpot slot="quests" />
       <Header />
       <main className="flex-1 w-full max-w-lg mx-auto px-3 py-4 sm:px-4 sm:py-6 pb-24">
         <div className="flex items-center gap-3 mb-5">

@@ -130,6 +130,13 @@ describe('PlayHero', () => {
     expect(mascot.closest('[data-testid="mascot-rig"]')).not.toBeNull();
   });
 
+  it('given the hero, then the mascot ships both holiday outfits for the html holiday class to reveal', () => {
+    renderHero();
+    const srcs = Array.from(screen.getByTestId('hp-mascot').querySelectorAll('img')).map((i) => i.getAttribute('src') ?? '');
+    expect(srcs.some((s) => s.includes('m-hanukkah'))).toBe(true);
+    expect(srcs.some((s) => s.includes('m-christmas'))).toBe(true);
+  });
+
   it('given a device that never played, then PLAY opens the coached first round', () => {
     window.localStorage.removeItem('lexiclash_quick_guest_v1');
     renderHero({ lang: 'he' });

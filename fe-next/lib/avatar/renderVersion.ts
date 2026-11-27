@@ -10,4 +10,5 @@
  */
 // 2026-09-24: full art redraw (components/avatar/art) + legacy id map.
 // 2026-09-24 r2: legendary parts in gold leaf, slate edge on common tokens.
-export const AVATAR_RENDER_VERSION = '2026-09-24.art3';
+// 2026-11-27: winter holiday accessories.
+export const AVATAR_RENDER_VERSION = '2026-11-27.art4';

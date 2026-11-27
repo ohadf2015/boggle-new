@@ -5,9 +5,14 @@ import {
   isEmailServiceConfigured,
   generateUnsubscribeToken,
   getSubscriberRecipients,
-  isUnsubscribedFromCampaigns,
-  CAMPAIGN_SUBSCRIPTION_COLUMN,
 } from '@/lib/email';
+import { loadCampaignRecipients, ensureUnsubscribeToken, type CampaignRecipient } from '@/lib/campaignRecipients';
+import {
+  planHolidayGreeting,
+  sendHolidayGreetingToRecipient,
+  HOLIDAY_KEYS_FOR_EMAIL,
+} from '@/lib/holidayGreetingEmail';
+import type { HolidayKey } from '@/lib/holidays/calendar';
 import {
   resolveUserLanguage,
   getFirstLetterForLanguage,
@@ -29,15 +34,24 @@ export const maxDuration = 60;
 type BulkEmailType =
   | 'reengagement'
   | 'game-mode-announcement'
-  | 'android-release-launch';
+  | 'android-release-launch'
+  | 'holiday-greeting';
+
+const EMAIL_TYPES: readonly BulkEmailType[] = [
+  'reengagement',
+  'game-mode-announcement',
+  'android-release-launch',
+  'holiday-greeting',
+];
 
 /**
  * POST /api/admin/send-bulk-email
  * Send emails to all eligible players. Admin-only.
  *
  * Body: {
- *   emailType: 'reengagement' | 'game-mode-announcement' | 'android-release-launch'
+ *   emailType: 'reengagement' | 'game-mode-announcement' | 'android-release-launch' | 'holiday-greeting'
  *   mode?: GameModeKey (required for game-mode-announcement)
+ *   holiday?: 'hanukkah' | 'christmas' (holiday-greeting: only recipients whose default holiday matches)
  *   dryRun?: boolean   (count recipients without sending)
  * }
  *
@@ -74,8 +88,13 @@ export async function POST(request: NextRequest) {
     const mode: GameModeKey = body.mode || 'blast';
     const includeSubscribers = body.includeSubscribers === true;
 
-    if (!['reengagement', 'game-mode-announcement', 'android-release-launch'].includes(emailType)) {
+    if (!EMAIL_TYPES.includes(emailType)) {
       return NextResponse.json({ error: 'Invalid emailType' }, { status: 400 });
+    }
+
+    const holidayFilter: HolidayKey | undefined = body.holiday ?? undefined;
+    if (holidayFilter !== undefined && !HOLIDAY_KEYS_FOR_EMAIL.includes(holidayFilter)) {
+      return NextResponse.json({ error: 'Invalid holiday' }, { status: 400 });
     }
 
     if (includeSubscribers && emailType !== 'game-mode-announcement') {
@@ -90,44 +109,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Supabase admin not configured' }, { status: 503 });
     }
 
-    // Get all subscribed players (not unsubscribed).
-    // One-click unsubscribe flips daily_email_subscribed=false (see
-    // lib/email.ts unsubscribeByToken). `.neq(..., false)` keeps NULL + true
-    // (legacy rows default NULL). We also SELECT the flag so the in-memory guard
-    // below can act as a second line of defense if this query ever drifts.
-    const { data: players, error: fetchError } = await adminSupabase
-      .from('profiles')
-      .select(
-        `id, display_name, username, timezone, country_code, email_unsubscribe_token, ${CAMPAIGN_SUBSCRIPTION_COLUMN}`
-      )
-      .neq(CAMPAIGN_SUBSCRIPTION_COLUMN, false);
-
-    if (fetchError) {
-      logger.error('BULK_EMAIL', 'Failed to fetch players:', fetchError);
-      return NextResponse.json({ error: 'Failed to fetch players' }, { status: 500 });
+    const audience = await loadCampaignRecipients(adminSupabase);
+    if (!audience.ok) {
+      logger.error('BULK_EMAIL', audience.error);
+      return NextResponse.json({ error: audience.error }, { status: 500 });
     }
+    const holidayPlan =
+      emailType === 'holiday-greeting' ? planHolidayGreeting(audience.recipients, holidayFilter) : null;
+    const eligible: CampaignRecipient[] = holidayPlan
+      ? holidayPlan.plan.map((p) => p.recipient)
+      : audience.recipients;
 
-    if (!players || players.length === 0) {
+    if (eligible.length === 0) {
       return NextResponse.json({ success: true, message: 'No eligible players', total: 0, sent: 0, failed: 0 });
     }
 
-    // Resolve emails via auth
-    const { data: authData, error: authListError } = await adminSupabase.auth.admin.listUsers();
-    if (authListError) {
-      return NextResponse.json({ error: 'Failed to list auth users' }, { status: 500 });
-    }
-
-    const emailMap = new Map<string, string>();
-    for (const u of authData.users) {
-      if (u.email) emailMap.set(u.id, u.email);
-    }
-
-    // Filter to players with emails, then HARD-suppress anyone who unsubscribed.
-    // The unsubscribe guard is enforced here in-memory (not just in the query)
-    // so it holds for every bulk email type even if the recipient query changes.
-    const eligible = players
-      .filter((p) => emailMap.has(p.id))
-      .filter((p) => !isUnsubscribedFromCampaigns(p));
+    const ensureUnsubToken = (player: CampaignRecipient) =>
+      ensureUnsubscribeToken(adminSupabase, player, generateUnsubscribeToken);
 
     if (dryRun) {
       const dryRunResponse: Record<string, unknown> = {
@@ -135,11 +133,11 @@ export async function POST(request: NextRequest) {
         dryRun: true,
         total: eligible.length,
         message: `Would send ${emailType} email to ${eligible.length} players`,
+        ...(holidayPlan && { byHoliday: holidayPlan.counts }),
       };
 
       if (includeSubscribers) {
-        const registeredEmailSet = new Set(emailMap.values());
-        const subscribers = await getSubscriberRecipients(registeredEmailSet);
+        const subscribers = await getSubscriberRecipients(audience.registeredEmails);
         dryRunResponse.subscriberTotal = subscribers.length;
         dryRunResponse.message += ` + ${subscribers.length} subscribers`;
       }
@@ -154,23 +152,30 @@ export async function POST(request: NextRequest) {
     const errors: string[] = [];
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.live';
 
+    const holidayById = new Map(holidayPlan?.plan.map((p) => [p.recipient.id, p]) ?? []);
+
     for (const player of eligible) {
-      const playerEmail = emailMap.get(player.id)!;
+      const playerEmail = player.email;
 
       try {
-        if (emailType === 'reengagement') {
+        if (emailType === 'holiday-greeting') {
+          const { holiday, language } = holidayById.get(player.id)!;
+          const unsubToken = await ensureUnsubToken(player);
+          const result = await sendHolidayGreetingToRecipient({
+            email: playerEmail,
+            recipientName: player.display_name || player.username || 'Word Hunter',
+            language,
+            holiday,
+            unsubscribeUrl: `${baseUrl}/api/email/unsubscribe?token=${unsubToken}`,
+          });
+          if (result.success) sent++;
+          else { failed++; errors.push(`${playerEmail}: ${result.error}`); }
+        } else if (emailType === 'reengagement') {
           const language = await resolveUserLanguage(player.id, player.country_code);
           const letterData = await getFirstLetterForLanguage(language);
           const firstLetter = letterData?.letter || '?';
 
-          let unsubToken = player.email_unsubscribe_token;
-          if (!unsubToken) {
-            unsubToken = generateUnsubscribeToken();
-            await adminSupabase
-              .from('profiles')
-              .update({ email_unsubscribe_token: unsubToken })
-              .eq('id', player.id);
-          }
+          const unsubToken = await ensureUnsubToken(player);
 
           const recipient: ReengagementRecipient = {
             id: player.id,
@@ -188,14 +193,7 @@ export async function POST(request: NextRequest) {
         } else if (emailType === 'android-release-launch') {
           const language = await resolveUserLanguage(player.id, player.country_code);
 
-          let unsubToken = player.email_unsubscribe_token;
-          if (!unsubToken) {
-            unsubToken = generateUnsubscribeToken();
-            await adminSupabase
-              .from('profiles')
-              .update({ email_unsubscribe_token: unsubToken })
-              .eq('id', player.id);
-          }
+          const unsubToken = await ensureUnsubToken(player);
 
           const result = await sendAndroidReleaseLaunchToRecipient({
             email: playerEmail,
@@ -224,8 +222,7 @@ export async function POST(request: NextRequest) {
     let subscribersFailed = 0;
 
     if (includeSubscribers && emailType === 'game-mode-announcement') {
-      const registeredEmailSet = new Set(emailMap.values());
-      const subscribers = await getSubscriberRecipients(registeredEmailSet);
+      const subscribers = await getSubscriberRecipients(audience.registeredEmails);
 
       const resendClient = new Resend(process.env.RESEND_API_KEY);
       const fromEmail = process.env.RESEND_FROM_EMAIL!;

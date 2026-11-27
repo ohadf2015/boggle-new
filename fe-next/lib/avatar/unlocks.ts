@@ -18,6 +18,7 @@
 import {
   FEMALE_HAIR_STYLES,
   HIDDEN_PARTS,
+  isHolidayPart,
   MALE_HAIR_STYLES,
   PREMIUM_CATEGORIES,
   getPremiumParts,
@@ -137,6 +138,7 @@ const NON_COLLECTIBLE_CATEGORIES = new Set(['eyebrows']);
 
 function isCollectible(category: string, partId: string): boolean {
   if (NON_COLLECTIBLE_CATEGORIES.has(category)) return false;
+  if (isHolidayPart(category, partId)) return false;
   const hidden = (HIDDEN_PARTS as Record<string, readonly string[]>)[category] ?? [];
   if (hidden.includes(partId)) return false;
   if (category === 'hair' && !HAIR_PICKABLE.has(partId)) return false;

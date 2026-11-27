@@ -19,6 +19,7 @@ import { safeToLocaleDateString } from '@/utils/bcp47Locale';
 import { useMusic } from '@/contexts/MusicContext';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
 import type { Language } from '@/types';
+import HolidayDailyIntro from './holiday/HolidayDailyIntro';
 
 export { LANGUAGE_OPTIONS } from './LanguageDropdown';
 
@@ -236,6 +237,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           <p data-testid="hunt-ready-tagline" className="mx-auto max-w-xs text-sm font-bold leading-snug text-neo-white/80">
             {t('wordHunt.survival.readyTagline')}
           </p>
+          <HolidayDailyIntro puzzleDate={puzzleDate} language={language} />
         </m.div>
 
         {/* PRIMARY PLAY BUTTON — inline on desktop, sticky on mobile */}

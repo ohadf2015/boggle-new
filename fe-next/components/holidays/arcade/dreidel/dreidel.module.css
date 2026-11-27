@@ -1,0 +1,96 @@
+.table {
+  position: relative;
+  flex: 1 0 auto;
+  align-content: center;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 12px 10px;
+}
+
+.spinner {
+  position: relative;
+  width: 96px;
+  height: 96px;
+}
+
+.spinning {
+  animation: spin 1.4s cubic-bezier(0.15, 0.6, 0.25, 1) both;
+  will-change: transform;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg) translateY(0); }
+  80% { transform: rotate(1980deg) translateY(-2px); }
+  90% { transform: rotate(2150deg) translateY(0); }
+  100% { transform: rotate(2160deg); }
+}
+
+.wobble {
+  animation: wobble 500ms ease-out;
+}
+
+@keyframes wobble {
+  30% { transform: rotate(-9deg); }
+  60% { transform: rotate(6deg); }
+}
+
+.face {
+  position: absolute;
+  inset-inline-end: -10px;
+  bottom: -6px;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 3px solid rgb(var(--neo-black));
+  border-radius: 12px;
+  background: var(--neo-holiday-gold);
+  color: rgb(var(--neo-black));
+  font-size: 1.7rem;
+  font-weight: 900;
+  animation: facePop 380ms cubic-bezier(0.3, 1.8, 0.5, 1) both;
+}
+
+@keyframes facePop {
+  from { transform: scale(0) rotate(-30deg); }
+  to { transform: scale(1) rotate(0deg); }
+}
+
+.purse {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-weight: 900;
+}
+
+.active {
+  outline: 3px solid var(--neo-holiday-gold);
+  outline-offset: 3px;
+  border-radius: 14px;
+}
+
+.pot {
+  animation: potBump 300ms ease-out;
+}
+
+@keyframes potBump {
+  50% { transform: scale(1.15); }
+}
+
+.wordBar {
+  height: 6px;
+  transform-origin: 0 50%;
+  background: var(--neo-holiday-gold);
+  will-change: transform;
+}
+
+:global([dir='rtl']) .wordBar {
+  transform-origin: 100% 50%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinning, .wobble, .face, .pot { animation: none; }
+}

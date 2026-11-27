@@ -52,6 +52,7 @@ import { levelUpOf, mergeLevelUps } from '../../modules/xpGrant';
 import { isSubmittableDate } from '../../../utils/dailyChallenge/catchUp';
 import { freezeDateToBridge } from '../../../lib/daily/chestFreezeBridge';
 import { loadOwnedFreezes, spendFreezeOn } from '../../../lib/daily/streakExtras.server';
+import { holidayDailyForSubmit } from '../../../lib/holidays/dailySubmit.server';
 
 const router: Router = express.Router();
 
@@ -520,10 +521,14 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       }
     }
 
+    const holiday = await holidayDailyForSubmit({
+      supabase, playerId, holiday: (req.body as { holiday?: unknown }).holiday, puzzleDate, language, wordsDiscovered, attemptWords, isCatchup: isCatchupRow,
+    });
     const levelUp = await questLevelUp;
     res.json({
       success: true, alreadySubmitted: false, isRetry, penaltyApplied, data, chestReady, chestTier, freezeBridged, freezesRemaining,
       ...(levelUp ? { levelUp } : {}),
+      ...(holiday ? { holiday } : {}),
     });
   } catch (error) {
     const err = error as Error;

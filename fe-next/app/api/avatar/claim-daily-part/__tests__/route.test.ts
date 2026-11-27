@@ -41,12 +41,13 @@ vi.mock('@/shared/types/customAvatar', () => ({
   getPremiumParts: vi.fn((category: string) => {
     const map: Record<string, string[]> = {
       eyes: ['laser', 'cyber', 'glow'],
-      accessory: ['crown', 'halo'],
+      accessory: ['crown', 'halo', 'santaHat'],
     };
     return map[category] ?? [];
   }),
   PREMIUM_CATEGORIES: ['eyes', 'accessory'],
   isChestOnlyPart: vi.fn((category: string, partId: string) => `${category}:${partId}` === 'eyes:supernova'),
+  isHolidayPart: vi.fn((category: string, partId: string) => `${category}:${partId}` === 'accessory:santaHat'),
 }));
 
 import { NextRequest } from 'next/server';

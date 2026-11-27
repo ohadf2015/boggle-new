@@ -1,5 +1,485 @@
 // Sv translations
 const sv = {
+  // @holiday:start
+  "holiday": {
+    // @holiday-arcade:start
+    "arcade": {
+      "back": "Tillbaka till arkaden",
+      "scoreLabel": "Poäng",
+      "pause": "Paus",
+      "resume": "Spela vidare",
+      "rackHint": "Tryck på bokstäver för att bilda ett ord",
+      "erase": "Sudda",
+      "submit": "Klar",
+      "shuffle": "Blanda",
+      "great": "Snyggt!",
+      "loading": "Laddar arkaden…",
+      "loadError": "Vi kunde inte starta spelet.",
+      "retry": "Försök igen",
+      "play": "Spela",
+      "coinNote": "Varje spel räknas för dagens högtidsspår. Mynten har ett tak per dag.",
+      "tileTitle": "Högtidsarkad",
+      "tileSubtitle": "Tre snabba ordspel, bara den här säsongen",
+      "shareText": "Jag fick {score} poäng i {game} på LexiClash! Klår du mig?",
+      "wordsFound": "{count} ord",
+      "saving": "Sparar dina poäng…",
+      "saveError": "Vi kunde inte spara rundan. Den räknas ändå för i dag.",
+      "guestCoins": "Logga in för att tjäna mynt i arkaden",
+      "coins": "+{count} mynt",
+      "capReached": "Du har nått dagens mynttak i arkaden. Spela vidare för skojs skull!",
+      "again": "Spela igen",
+      "share": "Dela",
+      "hub": "Alla spel",
+      "signIn": "Logga in för att tjäna mynt",
+      "reject": {
+        "short": "För kort",
+        "letters": "Alla de bokstäverna finns inte här",
+        "dup": "Det ordet har du redan tagit",
+        "unknown": "Finns inte i vår ordlista",
+        "offline": "Anslutningen hackade, försök igen",
+        "all": "Använd alla bokstäver i paketet"
+      },
+      "hanukkah": {
+        "title": "Chanukka-arkad",
+        "subtitle": "Snabba spel för ljusens högtid"
+      },
+      "christmas": {
+        "title": "Jularkad",
+        "subtitle": "Snabba spel medan snön faller"
+      },
+      "oil": {
+        "title": "Olja för 8 nätter",
+        "blurb": "Varje ord håller menoran tänd. Klara dig till den åttonde natten.",
+        "win": "Alla åtta ljus brinner!",
+        "over": "Oljan tog slut",
+        "nightLit": "Natt {night} är tänd",
+        "miracle": "Ett under! Sista droppen räcker",
+        "nightOf": "Natt {night} av {total}",
+        "candlesLit": "{count} ljus tända",
+        "oilLevel": "Olja kvar",
+        "hint": "Längre ord fyller på mer olja"
+      },
+      "sleigh": {
+        "title": "Släde och stavning",
+        "blurb": "Stava ett ord vid varje skorsten för att släppa ner en julklapp.",
+        "win": "Alla julklappar levererade!",
+        "over": "Tomtens runda är slut",
+        "bells": "{count} bjällror kvar",
+        "hint": "Stava ett ord innan skorstenen glider förbi",
+        "missed": "Den skorstenen missade du!"
+      },
+      "snowball": {
+        "title": "Snöbollskrig",
+        "blurb": "Fånga de riktiga orden och kasta tillbaka de falska.",
+        "win": "Vilket snöbollskrig!",
+        "over": "Snöbollskriget är slut",
+        "catch": "Fånga",
+        "toss": "Kasta",
+        "combo": "{count} i rad!",
+        "hint": "Svep uppåt för att fånga ett riktigt ord, åt sidan för att kasta ett falskt",
+        "oops": "Brr, det där var falskt!"
+      },
+      "wrap": {
+        "title": "Slå in det",
+        "blurb": "Kasta om bokstäverna i varje paket innan det rullar av bandet.",
+        "win": "Alla paket inslagna!",
+        "over": "Bandet vann den här gången",
+        "hint": "Använd alla bokstäver för att slå in paketet",
+        "missed": "Det paketet slank iväg!",
+        "misses": "{count} missar kvar",
+        "mystery": "Hemligt paket öppnat!",
+        "mysteryHint": "Hemligt paket! Här gömmer sig ett julord"
+      },
+      "dreidel": {
+        "title": "Snurrduell",
+        "blurb": "Snurra, hitta ord och vinn mynten. Först till 10 vinner.",
+        "win": "Du vann alla mynt!",
+        "over": "Snurran valde andra sidan",
+        "you": "Du",
+        "bot": "Botten",
+        "yourSpin": "Din tur att snurra…",
+        "botSpin": "Botten snurrar…",
+        "botThinking": "Botten tänker…",
+        "botFound": "Botten hittade {word}",
+        "giveUp": "Hoppa över turen",
+        "goal": "Först till {count} mynt vinner",
+        "needLetter": "Ordet måste innehålla bokstaven {letter}",
+        "needLong": "Gimel kräver ett ord med minst {count} bokstäver",
+        "pot": "Potten: {count}",
+        "rule": {
+          "nun": "Nun: ingenting händer den här turen",
+          "gimel": "Gimel! Ett ord med {count}+ bokstäver tar hela potten",
+          "hei": "He! Vilket ord som helst tar halva potten",
+          "shin": "Shin: hitta ett ord med {letter} eller lägg ett mynt i potten"
+        },
+        "result": {
+          "nun": {
+            "win": "Nun, ingenting händer",
+            "miss": "Nun, ingenting händer"
+          },
+          "gimel": {
+            "win": "Gimel! Hela potten är din",
+            "miss": "Inget långt ord, potten ligger kvar"
+          },
+          "hei": {
+            "win": "He! Halva potten är din",
+            "miss": "Inget ord, inga mynt den här gången"
+          },
+          "shin": {
+            "win": "Klarade dig! Du betalar inget",
+            "miss": "Ett mynt åker ner i potten"
+          }
+        },
+        "side": {
+          "nun": "Nun",
+          "gimel": "Gimel",
+          "hei": "He",
+          "shin": "Shin"
+        }
+      },
+      "sufganiyah": {
+        "title": "Munktornet",
+        "blurb": "Koppla ihop munkar som nuddar varandra till ord innan brickan blir full.",
+        "win": "Brickan höll!",
+        "over": "Brickan svämmade över",
+        "hint": "Dra över munkar som nuddar varandra för att stava ett ord",
+        "pick": "Välj munkar som nuddar varandra",
+        "splash": "Syltexplosion!",
+        "tray": "Munkbricka"
+      }
+    },
+    // @holiday-arcade:end
+    "event": {
+      "hanukkah": {
+        "title": "Ljusens högtid",
+        "subtitle": "Tänd ett ljus varje kväll du spelar"
+      },
+      "christmas": {
+        "title": "Snöbatalj",
+        "subtitle": "En present för varje dag du spelar"
+      },
+      "progress": "{lit} av {total}",
+      "dayLit": "Dag {day}: klar",
+      "dayUnlit": "Dag {day}: inte än",
+      "earned": "Dag {day} upplåst!",
+      "loadError": "Vi kunde inte ladda dina framsteg.",
+      "retry": "Försök igen",
+      "signInCta": "Logga in för att samla belöningarna",
+      "litByDaily": "Klart via dagens högtidsutmaning",
+      "litByFriend": "Räddad av en vän"
+    },
+    "part": {
+      "beanieBlue": "Blå mössa",
+      "scarfBlue": "Blå halsduk",
+      "dreidelPin": "Snurrpin",
+      "menorahCrown": "Gyllene menorakrona",
+      "santaHat": "Tomteluva",
+      "elfHat": "Nissemössa",
+      "antlers": "Renhorn",
+      "earmuffs": "Öronmuffar",
+      "scarfXmas": "Randig halsduk",
+      "candyGlasses": "Polkagrisglasögon",
+      "goldDreidelPin": "Gyllene snurrpin",
+      "goldOrnament": "Gyllene julgranskula",
+      "goldGeltMedal": "Gyllene geltmedalj",
+      "goldBell": "Gyllene bjällra"
+    },
+    "title": {
+      "keeperOfTheLight": "Ljusets väktare",
+      "snowChampion": "Snömästare",
+      "seeker": "Sökaren"
+    },
+    "reward": {
+      "coins": "+{count} mynt"
+    },
+    "avatar": {
+      "eventOnly": "Högtidsevent",
+      "eventOnlyHint": "Bara under högtidseventet. Spela en omgång varje dag för att få den."
+    },
+    "toggle": {
+      "label": "Högtidstema",
+      "hanukkah": "Chanukka",
+      "christmas": "Jul",
+      "off": "Inget tema"
+    },
+    "gift": {
+      "hanukkah": {
+        "title": "Mysteriepaket",
+        "hint": {
+          "0": "Något klirrar där inne…",
+          "1": "Vänta, är det gelt?",
+          "2": "Det luktar lite syltmunk.",
+          "3": "Tyngre än igår!",
+          "4": "Inget tjuvkikande före åttonde kvällen."
+        }
+      },
+      "christmas": {
+        "title": "Den stora julklappen",
+        "hint": {
+          "0": "Något skramlar där inne…",
+          "1": "Är det en bjällra?",
+          "2": "Tyngre än igår!",
+          "3": "Det doftar pepparkakor.",
+          "4": "Inget tjuvkikande före julmorgonen."
+        }
+      },
+      "grows": "Det växer varje dag du spelar.",
+      "stalled": "Du missade en dag, så det slutade växa. Det krymper aldrig.",
+      "opensOn": "Öppnas {day}",
+      "shakeLabel": "Skaka mysteriepaketet",
+      "open": "Öppna mysteriepaketet",
+      "openCta": "Öppna!",
+      "openError": "Snöret fastnade. Försök igen.",
+      "openedTitle": "Du öppnade ditt paket!"
+    },
+    "comeback": {
+      "hanukkah": "Missade du kväll {day}? Spela {count} omgångar till idag så tänds den igen.",
+      "christmas": "Missade du paket {day}? Spela {count} omgångar till idag så får du tillbaka det."
+    },
+    "hunt": {
+      "hint": {
+        "profile": "Dagens överraskning gömmer sig där din statistik finns.",
+        "settings": "Dagens överraskning gömmer sig bland reglage och inställningar.",
+        "friends": "Dagens överraskning gömmer sig där du ser dina vänner.",
+        "leaderboard": "Dagens överraskning gömmer sig nära topplistan.",
+        "quests": "Dagens överraskning gömmer sig bland dina uppdrag.",
+        "adventure": "Dagens överraskning gömmer sig på äventyrskartan.",
+        "howToPlay": "Dagens överraskning gömmer sig i reglerna.",
+        "daily": "Dagens överraskning gömmer sig vid dagens utmaning.",
+        "results": "Dagens överraskning dyker upp när du har spelat klart en omgång.",
+        "avatar": "Dagens överraskning gömmer sig i avatarens garderob.",
+        "community": "Dagens överraskning gömmer sig där communityn hänger.",
+        "notFound": "Dagens överraskning gick vilse på en sida som inte finns."
+      },
+      "item": {
+        "doughnut": "syltmunk",
+        "dreidel": "snurra",
+        "gelt": "geltmynt",
+        "latke": "latke",
+        "ornament": "julgranskula",
+        "elf": "tomtenisse",
+        "gingerbread": "pepparkaksgubbe",
+        "snowman": "snögubbe",
+        "candycane": "polkagris"
+      },
+      "foundToday": "Du hittade dagens överraskning. Kom tillbaka i morgon!",
+      "progress": "{count}/{goal}",
+      "found": "Hittad! {count} av {goal}",
+      "seeker": "Du är Sökaren! Ett gyllene pris har lagts till på din avatar.",
+      "error": "Kunde inte spara fyndet. Tryck igen.",
+      "itemLabel": "Plocka upp: {item}"
+    },
+    "eggs": {
+      "close": "Stäng",
+      "dreidelLabel": "Snurra snurran",
+      "dreidelIL": "Ett stort under hände här!",
+      "dreidelWorld": "Ett stort under hände där!",
+      "mascotLabel": "Tryck på maskoten",
+      "globeTitle": "Skaka, skaka… låt det snöa!",
+      "globeShake": "Skaka telefonen",
+      "secretFound": "Hemligt ord: {word}!",
+      "secretsLeft": "??? {count} hemligheter kvar",
+      "secretsAll": "Du hittade alla hemliga ord!",
+      "word": {
+        "maccabee": "MACKABÉ",
+        "miracle": "MIRAKEL",
+        "latke": "LATKE",
+        "sufganiyah": "MUNK",
+        "dreidel": "SNURRA",
+        "santa": "TOMTE",
+        "rudolph": "RUDOLF",
+        "mistletoe": "MISTEL",
+        "elf": "NISSE",
+        "sleigh": "SLÄDE",
+        "reyes": "REYES",
+        "lucia": "LUCIA",
+        "yolka": "JOLKA"
+      },
+      "permanent": {
+        "lost_latke": "Den här sidan gick vilse som en latke i oljan.",
+        "lost_latkeLabel": "Peta på den vilsna latken",
+        "snowman": "Du hittade inställningarnas snögubbe. Han gillar att det är svalt här.",
+        "snowmanLabel": "Säg hej till snögubben",
+        "gingerbread": "Spring, spring, så fort du kan!",
+        "gingerbreadLabel": "Peta på pepparkaksgubben"
+      },
+      "candles": "{count}/{total} ljus",
+      "zotTitle": "Zot Chanukka",
+      "zotBody": "Alla åtta ljus brinner. Tryck för att fira!"
+    },
+    "moment": {
+      "loadError": "Det gick inte att ladda just nu.",
+      "sleigh": "Vinka till släden",
+      "fika": "Fikapaus! Ta en kaffe och en lussekatt, och kom sen tillbaka för ett ord till.",
+      "boxingDay": "Glad annandag! En perfekt dag för ett lugnt ordspel.",
+      "inocentes": {
+        "fake": "Idag är alla ord värda dubbelt!",
+        "reveal": "¡Inocente! Lurad. Orden är värda lika mycket som vanligt."
+      },
+      "kohaku": {
+        "title": "Kōhaku-ordkamp",
+        "team": {
+          "red": "Du är i Lag Röd. Varje ord du hittar ikväll räknas!",
+          "white": "Du är i Lag Vit. Varje ord du hittar ikväll räknas!"
+        },
+        "guest": "Logga in för att gå med i ett lag. Så här står det:",
+        "red": "Röd {count}",
+        "white": "Vit {count}"
+      },
+      "bells108": {
+        "title": "108 klockslag"
+      },
+      "bells": {
+        "label": "Ring i klockan",
+        "hint": "Ring alla 108 slag för att välkomna det nya året.",
+        "done": "Alla 108 ringda. Gott nytt år!"
+      },
+      "chimes": {
+        "title": "Önska innan klockan slår",
+        "intro": "12 slag, 12 sekunder: stava önskeordet innan klockan slår tolv.",
+        "start": "Börja",
+        "lost": "Tiden är slut! Ett försök till?",
+        "won": "{word}! Din önskan är skickad."
+      },
+      "roscon": {
+        "title": "Roscón de Reyes",
+        "hint": "Välj en bit. Akta dig för bönan!",
+        "slice": "Bit {n}",
+        "signIn": "Logga in för att få en bit roscón.",
+        "haba": "Du fick bönan! Nästa års roscón bjuder du på.",
+        "figurine": "Du hittade figuren! Tur hela året: +{count} mynt.",
+        "none": "Bara kaka. Men god!"
+      }
+    },
+    "wrapped": {
+      "hanukkah": {
+        "title": "Din chanukka-sammanfattning",
+        "intro": "Åtta kvällar med ord. Så här gick det.",
+        "days": "kvällar tända",
+        "shareText": "Jag tände {lit} av {total} kvällar på LexiClash i chanukka och hittade {words} ord!"
+      },
+      "christmas": {
+        "title": "Din julsammanfattning",
+        "intro": "Tolv dagar med ord. Så här gick det.",
+        "days": "paket samlade",
+        "shareText": "Jag samlade {lit} av {total} paket på LexiClash i jul och hittade {words} ord!"
+      },
+      "cta": "Se din högtidssammanfattning",
+      "words": "ord hittade på {games} omgångar",
+      "longest": "ditt längsta ord",
+      "hunt": "gömda överraskningar hittade",
+      "secrets": "hemliga ord upptäckta",
+      "finale": "Vi ses nästa högtid!",
+      "share": "Dela",
+      "next": "Nästa",
+      "prev": "Tillbaka",
+      "close": "Stäng",
+      "loading": "Laddar…",
+      "error": "Det gick inte att ladda sammanfattningen.",
+      "table": "din placering vid ett högtidsbord med {size}"
+    },
+    "daily": {
+      "geltFound": "Gelt! +{count}",
+      "geltTiles": "Kväll {night}: {count} gyllene gelt-rutor ligger på brädet. Ord som går genom dem ger mynt.",
+      "giftHidden": "Här gömmer sig ett paket med {count} bokstäver",
+      "giftCheer": "Du hittade paketet!",
+      "nightlyTitle": "Kvällens bräde",
+      "adventTitle": "Adventsbrädet",
+      "nightN": "Kväll {n}",
+      "giftN": "Paket {n}",
+      "nightlyIntro": "{n} gyllene gelt-rutor glittrar på kvällens bräde. Dra ord genom dem för att få mynt och snurra sedan snurran.",
+      "adventIntro": "Ett julord ligger inslaget på dagens bräde. Hitta det så får du öppna dagens paket.",
+      "guestLine": "Logga in för att tända kvällens ljus och hålla liv i din högtidssvit.",
+      "litByBoard": "Kväll {n} tänd med Kvällens bräde. {words} gelt-ord, +{coins} mynt.",
+      "giftUnwrapped": "Paket {n} öppnat! +{coins} mynt.",
+      "giftMissed": "Paket {n} förblev inslaget idag. Dagen räknas ändå.",
+      "giftOpened": "Paketet öppnat: {word}!",
+      "mascotTap": "Säg hej till högtidsmaskoten",
+      "mascotHi": {
+        "hanukkah": "Glad chanukka!",
+        "christmas": "God jul!"
+      }
+    },
+    "community": {
+      "hanukkah": "{count} ljus tända runt om i Israel ikväll",
+      "christmas": "{count} julklappar öppnade runt om i världen idag"
+    },
+    "cracker": {
+      "pullLabel": "Dra i smällkaramellen",
+      "notPlayed": "Spela klart dagens utmaning när du är inloggad så får du dra i smällkaramellen.",
+      "locked": "Det krävs två för en smällkaramell! Den öppnas när någon vid ditt bord eller en vän du bjudit in har spelat klart dagens utmaning.",
+      "error": "Smällkaramellen smällde inte. Försök igen.",
+      "prompt": "Dra eller tryck för att dra i smällkaramellen",
+      "joke": {
+        "1": "Varför är Rudolf alltid så fräsch? Han är ju en ren!",
+        "2": "Hur pratar renar? Rent ut sagt!",
+        "3": "Varför är snögubbar så lugna? De har is i magen.",
+        "4": "Varför har granen så svårt att smälta in? Den sticker ut.",
+        "5": "Vad säger tomten när han krattar? Hö, hö, hö!",
+        "6": "Hur vet man att snögubben är kär? Han smälter när du kommer.",
+        "7": "Vad sa lussekatten när den såg sig i spegeln? Saffrantastiskt!",
+        "8": "Hur stavar en snögubbe? Flinga för flinga.",
+        "9": "Varför trivdes glöggen så bra på julfesten? Den var varm i kläderna.",
+        "10": "Vad faller men gör sig aldrig illa? Snön, och din motståndares poäng."
+      }
+    },
+    "rescue": {
+      "relitHanukkah": "Du tände kväll {n} igen åt din vän!",
+      "relitChristmas": "Du fyllde din väns julstrumpa för dag {n}!",
+      "shareHanukkah": "Hjälp mig tända ett chanukkaljus igen! Spela dagens LexiClash-utmaning via min länk.",
+      "shareChristmas": "Fyll min julstrumpa! Spela dagens LexiClash-utmaning via min länk.",
+      "hanukkah": "Shamash tänder de andra ljusen. Ta med en vän och tänd kväll {n} igen.",
+      "christmas": "Strumpfyllare: en vän kan fylla i dag {n} som du missade."
+    },
+    "dreidel": {
+      "notPlayed": "Spela klart kvällens utmaning när du är inloggad så får du snurra.",
+      "error": "Snurran slant. Försök igen.",
+      "prompt": "Snurra snurran för kvällens gelt",
+      "spin": "Snurra!",
+      "nun": "{letter}: inget den här gången. Snurra igen i morgon kväll!",
+      "gimel": "{letter}: du tar hela potten! +{coins} mynt",
+      "hei": "{letter}: halva potten! +{coins} mynt",
+      "shin": "{letter}: lite extra. +{coins} mynt"
+    },
+    "share": {
+      "whatsapp": "Bjud in via WhatsApp",
+      "more": "Mer"
+    },
+    "table": {
+      "joined": "Du sitter vid bordet! Spela dagens utmaning så bidrar du till gruppens mål.",
+      "full": "Bordet är fullt (8 spelare).",
+      "notFound": "Länken till bordet fungerar inte längre.",
+      "closed": "Det här högtidsbordet har stängt.",
+      "inOther": "Du sitter redan vid ett annat bord. Lämna det först om du vill sitta här.",
+      "error": "Det gick inte att gå med just nu. Försök igen.",
+      "invited": "En vän har sparat en plats åt dig vid sitt högtidsbord.",
+      "join": "Ta min plats",
+      "signInToJoin": "Logga in för att ta din plats",
+      "loadError": "Vi kunde inte ladda ditt högtidsbord.",
+      "pitch": "Spela tillsammans: upp till 8 vänner och ett gemensamt mål varje kväll.",
+      "create": "Duka ett högtidsbord",
+      "inviteText": "Slå dig ner vid mitt högtidsbord på LexiClash! Vi spelar dagens utmaning och lyser upp det tillsammans.",
+      "title": "Ditt högtidsbord",
+      "seats": "{count} av 8 platser",
+      "goalLabel": "Kvällens gruppmål",
+      "goal": "Ikväll: {total} / {goal} poäng tillsammans",
+      "player": "Spelare",
+      "playedToday": "har spelat",
+      "leave": "Lämna bordet",
+      "finaleHanukkah": "Full menora! Ert bord tände varje kväll tillsammans.",
+      "finaleChristmas": "Alla paket öppnade! Ert bord spelade alla 12 dagar tillsammans."
+    },
+    "shareCard": {
+      "hanukkah": "Jag tände kväll {n} av 8!",
+      "hanukkahFinale": "Jag tände alla 8 ljusen!",
+      "christmas": "Jag öppnade paket {n} av 12!",
+      "christmasFinale": "Jag öppnade alla 12 paketen!",
+      "footer": "Spela högtidens dagliga utmaning på lexiclash.live",
+      "buttonHanukkah": "Dela min menora",
+      "buttonChristmas": "Dela mina paket"
+    }
+  },
+  // @holiday:end
   "wordVerdict": {
     "tooShort": "För kort: minst {min} bokstäver",
     "tooLong": "För långt: max {max} bokstäver",

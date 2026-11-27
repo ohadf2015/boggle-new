@@ -16,7 +16,8 @@
  */
 import { Fragment, useCallback, useState } from "react";
 import dynamic from "next/dynamic";
-import Image from "next/image";
+import HolidayMascot from "@/components/holidays/HolidayMascot";
+import HolidayMascotEggs from "@/components/holidays/eggs/HolidayMascotEggs";
 import { ArrowRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCrazyGames } from "@/components/CrazyGamesSDK";
@@ -88,18 +89,15 @@ export function FreshHero({ onPlay }: FreshHeroProps) {
           data-found={found ? "true" : "false"}
           className="relative mx-auto w-[min(74vw,31svh,440px)] min-w-[220px] md:col-start-2 md:row-span-2 md:row-start-1 md:w-full md:max-w-[400px] md:-rotate-2"
         >
-          <Image
-            src="/mascot/hello-nobg.webp"
-            alt=""
-            width={320}
-            height={320}
-            loading="eager"
-            sizes="(min-width: 768px) 140px, 84px"
-            className={cn(
-              "pointer-events-none absolute bottom-3 -start-9 z-40 h-auto w-[76px] -rotate-6 select-none md:-end-14 md:-top-20 md:bottom-auto md:start-auto md:w-[140px] md:rotate-6",
-              m.mascot,
-            )}
-          />
+          <HolidayMascotEggs className="absolute bottom-3 -start-9 z-40 w-[76px] -rotate-6 md:-end-14 md:-top-20 md:bottom-auto md:start-auto md:w-[140px] md:rotate-6">
+            <HolidayMascot
+              defaultSrc="/mascot/hello-nobg.webp"
+              defaultWidth={320}
+              defaultHeight={320}
+              sizes="(min-width: 768px) 140px, 84px"
+              className={cn("pointer-events-none h-auto w-full select-none", m.mascot)}
+            />
+          </HolidayMascotEggs>
           <HeroGrid onFound={handleFound} />
         </div>
 

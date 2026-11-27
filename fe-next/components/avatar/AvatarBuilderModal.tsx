@@ -14,6 +14,7 @@
  * premium parts, `previousConfig` enables restore. Locked parts are TRIED ON,
  * never saved: DONE always saves the committed draft.
  */
+import HolidayHideSpot from '@/components/holidays/hunt/HolidayHideSpot';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
@@ -203,6 +204,7 @@ export default function AvatarBuilderModal({ isOpen, onClose, onSave, initialCon
       onClick={onClose}
       className="fixed inset-0 z-[110] flex items-stretch md:items-center justify-center bg-black/70 md:bg-black/85 md:p-6 pb-[calc(min(var(--admob-banner-height,0px),120px))] md:pb-[1.5rem]"
     >
+      <HolidayHideSpot slot="avatar" />
       <div
         ref={dialogRef}
         role="dialog"

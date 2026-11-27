@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
 import { Play } from 'lucide-react';
@@ -16,6 +15,7 @@ import { quickRoundsPlayed } from '@/lib/quickPlay/guestProgress';
 import { firstGameRoute } from '@/lib/onboarding/firstGameRoute';
 import { PressSurface } from '@/components/motion/PressSurface';
 import { MascotRig } from '@/components/motion/MascotRig';
+import HolidayMascot from '@/components/holidays/HolidayMascot';
 
 const EASE_OUT = 'cubic-bezier(0.22,1,0.36,1)';
 const BREATH: Keyframe[] = [
@@ -74,16 +74,15 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
         <span aria-hidden="true" className="absolute -bottom-1.5 left-1/2 -z-10 h-3 w-20 -translate-x-1/2 rounded-[50%] bg-black/45" />
         <span aria-hidden="true" className="absolute -start-[46px] bottom-0 -rotate-12 lg:-start-[60px]">
           <MascotRig state={animate ? 'hop' : 'idle'}>
-            <Image
-              src="/mascot/hello-nobg.webp"
-              alt=""
-              width={320}
-              height={320}
-              data-testid="hp-mascot"
-              loading="eager"
-              unoptimized
-              className="h-[60px] w-[60px] drop-shadow-[0_3px_0_black] lg:h-[80px] lg:w-[80px]"
-            />
+            <span data-testid="hp-mascot" className="block">
+              <HolidayMascot
+                defaultSrc="/mascot/hello-nobg.webp"
+                defaultWidth={320}
+                defaultHeight={320}
+                sizes="80px"
+                className="h-[60px] w-auto drop-shadow-[0_3px_0_black] lg:h-[80px]"
+              />
+            </span>
           </MascotRig>
         </span>
         {avatar && (

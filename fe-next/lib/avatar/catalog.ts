@@ -34,6 +34,7 @@ import {
   PREMIUM_BG_COLORS,
   getPartPrice,
   isChestOnlyPart,
+  isHolidayPart,
   isNewPart,
   isPremiumPart,
   type CustomAvatarConfig,
@@ -234,7 +235,7 @@ function buildPart(category: PartCategoryId, id: string): CatalogPart {
     genders: gendersFor(category, id),
     isHidden: isHiddenPart(category, id),
     isNew: isNewPart(rc, id),
-    price: premium && !isChestOnlyPart(rc, id) ? getPartPrice(rc, id) : null,
+    price: premium && !isChestOnlyPart(rc, id) && !isHolidayPart(rc, id) ? getPartPrice(rc, id) : null,
     unlockLevel: getUnlockLevel(rc, id),
   };
 }

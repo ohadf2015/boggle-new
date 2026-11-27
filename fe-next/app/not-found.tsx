@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { headers, cookies } from 'next/headers';
+import NotFoundLatke from '@/components/holidays/eggs/NotFoundLatke';
+import { HOLIDAY_PREPAINT_SCRIPT } from '@/lib/holidays/prepaintScript';
+import { loadTranslation } from '@/translations/loadTranslation';
 
 export const dynamic = 'force-dynamic';
 
@@ -105,12 +108,17 @@ export default async function GlobalNotFound() {
     'en';
   const isRTL = locale === 'he';
   const t = notFoundTranslations[locale] || notFoundTranslations.en;
+  const eggs = ((await loadTranslation(locale)).holiday as { eggs: { permanent: Record<string, string> } }).eggs.permanent;
 
   return (
-    <html lang={locale} dir={isRTL ? 'rtl' : 'ltr'}>
+    <html lang={locale} dir={isRTL ? 'rtl' : 'ltr'} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: HOLIDAY_PREPAINT_SCRIPT }} />
+      </head>
       <body className="bg-neo-navy texture-halftone">
         <div className="min-h-screen flex items-center justify-center px-4 py-8">
           <div className="text-center max-w-lg">
+            <NotFoundLatke text={eggs.lost_latke} label={eggs.lost_latkeLabel} />
 
             {/* Scattered letter tiles */}
             <div className="relative h-32 sm:h-40 mb-4 flex items-center justify-center" aria-hidden="true">

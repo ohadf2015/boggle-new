@@ -86,6 +86,15 @@ module.exports = {
           "purple-muted": "var(--neo-purple-muted)",
           "purple-dark": "var(--neo-purple-dark)",
 
+          "holiday-gold": "var(--neo-holiday-gold)",
+          "holiday-gold-dark": "var(--neo-holiday-gold-dark)",
+          "holiday-blue": "var(--neo-holiday-blue)",
+          "holiday-blue-dark": "var(--neo-holiday-blue-dark)",
+          "holiday-red": "var(--neo-holiday-red)",
+          "holiday-red-dark": "var(--neo-holiday-red-dark)",
+          "holiday-pine": "var(--neo-holiday-pine)",
+          "holiday-snow": "var(--neo-holiday-snow)",
+
           // COZY Family (Practice Hub)
           cozy: "var(--neo-cozy)",
           "cozy-light": "var(--neo-cozy-light)",

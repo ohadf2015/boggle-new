@@ -1,5 +1,485 @@
 // EN translations
 const en = {
+  // @holiday:start
+  "holiday": {
+    // @holiday-arcade:start
+    "arcade": {
+      "back": "Back to the arcade",
+      "scoreLabel": "Score",
+      "pause": "Pause",
+      "resume": "Keep playing",
+      "rackHint": "Tap letters to build a word",
+      "erase": "Erase",
+      "submit": "Go",
+      "shuffle": "Shuffle",
+      "great": "Nice one!",
+      "loading": "Loading the arcade…",
+      "loadError": "We couldn't start this game.",
+      "retry": "Try again",
+      "play": "Play",
+      "coinNote": "Every game counts for today's holiday track. Coins are capped per day.",
+      "tileTitle": "Holiday Arcade",
+      "tileSubtitle": "Three quick word games, only this season",
+      "shareText": "I scored {score} in {game} on LexiClash! Can you beat it?",
+      "wordsFound": "{count} words",
+      "saving": "Saving your score…",
+      "saveError": "We couldn't save this round. Your score still counts for today.",
+      "guestCoins": "Sign in to earn coins from the arcade",
+      "coins": "+{count} coins",
+      "capReached": "You've hit today's arcade coin limit. Play on for fun!",
+      "again": "Play again",
+      "share": "Share",
+      "hub": "All games",
+      "signIn": "Sign in to earn coins",
+      "reject": {
+        "short": "Too short",
+        "letters": "Those letters aren't all here",
+        "dup": "You already used that one",
+        "unknown": "Not in our dictionary",
+        "offline": "Connection hiccup, try that again",
+        "all": "Use every letter in the box"
+      },
+      "hanukkah": {
+        "title": "Hanukkah Arcade",
+        "subtitle": "Quick games for the Festival of Lights"
+      },
+      "christmas": {
+        "title": "Christmas Arcade",
+        "subtitle": "Quick games while the snow falls"
+      },
+      "oil": {
+        "title": "Oil for 8 Nights",
+        "blurb": "Words keep the menorah burning. Make it to the eighth night.",
+        "win": "All eight candles are lit!",
+        "over": "The oil ran out",
+        "nightLit": "Night {night} is lit",
+        "miracle": "Miracle! The last drop holds",
+        "nightOf": "Night {night} of {total}",
+        "candlesLit": "{count} candles lit",
+        "oilLevel": "Oil left",
+        "hint": "Longer words pour in more oil"
+      },
+      "sleigh": {
+        "title": "Sleigh Spell",
+        "blurb": "Spell a word at every chimney to drop a gift down it.",
+        "win": "Every gift delivered!",
+        "over": "Santa's run is over",
+        "bells": "{count} bells left",
+        "hint": "Spell a word before the chimney slips past",
+        "missed": "Missed that chimney!"
+      },
+      "snowball": {
+        "title": "Snowball Fight",
+        "blurb": "Catch the real words, throw back the fakes.",
+        "win": "What a snowball fight!",
+        "over": "Snowball fight over",
+        "catch": "Catch",
+        "toss": "Throw",
+        "combo": "{count} in a row!",
+        "hint": "Swipe up to catch a real word, swipe sideways to throw a fake",
+        "oops": "Brr, that one was a fake!"
+      },
+      "wrap": {
+        "title": "Wrap It Up",
+        "blurb": "Unscramble each gift before it rolls off the belt.",
+        "win": "Every gift wrapped!",
+        "over": "The belt won the day",
+        "hint": "Use every letter to wrap the gift",
+        "missed": "That gift slipped away!",
+        "misses": "{count} misses left",
+        "mystery": "Mystery gift unwrapped!",
+        "mysteryHint": "Mystery gift! A holiday word is hiding in here"
+      },
+      "dreidel": {
+        "title": "Dreidel Duel",
+        "blurb": "Spin, find words, win the gelt. First to 10 takes it.",
+        "win": "You won the gelt!",
+        "over": "The dreidel picked the other side",
+        "you": "You",
+        "bot": "Dreidel bot",
+        "yourSpin": "Your spin…",
+        "botSpin": "The bot spins…",
+        "botThinking": "The bot is thinking…",
+        "botFound": "The bot found {word}",
+        "giveUp": "Skip this turn",
+        "goal": "First to {count} gelt wins",
+        "needLetter": "Your word needs the letter {letter}",
+        "needLong": "Gimel needs a word with {count}+ letters",
+        "pot": "Pot: {count}",
+        "rule": {
+          "nun": "Nun: nothing happens this turn",
+          "gimel": "Gimel! A word with {count}+ letters takes the whole pot",
+          "hei": "Hey! Any word takes half the pot",
+          "shin": "Shin: find a word with {letter} or put one gelt in"
+        },
+        "result": {
+          "nun": {
+            "win": "Nun, nothing happens",
+            "miss": "Nun, nothing happens"
+          },
+          "gimel": {
+            "win": "Gimel! The whole pot is yours",
+            "miss": "No long word, the pot stays put"
+          },
+          "hei": {
+            "win": "Hey! Half the pot is yours",
+            "miss": "No word, no gelt this time"
+          },
+          "shin": {
+            "win": "Saved! No gelt paid",
+            "miss": "One gelt goes into the pot"
+          }
+        },
+        "side": {
+          "nun": "Nun",
+          "gimel": "Gimel",
+          "hei": "Hey",
+          "shin": "Shin"
+        }
+      },
+      "sufganiyah": {
+        "title": "Sufganiyah Stack",
+        "blurb": "Link touching doughnuts into words before the tray fills up.",
+        "win": "The tray survived!",
+        "over": "The tray overflowed",
+        "hint": "Drag across touching doughnuts to spell a word",
+        "pick": "Pick touching doughnuts",
+        "splash": "Jelly splash!",
+        "tray": "Doughnut tray"
+      }
+    },
+    // @holiday-arcade:end
+    "event": {
+      "hanukkah": {
+        "title": "Festival of Lights",
+        "subtitle": "Light a candle every night you play"
+      },
+      "christmas": {
+        "title": "Snow Clash",
+        "subtitle": "A gift for every day you play"
+      },
+      "progress": "{lit} of {total}",
+      "dayLit": "Day {day}: collected",
+      "dayUnlit": "Day {day}: not yet",
+      "earned": "Day {day} unlocked!",
+      "loadError": "We couldn't load your progress.",
+      "retry": "Try again",
+      "signInCta": "Sign in to collect your rewards",
+      "litByDaily": "Lit by the Holiday Daily",
+      "litByFriend": "Brought back by a friend"
+    },
+    "part": {
+      "beanieBlue": "Blue Beanie",
+      "scarfBlue": "Blue Scarf",
+      "dreidelPin": "Dreidel Pin",
+      "menorahCrown": "Golden Menorah Crown",
+      "santaHat": "Santa Hat",
+      "elfHat": "Elf Hat",
+      "antlers": "Reindeer Antlers",
+      "earmuffs": "Earmuffs",
+      "scarfXmas": "Striped Scarf",
+      "candyGlasses": "Candy Cane Glasses",
+      "goldDreidelPin": "Golden Dreidel Pin",
+      "goldOrnament": "Golden Ornament",
+      "goldGeltMedal": "Golden Gelt Medal",
+      "goldBell": "Golden Bell"
+    },
+    "title": {
+      "keeperOfTheLight": "Keeper of the Light",
+      "snowChampion": "Snow Champion",
+      "seeker": "Seeker"
+    },
+    "reward": {
+      "coins": "+{count} coins"
+    },
+    "avatar": {
+      "eventOnly": "Holiday event",
+      "eventOnlyHint": "Only during the holiday event. Play a game each day to earn it."
+    },
+    "toggle": {
+      "label": "Holiday theme",
+      "hanukkah": "Hanukkah",
+      "christmas": "Christmas",
+      "off": "No theme"
+    },
+    "gift": {
+      "hanukkah": {
+        "title": "Mystery Gift",
+        "hint": {
+          "0": "Something jingles in there…",
+          "1": "Wait, is that gelt?",
+          "2": "It smells a little like jam doughnuts.",
+          "3": "Heavier than yesterday!",
+          "4": "No peeking before the eighth night."
+        }
+      },
+      "christmas": {
+        "title": "The Big Present",
+        "hint": {
+          "0": "Something rattles in there…",
+          "1": "Is that a bell?",
+          "2": "Heavier than yesterday!",
+          "3": "It smells like gingerbread.",
+          "4": "No peeking before Christmas morning."
+        }
+      },
+      "grows": "It grows bigger every day you play.",
+      "stalled": "You missed a day, so it stopped growing. It never shrinks.",
+      "opensOn": "Opens {day}",
+      "shakeLabel": "Shake the mystery gift",
+      "open": "Open the mystery gift",
+      "openCta": "Open it!",
+      "openError": "The ribbon got stuck. Try again.",
+      "openedTitle": "You opened your gift!"
+    },
+    "comeback": {
+      "hanukkah": "Missed night {day}? Play {count} more games today to relight it.",
+      "christmas": "Missed gift {day}? Play {count} more games today to get it back."
+    },
+    "hunt": {
+      "hint": {
+        "profile": "Today's treat is hiding where your stats live.",
+        "settings": "Today's treat is hiding among the switches and sliders.",
+        "friends": "Today's treat is hiding somewhere you can see your friends.",
+        "leaderboard": "Today's treat is hiding near the top players.",
+        "quests": "Today's treat is hiding with your quests.",
+        "adventure": "Today's treat is hiding on the adventure map.",
+        "howToPlay": "Today's treat is hiding in the rules.",
+        "daily": "Today's treat is hiding by the daily challenge.",
+        "results": "Today's treat shows up after you finish a game.",
+        "avatar": "Today's treat is hiding in the avatar closet.",
+        "community": "Today's treat is hiding where the community hangs out.",
+        "notFound": "Today's treat got lost on a page that doesn't exist."
+      },
+      "item": {
+        "doughnut": "jelly doughnut",
+        "dreidel": "dreidel",
+        "gelt": "gelt coin",
+        "latke": "latke",
+        "ornament": "ornament",
+        "elf": "elf",
+        "gingerbread": "gingerbread man",
+        "snowman": "snowman",
+        "candycane": "candy cane"
+      },
+      "foundToday": "You found today's treat. Come back tomorrow!",
+      "progress": "{count}/{goal}",
+      "found": "Found it! {count} of {goal}",
+      "seeker": "You're a Seeker! A golden prize was added to your avatar.",
+      "error": "Couldn't save that find. Tap it again.",
+      "itemLabel": "Collect the hidden {item}"
+    },
+    "eggs": {
+      "close": "Close",
+      "dreidelLabel": "Spin the dreidel",
+      "dreidelIL": "A great miracle happened here!",
+      "dreidelWorld": "A great miracle happened there!",
+      "mascotLabel": "Tap the mascot",
+      "globeTitle": "Shake it up… let it snow!",
+      "globeShake": "Shake your phone",
+      "secretFound": "Secret word: {word}!",
+      "secretsLeft": "??? {count} secrets left",
+      "secretsAll": "You found every secret word!",
+      "word": {
+        "maccabee": "MACCABEE",
+        "miracle": "MIRACLE",
+        "latke": "LATKE",
+        "sufganiyah": "SUFGANIYAH",
+        "dreidel": "DREIDEL",
+        "santa": "SANTA",
+        "rudolph": "RUDOLPH",
+        "mistletoe": "MISTLETOE",
+        "elf": "ELF",
+        "sleigh": "SLEIGH",
+        "reyes": "REYES",
+        "lucia": "LUCIA",
+        "yolka": "YOLKA"
+      },
+      "permanent": {
+        "lost_latke": "This page got lost like a latke in oil.",
+        "lost_latkeLabel": "Poke the lost latke",
+        "snowman": "You found the settings snowman. He likes it cool in here.",
+        "snowmanLabel": "Say hi to the snowman",
+        "gingerbread": "Run, run, as fast as you can!",
+        "gingerbreadLabel": "Poke the gingerbread man"
+      },
+      "candles": "{count}/{total} candles",
+      "zotTitle": "Zot Hanukkah",
+      "zotBody": "All eight lights are burning. Tap to celebrate!"
+    },
+    "moment": {
+      "loadError": "Couldn't load this right now.",
+      "sleigh": "Wave at the sleigh",
+      "fika": "Fika break! Grab a coffee and a lussekatt, then come back for one more word.",
+      "boxingDay": "Happy Boxing Day! A perfect day for a lazy word game.",
+      "inocentes": {
+        "fake": "Today every word counts double!",
+        "reveal": "¡Inocente! Got you. Words count the same as always."
+      },
+      "kohaku": {
+        "title": "Kōhaku word battle",
+        "team": {
+          "red": "You're on Team Red. Every word you find tonight counts!",
+          "white": "You're on Team White. Every word you find tonight counts!"
+        },
+        "guest": "Sign in to join a team. Here's the score so far:",
+        "red": "Red {count}",
+        "white": "White {count}"
+      },
+      "bells108": {
+        "title": "108 bells"
+      },
+      "bells": {
+        "label": "Ring the bell",
+        "hint": "Ring all 108 bells to welcome the new year.",
+        "done": "All 108 rung. Happy New Year!"
+      },
+      "chimes": {
+        "title": "Wish before the chimes",
+        "intro": "12 chimes, 12 seconds: spell the wish word before midnight strikes.",
+        "start": "Start the chimes",
+        "lost": "Time's up! Another go?",
+        "won": "{word}! Your wish is in."
+      },
+      "roscon": {
+        "title": "Roscón de Reyes",
+        "hint": "Pick a slice. Watch out for the bean!",
+        "slice": "Slice {n}",
+        "signIn": "Sign in to get a slice of the roscón.",
+        "haba": "You got the bean! Next year's roscón is on you.",
+        "figurine": "You found the figurine! Good luck all year: +{count} coins.",
+        "none": "Just cake. Delicious, though."
+      }
+    },
+    "wrapped": {
+      "hanukkah": {
+        "title": "Your Hanukkah Wrapped",
+        "intro": "Eight nights of words. Here's how you did.",
+        "days": "nights lit",
+        "shareText": "I lit {lit} of {total} nights on LexiClash this Hanukkah and found {words} words!"
+      },
+      "christmas": {
+        "title": "Your Christmas Wrapped",
+        "intro": "Twelve days of words. Here's how you did.",
+        "days": "gifts collected",
+        "shareText": "I collected {lit} of {total} gifts on LexiClash this Christmas and found {words} words!"
+      },
+      "cta": "See your Holiday Wrapped",
+      "words": "words found in {games} games",
+      "longest": "your longest word",
+      "hunt": "hidden treats found",
+      "secrets": "secret words discovered",
+      "finale": "See you next holiday!",
+      "share": "Share",
+      "next": "Next",
+      "prev": "Back",
+      "close": "Close",
+      "loading": "Loading…",
+      "error": "Couldn't load your recap.",
+      "table": "your rank at a Holiday Table of {size}"
+    },
+    "daily": {
+      "geltFound": "Gelt! +{count}",
+      "geltTiles": "Night {night}: {count} gold gelt tiles are on the board. Words through them earn coins.",
+      "giftHidden": "A {count}-letter gift is hidden",
+      "giftCheer": "You found the gift!",
+      "nightlyTitle": "Nightly Board",
+      "adventTitle": "Advent Board",
+      "nightN": "Night {n}",
+      "giftN": "Gift {n}",
+      "nightlyIntro": "{n} gold gelt tiles shine on tonight’s board. Trace words through them for coins, then spin the dreidel.",
+      "adventIntro": "One holiday word is wrapped on today’s board. Find it to unwrap today’s gift.",
+      "guestLine": "Sign in to light tonight’s candle and keep your holiday streak.",
+      "litByBoard": "Night {n} lit by the Nightly Board. {words} gelt words, +{coins} coins.",
+      "giftUnwrapped": "Gift {n} unwrapped! +{coins} coins.",
+      "giftMissed": "Gift {n} stayed wrapped today. Your day still counts.",
+      "giftOpened": "Gift unwrapped: {word}!",
+      "mascotTap": "Say hi to the holiday mascot",
+      "mascotHi": {
+        "hanukkah": "Happy Hanukkah!",
+        "christmas": "Merry Christmas!"
+      }
+    },
+    "community": {
+      "hanukkah": "{count} candles lit across Israel tonight",
+      "christmas": "{count} gifts unwrapped worldwide today"
+    },
+    "cracker": {
+      "pullLabel": "Pull the cracker",
+      "notPlayed": "Finish today’s daily while signed in to pull your cracker.",
+      "locked": "Crackers need two! It opens once a table-mate or a friend you invited finishes today’s daily.",
+      "error": "The cracker didn’t snap. Try again.",
+      "prompt": "Drag or tap to pull your cracker",
+      "joke": {
+        "1": "What do snowmen eat for breakfast? Frosted flakes!",
+        "2": "Why was the word so cold? It lost its letter C... now it is just old.",
+        "3": "What do you call an elf who sings? A wrapper!",
+        "4": "Why did the tree go to the barber? It needed a trim.",
+        "5": "What is a snowman's favourite letter? Brrr... B!",
+        "6": "Why are reindeer great at word games? They always find the deer-est words.",
+        "7": "What did the gift say to the bow? You tie me up in knots!",
+        "8": "How does a snowman spell? One flake at a time.",
+        "9": "Why did Santa's helper go to school? To learn the elf-abet!",
+        "10": "What falls but never gets hurt? Snow, and your rival's score."
+      }
+    },
+    "rescue": {
+      "relitHanukkah": "You relit night {n} for your friend!",
+      "relitChristmas": "You filled your friend’s stocking for day {n}!",
+      "shareHanukkah": "Help me relight a Hanukkah candle! Play today’s LexiClash daily from my link.",
+      "shareChristmas": "Fill my stocking! Play today’s LexiClash daily from my link.",
+      "hanukkah": "The shamash lights the others. Bring a friend to relight night {n}.",
+      "christmas": "Stocking stuffer: a friend can fill your missed day {n}."
+    },
+    "dreidel": {
+      "notPlayed": "Finish tonight’s daily while signed in to spin.",
+      "error": "The dreidel slipped. Try again.",
+      "prompt": "Spin the dreidel for tonight’s gelt",
+      "spin": "Spin!",
+      "nun": "{letter}: nothing this time. Spin again tomorrow night!",
+      "gimel": "{letter}: you take it all! +{coins} coins",
+      "hei": "{letter}: half the pot! +{coins} coins",
+      "shin": "{letter}: a little extra. +{coins} coins"
+    },
+    "share": {
+      "whatsapp": "Invite on WhatsApp",
+      "more": "More"
+    },
+    "table": {
+      "joined": "You’re at the table! Play today’s daily to add to the group goal.",
+      "full": "This table is full (8 players).",
+      "notFound": "That table link doesn’t work anymore.",
+      "closed": "This holiday table has closed.",
+      "inOther": "You already sit at another table. Leave it first to join this one.",
+      "error": "Couldn’t join right now. Try again.",
+      "invited": "A friend saved you a seat at their holiday table.",
+      "join": "Take my seat",
+      "signInToJoin": "Sign in to take your seat",
+      "loadError": "We couldn’t load your holiday table.",
+      "pitch": "Play together: up to 8 friends, one shared goal every night.",
+      "create": "Start a holiday table",
+      "inviteText": "Sit at my holiday table on LexiClash! Play the daily and we light it up together.",
+      "title": "Your holiday table",
+      "seats": "{count} of 8 seats",
+      "goalLabel": "Tonight’s group goal",
+      "goal": "Tonight: {total} / {goal} points together",
+      "player": "Player",
+      "playedToday": "played",
+      "leave": "Leave table",
+      "finaleHanukkah": "Full menorah! Your table lit every night together.",
+      "finaleChristmas": "Every gift opened! Your table played all 12 days together."
+    },
+    "shareCard": {
+      "hanukkah": "I lit night {n} of 8!",
+      "hanukkahFinale": "I lit all 8 candles!",
+      "christmas": "I opened gift {n} of 12!",
+      "christmasFinale": "I opened all 12 gifts!",
+      "footer": "Play the holiday daily on lexiclash.live",
+      "buttonHanukkah": "Share my menorah",
+      "buttonChristmas": "Share my gifts"
+    }
+  },
+  // @holiday:end
   "wordVerdict": {
     "tooShort": "Too short: {min}+ letters",
     "tooLong": "Too long: {max} letters max",

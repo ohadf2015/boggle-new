@@ -14,6 +14,8 @@ import { useMusicFocusManager } from '@/lib/audio/useMusicFocusManager';
 import { restartStalledHowl } from '@/lib/audio/howlStall';
 import { usePlayerStyle } from '@/contexts/PlayerStyleContext';
 import { resolveStyleTrack } from '@/lib/playerStyle/styles';
+import { HOLIDAY_KEYS, type HolidayKey } from '@/lib/holidays/calendar';
+import { holidayClass } from '@/lib/holidays/override';
 
 type TrackKey = 'lobby' | 'beforeGame' | 'inGame' | 'almostOutOfTime' | 'bossaArcade' | 'bossa' | 'blast' | 'daily' | 'boss' | 'results' | 'wordTower' | 'connections' | 'crossword' | 'adventure';
 
@@ -90,7 +92,15 @@ const STYLE_SWAPPABLE_TRACKS: ReadonlySet<TrackKey> = new Set<TrackKey>([
   'results',
 ]);
 
-export function resolveTrackSrc(key: TrackKey, styleKey: string): string {
+const HOLIDAY_SWAPPABLE_TRACKS: ReadonlySet<TrackKey> = new Set<TrackKey>(['bossa', 'lobby', 'results']);
+
+function domHoliday(): HolidayKey | null {
+  if (typeof document === 'undefined') return null;
+  return HOLIDAY_KEYS.find((k) => document.documentElement.classList.contains(holidayClass(k))) ?? null;
+}
+
+export function resolveTrackSrc(key: TrackKey, styleKey: string, holiday: HolidayKey | null = null): string {
+  if (holiday && HOLIDAY_SWAPPABLE_TRACKS.has(key)) return `/audio/holidays/${holiday}.mp3`;
   if (STYLE_SWAPPABLE_TRACKS.has(key)) return resolveStyleTrack(styleKey, TRACKS[key]);
   return TRACKS[key];
 }
@@ -107,9 +117,10 @@ export function isSameResolvedTrack(
   currentKey: TrackKey | null,
   nextKey: TrackKey,
   styleKey: string,
+  holiday: HolidayKey | null = domHoliday(),
 ): boolean {
   if (!currentKey) return false;
-  return resolveTrackSrc(currentKey, styleKey) === resolveTrackSrc(nextKey, styleKey);
+  return resolveTrackSrc(currentKey, styleKey, holiday) === resolveTrackSrc(nextKey, styleKey, holiday);
 }
 
 const STORAGE_KEY = 'boggle_music_settings';
@@ -202,7 +213,7 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
   const getOrCreateHowl = useCallback((key: TrackKey): Howl => {
     if (howlsRef.current[key]) return howlsRef.current[key];
 
-    const src = resolveTrackSrc(key, styleKeyRef.current);
+    const src = resolveTrackSrc(key, styleKeyRef.current, domHoliday());
     const howl = createLazyHowl(src, {
       loop: true,
       volume: 0,

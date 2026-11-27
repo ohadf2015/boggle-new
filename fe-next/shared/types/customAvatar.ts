@@ -168,6 +168,10 @@ export const AVATAR_ACCESSORIES = [
   'unicornHorn', 'dragonWings', 'flameAura',
   'goldNecklace',
   'goldChain',
+  /* Winter holiday events (earned on the event track only) */
+  'beanieBlue', 'scarfBlue', 'dreidelPin', 'menorahCrown',
+  'santaHat', 'elfHat', 'antlers', 'earmuffs', 'scarfXmas', 'candyGlasses',
+  'goldDreidelPin', 'goldOrnament', 'goldGeltMedal', 'goldBell',
 ] as const;
 
 export const AVATAR_ACCESSORY_COLORS = [
@@ -274,6 +278,8 @@ export const PREMIUM_ACCESSORIES = [
   'tinfoilHat', 'duckHat', 'vrHeadset',
   // Premium overhaul (Rare tier)
   'earrings', 'goldNecklace', 'goldChain',
+  // Winter holiday events (HOLIDAY_PARTS)
+  'beanieBlue', 'scarfBlue', 'dreidelPin', 'santaHat', 'elfHat', 'antlers', 'earmuffs', 'scarfXmas',
 ] as const;
 
 export const PREMIUM_HAIR_STYLES = [
@@ -302,6 +308,9 @@ export const EPIC_ACCESSORIES = ['samurai', 'astronaut', 'wizardHat', 'ninjaScar
   'cape', 'wings',
   // 2026-11 chest drop
   'unicornHorn', 'dragonWings', 'flameAura',
+  // Winter holiday events (HOLIDAY_PARTS): the two final-day prizes
+  'menorahCrown', 'candyGlasses',
+  'goldDreidelPin', 'goldOrnament', 'goldGeltMedal', 'goldBell',
 ] as const;
 export const EPIC_HAIR_STYLES = ['flame', 'galaxy', 'neon', 'lightning', 'rainbowMohawk', 'iceSpikes', 'trumpSwoop', 'recedingHair', 'highAndTight', 'aurora'] as const;
 export const EPIC_BASES = ['skull', 'shield', 'dragonHead', 'robotHead', 'alienHead', 'ghostFace', 'starBase', 'moonBase'] as const;
@@ -454,6 +463,9 @@ export const EPIC_PART_PRICES: Record<string, number> = {
   // 2026-11 chest drop
   'accessory:unicornHorn': 1800,
   'eyes:supernova': 6000, 'hair:aurora': 6000, 'accessory:dragonWings': 6000, 'accessory:flameAura': 6000,
+  // Winter holiday events: bookkeeping only, never sold (HOLIDAY_PARTS)
+  'accessory:menorahCrown': 6000, 'accessory:candyGlasses': 6000,
+  'accessory:goldDreidelPin': 6000, 'accessory:goldOrnament': 6000, 'accessory:goldGeltMedal': 6000, 'accessory:goldBell': 6000,
 };
 
 /** Get price for a part (epic > vip per-part > category default) */
@@ -475,7 +487,9 @@ export function isEpicPart(category: string, value: string): boolean {
 /** The 3 rarest items — shown with special golden LEGENDARY badge */
 export const LEGENDARY_PARTS = ['eyes:infinity', 'accessory:phoenixCrown', 'base:dragonHead', 'accessory:crystalCrown', 'eyes:thirdEye', 'hair:trumpSwoop', 'hair:recedingHair', 'hair:highAndTight', 'accessory:microphone', 'accessory:earsOut',
   // 2026-11 chest drop: chest-only legendaries
-  'eyes:supernova', 'hair:aurora', 'accessory:dragonWings', 'accessory:flameAura'] as const;
+  'eyes:supernova', 'hair:aurora', 'accessory:dragonWings', 'accessory:flameAura',
+  'accessory:menorahCrown', 'accessory:candyGlasses',
+  'accessory:goldDreidelPin', 'accessory:goldOrnament', 'accessory:goldGeltMedal', 'accessory:goldBell'] as const;
 
 /** Check if a part is legendary (subset of epic) */
 export function isLegendaryPart(category: string, value: string): boolean {
@@ -491,6 +505,17 @@ export const CHEST_ONLY_PARTS = ['eyes:supernova', 'hair:aurora', 'accessory:dra
 
 export function isChestOnlyPart(category: string, value: string): boolean {
   return (CHEST_ONLY_PARTS as readonly string[]).includes(`${category}:${value}`);
+}
+
+/** Winter holiday event rewards: never sold, never in chests; usable only once granted. */
+export const HOLIDAY_PARTS = [
+  'accessory:beanieBlue', 'accessory:scarfBlue', 'accessory:dreidelPin', 'accessory:menorahCrown',
+  'accessory:santaHat', 'accessory:elfHat', 'accessory:antlers', 'accessory:earmuffs', 'accessory:scarfXmas', 'accessory:candyGlasses',
+  'accessory:goldDreidelPin', 'accessory:goldOrnament', 'accessory:goldGeltMedal', 'accessory:goldBell',
+] as const;
+
+export function isHolidayPart(category: string, value: string): boolean {
+  return (HOLIDAY_PARTS as readonly string[]).includes(`${category}:${value}`);
 }
 
 // Combined: all non-free parts (VIP + Epic)

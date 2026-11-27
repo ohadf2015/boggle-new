@@ -50,6 +50,7 @@ import { isNewDailyPlayer } from '@/utils/trainingProgressStorage';
 import { NEW_PLAYER_THRESHOLD } from './survival/constants';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { HuntMascot } from './mascot/HuntMascot';
+import HolidayBoardLayer from './holiday/HolidayBoardLayer';
 
 export type { WordDiscovery, TargetAttempt, SurvivalGameResult } from './survival/types';
 
@@ -383,6 +384,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))' }}
     >
       {pixiOverlay}
+      {puzzleDate && !practice && <HolidayBoardLayer grid={grid} puzzleDate={puzzleDate} language={language} foundWords={foundWords} />}
       <ScreenFlashOverlay trigger={fx.flashTrigger} colorClass={fx.flashColor} />
       {coach}
 

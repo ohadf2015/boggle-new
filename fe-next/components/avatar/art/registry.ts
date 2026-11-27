@@ -18,10 +18,11 @@ import { EYES_CHEST } from './eyesChest';
 import { HAIR_CHEST } from './hairChest';
 import { ACC_CHEST } from './accessoriesChest';
 import { ACC_CHEST_B } from './accessoriesChestB';
+import { ACC_HOLIDAY } from './accessoriesHoliday';
 
 export const EYES: Record<string, EyeDef> = { ...EYES_FREE, ...EYES_PREMIUM, ...EYES_CHEST };
 export const HAIR: Record<string, HairDef> = { ...HAIR_FREE, ...HAIR_PREMIUM, ...HAIR_CHEST };
-export const ACCESSORIES: Record<string, AccDef> = { ...ACC_FREE, ...ACC_PREMIUM, ...ACC_CHEST, ...ACC_CHEST_B };
+export const ACCESSORIES: Record<string, AccDef> = { ...ACC_FREE, ...ACC_PREMIUM, ...ACC_CHEST, ...ACC_CHEST_B, ...ACC_HOLIDAY };
 
 /** Every id the art can draw, per config field — used by tests + catalog. */
 export const DRAWN_IDS: Record<string, readonly string[]> = {
