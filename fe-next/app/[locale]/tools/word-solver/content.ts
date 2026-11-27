@@ -92,6 +92,11 @@ const content: Record<Locale, ToolContent> = {
           'Type the letters into the box above — the order does not matter — and hit Find Words. The solver checks every combination against the full LexiClash dictionary and returns each valid word, longest first. For a two-word anagram, solve the long word first, then run the leftover letters again.',
       },
       {
+        question: 'How do I rearrange letters into words?',
+        answer:
+          'Type the letters in any order and press Find Words. The solver tries every arrangement and lists each real word it makes, longest first, so "listen" turns into silent, enlist and tinsel along with 116 other words. It works as an anagram decoder too: paste the scrambled word and the answer is at the top of the list.',
+      },
+      {
         question: 'Can I use this for Scrabble or Words With Friends?',
         answer:
           'Yes! This word finder works for any word game including Scrabble, Words With Friends, Boggle, and LexiClash. Enter your rack letters and discover every possible word you can play.',
@@ -187,7 +192,7 @@ const content: Record<Locale, ToolContent> = {
         answer: 'תלוי באותיות. מ"שלום" הפותר מוצא 25 מילים, ביניהן "מושל", "שולם" ו"שלמו", ומ"ספר" רק 7. אותיות נפוצות כמו ו, י, ה ו-ל מוסיפות הכי הרבה אפשרויות.',
       },
       {
-        question: 'זה עובד כמחולל אנגרמות למשחקי מילים?',
+        question: 'זה עובד כמחולל אנגרמות או כמחשבון אנגרמות למשחקי מילים?',
         answer: 'כן. אפשר להשתמש בו לתשבצי היגיון, לסקרבל, לבוגל או לשבץ נא, וגם כדי לבדוק אחרי משחק ב-LexiClash אילו מילים פספסתם. מוצגות עד 500 מילים, מהארוכה לקצרה.',
       },
       {
@@ -264,10 +269,11 @@ const content: Record<Locale, ToolContent> = {
       { question: 'Hur bildar man ord med bokstäver?', answer: 'Ange dina bokstäver i fältet ovan och klicka "Hitta ord" — verktyget hittar automatiskt alla möjliga ord du kan bilda av dina bokstäver på svenska. Resultaten sorteras efter ordlängd.' },
       { question: 'Hur många ord kan man bilda av 7 bokstäver?', answer: 'Det beror helt på vilka bokstäver det är. ”Stjärna” ger 114 ord, medan ”kärlek” med sex bokstäver bara ger 27. En blank bricka (?) ökar antalet snabbt.' },
       { question: 'Vad är en anagramlösare?', answer: 'En anagramlösare tar en uppsättning bokstäver och hittar alla giltiga ord som kan bildas.' },
-      { question: 'Kan jag använda detta för Scrabble?', answer: 'Ja! Denna ordfinnare fungerar för alla ordspel inklusive Scrabble, Boggle och LexiClash.' },
+      { question: 'Funkar det för Scrabble och Boggle?', answer: 'Ja. Skriv in brickorna eller tärningsbokstäverna du har så ser du vilka svenska ord som går att bilda. Ett ord som är godkänt hos oss kan ändå saknas i ett annat spels ordlista.' },
       { question: 'Varför saknas vissa ord?', answer: 'Ordlösaren visar bara ord som finns i vår svenska ordlista, och högst 500 per sökning, de längsta först. Underkänns ett riktigt ord i en multiplayermatch kan du överklaga det, så granskar vi det.' },
       { question: 'Kan jag använda blanka brickor?', answer: 'Ja. Skriv ett frågetecken (?) för varje blank bricka, högst tre. ”kärl?k” ger till exempel 172 ord, bland annat kälkar och lärka.' },
       { question: 'Fungerar det för Wordfeud och Alfapet?', answer: 'Ja, skriv in brickorna du har på hand så ser du vilka ord de räcker till. Ordlistan är inte exakt samma som Wordfeuds, så ett ord kan ibland godkännas i det ena spelet men inte i det andra.' },
+      { question: 'Vilka ord kan man bilda av dessa bokstäver?', answer: 'Skriv in bokstäverna så ser du alla ord som går att bilda, längst först. Med ”tavla” får du till exempel 20 ord, bland annat avtal, avlat, tala och valt.' },
       { question: 'Hur blir man bättre på att hitta ord?', answer: 'Öva regelbundet med tidsbegränsade ordspel som LexiClash. Leta efter vanliga prefix och suffix.' },
     ],
     tipsTitle: 'Tips för ordspel',
@@ -320,9 +326,10 @@ const content: Record<Locale, ToolContent> = {
     tipsTitle: 'ワードゲームのコツ',
     faqTitle: 'よくある質問',
     faqs: [
-      { question: 'アナグラムソルバーとは？', answer: 'LexiClashのアナグラムソルバーは、入力した文字を並べ替えて作れる日本語の単語をすべて表示する無料ツールです。ひらがな・カタカナ・漢字に対応し、約40万語の日本語辞書と照合します。例：「さくらんぼ」と入力すると「ぼんくら」「ぼくら」など20語が見つかります。最大20文字、登録不要。英語・スペイン語・スウェーデン語・ヘブライ語の辞書にも切り替えられます（ロシア語の辞書には未対応です）。' },
+      { question: 'アナグラムソルバーとは？', answer: 'LexiClashのアナグラムソルバーは、入力した文字を並べ替えて作れる日本語の単語をすべて表示する無料ツールです。ひらがな・カタカナ・漢字に対応し、約40万語の日本語辞書と照合します。例：「さくらんぼ」と入力すると「ぼんくら」「ぼくら」など20語が見つかります。最大20文字、登録不要。辞書は英語・スペイン語・スウェーデン語・ヘブライ語・ロシア語にも切り替えられます。' },
+      { question: '英単語のアナグラムも解析できますか？', answer: 'できます。上の「辞書の言語」を「English」にして、英字で入力してください。たとえば「listen」なら「silent」「enlist」「tinsel」など119語が見つかります。並び順は気にせず入れてかまいません。' },
       { question: '何文字あれば、いくつの言葉が作れますか？', answer: '文字の組み合わせでかなり変わります。「とうきょう」や「ちょこれーと」では14語、漢字の「会議室」では3語でした。「?」を1つ足すと候補が一気に増え、「ねこ?」だけで111語見つかります。' },
-      { question: 'スクラブルなどに使えますか？', answer: 'はい！このワードファインダーはScrabble、Boggle、LexiClashなどすべてのワードゲームで使えます。' },
+      { question: '謎解きや言葉遊びにも使えますか？', answer: '使えます。謎解きのアナグラム問題、文字の並べ替えクイズ、LexiClashのような文字盤のゲームで、手持ちの文字から作れる言葉を確かめるのに向いています。' },
       { question: 'なぜ一部の単語が結果にないのですか？', answer: 'LexiClashのゲーム辞書（日本語は約40万語）に載っていない語は表示されません。また、1回の検索で表示されるのは長い単語から順に最大500語です。' },
       { question: '単語探しが上手くなるには？', answer: 'LexiClashのような時間制限付きワードゲームで定期的に練習しましょう。一般的な接頭辞と接尾辞を探しましょう。' },
     ],
@@ -363,7 +370,7 @@ const content: Record<Locale, ToolContent> = {
     ctaTitle: 'Practica encontrar palabras más rápido',
     ctaButton: 'Juega LexiClash gratis',
     ctaDescription: '¡Desafía a amigos en batallas de palabras en tiempo real. Entrena tu cerebro!',
-    fullDictionaryNote: 'Mostrando resultados de una lista de 500+ palabras comunes. ¡Para el diccionario completo, juega LexiClash!',
+    fullDictionaryNote: 'Se muestran hasta 500 palabras, primero las más largas. Todas se comprueban con el mismo diccionario de español que usa LexiClash en las partidas.',
     howToTitle: 'Cómo usar el buscador de palabras',
     howToSteps: [
       'Escribe o pega tus letras disponibles en el campo de entrada.',
@@ -375,10 +382,11 @@ const content: Record<Locale, ToolContent> = {
     tipsTitle: 'Consejos para juegos de palabras',
     faqTitle: 'Preguntas frecuentes',
     faqs: [
-      { question: '¿Cuántas palabras se pueden formar con 7 letras?', answer: 'Con 7 letras aleatorias, normalmente puedes formar entre 20 y 80 palabras válidas en inglés. Nuestro solucionador encuentra todas las posibilidades al instante.' },
+      { question: '¿Cuántas palabras se pueden formar con estas letras?', answer: 'Depende mucho de las letras. Con «cartas» salen 66 palabras (castra, tascar, carta, casar…) y con «palabra», 45. Si pones un ? como comodín, el número se dispara: «cart?s» da 434.' },
       { question: '¿Qué es un solucionador de anagramas?', answer: 'Un solucionador de anagramas toma un conjunto de letras y encuentra todas las palabras válidas que se pueden formar con ellas.' },
       { question: '¿Puedo usarlo para Scrabble?', answer: '¡Sí! Este buscador de palabras funciona para todos los juegos de palabras incluyendo Scrabble, Boggle y LexiClash.' },
-      { question: '¿Por qué faltan algunas palabras?', answer: 'Nuestra herramienta gratuita usa una lista de 500+ palabras comunes. ¡Para el diccionario completo, juega LexiClash!' },
+      { question: '¿Por qué faltan algunas palabras?', answer: 'El buscador solo muestra palabras que están en nuestro diccionario de español, y como mucho 500 por búsqueda, empezando por las más largas. Si en una partida te rechaza una palabra que existe, puedes reclamarla y la revisamos.' },
+      { question: '¿Puedo usar comodines?', answer: 'Sí. Escribe un signo de interrogación (?) por cada ficha en blanco, hasta tres. Con «form?r» verás palabras como formar, forma y forro.' },
       { question: '¿Cómo mejorar en encontrar palabras?', answer: 'Practica regularmente con juegos de palabras cronometrados como LexiClash. Busca prefijos y sufijos comunes.' },
     ],
     tips: [
@@ -430,7 +438,7 @@ const content: Record<Locale, ToolContent> = {
     faqs: [
       { question: 'Сколько слов можно составить из 7 букв?', answer: 'Из 7 букв обычно получается от нескольких десятков до двухсот с лишним слов, считая формы слов. Всё зависит от самих букв.' },
       { question: 'Что такое решатель анаграмм?', answer: 'Решатель анаграмм берет набор букв и находит все действительные слова, которые можно составить из этих букв.' },
-      { question: 'Могу ли я использовать это для Scrabble?', answer: 'Да! Этот искатель слов работает для всех словесных игр, включая Scrabble, Boggle и LexiClash.' },
+      { question: 'Подойдёт ли решатель для Балды и Эрудита?', answer: 'Да, чтобы быстро проверить, какие слова складываются из ваших букв. Учтите, что он не видит поле: не знает, как стоят буквы в Балде, и не считает очки Эрудита. Он просто находит все слова из введённого набора.' },
       { question: 'Почему отсутствуют некоторые слова?', answer: 'Решатель показывает только слова из нашего русского словаря и не больше 500 за один поиск, сначала самые длинные. Е и Ё считаются одной буквой.' },
       { question: 'Как улучшить навыки поиска слов?', answer: 'Занимайся регулярно с помощью словесных игр с таймером, таких как LexiClash. Ищи распространенные префиксы и суффиксы.' },
     ],

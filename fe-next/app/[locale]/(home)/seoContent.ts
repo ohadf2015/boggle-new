@@ -187,7 +187,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: 'מה זה גלגל המילה היומית?',
         answer:
-          'גלגל המילה היומית הוא פאזל חינמי חדש מדי יום: גלגל של אותיות שממנו יוצרים כמה שיותר מילים, כאשר כל מילה חייבת לכלול את האות המרכזית. כל העולם מקבל את אותו הגלגל בחצות UTC. ללא הורדה, ללא הרשמה — שחקו בדפדפן ושתפו תוצאות כמו Wordle.',
+          'גלגל המילה היומית הוא פאזל חינמי חדש מדי יום: גלגל של אותיות שממנו יוצרים כמה שיותר מילים, כאשר כל מילה חייבת לכלול את האות המרכזית. כל העולם מקבל את אותו הגלגל בחצות UTC. ללא הורדה, ללא הרשמה — שחקו בדפדפן ושלחו לחברים את התוצאה.',
       },
       {
         question: 'מה זה Word Hunt (חיפוש מילים)?',
@@ -230,14 +230,14 @@ export const seoContent: Record<string, HomepageSeoContent> = {
           'Dagligt Ordhjul är ett gratis ordpussel som förnyas varje dag: ett hjul med bokstäver där du bildar så många ord som möjligt, och varje ord måste innehålla mittbokstaven. Alla spelare världen över får samma hjul vid midnatt UTC. Ingen nedladdning, ingen registrering — spela i webbläsaren och dela resultat som Wordle.',
       },
       {
-        question: 'Vad är Word Hunt (Ordjakt)?',
+        question: 'Vad är Ordjakt?',
         answer:
-          'Word Hunt är ett dagligt ordpussel: du har 10 försök att hitta det dolda ordet på brädet. Alla spelare världen över får samma bräde vid midnatt UTC. Dela ditt resultat med vänner. Spela gratis på LexiClash — ingen nedladdning, ingen registrering.',
+          'Ordjakt är ett dagligt ordpussel: du har 10 försök att hitta det dolda ordet på brädet. Alla spelare världen över får samma bräde vid midnatt UTC. Dela ditt resultat med vänner. Spela gratis på LexiClash — ingen nedladdning, ingen registrering.',
       },
       {
         question: 'Vilka är de bästa gratis ordspelen online 2026?',
         answer:
-          'LexiClash erbjuder fem gratis ordspel som spelas direkt i webbläsaren utan nedladdning: Classic (Boggle i realtid för 2–50 spelare), Dagligt Ordhjul (ett dagligt delat ordpussel), Word Hunt (daglig ordsökning), Word Forge (snabbt ordbyggarläge) och Blast (sprintläge med brickrensning). Inget konto krävs, tillgängligt på sex språk inklusive svenska.',
+          'LexiClash erbjuder fem gratis ordspel som spelas direkt i webbläsaren utan nedladdning: Klassisk (som Boggle, fast i realtid för 2–50 spelare), Dagligt Ordhjul (ett dagligt delat ordpussel), Ordjakt (gissa dagens dolda ord), Ordsmedjan (snabbt ordbyggarläge) och Blast-läge (sprint där brickorna rensas). Inget konto krävs, tillgängligt på sex språk inklusive svenska.',
       },
     ],
   },
@@ -284,7 +284,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
   es: {
     title: 'LexiClash — Juego de Palabras Multijugador Gratis Online',
     description:
-      'LexiClash es un juego de palabras multijugador gratuito en línea — scrabble online español multijugador en tiempo real. Encuentra palabras en un tablero compartido, compite contra amigos o desconocidos y sube en la tabla de clasificación — todo en tu navegador sin descarga ni registro.',
+      'LexiClash es un juego de palabras multijugador, gratis y en línea: todos buscan palabras en el mismo tablero a la vez, contra amigos o contra gente de cualquier país, y suben en la clasificación sin descargar nada ni registrarse.',
     features: [
       'Batallas de palabras en tiempo real — de 2 a 20+ jugadores en el mismo tablero simultáneamente',
       'Seis modos de juego: Clásico, Caza de Palabras, Blast, Rueda de Palabras, Aventura y Entrenamiento Cerebral',
@@ -315,14 +315,14 @@ export const seoContent: Record<string, HomepageSeoContent> = {
           'La Rueda de Palabras diaria es un puzzle gratuito nuevo cada día: una rueda de letras donde formas la mayor cantidad de palabras posible, y cada palabra debe incluir la letra central. Todos los jugadores del mundo reciben la misma rueda a medianoche UTC. Sin descargas, sin registro — juega en el navegador y comparte resultados como Wordle.',
       },
       {
-        question: '¿Qué es Word Hunt (Caza de Palabras)?',
+        question: '¿Qué es Caza de palabras?',
         answer:
-          'Word Hunt es un puzzle diario de búsqueda de palabras: tienes 10 intentos para encontrar la palabra oculta en el tablero. Todos los jugadores del mundo reciben el mismo tablero a medianoche UTC. Comparte tu resultado con amigos. Juega gratis en LexiClash — sin descargas, sin registro.',
+          'Caza de palabras es un puzzle diario: tienes 10 intentos para encontrar la palabra oculta en el tablero. Todos los jugadores del mundo reciben el mismo tablero a medianoche UTC. Comparte tu resultado con amigos. Juega gratis en LexiClash — sin descargas, sin registro.',
       },
       {
         question: '¿Cuáles son los mejores juegos de palabras gratuitos en línea en 2026?',
         answer:
-          'LexiClash ofrece cinco juegos de palabras gratuitos que se juegan en el navegador sin descargas: Classic (Boggle en tiempo real para 2–50 jugadores), Rueda de Palabras Diaria (puzzle diario compartido), Word Hunt (búsqueda de palabras diaria), Word Forge (construcción rápida de palabras) y Blast (sprint de limpieza de fichas). Sin registro, en seis idiomas incluyendo español.',
+          'LexiClash ofrece cinco juegos de palabras gratuitos que se juegan en el navegador sin descargas: Clásico (como el Boggle, pero en tiempo real y para 2 a 50 jugadores), la Rueda de Palabras diaria (un puzzle compartido), Caza de palabras (adivina la palabra oculta del día), Forja de Palabras (construcción rápida de palabras) y Blast (sprint de limpieza de fichas). Sin registro, en seis idiomas incluyendo español.',
       },
     ],
   },

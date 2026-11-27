@@ -44,8 +44,8 @@ describe('Spanish MP landing — composition', () => {
   it('HeroAnimated renders title, both CTAs and stats', () => {
     render(<HeroAnimated locale="es" />);
     const heading = screen.getByRole('heading', { level: 1 });
-    expect(heading).toHaveTextContent('Juega gratis Scrabble español sin registrarse');
-    expect(screen.getByText('Scrabble español online gratis sin registrarse')).toBeInTheDocument();
+    expect(heading).toHaveTextContent('Como el Scrabble en español, pero online, gratis y sin registro');
+    expect(screen.getByText('¿Buscas scrabble en español online, gratis y sin registrarte?')).toBeInTheDocument();
     expect(screen.getAllByText(/sin email/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('link', { name: /jugar ahora/i })).toHaveAttribute('href', '/es/multiplayer');
     expect(screen.getByRole('link', { name: /probar solo/i })).toHaveAttribute('href', '/es/quick-play');

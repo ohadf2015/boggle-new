@@ -79,6 +79,10 @@ const faqs = [
         q: 'Finns det ett klassrumsläge för lärare?',
         a: 'Ja. LexiClash Education är gratis för lärare, ingen elevregistrering krävs. Bygg egna ordlistor från läroplanen, kör vokabulärduells, följ elevernas framsteg på en lärardashboard. Detta finns inte i Wordfeud. Lämpligt för svensktalande klassrum, ESL/SFI och språkundervisning.',
     },
+    {
+        q: 'Vad är skillnaden mellan Wordfeud, Alfapet och LexiClash?',
+        a: 'Wordfeud och Alfapet bygger på samma idé som Scrabble: du lägger brickor på en spelplan och väntar på motståndarens drag. I LexiClash finns ingen spelplan och ingen tur. Alla letar ord i samma bokstavsrutnät samtidigt, och en runda är över på 90 sekunder.',
+    },
 ];
 
 const faqJsonLd = JSON.stringify({
@@ -169,7 +173,7 @@ export default async function LexiClashVsWordfeudPage({ params }: PageProps) {
             { title: 'Daglig utmaning i Wordle-stil', body: 'Word Hunt Survival och Daily Buzz — globala dagliga pussel med resultat att dela och streak-uppföljning. Wordfeud har inget motsvarande dagligt format.' },
             { title: 'Multiplayer för 20+ spelare', body: 'Skapa ett rum, dela koden, få in hela klassen eller hela festen samtidigt på samma rutnät. Wordfeud är begränsat till 1 mot 1.' },
             { title: 'Klassrumsläge för lärare', body: 'Egna ordlistor från läroplanen, vokabulärduells, lärardashboard med elevernas framsteg. Helt gratis utan elevregistrering. Saknas i Wordfeud.' },
-            { title: 'Brain Drills (6 minispel)', body: 'Word Wheel, Anagram Sprint, Connections, Word Detective, Word of the Day, Speed Spell. Snabba kognitionsövningar — finns inte i Wordfeud.' },
+            { title: 'Hjärnträning: 4 övningar på en minut', body: 'Snabbhet, minne, uppmärksamhet och ovanliga ord, i rundor på 60 sekunder. Något sådant finns inte i Wordfeud.' },
             { title: '6 språk i samma app', body: 'Engelska, hebreiska (RTL), svenska, japanska, spanska, ryska. Användbart för språkstudier eller flerspråkiga vänner. Wordfeud fokuserar på nordiska språk var för sig.' },
             { title: 'Ingen registrering krävs', body: 'Klicka Spela, ange smeknamn, kör. Konto är valfritt — för synk mellan enheter. Wordfeud kräver konto från start.' },
           ]}

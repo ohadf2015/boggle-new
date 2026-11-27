@@ -86,7 +86,7 @@ const faqs = [
   },
   {
     q: 'Is this like real Boggle?',
-    a: "LexiClash is inspired by Boggle with exciting additions! Like Boggle, you find words by connecting adjacent letters on a grid. But LexiClash adds real-time multiplayer, combo scoring, three board sizes (5x5, 6x6, 7x7), daily challenges, and boss battles — all free.",
+    a: "Close. Like Boggle, you find words by linking letters that touch, across, down or diagonally. Classic Boggle uses a 4×4 tray and a 3-minute sand timer; LexiClash rooms use 5×5, 6×6 or 7×7 boards and rounds from 1 to 3 minutes, and add real-time multiplayer, combo scoring, daily challenges and boss battles, all free.",
   },
   {
     q: 'Can I play with friends online?',
@@ -94,8 +94,8 @@ const faqs = [
   },
   TWO_PLAYER_FAQ,
   {
-    q: 'Is LexiClash better than Words With Friends?',
-    a: "LexiClash offers a different experience. Unlike Words With Friends (turn-based), LexiClash is real-time — everyone plays simultaneously, making it faster and more exciting. It combines Boggle-style grid word finding with competitive multiplayer. Both are great, but LexiClash is completely free with no pay-to-win mechanics.",
+    q: 'Is there a Boggle With Friends I can play in the browser?',
+    a: "Boggle With Friends is the official app. If you want the same idea without installing anything, LexiClash runs in the browser: make a room, send the link, and everyone plays the same board at once. It's free, with no in-app purchases and no pay-to-win boosts, and nobody waits for a turn.",
   },
   {
     q: 'What are the best Boggle alternatives online?',
@@ -108,6 +108,10 @@ const faqs = [
   {
     q: 'Can students play Boggle online free in a classroom?',
     a: 'Yes! LexiClash works great as a free classroom Boggle game — no accounts, no downloads, no setup. Teachers create a room in seconds and share the link or QR code. Up to 50 students compete simultaneously on the word grid, making it ideal for vocabulary practice, spelling drills, and ESL classes.',
+  },
+  {
+    q: 'Is LexiClash Boggle unblocked at school?',
+    a: "It runs in a normal browser tab with nothing to install, so it opens on school Chromebooks unless your school's filter blocks lexiclash.live. If it is blocked, ask the teacher or IT to allow the site; teachers can run a whole class from one room.",
   },
   {
     q: 'Is there a free Boggle app?',
@@ -353,7 +357,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
             room in seconds, share the link or QR code, and up to 50 students compete live on the same word grid. Great
             for vocabulary practice, spelling drills, and ESL classes. Run{' '}
             <Link href={`/${locale}/education/esl-word-games`}>vocabulary games for the classroom</Link>, see the{' '}
-            <Link href={`/${locale}/education/boggle-for-the-classroom`}>step-by-step classroom guide</Link> or check
+            <Link href={`/${locale}/education/boggle-for-the-classroom`}>Boggle for the classroom guide</Link> or check
             out <Link href={`/${locale}/education/for-schools`}>LexiClash for Schools</Link>.
           </p>
         </Prose>

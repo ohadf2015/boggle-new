@@ -9,7 +9,7 @@ export function MultijugadorIntent({ locale }: { locale: string }) {
         <p>
           <strong>Scrabble online español multijugador</strong> es jugar una partida de palabras en español con
           otras personas a la vez — no contra una IA, no por turnos de horas. En LexiClash todos ven la misma
-          cuadrícula y buscan palabras en tiempo real: 2 a 50 jugadores, ronda de 2–3 minutos, en el navegador.
+          cuadrícula y buscan palabras en tiempo real: 2 a 50 jugadores, rondas de 90 segundos, en el navegador.
         </p>
         <p>
           Minijuegos, JuegoSpot y Locura de Letras son Scrabble contra el ordenador. El Club de Scrabble de

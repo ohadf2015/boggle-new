@@ -11,11 +11,12 @@ import { SeoKitBlock } from '@/components/landing/SeoKitBlock';
 import { LandingButton, LandingHero, LandingPage, LinkPills, Prose, Section, TileGrid } from '@/components/landing/kit';
 import { LANDING_ART } from '@/components/landing/kit/art';
 import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
+import { dictionaryFloor } from '@/lib/seo/dictionaryStats';
 
 /** Growth Radar rec 6487 — H2 + FAQPage Question must match this query verbatim. */
 const ANAGRAM_SVENSKA_QUESTION = 'anagram svenska';
 const ANAGRAM_SVENSKA_ANSWER =
-  'Anagram svenska betyder att blanda om bokstäver till nya ord. LexiClash gratis anagramlösare på svenska tar 2–10 bokstäver och visar varje giltigt tävlingsord, grupperat efter längd, på under 100 millisekunder. Ingen registrering och ingen app. Skriv bokstäverna i adressen, till exempel /sv/anagram/listen. Vill du spela live med svenska ord i stället? Starta ett rum och tävla mot vänner.';
+  'Ett anagram är ett ord du får genom att kasta om bokstäverna i ett annat ord, som när tavla blir avtal. Skriv dina bokstäver i LexiClash ordlösare så ser du alla svenska ord de räcker till, längst först, även med blanka brickor. Gratis, utan registrering och utan app. Vill du spela live? Starta ett rum och tävla mot vänner.';
 
 const anagramSeoContent: Record<string, {
   title: string;
@@ -24,14 +25,14 @@ const anagramSeoContent: Record<string, {
   faq: { question: string; answer: string }[];
 }> = {
   en: {
-    title: 'Free Anagram Solver — Find Every Word From Any Letters',
+    title: 'Free Anagram Finder & Decoder — Every Word From Any Letters',
     description:
-      'The LexiClash anagram solver finds every valid word you can spell from a pool of letters. Type in 2-10 letters and instantly get a grouped, alphabetized list of every legal English word — sorted by length, scored for Scrabble and Words With Friends compatibility, and linked to definitions. The solver runs on the same competitive dictionary that powers LexiClash multiplayer matches, so the words it returns are the words that count in real tournament play. No signup, no install, no ad-wall — just paste your letters into the URL and read the result.',
+      'The LexiClash anagram finder lists every valid word you can spell from a pool of letters. Type in 2-10 letters and instantly get a grouped, alphabetized list of every legal English word — sorted by length, with the LexiClash points each word scores. The solver runs on the same competitive dictionary that powers LexiClash multiplayer matches, so the words it returns are the words that count in real tournament play. No signup, no install, no ad-wall — just paste your letters into the URL and read the result.',
     features: [
-      'Finds every valid word from any 2-10 letter pool in under 100ms — no waiting, no ads to skip',
+      'Finds every valid word from any 2-10 letter pool instantly, with no ads to skip',
       'Groups results by length so you can scan long, high-scoring plays first',
       'Same competitive dictionary as LexiClash multiplayer — words returned are tournament-legal',
-      'Tap any word to see its definition, etymology, and Scrabble / Words With Friends point value',
+      'Tap any word to open its page with the LexiClash points it scores',
       'Works for crossword help, Scrabble racks, Words With Friends bingo finder, and Boggle path planning',
       'Mobile-friendly URL-driven interface — bookmark frequent rack patterns for one-tap reuse',
       'Always free to play, no signup, runs entirely in your browser with zero data sent to third parties',
@@ -40,12 +41,12 @@ const anagramSeoContent: Record<string, {
       {
         question: 'How does the anagram solver work?',
         answer:
-          'You enter a letter pool (e.g. "listen") into the URL — /anagram/listen — and the solver returns every valid English word that can be spelled using those exact letters or a subset of them. It checks against a 280,000-word competitive dictionary, then groups results by length so long, high-scoring words appear first. The whole process runs locally in your browser in under 100ms.',
+          `You enter a letter pool (e.g. "listen") into the URL — /anagram/listen — and the solver returns every valid English word that can be spelled using those exact letters or a subset of them. It checks against a ${dictionaryFloor('en', 'en')}-word dictionary, then groups results by length so long, high-scoring words appear first. The full list is on the page as soon as it loads.`,
       },
       {
         question: 'Is this a Scrabble word finder or a Words With Friends solver?',
         answer:
-          'Both. LexiClash uses a competitive dictionary that matches the TWL (Tournament Word List) used by official Scrabble play in North America, with SOWPODS additions for international rules. Every word returned is legal in both Scrabble and Words With Friends, and tap-through reveals the point value under each game\'s scoring system.',
+          'You can use it for both to see which words your letters make. It checks the LexiClash English dictionary, which is larger than the official Scrabble lists, so double-check a rare word against your game\'s own dictionary before you play it.',
       },
       {
         question: 'How is this different from other free anagram tools online?',
@@ -272,16 +273,16 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   }
 
   return {
-    title: 'Free Anagram Solver — Find Every Word From Any Letters | LexiClash',
+    title: 'Anagram Finder & Decoder — Words in Your Letters | LexiClash',
     description:
       'Free online anagram solver. Enter any letters and instantly see every valid English word you can make. Perfect for Scrabble, Boggle, Words With Friends, and crossword help.',
     openGraph: {
       images: defaultOgImages(locale),
       type: 'website',
       url: pageUrl,
-      title: 'Free Anagram Solver — Find Every Word From Any Letters',
+      title: 'Anagram Finder & Decoder — Words in Your Letters',
       description:
-        'Enter any letters and find every word you can make. Free, instant, no signup. Built into LexiClash, the multiplayer word game with 30+ modes.',
+        'Enter any letters and find every word you can make. Free, instant, no signup. Built into LexiClash, the multiplayer word game.',
       siteName: 'LexiClash',
     },
     // EN + SV indexed; other locales stay noindex and consolidate onto EN.
@@ -309,7 +310,7 @@ export default async function AnagramHubPage({ params }: PageParams) {
         items={[
           { name: 'LexiClash', url: `${BASE_URL}/${locale}` },
           {
-            name: locale === 'sv' ? 'Anagram svenska' : 'Anagram Solver',
+            name: locale === 'sv' ? 'Anagram svenska' : 'Anagram Finder',
             url: `${BASE_URL}/${locale === 'sv' ? 'sv' : 'en'}/anagram`,
           },
         ]}
@@ -332,13 +333,13 @@ export default async function AnagramHubPage({ params }: PageParams) {
           <h2 className="font-neo-display text-xl font-bold">{ANAGRAM_SVENSKA_QUESTION}</h2>
           <p className="max-w-xl text-lg leading-relaxed text-neo-white/85">{ANAGRAM_SVENSKA_ANSWER}</p>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-            <LandingButton href={`/${locale}/anagram/listen`}>Prova med listen →</LandingButton>
+            <LandingButton href={`/${locale}/tools/word-solver`}>Bilda ord av dina bokstäver →</LandingButton>
             <LandingButton href={`/${locale}/multiplayer`} variant="secondary">Spela live →</LandingButton>
           </div>
         </LandingHero>
       ) : (
         <LandingHero
-          title="Anagram Solver"
+          title="Anagram Finder"
           lead="Enter any letters in the URL and instantly see every valid English word you can make. Free, no signup, no download. Powered by the same dictionary that runs the LexiClash multiplayer word game."
           art={LANDING_ART.solver('')}
           artTone="cyan"

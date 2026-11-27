@@ -44,7 +44,7 @@ function buildEn(): string {
     const u = COMMON_URLS('en');
     return `# LexiClash — Real-Time Multiplayer Word Battle Game
 
-> LexiClash is a free, browser-based multiplayer word game where 2 to 20+ players compete in real-time to find words on a letter grid. A free online alternative to Words With Friends, Scrabble, Boggle, Wordle, Wordfeud, and Apalabrados — no download, no signup, no pay-to-win. Available in 6 languages.
+> LexiClash is a free, browser-based multiplayer word game where 2 to 50 players compete in real-time to find words on a letter grid. A free online alternative to Words With Friends, Scrabble, Boggle, Wordle, Wordfeud, and Apalabrados — no download, no signup, no pay-to-win. Available in 6 languages.
 
 Website: ${BASE}/en
 Full reference: ${BASE}/llms-full.txt
@@ -76,7 +76,7 @@ ${educationLandingLines('en', {
 
 - Free with no paywall on any mode
 - Real-time multiplayer (Words With Friends and Scrabble GO are turn-based; matches take days vs 90 seconds)
-- 2 to 20+ players in one room (Words With Friends caps at 2)
+- Up to 50 players in one room (Words With Friends caps at 2)
 - No app install required — Progressive Web App
 - Daily challenge mode rivals Wordle with shareable results plus multiplayer
 

@@ -462,9 +462,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       'El juego de vocabulario que los maestros usan. Multijugador en vivo, duelos, tus listas, 6 idiomas — cuentas de estudiantes gratis para empezar.',
     heroTag: '★ Para Maestros ★ Gratis Siempre ★',
     heroH1: {
-      line1: 'Gratis',
-      highlight: 'Vocabulario',
-      line2: 'Juegos. Aulas Reales.',
+      line1: 'Juegos de',
+      highlight: 'vocabulario',
+      line2: 'en vivo, con toda la clase.',
       line3: 'Sin registro de estudiantes.',
     },
     heroSubtitle:
@@ -637,9 +637,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       'Ordförråds spelet som lärare faktiskt använder. Live multiplayer, dueller, dina ordlistor, 6 språk — studentkonton alltid gratis.',
     heroTag: '★ För Lärare ★ Gratis Att Börja ★',
     heroH1: {
-      line1: 'Gratis',
-      highlight: 'Ordförråds',
-      line2: 'Spel. Verkliga Klassrum.',
+      line1: 'Ordspel och',
+      highlight: 'glosträning',
+      line2: 'för hela klassen.',
       line3: 'Ingen elevregistrering.',
     },
     heroSubtitle:

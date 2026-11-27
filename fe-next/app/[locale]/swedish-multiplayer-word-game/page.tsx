@@ -102,12 +102,20 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
       a: 'Klicka helt enkelt på "Skapa rum" eller "Gå med i rum" på multiplayer-sidan. Dela rumslänken med vänner, så kan ni börja tävla i realtid!',
     },
     {
-      q: 'Vad gör LexiClash olika från andra ordspel?',
-      a: 'LexiClash kombinerar det bästa från Boggle, Scrabble och Wordle. Tävla i realtid med omedelbar poängåterkoppling, flera spellägen, bosskamper och dagliga utmaningar.',
+      q: 'Vad skiljer LexiClash från andra ordspel?',
+      a: 'I Alfapet och Wordfeud väntar du på din tur. Här spelar alla samtidigt på samma rutnät, ser poängen direkt och kör en ny runda när klockan har gått. Har du spelat Ruzzle känner du igen idén, fast här tävlar hela rummet på samma bräde.',
     },
     {
       q: 'Kan jag spela med vänner online gratis?',
       a: 'Ja! LexiClash är helt gratis. Skapa rum, bjud in vänner via länk, och tävla utan nedladdning eller registrering.',
+    },
+    {
+      q: 'Kan man spela mot datorn?',
+      a: 'Ja. Välj Spela ensam så möter du datorstyrda motståndare på nivå lätt, medel eller svår. Vill du spela mot riktiga människor skapar du ett rum och skickar länken.',
+    },
+    {
+      q: 'Är LexiClash samma sak som Alfapet?',
+      a: 'Nej. Alfapet är Algas brädspel där man lägger brickor på en spelplan, och det gamla Alfapet säljs i dag som Scrabble. I LexiClash finns ingen spelplan att lägga på: alla letar ord i samma bokstavsrutnät samtidigt, och den som hittar flest och längst ord vinner rundan.',
     },
     {
       q: 'Hur många svenska ord innehåller LexiClash?',
@@ -115,11 +123,11 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
     },
     {
       q: 'Vilka spellägen finns?',
-      a: 'Spela multiplayer-rum, dagliga utmaningar (ordhjul och ordjakt), ordletare, blastläge och mer. Varje läge har unika regler och poängberäkning. Ordhjulet är en daglig pussel där alla bokstäver ska inkludera mittenbokstaven.',
+      a: 'Du kan spela i rum med vänner, köra dagens Ordhjul och Ordjakt, eller Blast-läget där brickorna sprängs. Varje läge har egna regler och egen poängräkning. Ordhjulet är ett dagligt pussel där varje ord måste innehålla bokstaven i mitten.',
     },
     {
       q: 'Hur bildar man ord av bokstäver i LexiClash?',
-      a: `I LexiClash ser alla spelare samma rutnät av bokstäver. Klicka eller dra för att bilda ord — ju längre ord, desto fler poäng. Spelet stödjer över ${SV_DICT_FLOOR} svenska ord inklusive flerordsformer och dialektord.`,
+      a: `I LexiClash ser alla spelare samma rutnät av bokstäver. Klicka eller dra för att bilda ord — ju längre ord, desto fler poäng. Spelet godkänner över ${SV_DICT_FLOOR} svenska ord.`,
     },
   ];
 
@@ -147,7 +155,7 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
                 step: [
                   { '@type': 'HowToStep', name: 'Öppna LexiClash', text: 'Gå till lexiclash.live i valfri webbläsare på telefon, surfplatta eller dator. Ingen nedladdning krävs.' },
                   { '@type': 'HowToStep', name: 'Skapa ett rum', text: 'Välj "Skapa rum" och dela länken via WhatsApp, Discord eller direktmeddelande. Upp till 50 spelare kan ansluta.' },
-                  { '@type': 'HowToStep', name: 'Hitta ord i realtid', text: 'Alla spelare ser samma rutnät samtidigt. Klicka eller dra för att skapa ord — längre ord ger fler poäng. Match varar 2-3 minuter.' },
+                  { '@type': 'HowToStep', name: 'Hitta ord i realtid', text: 'Alla spelare ser samma rutnät samtidigt. Klicka eller dra för att skapa ord — längre ord ger fler poäng. En runda tar 90 sekunder.' },
                 ],
               },
             ],
@@ -158,14 +166,15 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
       <LandingHero
         title={
           <>
-            Multiplayer Ordspel Online - Spela Boggle & Scrabble på <Mark>Svenska</Mark>
+            Ordspel som Scrabble och Alfapet, på <Mark>svenska</Mark> och i realtid
           </>
         }
         lead={
           <span data-speakable="true">
-            Spela Alfapet på svenska gratis i webbläsaren — inget konto, ingen app. LexiClash är ett
-            realtids-alternativ till Wordfeud: skapa ett rum, skicka länken, och upp till 50 spelare tävlar
-            på samma bokstavsrutnät. Över {SV_DICT_FLOOR} svenska ord, matcher på 2–3 minuter. Starta direkt.
+            Letar du efter Alfapet eller Scrabble på svenska online? LexiClash är ett eget ordspel i samma
+            anda och ett alternativ till Wordfeud i realtid: skapa ett rum, skicka länken, så bildar upp till 50
+            spelare ord på samma bokstavsrutnät samtidigt. Gratis i webbläsaren, utan konto och utan app, med
+            över {SV_DICT_FLOOR} svenska ord. En runda tar 90 sekunder.
           </span>
         }
         actions={
@@ -188,7 +197,7 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
             Skapa ett rum och spela nu →
           </Link>
         </section>
-        <Section title="Bilda ord av bokstäver — så funkar det">
+        <Section title="Så går en runda till">
           <Prose>
             <p>
               På ytan är det enkelt: du får ett rutnät med slumpade bokstäver och ska bilda ord av
@@ -211,7 +220,7 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
             'Realtids multiplayer-kamper med omedelbar poängåterkoppling',
             'Skapa rum och bjud in vänner via delbar länk',
             `Över ${SV_DICT_FLOOR} svenska ord i ordförrådet`,
-            'Flera spellägen (Boggle, Ordhjul, Letare, Blast)',
+            'Flera spellägen: Klassisk, Ordjakt, Ordhjulet och Blast-läge',
             'Dagliga utmaningar med poängtabeller',
             'Bosskamper med unika vändningar',
             'Helt gratis, ingen nedladdning behövs',
@@ -235,13 +244,13 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
       <Section title="Om LexiClash Multiplayer">
         <Prose>
           <p>
-            LexiClash tar det strategiska djupet från Scrabble, tempot från Boggle och pusselglädjen från
-            Wordle — och blandar allt i en enda realtidsduell. Det är byggt för alla som någonsin bråkat
+            LexiClash har lite av Alfapets ordletande, Boggles tempo och Ordels dagliga pussel, men allt
+            händer samtidigt för alla i rummet. Det är byggt för alla som någonsin bråkat
             om ett ord faktiskt finns: ordnördar, söndagsspelare och renodlade tävlingsmänniskor.
           </p>
           <p>
-            Spela multiplayer ordspel online med vänner, familj eller främlingar världen över. Oavsett om du vill ha en
-            snabb 15-minuters match eller en längre tävlingssession, LexiClash passar alla spelstilar. Det intuitiva
+            Spela multiplayer ordspel online med vänner, familj eller främlingar världen över. Kör en snabb runda på
+            90 sekunder eller sitt kvar en hel kväll – du bestämmer själv. Det intuitiva
             gränssnittet fungerar på både dator och mobil, så att du kan spela ordspel var som helst, när som helst.
           </p>
           <p>

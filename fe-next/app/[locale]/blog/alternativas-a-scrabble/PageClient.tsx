@@ -47,6 +47,7 @@ export default function AlternativasAScrabblePageClient(): React.ReactElement {
       ctas={[
         { href: `/${locale}/daily`, label: content.playDaily },
         { href: `/${locale}/multiplayer`, label: content.startPracticing },
+        { href: `/${locale}/lexiclash-vs-apalabrados`, label: content.compareApalabrados },
       ]}
       after={
         <>
