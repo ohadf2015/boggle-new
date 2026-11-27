@@ -2,7 +2,9 @@
 type Row = Record<string, unknown>;
 type Err = { message: string } | null;
 
-export function memoryDb(seed: { reviews?: Row[]; progress?: Row[]; failRead?: string; failWrite?: string } = {}) {
+export function memoryDb(
+  seed: { reviews?: Row[]; progress?: Row[]; failRead?: string; failWrite?: string; beforeRpc?: (tables: Record<string, Row[]>) => void } = {},
+) {
   const tables: Record<string, Row[]> = { word_review_state: [...(seed.reviews ?? [])], student_lesson_progress: [...(seed.progress ?? [])] };
   const upserts: Array<{ table: string; rows: Row[]; onConflict?: string }> = [];
   const from = (table: string) => {
@@ -44,6 +46,28 @@ export function memoryDb(seed: { reviews?: Row[]; progress?: Row[]; failRead?: s
     };
     return builder;
   };
-  return { db: { from } as never, tables, upserts };
+  const rpcs: Array<{ name: string; args: Row }> = [];
+  /** Mirrors apply_words_mastered: one statement, existing order kept, removes by exact text, adds deduped case-insensitively. */
+  const rpc = async (name: string, args: Row) => {
+    if (name !== 'apply_words_mastered') throw new Error(`unexpected rpc ${name}`);
+    rpcs.push({ name, args });
+    seed.beforeRpc?.(tables);
+    if (seed.failWrite === 'apply_words_mastered') return { data: null, error: { message: 'write failed' } };
+    const rows = tables.student_lesson_progress;
+    let row = rows.find((r) => r.student_id === args.p_student_id && r.lesson_id === args.p_lesson_id);
+    if (!row) rows.push((row = { student_id: args.p_student_id, lesson_id: args.p_lesson_id, words_mastered: [] }));
+    const remove = new Set(args.p_remove as string[]);
+    const out: string[] = [];
+    const seen = new Set<string>();
+    for (const w of [...((row.words_mastered as string[]) ?? []), ...(args.p_add as string[])]) {
+      const k = w.trim().toLowerCase();
+      if (!k || remove.has(w) || seen.has(k)) continue;
+      seen.add(k);
+      out.push(w);
+    }
+    row.words_mastered = out;
+    return { data: out, error: null };
+  };
+  return { db: { from, rpc } as never, tables, upserts, rpcs };
 }
 

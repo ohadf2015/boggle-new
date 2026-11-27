@@ -14,10 +14,10 @@ const mastered = (m: ReturnType<typeof memoryDb>) => m.tables.student_lesson_pro
 const row = (m: ReturnType<typeof memoryDb>, word: string) => m.tables.word_review_state.find((x) => x.word === word) as WordReviewRow | undefined;
 
 describe('recordWordReviews', () => {
-  it('GIVEN one live find WHEN recorded THEN the word is a sprout and NOT mastered', async () => {
+  it('GIVEN one live find WHEN recorded THEN the word is a plant and NOT mastered', async () => {
     const m = memoryDb({ progress: [{ student_id: STUDENT, lesson_id: LESSON, words_mastered: [] }] });
     const out = await record(m, [r('apple', true, 'find')]);
-    expect(row(m, 'Apple')).toMatchObject({ student_id: STUDENT, lesson_id: LESSON, strength: 'sprout', correct_days: 0 });
+    expect(row(m, 'Apple')).toMatchObject({ student_id: STUDENT, lesson_id: LESSON, strength: 'plant', correct_days: 1 });
     expect(out.mastered).toEqual([]);
     expect(mastered(m)).toEqual([]);
   });
@@ -32,15 +32,47 @@ describe('recordWordReviews', () => {
     expect(mastered(m)).toEqual(['Apple']);
   });
 
-  it('GIVEN a mastered word that wilted WHEN only recognised THEN it drops out of words_mastered', async () => {
+  it('GIVEN a mastered word that wilted WHEN answered wrong THEN it drops out of words_mastered', async () => {
     const m = memoryDb();
     await record(m, [r('apple', true, 'recall')]);
     await record(m, [r('apple', true, 'recall')], addDays(D0, 1));
     expect(mastered(m)).toEqual(['Apple']);
     const due = row(m, 'Apple')!.next_review_date;
-    await record(m, [r('apple', true, 'recognise')], addDays(due, 3));
+    await record(m, [r('apple', false, 'recall')], addDays(due, 3));
     expect(row(m, 'Apple')?.strength).toBe('plant');
     expect(mastered(m)).toEqual([]);
+  });
+
+  it('GIVEN a mastered word that wilted WHEN recognised right THEN it stays mastered', async () => {
+    const m = memoryDb();
+    await record(m, [r('apple', true, 'recall')]);
+    await record(m, [r('apple', true, 'recall')], addDays(D0, 1));
+    const due = row(m, 'Apple')!.next_review_date;
+    await record(m, [r('apple', true, 'recognise')], addDays(due, 3));
+    expect(mastered(m)).toEqual(['Apple']);
+  });
+
+  it('GIVEN a mastery change WHEN written THEN it is ONE atomic call with only the adds and removes', async () => {
+    const m = memoryDb({ progress: [{ student_id: STUDENT, lesson_id: LESSON, words_mastered: ['cherry', 'banana'] }] });
+    m.tables.word_review_state.push({ student_id: STUDENT, lesson_id: LESSON, word: 'banana', ease_factor: 2.5, interval: 1, repetitions: 1, next_review_date: D0, last_review_date: D0, correct_days: 2, last_correct_date: D0, best_gap_days: 1, strength: 'flower' });
+    await record(m, [r('banana', false, 'spell'), r('apple', true, 'recall')], addDays(D0, 5));
+    await record(m, [r('apple', true, 'recall')], addDays(D0, 6));
+    expect(m.upserts.filter((u) => u.table === 'student_lesson_progress')).toEqual([]);
+    expect(m.rpcs.map((c) => c.args)).toEqual([
+      { p_student_id: STUDENT, p_lesson_id: LESSON, p_add: [], p_remove: ['banana'] },
+      { p_student_id: STUDENT, p_lesson_id: LESSON, p_add: ['Apple'], p_remove: [] },
+    ]);
+    expect(mastered(m)).toEqual(['cherry', 'Apple']);
+  });
+
+  it('GIVEN another writer added a word between our read and write THEN it survives (no read-then-overwrite)', async () => {
+    const m = memoryDb({
+      beforeRpc: (t) => { (t.student_lesson_progress[0].words_mastered as string[]).push('cherry'); },
+      progress: [{ student_id: STUDENT, lesson_id: LESSON, words_mastered: [] }],
+    });
+    await record(m, [r('apple', true, 'recall')]);
+    await record(m, [r('apple', true, 'recall')], addDays(D0, 1));
+    expect(mastered(m)).toEqual(['cherry', 'Apple']);
   });
 
   it('GIVEN mixed case and spacing WHEN recorded THEN one row under the lesson spelling', async () => {
@@ -105,10 +137,10 @@ describe('recordWordReviews', () => {
     expect(out.mastered).toEqual(['Apple', 'banana']);
   });
 
-  it('GIVEN nothing changed in mastery WHEN recorded THEN student_lesson_progress is not written', async () => {
+  it('GIVEN nothing changed in mastery WHEN recorded THEN mastery is not written', async () => {
     const m = memoryDb({ progress: [{ student_id: STUDENT, lesson_id: LESSON, words_mastered: [] }] });
     await record(m, [r('apple', true, 'find')]);
-    expect(m.upserts.filter((u) => u.table === 'student_lesson_progress')).toEqual([]);
+    expect(m.rpcs).toEqual([]);
   });
 
   it('GIVEN an existing row stored under an older spelling WHEN reviewed THEN that row is updated, not duplicated', async () => {
@@ -127,5 +159,8 @@ describe('recordWordReviews', () => {
 
   it('GIVEN a write error WHEN recorded THEN it throws', async () => {
     await expect(record(memoryDb({ failWrite: 'word_review_state' }), [r('apple', true, 'recall')])).rejects.toThrow(/write failed/);
+    const m = memoryDb({ failWrite: 'apply_words_mastered', progress: [{ student_id: STUDENT, lesson_id: LESSON, words_mastered: ['apple'] }] });
+    m.tables.word_review_state.push({ student_id: STUDENT, lesson_id: LESSON, word: 'apple', ease_factor: 2.5, interval: 1, repetitions: 0, next_review_date: D0, last_review_date: D0, correct_days: 0, last_correct_date: null, best_gap_days: 0, strength: 'sprout' });
+    await expect(record(m, [r('apple', false, 'recall')])).rejects.toThrow(/write failed/);
   });
 });

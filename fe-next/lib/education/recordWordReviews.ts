@@ -1,5 +1,6 @@
 /**
- * The one writer of `word_review_state` and `student_lesson_progress.words_mastered`.
+ * The one writer of `word_review_state` and `student_lesson_progress.words_mastered`
+ * (the latter through the `apply_words_mastered` RPC).
  * Server-only: callers pass the service-role client after authenticating the
  * student and checking lesson access (students may only read these rows).
  */
@@ -143,17 +144,15 @@ export async function recordWordReviews(db: SupabaseClient, args: RecordWordRevi
   }
 
   // Stored (earned) strength decides mastery; wilting shows only in reads. Words with no row keep their legacy entry.
+  // One SQL statement applies only the difference, so a concurrent writer's change survives.
   const isMasteredKey = (k: string) => isMasteredStrength(states.get(k)?.strength ?? 'seed');
-  const mastered = legacy.filter((w) => !states.has(key(w)) || isMasteredKey(key(w)));
-  for (const k of states.keys()) {
-    if (isMasteredKey(k) && !legacyKeys.has(k)) mastered.push(storedWord.get(k) ?? displayByKey.get(k)!);
-  }
-  const sameAsBefore = mastered.length === legacy.length && mastered.every((w) => legacyKeys.has(key(w)));
-  if (!sameAsBefore) {
-    const { error } = await db
-      .from('student_lesson_progress')
-      .upsert({ student_id: studentId, lesson_id: lessonId, words_mastered: mastered }, { onConflict: 'student_id,lesson_id' });
+  const remove = legacy.filter((w) => states.has(key(w)) && !isMasteredKey(key(w)));
+  const add = [...states.keys()].filter((k) => isMasteredKey(k) && !legacyKeys.has(k)).map((k) => storedWord.get(k) ?? displayByKey.get(k)!);
+  let mastered = [...legacy.filter((w) => !remove.includes(w)), ...add];
+  if (add.length > 0 || remove.length > 0) {
+    const { data, error } = await db.rpc('apply_words_mastered', { p_student_id: studentId, p_lesson_id: lessonId, p_add: add, p_remove: remove });
     if (error) fail('write mastery', error);
+    if (Array.isArray(data)) mastered = data as string[];
   }
 
   return { recorded, dropped: args.reviews.length - recorded, mastered };
