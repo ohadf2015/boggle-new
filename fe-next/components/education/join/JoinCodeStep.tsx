@@ -127,7 +127,7 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
 
         <details className="group/where edu-card">
           <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 rounded-[inherit] px-3 py-2 font-neo-display text-lg font-bold text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-neo-cyan lg:text-xl [&::-webkit-details-marker]:hidden">
-            <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-lg border-2 border-neo-black bg-neo-pink text-neo-black">
+            <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-pink text-neo-black">
               <HelpCircle className="size-5" strokeWidth={2.5} />
             </span>
             <span>{t(`${K}.flow.whereCode`)}</span>

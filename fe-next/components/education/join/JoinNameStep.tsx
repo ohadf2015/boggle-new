@@ -59,7 +59,7 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
           <DirectionalIcon icon={ArrowLeft} className="mx-1 size-5 text-edu-ink" />
           <span dir="ltr" data-testid="join-code-chip" className="flex gap-1">
             {flow.code.split('').map((ch, i) => (
-              <span key={i} className="edu-tile size-9 rounded-lg border-2 text-xl leading-none">
+              <span key={i} className="edu-tile size-9 rounded-neo border-2 text-xl leading-none">
                 {ch}
               </span>
             ))}
@@ -129,7 +129,7 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
                   suggestionLeads ? 'border-2 border-edu-line bg-transparent px-3 text-sm text-edu-ink/80' : 'edu-card ps-1.5 shadow-edu-lip-sm'
                 )}
               >
-                <span aria-hidden="true" className="flex size-8 items-center justify-center rounded-lg border-2 border-neo-black bg-neo-cyan text-neo-black">
+                <span aria-hidden="true" className="flex size-8 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black">
                   <Dices
                     key={diceSpin}
                     className="size-5 motion-safe:animate-[lc-join-dice_450ms_ease-out]"
