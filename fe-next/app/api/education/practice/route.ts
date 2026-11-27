@@ -17,6 +17,7 @@ import { grantPlayerXp, levelUpOf } from '@/backend/modules/xpGrant';
 import { readAwardState, type AwardState } from '@/lib/education/grantStudentAwards';
 import { grantPracticeRewards } from '@/lib/education/practiceRewards';
 import { nextPracticeStreak, utcDay, type PracticeStreak } from '@/lib/education/practiceStreak';
+import { recordPracticeWordReviews } from '@/lib/education/practiceWordReviews';
 
 /**
  * GET /api/education/practice
@@ -275,7 +276,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const { sessionId, completed: completionRequested, ...updateData } = parseResult.data;
+    const { sessionId, completed: completionRequested, wordResults, ...updateData } = parseResult.data;
 
     // Verify user owns the session + idempotency guard.
     // PERF: the extra columns are exactly the ones the completion path needs to
@@ -443,11 +444,17 @@ export async function PATCH(request: NextRequest) {
       lessonId: existing.lesson_id, assignmentId: satisfiedAssignment.id, classroomId: satisfiedAssignment.classroomId }).catch((err) => { logger.error('Assignment stamp failed:', err); return false; })
       : Promise.resolve(null);
 
+    const wordMemory = completionRequested
+      ? recordPracticeWordReviews(createAdminClient, { studentId: existing.student_id, lessonId: existing.lesson_id, wordResults, nowMs: Date.now() })
+          .catch((err) => logger.error('Word memory update failed:', err))
+      : Promise.resolve();
+
     const [{ data: session, error }, xpResult, profileXp, stamped] = await Promise.all([
       sessionWrite,
       awardEducationXp,
       incrementProfileXp,
       stampAssignment,
+      wordMemory,
     ]);
 
     if (error) {
