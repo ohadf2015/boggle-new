@@ -99,7 +99,7 @@ export function RoundWordGridDialog({ language, round, proLabel = 'Pro', offer, 
             data-testid="round-grid-close"
             onClick={onClose}
             aria-label={t('eduProResults.close')}
-            className="inline-flex size-11 shrink-0 items-center justify-center rounded-neo border-[3px] border-neo-black bg-edu-paper shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="inline-flex size-11 shrink-0 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-white edu-sky:bg-edu-paper shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             <X className="size-5" aria-hidden="true" />
           </button>
@@ -114,7 +114,7 @@ export function RoundWordGridDialog({ language, round, proLabel = 'Pro', offer, 
         </div>
 
         {upsell ? (
-          <footer data-testid="round-grid-depth" className="flex flex-col gap-2 border-t-[3px] border-neo-black bg-edu-paper px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <footer data-testid="round-grid-depth" className="flex flex-col gap-2 border-t-[3px] border-neo-black bg-neo-white edu-sky:bg-edu-paper px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="flex items-center gap-2 font-neo-display text-sm font-black">
                 <Lock className="size-4 shrink-0" aria-hidden="true" />
@@ -132,7 +132,7 @@ export function RoundWordGridDialog({ language, round, proLabel = 'Pro', offer, 
                     rel="noopener noreferrer"
                     data-testid="round-grid-cta"
                     onClick={offer.onClick}
-                    className={cn(ACTION, 'bg-neo-pink text-edu-ink')}
+                    className={cn(ACTION, 'bg-neo-pink text-neo-white edu-sky:text-edu-ink')}
                   >
                     <Sparkles className="size-4 shrink-0" aria-hidden="true" />
                     {offer.label}

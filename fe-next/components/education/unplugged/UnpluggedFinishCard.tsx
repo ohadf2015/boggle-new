@@ -90,7 +90,7 @@ export function UnpluggedFinishCard({
       data-perfect={String(perfect)}
       className={cn(
         'flex-1 min-h-0 flex flex-col items-center justify-center gap-2 sm:gap-4 px-3 sm:px-6 py-3',
-        'rounded-neo border-[3px] border-edu-line bg-edu-surface shadow-hard overflow-hidden',
+        'rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface shadow-hard overflow-hidden',
       )}
     >
       <UnpluggedMascot
@@ -109,10 +109,10 @@ export function UnpluggedFinishCard({
         </span>
       ) : null}
 
-      <h2 className="font-neo-display font-bold text-edu-ink text-center leading-none text-[clamp(1.6rem,5vw,4.5rem)]">
+      <h2 className="font-neo-display font-bold text-neo-white edu-sky:text-edu-ink text-center leading-none text-[clamp(1.6rem,5vw,4.5rem)]">
         {headline}
       </h2>
-      <p className="font-neo-body text-edu-ink/70 text-center text-[clamp(0.75rem,1.3vw,1.2rem)] max-w-[48ch]">
+      <p className="font-neo-body text-neo-white/70 edu-sky:text-edu-ink/70 text-center text-[clamp(0.75rem,1.3vw,1.2rem)] max-w-[48ch]">
         {subline}
       </p>
 

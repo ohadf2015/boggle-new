@@ -64,7 +64,7 @@ export function UnpluggedToolsBar({
         data-testid="share-miss-gap-practice"
         onClick={onShare}
         aria-label={shared ? shareCopiedLabel : shareLabel}
-        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', TOOL, 'bg-edu-paper text-neo-black')}
+        className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', TOOL, 'bg-neo-white edu-sky:bg-edu-paper text-neo-black')}
       >
         {shared ? (
           <Check className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" aria-hidden />

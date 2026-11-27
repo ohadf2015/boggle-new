@@ -39,16 +39,16 @@ export function LobbyWordStudy({ cards, studied, onDone, quiet = false, t }: Lob
   return (
     <section data-testid="lobby-word-study" aria-labelledby="lobby-word-study-title" className="flex w-full flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 id="lobby-word-study-title" className="font-neo-display text-2xl font-black text-edu-ink lg:text-4xl">
+        <h2 id="lobby-word-study-title" className="font-neo-display text-2xl font-black text-neo-cream edu-sky:text-edu-ink lg:text-4xl">
           {t('eduStudent.lobby.studyTitle')}
         </h2>
         {studied ? (
-          <span data-testid="study-learned" className="inline-flex items-center gap-1 rounded-full border-2 border-neo-lime bg-neo-lime/10 px-2 py-0.5 font-neo-display text-sm font-bold text-edu-lime-ink">
+          <span data-testid="study-learned" className="inline-flex items-center gap-1 rounded-full border-2 border-neo-lime bg-neo-lime/10 px-2 py-0.5 font-neo-display text-sm font-bold text-neo-lime edu-sky:text-edu-lime-ink">
             <CheckCircle2 className="size-4" aria-hidden="true" />
             {t(pluralKeyOf('eduStudent.lobby.studyLearned', cards.length, language), { count: cards.length })}
           </span>
         ) : (
-          <span className="font-neo-display text-sm font-bold tabular-nums text-edu-ink/75">
+          <span className="font-neo-display text-sm font-bold tabular-nums text-neo-cream/75 edu-sky:text-edu-ink/75">
             {t('eduStudent.lobby.studyProgress', { current: index + 1, total: cards.length })}
           </span>
         )}
@@ -76,7 +76,7 @@ export function LobbyWordStudy({ cards, studied, onDone, quiet = false, t }: Lob
           data-testid="study-back"
           onClick={() => nav('back')}
           disabled={index === 0}
-          className={cn(NAV, PRESS, 'flex-1 border-edu-line bg-edu-surface text-edu-ink')}
+          className={cn(NAV, PRESS, 'flex-1 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink')}
         >
           <DirectionalIcon icon={ArrowLeft} className="size-5" />
           {t('eduStudent.lobby.studyBack')}
@@ -87,7 +87,7 @@ export function LobbyWordStudy({ cards, studied, onDone, quiet = false, t }: Lob
               posthog.capture('edu_lobby_study_done_clicked', { totalCards: cards.length });
               onDone();
             }}
-            className={cn(NAV, PRESS, 'flex-[2]', quiet ? 'border-edu-line bg-edu-surface text-edu-ink' : 'border-neo-black bg-neo-lime text-neo-black')}>
+            className={cn(NAV, PRESS, 'flex-[2]', quiet ? 'border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink' : 'border-neo-black edu-sky:border-neo-black bg-neo-lime edu-sky:bg-neo-lime text-neo-black edu-sky:text-neo-black')}>
             <Check className="size-5" aria-hidden="true" />
             {t('eduStudent.lobby.studyDone')}
           </button>

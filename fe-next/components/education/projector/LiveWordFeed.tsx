@@ -24,18 +24,18 @@ const TILE = 'grid size-[clamp(18px,min(6.4cqw,4.4cqh),48px)] shrink-0 place-ite
 export const LiveWordFeed = memo(function LiveWordFeed({ entries, avatars, reduceMotion, t }: LiveWordFeedProps) {
   if (!entries.length) {
     return (
-      <div data-testid="live-feed-empty" className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(6px,1.4cqh,18px)] rounded-neo border-[3px] border-dashed border-edu-line bg-edu-page px-3 text-center">
+      <div data-testid="live-feed-empty" className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(6px,1.4cqh,18px)] rounded-neo border-[3px] border-dashed border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-page px-3 text-center">
         <span aria-hidden className="flex gap-[clamp(3px,0.8cqw,10px)]">
           {[0, 1, 2, 3, 4].map((i) => (
             <span
               key={i}
               style={{ animationDelay: `${i * 140}ms` }}
-              className="size-[clamp(18px,min(8cqw,6cqh),56px)] rounded-neo border-[3px] border-dashed border-edu-line bg-neo-purple/25 motion-safe:animate-[edu-ghost-wave_2.4s_cubic-bezier(0.45,0,0.55,1)_infinite]"
+              className="size-[clamp(18px,min(8cqw,6cqh),56px)] rounded-neo border-[3px] border-dashed border-neo-cream/60 edu-sky:border-edu-line bg-neo-purple/25 motion-safe:animate-[edu-ghost-wave_2.4s_cubic-bezier(0.45,0,0.55,1)_infinite]"
             />
           ))}
         </span>
-        <p className="font-neo-display font-black uppercase text-edu-ink text-[clamp(16px,min(6.5cqw,4.4cqh),40px)]">{t('tvBroadcast.wordDropEmpty')}</p>
-        <p className="max-w-[30ch] font-neo-body font-bold text-edu-ink/85 text-[clamp(13px,min(4.2cqw,2.6cqh),24px)]">{t('tvBroadcast.wordDropEmptyHint')}</p>
+        <p className="font-neo-display font-black uppercase text-neo-cream edu-sky:text-edu-ink text-[clamp(16px,min(6.5cqw,4.4cqh),40px)]">{t('tvBroadcast.wordDropEmpty')}</p>
+        <p className="max-w-[30ch] font-neo-body font-bold text-neo-cream/85 edu-sky:text-edu-ink/85 text-[clamp(13px,min(4.2cqw,2.6cqh),24px)]">{t('tvBroadcast.wordDropEmptyHint')}</p>
       </div>
     );
   }
@@ -57,11 +57,11 @@ export const LiveWordFeed = memo(function LiveWordFeed({ entries, avatars, reduc
               transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 460, damping: 24 }}
               className={cn(
                 'flex w-full shrink-0 items-center gap-[clamp(6px,2cqw,16px)] rounded-neo border-[3px] px-[clamp(6px,2cqw,16px)] py-[clamp(3px,0.7cqh,10px)] shadow-hard-sm',
-                entry.lesson ? 'border-neo-black bg-neo-lime text-neo-black' : 'border-edu-line bg-edu-surface text-edu-ink',
+                entry.lesson ? 'border-neo-black edu-sky:border-neo-black bg-neo-lime edu-sky:bg-neo-lime text-neo-black edu-sky:text-neo-black' : 'border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink',
                 i > 3 && !entry.lesson && 'brightness-75'
               )}
             >
-              <span aria-hidden className="size-[clamp(28px,min(10cqw,6.5cqh),68px)] shrink-0 overflow-hidden rounded-full border-[3px] border-edu-line bg-edu-surface">
+              <span aria-hidden className="size-[clamp(28px,min(10cqw,6.5cqh),68px)] shrink-0 overflow-hidden rounded-full border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface">
                 <Avatar
                   userId={entry.username}
                   avatarImage={avatar?.avatarImage}

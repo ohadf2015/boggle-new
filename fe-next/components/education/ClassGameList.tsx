@@ -55,12 +55,12 @@ export function ClassGameList({ section }: { section: ClassGameSection }): React
   return (
     <section>
       <h2 className="mb-3 font-neo-display text-3xl font-black uppercase sm:text-4xl">{section.heading}</h2>
-      <p className="mb-8 max-w-3xl text-sm text-edu-ink/70 sm:text-base">{section.intro}</p>
+      <p className="mb-8 max-w-3xl text-sm text-neo-gray-300 edu-sky:text-edu-ink/70 sm:text-base">{section.intro}</p>
       <ol className="space-y-4">
         {section.games.map((g, i) => (
           <li
             key={g.name}
-            className="relative rounded-neo border-3 border-edu-line bg-edu-surface p-5 pt-7 shadow-hard sm:p-6 sm:pt-7"
+            className="relative rounded-neo border-3 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface p-5 pt-7 shadow-hard sm:p-6 sm:pt-7"
           >
             <span
               className="absolute -top-3.5 start-4 grid h-8 w-8 place-items-center rounded border-2 border-neo-black bg-neo-yellow font-neo-display text-sm font-black text-neo-navy shadow-hard-sm"
@@ -68,31 +68,31 @@ export function ClassGameList({ section }: { section: ClassGameSection }): React
             >
               {i + 1}
             </span>
-            <h3 className="font-neo-display text-lg font-black text-edu-yellow-ink sm:text-xl">{g.name}</h3>
+            <h3 className="font-neo-display text-lg font-black text-neo-yellow edu-sky:text-edu-yellow-ink sm:text-xl">{g.name}</h3>
 
-            <dl className="mt-3 space-y-2 text-sm leading-relaxed text-edu-ink/80 sm:text-base">
+            <dl className="mt-3 space-y-2 text-sm leading-relaxed text-neo-gray-200 edu-sky:text-edu-ink/80 sm:text-base">
               <div>
-                <dt className="inline font-black uppercase tracking-wide text-edu-cyan-ink">{labels.setup}: </dt>
+                <dt className="inline font-black uppercase tracking-wide text-neo-cyan edu-sky:text-edu-cyan-ink">{labels.setup}: </dt>
                 <dd className="inline">{g.setup}</dd>
               </div>
               <div>
-                <dt className="inline font-black uppercase tracking-wide text-edu-cyan-ink">{labels.rules}: </dt>
+                <dt className="inline font-black uppercase tracking-wide text-neo-cyan edu-sky:text-edu-cyan-ink">{labels.rules}: </dt>
                 <dd className="inline">{g.rules}</dd>
               </div>
               <div>
-                <dt className="inline font-black uppercase tracking-wide text-edu-lime-ink">{labels.onLexiClash}: </dt>
+                <dt className="inline font-black uppercase tracking-wide text-neo-lime edu-sky:text-edu-lime-ink">{labels.onLexiClash}: </dt>
                 <dd className="inline">{g.runsWithNote}</dd>
               </div>
             </dl>
 
             <ul className="mt-4 flex flex-wrap gap-2 text-xs font-bold uppercase tracking-widest">
-              <li className="rounded border-2 border-edu-line bg-edu-surface px-2 py-1 text-edu-ink/80">
+              <li className="rounded border-2 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface px-2 py-1 text-neo-gray-200 edu-sky:text-edu-ink/80">
                 {labels.time}: {g.time}
               </li>
-              <li className="rounded border-2 border-edu-line bg-edu-surface px-2 py-1 text-edu-ink/80">
+              <li className="rounded border-2 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface px-2 py-1 text-neo-gray-200 edu-sky:text-edu-ink/80">
                 {labels.group}: {g.groupSize}
               </li>
-              <li className="rounded border-2 border-edu-line bg-edu-surface px-2 py-1 text-edu-ink/80">
+              <li className="rounded border-2 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface px-2 py-1 text-neo-gray-200 edu-sky:text-edu-ink/80">
                 {labels.drills}: {g.drills}
               </li>
             </ul>

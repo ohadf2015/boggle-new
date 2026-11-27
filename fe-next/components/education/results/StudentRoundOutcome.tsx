@@ -97,7 +97,7 @@ export function StudentRoundOutcome({
       data-testid="student-round-outcome"
       {...(hideClassPosition ? {} : { 'data-rank': String(rank) })}
       className={cn(
-        'mb-5 p-4 rounded-neo border-[2px] border-edu-line bg-edu-surface shadow-hard'
+        'mb-5 p-4 rounded-neo border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface shadow-hard'
       )}
     >
       <div className="flex items-center gap-4">
@@ -118,7 +118,7 @@ export function StudentRoundOutcome({
             <>
               {rank === 1 && (
                 <Crown
-                  className="absolute -top-5 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-9 h-9 text-edu-yellow-ink animate-neo-wobble motion-reduce:animate-none"
+                  className="absolute -top-5 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-9 h-9 text-neo-yellow edu-sky:text-edu-yellow-ink animate-neo-wobble motion-reduce:animate-none"
                   aria-hidden
                 />
               )}
@@ -137,13 +137,13 @@ export function StudentRoundOutcome({
         <div className="min-w-0 flex-1">
           <p
             data-testid="student-outcome-headline"
-            className="font-neo-display font-black uppercase tracking-wide text-edu-lime-ink text-2xl leading-none"
+            className="font-neo-display font-black uppercase tracking-wide text-neo-lime edu-sky:text-edu-lime-ink text-2xl leading-none"
           >
             {headline}
           </p>
-          <p className="mt-1 font-neo-display font-black text-edu-ink text-4xl leading-none tabular-nums">
+          <p className="mt-1 font-neo-display font-black text-neo-white edu-sky:text-edu-ink text-4xl leading-none tabular-nums">
             {entry.score}
-            <span className="ms-2 font-neo-body font-bold text-edu-ink/50 text-sm uppercase tracking-widest">
+            <span className="ms-2 font-neo-body font-bold text-neo-white/50 edu-sky:text-edu-ink/50 text-sm uppercase tracking-widest">
               {t('education.results.you.points')}
             </span>
           </p>
@@ -151,9 +151,9 @@ export function StudentRoundOutcome({
           {beaten > 0 && !hideClassPosition && (
             <p
               data-testid="student-outcome-beat"
-              className="mt-2 flex items-center gap-1.5 font-neo-body font-bold text-edu-ink/80 text-sm"
+              className="mt-2 flex items-center gap-1.5 font-neo-body font-bold text-neo-white/80 edu-sky:text-edu-ink/80 text-sm"
             >
-              <Users className="w-4 h-4 shrink-0 text-edu-cyan-ink" aria-hidden />
+              <Users className="w-4 h-4 shrink-0 text-neo-cyan edu-sky:text-edu-cyan-ink" aria-hidden />
               {t('education.results.you.beat', { count: beaten })}
             </p>
           )}
@@ -177,12 +177,12 @@ export function StudentRoundOutcome({
         {(ahead || tiedWith) && !hideClassPosition && (
           <span
             data-testid="student-outcome-gap"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-[2px] border-edu-line bg-edu-surface text-edu-ink font-bold text-sm shadow-hard-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink font-bold text-sm shadow-hard-sm"
           >
             {ahead ? (
-              <TrendingUp className="w-4 h-4 shrink-0 text-edu-yellow-ink" aria-hidden />
+              <TrendingUp className="w-4 h-4 shrink-0 text-neo-yellow edu-sky:text-edu-yellow-ink" aria-hidden />
             ) : (
-              <Users className="w-4 h-4 shrink-0 text-edu-cyan-ink" aria-hidden />
+              <Users className="w-4 h-4 shrink-0 text-neo-cyan edu-sky:text-edu-cyan-ink" aria-hidden />
             )}
             {ahead
               ? t('education.results.you.gapToNext', { points: gap, name: ahead.username })
@@ -212,9 +212,9 @@ export function StudentMomentumChips({
         data-testid="student-outcome-delta"
         className={cn(
           CHIP,
-          momentum.delta > 0 && 'bg-neo-lime text-neo-black',
-          momentum.delta < 0 && 'bg-neo-pink text-neo-black',
-          momentum.delta === 0 && 'bg-edu-surface text-edu-ink'
+          momentum.delta > 0 && 'bg-neo-lime edu-sky:bg-neo-lime text-neo-black edu-sky:text-neo-black',
+          momentum.delta < 0 && 'bg-neo-pink edu-sky:bg-neo-pink text-neo-black edu-sky:text-neo-black',
+          momentum.delta === 0 && 'bg-neo-navy edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink'
         )}
       >
         {momentum.delta > 0 ? (
@@ -253,9 +253,9 @@ export function StudentMomentumChips({
 
       <span
         data-testid="student-outcome-round"
-        className={cn(CHIP, 'bg-edu-surface text-edu-ink')}
+        className={cn(CHIP, 'bg-neo-navy edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink')}
       >
-        <Flame className="w-4 h-4 shrink-0 text-edu-orange-ink" aria-hidden />
+        <Flame className="w-4 h-4 shrink-0 text-neo-orange edu-sky:text-edu-orange-ink" aria-hidden />
         {t('education.results.moment.roundOfSession', { round: momentum.roundNumber })}
       </span>
     </div>

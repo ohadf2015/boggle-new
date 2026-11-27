@@ -30,12 +30,12 @@ export const BossHpBar = memo(function BossHpBar({ hp, maxHp, phase, size, label
       data-testid="boss-hp-bar"
       className={cn(
         'relative w-full overflow-hidden bg-neo-abyss-deep',
-        stage ? 'h-[3.4cqw] rounded-[0.5cqw] border-[0.3cqw] border-neo-black shadow-hard-xl' : 'h-4 rounded-full border-2 border-edu-line',
+        stage ? 'h-[3.4cqw] rounded-[0.5cqw] border-[0.3cqw] border-neo-black edu-sky:border-neo-black shadow-hard-xl' : 'h-4 rounded-full border-2 border-neo-cream/60 edu-sky:border-edu-line',
       )}
     >
       <div className={cn('absolute inset-0 bg-neo-cream', styles.hpGhost)} style={{ transform: `scaleX(${ratio})` }} aria-hidden="true" />
       <div className={cn('absolute inset-0', fill, styles.hpFill)} style={{ transform: `scaleX(${ratio})` }} />
-      {stage && <div className="absolute inset-x-0 top-0 h-[38%] bg-edu-ink/25" aria-hidden="true" />}
+      {stage && <div className="absolute inset-x-0 top-0 h-[38%] bg-neo-white/25 edu-sky:bg-edu-ink/25" aria-hidden="true" />}
       <div className="absolute inset-0 flex" aria-hidden="true">
         {Array.from({ length: SEGMENTS - 1 }, (_, i) => (
           <span key={i} className={cn('flex-1 border-e-neo-black/60', stage ? 'border-e-[0.15cqw]' : 'border-e-2')} />
@@ -45,7 +45,7 @@ export const BossHpBar = memo(function BossHpBar({ hp, maxHp, phase, size, label
       <span
         dir="ltr"
         className={cn(
-          'absolute inset-y-0 end-[1%] flex items-center font-neo-display font-black leading-none text-edu-ink tabular-nums',
+          'absolute inset-y-0 end-[1%] flex items-center font-neo-display font-black leading-none text-neo-white edu-sky:text-edu-ink tabular-nums',
           stage ? 'text-[2.2cqw] [text-shadow:0.15cqw_0.15cqw_0_rgb(var(--neo-black))]' : 'text-xs [text-shadow:1px_1px_0_rgb(var(--neo-black))]',
         )}
       >

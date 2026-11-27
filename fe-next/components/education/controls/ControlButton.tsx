@@ -7,8 +7,8 @@ export type ControlTone = 'go' | 'time' | 'neutral' | 'danger' | 'armed';
 
 const TONE_CLASSES: Record<ControlTone, string> = {
   go: 'bg-neo-lime text-neo-black',
-  time: 'bg-edu-paper text-neo-black',
-  neutral: 'bg-edu-paper text-neo-black',
+  time: 'bg-neo-white edu-sky:bg-edu-paper text-neo-black',
+  neutral: 'bg-neo-white edu-sky:bg-edu-paper text-neo-black',
   // Destructive-secondary: an outline until armed, so it never outweighs Pause.
   danger: 'bg-neo-cream text-neo-black border-neo-red shadow-none lg:shadow-none [&_svg]:text-neo-red',
   // No `animate-pulse`: the app-wide pulse keyframes scale the box, so the

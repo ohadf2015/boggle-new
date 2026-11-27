@@ -88,23 +88,23 @@ export function NoAccountCta({
   return (
     <div
       data-testid="no-account-cta"
-      className={`max-w-xl rounded-neo border-2 border-s-4 border-edu-line border-s-neo-lime bg-edu-surface p-4 text-edu-ink sm:p-5 ${className}`}
+      className={`max-w-xl rounded-neo border-2 border-s-4 border-neo-cream/40 edu-sky:border-edu-line border-s-neo-lime edu-sky:border-s-neo-lime bg-neo-navy-light edu-sky:bg-edu-surface p-4 text-neo-white edu-sky:text-edu-ink sm:p-5 ${className}`}
     >
-      <p className="font-neo-display text-base font-bold leading-snug text-edu-lime-ink sm:text-lg">
+      <p className="font-neo-display text-base font-bold leading-snug text-neo-lime edu-sky:text-edu-lime-ink sm:text-lg">
         {c.heading}
       </p>
-      {compact ? null : <p className="mt-1.5 text-sm leading-relaxed text-edu-ink/80">{c.body}</p>}
+      {compact ? null : <p className="mt-1.5 text-sm leading-relaxed text-neo-white/80 edu-sky:text-edu-ink/80">{c.body}</p>}
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
         <Link
           data-lc-cta="play_now"
           href={`/${locale}${QUICK_PLAY_PATH}`}
           className={`${ctaStyle === 'link'
-              ? 'inline-flex min-h-11 items-center font-neo-display text-base font-bold text-edu-lime-ink underline decoration-2 underline-offset-4 hover:text-edu-lime-ink'
-              : 'inline-flex min-h-11 items-center rounded-neo border-2 border-neo-black bg-neo-lime px-5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed'} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
+              ? 'inline-flex min-h-11 items-center font-neo-display text-base font-bold text-neo-lime edu-sky:text-edu-lime-ink underline decoration-2 underline-offset-4 hover:text-neo-lime-light edu-sky:hover:text-edu-lime-ink'
+              : 'inline-flex min-h-11 items-center rounded-neo border-2 border-neo-black bg-neo-lime px-5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy edu-sky:text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed'} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
         >
           {c.cta}
         </Link>
-        <p className="text-xs font-semibold text-edu-ink/65">{c.note}</p>
+        <p className="text-xs font-semibold text-neo-white/65 edu-sky:text-edu-ink/65">{c.note}</p>
       </div>
     </div>
   );

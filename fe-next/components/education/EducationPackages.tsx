@@ -61,7 +61,7 @@ export function EducationPackages({
       <h2 className="font-neo-display text-3xl font-black sm:text-4xl">
         {t('education.packages.title')}
       </h2>
-      <p className="mt-3 max-w-3xl text-edu-ink/80">{t('education.packages.subtitle')}</p>
+      <p className="mt-3 max-w-3xl text-neo-gray-200 edu-sky:text-edu-ink/80">{t('education.packages.subtitle')}</p>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {EDUCATION_PACKAGES.map((pkg) => (
           <PackageCard
@@ -94,8 +94,8 @@ function PackageCard({
     <article
       className={
         highlighted
-          ? 'flex flex-col rounded-neo border-4 border-neo-black bg-neo-lime p-5 text-neo-navy shadow-hard-xl'
-          : 'flex flex-col rounded-neo border-4 border-edu-line bg-edu-surface p-5 text-edu-ink shadow-hard'
+          ? 'flex flex-col rounded-neo border-4 border-neo-black edu-sky:border-neo-black bg-neo-lime edu-sky:bg-neo-lime p-5 text-neo-navy edu-sky:text-neo-navy shadow-hard-xl'
+          : 'flex flex-col rounded-neo border-4 border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface p-5 text-neo-white edu-sky:text-edu-ink shadow-hard'
       }
     >
       <h3 className="font-neo-display text-xl font-black">{t(`education.packages.${ns}.name`)}</h3>
@@ -118,11 +118,11 @@ function PackageCard({
         )}
       </p>
       {pkg.id === 'school' && (
-        <p className={`mt-1.5 text-xs font-bold ${highlighted ? 'text-neo-navy/70' : 'text-edu-ink/70'}`}>
+        <p className={`mt-1.5 text-xs font-bold ${highlighted ? 'text-neo-navy/70 edu-sky:text-neo-navy/70' : 'text-neo-white/70 edu-sky:text-edu-ink/70'}`}>
           {t('education.packages.school.priceTerms', { min: SCHOOL_PLAN_MIN_TEACHERS })}
         </p>
       )}
-      <p className={`mt-3 text-sm ${highlighted ? 'text-neo-navy/80' : 'text-edu-ink/80'}`}>
+      <p className={`mt-3 text-sm ${highlighted ? 'text-neo-navy/80 edu-sky:text-neo-navy/80' : 'text-neo-gray-200 edu-sky:text-edu-ink/80'}`}>
         {t(`education.packages.${ns}.blurb`)}
       </p>
       <ul className="mt-4 flex-1 space-y-2 text-sm font-bold">
@@ -153,8 +153,8 @@ function PackageCard({
           type="button"
           onClick={() => pkg.leadPlan && onLead(pkg.leadPlan)}
           className={`${highlighted
-              ? 'mt-6 rounded-neo border-4 border-edu-line bg-edu-surface px-4 py-3 font-neo-display font-black uppercase tracking-wider text-edu-ink shadow-hard'
-              : 'mt-6 rounded-neo border-4 border-neo-black bg-neo-pink px-4 py-3 font-neo-display font-black uppercase tracking-wider text-neo-black shadow-hard'} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
+              ? 'mt-6 rounded-neo border-4 border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface px-4 py-3 font-neo-display font-black uppercase tracking-wider text-neo-white edu-sky:text-edu-ink shadow-hard'
+              : 'mt-6 rounded-neo border-4 border-neo-black edu-sky:border-neo-black bg-neo-pink edu-sky:bg-neo-pink px-4 py-3 font-neo-display font-black uppercase tracking-wider text-neo-black edu-sky:text-neo-black shadow-hard'} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
         >
           {t(`education.packages.${ns}.cta`)}
         </button>
@@ -180,10 +180,10 @@ export function ForSchoolsPackages({
       <section id="lead" className="mt-16 scroll-mt-20 grid gap-10 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <h2 className="font-neo-display text-3xl font-black sm:text-4xl">{leadTitle}</h2>
-          <p className="mt-3 text-edu-ink/80">{leadIntro}</p>
+          <p className="mt-3 text-neo-gray-200 edu-sky:text-edu-ink/80">{leadIntro}</p>
         </div>
         <div className="lg:col-span-7">
-          <div className="rounded-neo border-4 border-edu-line bg-edu-surface p-6 shadow-hard-xl">
+          <div className="rounded-neo border-4 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface p-6 shadow-hard-xl">
             <SchoolLeadForm plan={plan} page={`/${locale}/education/for-schools`} />
           </div>
         </div>

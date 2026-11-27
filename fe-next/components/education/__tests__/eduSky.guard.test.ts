@@ -5,6 +5,8 @@ import {
   EDU_SKY_LAYOUTS,
   classLiterals,
   listCodemodFiles,
+  listDarkRenderedFiles,
+  listSharedFiles,
   transformSource,
 } from '../../../scripts/edu-sky-codemod.mjs';
 
@@ -13,6 +15,7 @@ const read = (rel: string) => fs.readFileSync(path.join(REPO, rel), 'utf8');
 
 describe('classroom sky skin', () => {
   const files: string[] = listCodemodFiles(REPO);
+  const shared = new Set<string>(listSharedFiles(REPO));
 
   it('scans the whole classroom file set (guard against a vacuous pass)', () => {
     expect(files.length).toBeGreaterThan(800);
@@ -22,7 +25,7 @@ describe('classroom sky skin', () => {
     const offenders: string[] = [];
     for (const rel of files) {
       const src = read(rel);
-      const out = transformSource(src, rel);
+      const out = transformSource(src, rel, { shared: shared.has(rel) });
       if (out === src) continue;
       const before = src.split('\n');
       out.split('\n').forEach((line, i) => {
@@ -41,7 +44,8 @@ describe('classroom sky skin', () => {
     const offenders: string[] = [];
     for (const rel of files) {
       for (const lit of classLiterals(read(rel), rel)) {
-        if (fill.test(lit) && whiteInk.test(lit)) offenders.push(`${rel}: ${lit}`);
+        // A shared file keeps master's white ink for the dark page; its edu-sky: twin inks the sky.
+        if (fill.test(lit) && whiteInk.test(lit) && !/(^|\s)edu-sky:text-/.test(lit)) offenders.push(`${rel}: ${lit}`);
       }
     }
     expect(offenders).toEqual([]);
@@ -163,6 +167,12 @@ const CLASSROOM_BRANCHES: ReadonlyArray<readonly [string, RegExp, readonly strin
   ['components/daily/survival/SurvivalClueLegend.tsx', HOOK, ['text-edu-ink', 'text-edu-cyan-ink']],
   ['components/wordhunt/WordHuntGameLayout.tsx', /wordHuntLayoutSkin\(useClassroomBoard\(\)\)/, []],
   ['components/wordhunt/wordHuntLayoutSkin.ts', /classroom/, ['bg-edu-surface', 'text-edu-ink']],
+  ['components/keyboard/KeyboardInlineHint.tsx', HOOK, ["classroom ? 'bg-edu-surface' : 'bg-neo-navy/80'"]],
+  ['components/game/WordFormingArea.tsx', HOOK, ['border-edu-line/30 bg-edu-surface']],
+  ['host/components/tv-broadcast/TvGameHeader.tsx', /classroom \? \(/, ['TIMER_PLATE']],
+  ['host/components/tv-broadcast/TvClassroomJoinCards.tsx', /TvClassroomJoinCards/, []],
+  // Only the classroom header slot (inline placement) passes `wrap`.
+  ['host/components/tv-broadcast/notifications/MinimalToastLayout.tsx', /if \(wrap\)/, ['bg-edu-paper']],
   // The boss art stays dark, so its title and HP readout keep the dark edu tokens.
   ['components/education/boss/ProjectorBossStage.tsx', /<header data-edu-theme="dark"/, []],
 ];
@@ -179,3 +189,66 @@ describe('classroom branches in shared game files', () => {
   });
 });
 
+
+/**
+ * A file any dark page imports must render exactly as on master outside the sky scope, so its
+ * sky look rides only behind `edu-sky:` (`border-neo-cream/40 edu-sky:border-edu-line`). A bare
+ * edu token there changes the dark page: `border-edu-line` drops the master alpha and
+ * `bg-edu-surface` swaps navy for navy-light. Classroom-only branches of shared game files are
+ * pinned above instead.
+ */
+const BARE_EDU = /^(?:(?:bg|text|border(?:-[xytrblse])?|ring|ring-offset|divide|outline|shadow|from|via|to|fill|stroke|placeholder|caret|accent|decoration)-edu-[a-z-]+(?:\/\d+)?|edu-(?:card|btn|btn-primary|tile|rays-dark|rays-gold))$/;
+const CLASSROOM_ONLY = new Set<string>([
+  ...CLASSROOM_BRANCHES.map(([rel]) => rel),
+  // Rendered only behind a classroom recap (classroomSummary); dark routes reach it through a results preload.
+  'components/education/results/WinnerSpotlight.tsx',
+  // Classroom style tables. A dark page reads only PRO_BANNER_CTA from them, pinned below.
+  'components/teacher/nb/nbStyles.ts',
+  'components/education/eduNeoStyles.ts',
+]);
+
+function bareEduTokens(src: string, rel: string): string[] {
+  const hits: string[] = [];
+  for (const lit of classLiterals(src, rel)) {
+    for (const token of lit.split(/\s+/)) {
+      const cut = token.lastIndexOf(':');
+      const prefix = token.slice(0, cut + 1);
+      const base = token.slice(cut + 1).replace(/^!|!$/g, '');
+      if (!prefix.split(':').includes('edu-sky') && BARE_EDU.test(base)) hits.push(token);
+    }
+  }
+  return hits;
+}
+
+describe('files a dark page imports', () => {
+  it('give the SEO pages the Pro CTA without a bare edu token', async () => {
+    const { PRO_BANNER_CTA } = await import('@/components/teacher/pro/ProBanner');
+    expect(bareEduTokens(`const c = '${PRO_BANNER_CTA}';`, 'cta.ts')).toEqual([]);
+  });
+
+  const reachable: string[] = listDarkRenderedFiles(REPO);
+
+  it('walks the real import graph (guard against a vacuous pass)', () => {
+    expect(reachable.length).toBeGreaterThan(1000);
+    expect(reachable).toContain('components/education/HomeEducationCard.tsx');
+    expect(reachable).toContain('components/education/EducationRelatedLinks.tsx');
+    expect(reachable).toContain('components/teacher/pro/ProBanner.tsx');
+    expect(reachable).toContain('host/components/tv-broadcast/notifications/MinimalToastLayout.tsx');
+    expect(reachable).not.toContain('app/[locale]/teacher/layout.tsx');
+    // Only /multiplayer imports it, and a classroom room there is always sky.
+    expect(reachable).not.toContain('components/education/projector/ProjectorLobby.tsx');
+  });
+
+  it('paint the sky only behind edu-sky:, keeping every master alpha and navy', () => {
+    const offenders: string[] = [];
+    for (const rel of reachable) {
+      if (CLASSROOM_ONLY.has(rel)) continue;
+      const hits = bareEduTokens(read(rel), rel);
+      if (hits.length) offenders.push(`${rel}: ${[...new Set(hits)].join(' ')}`);
+    }
+    expect(
+      offenders,
+      `Run \`node scripts/edu-sky-codemod.mjs\` (it twins shared files) or write master-class edu-sky:twin pairs:\n${offenders.slice(0, 60).join('\n')}`,
+    ).toEqual([]);
+  });
+});

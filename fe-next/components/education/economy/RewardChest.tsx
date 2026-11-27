@@ -75,7 +75,7 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
       onKeyDown={(e) => {
         if (e.key === 'Escape' && revealed) onClose();
       }}
-      className="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden bg-edu-page text-edu-ink"
+      className="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden bg-neo-navy edu-sky:bg-edu-page text-white edu-sky:text-edu-ink"
     >
       <div className="mx-auto flex min-h-full w-full max-w-md flex-col items-center gap-3 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]">
         {!revealed && (
@@ -110,7 +110,7 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
                 {t('economy.reward.rank', { rank: reveal.rank, size: reveal.size })}
               </p>
             )}
-            <p className="text-sm font-bold text-edu-cyan-ink">{t('economy.locker.added')}</p>
+            <p className="text-sm font-bold text-neo-cyan edu-sky:text-edu-cyan-ink">{t('economy.locker.added')}</p>
             <button
               type="button"
               autoFocus
@@ -118,7 +118,7 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
                 e.stopPropagation();
                 onClose();
               }}
-              className="min-h-14 w-full rounded-neo-lg border-[3px] border-neo-black bg-neo-lime px-8 font-neo-display text-2xl font-black text-neo-navy shadow-hard-lg transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line active:scale-[0.97]"
+              className="min-h-14 w-full rounded-neo-lg border-[3px] border-neo-black bg-neo-lime px-8 font-neo-display text-2xl font-black text-neo-navy shadow-hard-lg transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white edu-sky:focus-visible:ring-edu-line active:scale-[0.97]"
             >
               {t('economy.chest.continue')}
             </button>
@@ -126,9 +126,9 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
         )}
 
         {(phase === 'sealed' || revealed) && (
-          <ul aria-label={t('economy.chest.odds.label')} className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-edu-ink/60">
+          <ul aria-label={t('economy.chest.odds.label')} className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-white/60 edu-sky:text-edu-ink/60">
             {CHEST_RARITIES.map((r) => (
-              <li key={r} className={r === reveal.rarity ? 'font-bold text-edu-ink' : undefined}>
+              <li key={r} className={r === reveal.rarity ? 'font-bold text-white edu-sky:text-edu-ink' : undefined}>
                 {`${t(`economy.chest.rarity.${r}`)} ${oddsLabel(r)}`}
               </li>
             ))}

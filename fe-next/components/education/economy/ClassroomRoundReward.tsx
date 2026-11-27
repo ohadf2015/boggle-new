@@ -27,7 +27,7 @@ export default function ClassroomRoundReward({ gameCode }: ClassroomRoundRewardP
       )}
 
       {locker.items.length > 0 && (
-        <div className="w-full max-w-sm rounded-neo border-3 border-edu-line bg-edu-surface p-3 text-edu-ink shadow-hard-xl">
+        <div className="w-full max-w-sm rounded-neo border-3 border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface p-3 text-white edu-sky:text-edu-ink shadow-hard-xl">
           <h3 className="mb-2 text-lg font-bold">{t('economy.locker.title')}</h3>
           <LockerGrid items={locker.items} />
         </div>

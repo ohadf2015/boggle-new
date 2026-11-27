@@ -9,7 +9,7 @@ import { bossImpactBus } from './bossFxBus';
 import type { BossFxScene } from '@/lib/pixiFx/bossFxScene';
 import styles from '../boss.module.css';
 
-const WORD = 'absolute left-0 top-0 whitespace-nowrap font-neo-display font-black uppercase tracking-wide text-edu-ink [text-shadow:0.15cqw_0.15cqw_0_rgb(var(--neo-black))] will-change-transform';
+const WORD = 'absolute left-0 top-0 whitespace-nowrap font-neo-display font-black uppercase tracking-wide text-neo-white edu-sky:text-edu-ink [text-shadow:0.15cqw_0.15cqw_0_rgb(var(--neo-black))] will-change-transform';
 const DMG = 'pointer-events-none absolute -translate-x-1/2 whitespace-nowrap text-center font-neo-display font-black leading-none [text-shadow:0.2cqw_0.2cqw_0_rgb(var(--neo-black))]';
 
 /** Feeds store changes into one Pixi scene; reduced motion or a failed WebGL init falls back to the DOM projectiles. */
@@ -46,9 +46,9 @@ export const BossFxLayer = memo(function BossFxLayer({ reducedMotion, shakeRef }
             {
               layer,
               wordClass: `${WORD} text-[2.4cqw]`,
-              critWordClass: `${WORD} text-[2.9cqw] !text-edu-pink-ink`,
-              dmgClass: `${DMG} text-[2.6cqw] text-edu-ink ${styles.pop}`,
-              critDmgClass: `${DMG} text-[3.6cqw] text-edu-pink-ink ${styles.pop}`,
+              critWordClass: `${WORD} text-[2.9cqw] !text-neo-pink edu-sky:!text-edu-pink-ink`,
+              dmgClass: `${DMG} text-[2.6cqw] text-neo-white edu-sky:text-edu-ink ${styles.pop}`,
+              critDmgClass: `${DMG} text-[3.6cqw] text-neo-pink edu-sky:text-edu-pink-ink ${styles.pop}`,
               critText,
               exposedText,
               lessonText,

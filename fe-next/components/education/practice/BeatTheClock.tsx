@@ -122,8 +122,8 @@ export default function BeatTheClock({
           // ON is a filled pink control; OFF keeps the navy fill, so the cream
           // border is the only thing that can make it findable at all.
           enabled
-            ? 'border-neo-black bg-neo-pink text-neo-black shadow-hard-sm'
-            : 'border-edu-line bg-edu-surface text-edu-ink'
+            ? 'border-neo-black edu-sky:border-neo-black bg-neo-pink edu-sky:bg-neo-pink text-neo-black edu-sky:text-neo-black shadow-hard-sm'
+            : 'border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink'
         )}
       >
         {enabled ? (
@@ -140,12 +140,12 @@ export default function BeatTheClock({
             data-testid="beat-the-clock-time"
             className={cn(
               'font-neo-display text-base font-black tabular-nums leading-none',
-              urgent ? 'text-edu-pink-ink' : 'text-edu-ink'
+              urgent ? 'text-neo-pink edu-sky:text-edu-pink-ink' : 'text-neo-white edu-sky:text-edu-ink'
             )}
           >
             {formatClock(left)}
           </span>
-          <div aria-hidden="true" className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-neo border-[2px] border-edu-line bg-neo-black/40">
+          <div aria-hidden="true" className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-neo border-[2px] border-neo-cream/40 edu-sky:border-edu-line bg-neo-black/40">
             <div
               className={cn(
                 'h-full transition-[width] duration-1000 ease-linear',

@@ -32,13 +32,13 @@ export function VerdictSheet({ correct, answer, points, streak = 0, t, onShow }:
       title={title}
       onShow={onShow}
       icon={
-        <span className="grid size-10 shrink-0 place-items-center rounded-full border-[3px] border-neo-black bg-edu-paper text-neo-black">
+        <span className="grid size-10 shrink-0 place-items-center rounded-full border-[3px] border-neo-black bg-neo-white edu-sky:bg-edu-paper text-neo-black">
           <Icon className="size-6" strokeWidth={3.5} aria-hidden />
         </span>
       }
       action={
         correct && typeof points === 'number' && points > 0 ? (
-          <span className="rounded-neo border-[3px] border-neo-black bg-edu-paper px-2 py-0.5 font-neo-display text-2xl font-black tabular-nums text-neo-black">
+          <span className="rounded-neo border-[3px] border-neo-black bg-neo-white edu-sky:bg-edu-paper px-2 py-0.5 font-neo-display text-2xl font-black tabular-nums text-neo-black">
             +{points}
           </span>
         ) : undefined

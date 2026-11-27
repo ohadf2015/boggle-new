@@ -34,7 +34,7 @@ describe('NbDialogContent', () => {
 
   it('Given the dark app theme, Then navy fill, cream 3px edge and hard shadow hold under dark: too', () => {
     const cls = tokens(renderDialog().el);
-    for (const want of ['bg-edu-surface', 'dark:bg-edu-surface', 'border-[3px]', 'sm:border-[3px]', 'border-edu-line', 'dark:border-edu-line', 'shadow-hard-xl', 'text-edu-ink', 'dark:text-edu-ink']) {
+    for (const want of ['bg-neo-navy', 'dark:bg-neo-navy', 'edu-sky:bg-edu-surface', 'edu-sky:dark:bg-edu-surface', 'border-[3px]', 'sm:border-[3px]', 'border-edu-line', 'edu-sky:dark:border-edu-line', 'shadow-hard-xl', 'edu-sky:text-edu-ink', 'edu-sky:dark:text-edu-ink']) {
       expect(cls, want).toContain(want);
     }
   });

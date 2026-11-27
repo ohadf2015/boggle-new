@@ -24,9 +24,9 @@ export function chestSrcForPhase(phase: ChestPhase, rarity: ChestRarity): string
 }
 
 export function rarityTone(rarity: ChestRarity): { glow: string; text: string; ring: string } {
-  if (rarity === 'epic') return { glow: 'bg-neo-pink/60', text: 'text-edu-pink-ink', ring: 'border-neo-pink' };
-  if (rarity === 'rare') return { glow: 'bg-neo-cyan/50', text: 'text-edu-cyan-ink', ring: 'border-neo-cyan' };
-  return { glow: 'bg-edu-ink/25', text: 'text-edu-ink', ring: 'border-edu-line' };
+  if (rarity === 'epic') return { glow: 'bg-neo-pink/60', text: 'text-neo-pink edu-sky:text-edu-pink-ink', ring: 'border-neo-pink' };
+  if (rarity === 'rare') return { glow: 'bg-neo-cyan/50', text: 'text-neo-cyan edu-sky:text-edu-cyan-ink', ring: 'border-neo-cyan' };
+  return { glow: 'bg-neo-white/25 edu-sky:bg-edu-ink/25', text: 'text-neo-white edu-sky:text-edu-ink', ring: 'border-neo-white edu-sky:border-edu-line' };
 }
 
 /** Tap anywhere on the chest screen: a sealed chest starts opening, a moving one skips to the reveal. */

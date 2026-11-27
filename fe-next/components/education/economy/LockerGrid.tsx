@@ -9,15 +9,15 @@ import type { ChestRarity, ClassroomLockerEntry } from '@/shared/constants/class
 import { useStudentAvatar } from './useStudentAvatar';
 
 const RARITY_FRAME: Record<ChestRarity, string> = {
-  common: 'border-edu-line',
+  common: 'border-neo-cream/60 edu-sky:border-edu-line',
   rare: 'border-neo-cyan',
   epic: 'border-neo-purple',
 };
 
 const RARITY_TEXT: Record<ChestRarity, string> = {
-  common: 'text-edu-ink/80',
-  rare: 'text-edu-cyan-ink',
-  epic: 'text-edu-purple-ink',
+  common: 'text-neo-cream/80 edu-sky:text-edu-ink/80',
+  rare: 'text-neo-cyan edu-sky:text-edu-cyan-ink',
+  epic: 'text-neo-purple edu-sky:text-edu-purple-ink',
 };
 
 /** The student's chest items: part thumbnail, name and rarity. Shared by the hub locker and the round results. */
@@ -33,12 +33,12 @@ export default function LockerGrid({ items }: { items: ClassroomLockerEntry[] })
         return (
           <li
             key={`${item.gameCode}-${item.roundId}`}
-            className={`flex flex-col items-center gap-1 rounded-neo border-2 bg-edu-surface p-2 text-center text-xs ${RARITY_FRAME[item.rarity]}`}
+            className={`flex flex-col items-center gap-1 rounded-neo border-2 bg-neo-navy-light edu-sky:bg-edu-surface p-2 text-center text-xs ${RARITY_FRAME[item.rarity]}`}
           >
             {unlock && unlock.category !== 'bgColor' && (
               <PartThumb category={unlock.category} id={unlock.partId} config={wearing} size={44} />
             )}
-            <span className="block font-bold text-edu-ink">{name}</span>
+            <span className="block font-bold text-white edu-sky:text-edu-ink">{name}</span>
             <span className={`font-neo-display text-xs font-black uppercase ${RARITY_TEXT[item.rarity]}`}>
               {t(`economy.chest.rarity.${item.rarity}`)}
             </span>

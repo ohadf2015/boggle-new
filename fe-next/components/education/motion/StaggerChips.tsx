@@ -65,12 +65,12 @@ export function StaggerChips({ chips, staggerMs = EDU_MS.chipStagger, instant = 
           initial={chipIn.initial}
           animate={chipIn.animate}
           transition={chipIn.transition}
-          className={`min-w-24 overflow-hidden rounded-neo border-4 bg-edu-surface shadow-hard ${TONE[chip.tone].border}`}
+          className={`min-w-24 overflow-hidden rounded-neo border-4 bg-neo-navy edu-sky:bg-edu-surface shadow-hard ${TONE[chip.tone].border}`}
         >
           <p className={`px-3 py-1 text-center font-neo-display text-xs font-black uppercase tracking-wide text-neo-black ${TONE[chip.tone].head}`}>
             {chip.label}
           </p>
-          <p className="flex items-center justify-center gap-1 px-3 py-2 font-neo-display text-2xl font-black text-edu-ink">
+          <p className="flex items-center justify-center gap-1 px-3 py-2 font-neo-display text-2xl font-black text-neo-cream edu-sky:text-edu-ink">
             {chip.icon}
             <CountUp
               to={chip.value}

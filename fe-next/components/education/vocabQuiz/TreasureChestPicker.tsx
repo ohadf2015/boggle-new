@@ -34,10 +34,10 @@ export function TreasureChestPicker({ onPick, disabled, pickedIndex = null, t }:
 
   return (
     <div className="flex flex-col items-center gap-2 p-3 w-full">
-      <p className="text-center font-neo-display font-bold text-2xl text-edu-yellow-ink">
+      <p className="text-center font-neo-display font-bold text-2xl text-neo-yellow edu-sky:text-edu-yellow-ink">
         {t('vocabQuiz.treasure.prompt')}
       </p>
-      <p className="text-center font-neo-body text-sm text-edu-ink/80 mb-2">
+      <p className="text-center font-neo-body text-sm text-neo-white/80 edu-sky:text-edu-ink/80 mb-2">
         {t('vocabQuiz.treasure.hint')}
       </p>
 
@@ -58,11 +58,11 @@ export function TreasureChestPicker({ onPick, disabled, pickedIndex = null, t }:
               whileTap={disabled || reduceMotion ? undefined : { scale: 0.92 }}
               className={cn(
                 'flex flex-col items-center justify-center',
-                'rounded-neo border-[3px] bg-edu-surface shadow-hard',
-                picked ? 'border-neo-yellow' : 'border-edu-line',
+                'rounded-neo border-[3px] bg-neo-navy-elevated edu-sky:bg-edu-surface shadow-hard',
+                picked ? 'border-neo-yellow edu-sky:border-neo-yellow' : 'border-neo-cream edu-sky:border-edu-line',
                 'disabled:cursor-not-allowed',
                 disabled && !picked && 'opacity-50',
-                !disabled && 'hover:border-neo-yellow'
+                !disabled && 'hover:border-neo-yellow edu-sky:hover:border-neo-yellow'
               )}
             >
               <ChestIcon size={64} />

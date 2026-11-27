@@ -30,18 +30,18 @@ export default function RoundShop({ gameCode, compact = false }: { gameCode: str
             data-testid="round-shop-open"
             onClick={() => setOpen(true)}
             disabled={!canBuy}
-            className="flex min-h-11 w-full items-center justify-between gap-2 rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 font-neo-display text-sm font-black text-edu-ink shadow-hard-sm disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="flex min-h-11 w-full items-center justify-between gap-2 rounded-neo border-[3px] border-neo-cream/60 edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface px-3 font-neo-display text-sm font-black text-neo-cream edu-sky:text-edu-ink shadow-hard-sm disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             <span className="min-w-0 truncate text-start">{t('economy.shop.title')}</span>
-            <span className="shrink-0 text-edu-lime-ink">{t('economy.shop.open', { cash: shop.cash })}</span>
+            <span className="shrink-0 text-neo-lime edu-sky:text-edu-lime-ink">{t('economy.shop.open', { cash: shop.cash })}</span>
           </button>
         )
       ) : (
       <section
         data-testid="round-shop"
-        className="flex w-full flex-col gap-3 rounded-neo-xl border-[3px] border-edu-line bg-edu-surface p-3 text-edu-ink shadow-hard-xl"
+        className="flex w-full flex-col gap-3 rounded-neo-xl border-[3px] border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface p-3 text-white edu-sky:text-edu-ink shadow-hard-xl"
       >
-        <h2 className="text-xl font-black text-edu-lime-ink">{t('economy.shop.round')}</h2>
+        <h2 className="text-xl font-black text-neo-lime edu-sky:text-edu-lime-ink">{t('economy.shop.round')}</h2>
         {!snapshot && !econ.error && <p className="text-sm font-bold">{t('economy.hud.loading')}</p>}
         {snapshot && !shop && <p className="text-sm">{t('economy.shop.off')}</p>}
         {shop && <ShopGoalLine cash={shop.cash} />}
@@ -54,20 +54,20 @@ export default function RoundShop({ gameCode, compact = false }: { gameCode: str
             className={cn(
               'min-h-14 w-full rounded-neo-lg border-4 px-3 text-lg font-black transition-transform duration-150 ease-out',
               canBuy
-                ? 'border-neo-black bg-neo-lime text-neo-navy shadow-hard-lg hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:scale-[0.97]'
-                : 'cursor-not-allowed border-dashed border-edu-line bg-edu-surface text-edu-ink/60'
+                ? 'border-neo-black edu-sky:border-neo-black bg-neo-lime edu-sky:bg-neo-lime text-neo-navy edu-sky:text-neo-navy shadow-hard-lg hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:scale-[0.97]'
+                : 'cursor-not-allowed border-dashed border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-white/60 edu-sky:text-edu-ink/60'
             )}
           >
             {t('economy.shop.open', { cash: shop.cash })}
           </button>
         )}
         {econ.error && (
-          <p role="alert" className="text-sm text-edu-pink-ink">{t(`economy.error.${econ.error}`)}</p>
+          <p role="alert" className="text-sm text-neo-pink edu-sky:text-edu-pink-ink">{t(`economy.error.${econ.error}`)}</p>
         )}
       </section>
       )}
       {compact && econ.error && !open && (
-        <p role="alert" className="text-sm text-edu-pink-ink">{t(`economy.error.${econ.error}`)}</p>
+        <p role="alert" className="text-sm text-neo-pink edu-sky:text-edu-pink-ink">{t(`economy.error.${econ.error}`)}</p>
       )}
 
       {open && shop && (
@@ -75,10 +75,10 @@ export default function RoundShop({ gameCode, compact = false }: { gameCode: str
           role="dialog"
           aria-modal="true"
           aria-labelledby="round-shop-dialog-title"
-          className="fixed inset-0 z-[90] flex flex-col gap-4 overflow-y-auto bg-edu-page p-4 pb-8 text-edu-ink"
+          className="fixed inset-0 z-[90] flex flex-col gap-4 overflow-y-auto bg-neo-navy edu-sky:bg-edu-page p-4 pb-8 text-white edu-sky:text-edu-ink"
         >
           <div className="flex items-center justify-between gap-2">
-            <h2 id="round-shop-dialog-title" className="text-xl font-black text-edu-lime-ink">{t('economy.shop.round')}</h2>
+            <h2 id="round-shop-dialog-title" className="text-xl font-black text-neo-lime edu-sky:text-edu-lime-ink">{t('economy.shop.round')}</h2>
             <button
               type="button"
               onClick={() => setOpen(false)}
@@ -90,7 +90,7 @@ export default function RoundShop({ gameCode, compact = false }: { gameCode: str
           <ShopGoalLine cash={shop.cash} />
           <PowerUpShop snapshot={shop} onBuy={econ.buy} between />
           {econ.error && (
-            <p role="alert" className="text-sm text-edu-pink-ink">{t(`economy.error.${econ.error}`)}</p>
+            <p role="alert" className="text-sm text-neo-pink edu-sky:text-edu-pink-ink">{t(`economy.error.${econ.error}`)}</p>
           )}
         </div>
       )}

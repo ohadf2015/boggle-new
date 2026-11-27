@@ -8,8 +8,8 @@ import { NB_BLOCK, NB_DARK_EDGE, NB_SMALL, type NbColor } from './nbStyles';
 
 const SURFACE = [
   'flex flex-col gap-0 p-0 overflow-hidden',
-  'bg-edu-surface dark:bg-edu-surface text-edu-ink dark:text-edu-ink',
-  `border-[3px] sm:border-[3px] ${NB_DARK_EDGE} dark:border-edu-line`,
+  'bg-neo-navy edu-sky:bg-edu-surface dark:bg-neo-navy edu-sky:dark:bg-edu-surface text-neo-cream edu-sky:text-edu-ink dark:text-neo-cream edu-sky:dark:text-edu-ink',
+  `border-[3px] sm:border-[3px] ${NB_DARK_EDGE} dark:border-neo-cream/50 edu-sky:dark:border-edu-line`,
   // tailwind-merge does not group the custom rounded-neo* scale, so the primitive's radius would stay; `!` settles it.
   'rounded-neo-xl! sm:rounded-neo-xl! shadow-hard-xl sm:shadow-hard-xl',
 ].join(' ');
@@ -41,7 +41,7 @@ export const NB_OVERLAY_LAYER = 'fixed inset-0 z-[90] flex items-end justify-cen
 
 /** Hand-rolled panel inside NB_OVERLAY_LAYER: bottom sheet on phones, chunky centered card from sm up. */
 export const NB_OVERLAY_PANEL = [
-  'relative flex max-h-[92dvh] w-full flex-col overflow-hidden bg-edu-surface text-edu-ink text-start',
+  'relative flex max-h-[92dvh] w-full flex-col overflow-hidden bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink text-start',
   `border-[3px] border-b-0 ${NB_DARK_EDGE} rounded-t-neo-xl`,
   'sm:max-h-[90dvh] sm:border-b-[3px] sm:rounded-neo-xl sm:shadow-hard-xl',
 ].join(' ');
@@ -67,10 +67,10 @@ export const NB_DIALOG_BODY = 'min-h-0 flex-1 overflow-y-auto overscroll-contain
 /** Footer: DOM order [secondary…, primary] → phone stacks primary on top, desktop puts it at the end. */
 export const NB_DIALOG_FOOTER = [
   'flex shrink-0 flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end sm:gap-3',
-  `border-t-[3px] ${NB_DARK_EDGE} bg-edu-surface px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-5`,
+  `border-t-[3px] ${NB_DARK_EDGE} bg-neo-navy-light edu-sky:bg-edu-surface px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-5`,
 ].join(' ');
 
 /** Dropdown menu panel and its rows. */
-export const NB_MENU = `rounded-neo-lg border-[3px] ${NB_DARK_EDGE} bg-edu-surface p-1.5 text-edu-ink shadow-hard-lg`;
+export const NB_MENU = `rounded-neo-lg border-[3px] ${NB_DARK_EDGE} bg-neo-navy-light edu-sky:bg-edu-surface p-1.5 text-neo-cream edu-sky:text-edu-ink shadow-hard-lg`;
 export const NB_MENU_ITEM =
-  'min-h-11 gap-3 rounded-neo px-2.5 font-neo-body text-sm font-bold text-edu-ink hover:bg-edu-page focus:bg-edu-page';
+  'min-h-11 gap-3 rounded-neo px-2.5 font-neo-body text-sm font-bold text-neo-cream edu-sky:text-edu-ink hover:bg-neo-navy edu-sky:hover:bg-edu-page focus:bg-neo-navy edu-sky:focus:bg-edu-page';

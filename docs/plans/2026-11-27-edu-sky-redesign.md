@@ -54,6 +54,7 @@ Works per string literal, keeps variant prefixes (`hover:`, `md:` …). Files: `
 - `bg-neo-cream|neo-white|white/NN` with NN ≤ 30 → `bg-edu-ink/NN` (solid ones stay).
 - `bg-neo-navy` → `bg-edu-page` when the literal also has `min-h-*`, `h-dvh`, `h-screen` or `flex-1` page-root classes, else `bg-edu-surface`. `bg-neo-navy-light|elevated` → `bg-edu-surface`. `bg-neo-navy/NN` → kept for `fixed inset-0` dimmers, else `bg-edu-surface/NN`.
 - Unchanged: `text-neo-black`, `text-neo-navy`, `border-neo-black`, solid `bg-neo-cream`, `bg-neo-black`.
+- A file any dark route imports (`listSharedFiles`, from the real import graph) keeps the master class and gets the sky class as an `edu-sky:` twin (`border-neo-cream/40 edu-sky:border-edu-line`), so the dark page renders exactly as on master. A state or override class on a twinned colour property in the same className group, or composed with a twinned constant of the file, gets an identical twin so it still wins on sky. The guard bans bare edu tokens in every file a dark page renders; classroom modules only `/multiplayer` (sky for a classroom room) or `/dev` imports are exempt.
 
 ## Routes
 

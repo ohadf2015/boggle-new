@@ -24,12 +24,12 @@ export function LessonTargetStrip({ targets, t, dir, className }: LessonTargetSt
       data-testid="lesson-target-strip"
       dir={dir}
       className={cn(
-        'pointer-events-none fixed bottom-0 inset-x-0 z-40 mx-auto w-full max-w-lg rounded-t-neo border-3 border-b-0 border-edu-line bg-edu-surface px-3 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] text-edu-ink shadow-hard',
+        'pointer-events-none fixed bottom-0 inset-x-0 z-40 mx-auto w-full max-w-lg rounded-t-neo border-3 border-b-0 border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface px-3 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] text-neo-cream edu-sky:text-edu-ink shadow-hard',
         className,
       )}
     >
       <div className="flex min-w-0 flex-1 items-center gap-2">
-        <span className="flex shrink-0 items-center gap-1 font-neo-display text-xs font-black uppercase tracking-wide text-edu-cyan-ink">
+        <span className="flex shrink-0 items-center gap-1 font-neo-display text-xs font-black uppercase tracking-wide text-neo-cyan edu-sky:text-edu-cyan-ink">
           <Target className="h-3.5 w-3.5" aria-hidden="true" />
           <Pop pulseKey={done}>{t('education.wordBank.huntTitle', { found: done, total: slots.length })}</Pop>
         </span>

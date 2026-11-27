@@ -25,7 +25,7 @@ export interface ClassroomModeSpotlightProps {
 }
 
 const CHIP =
-  'inline-flex min-w-0 items-center gap-1 whitespace-nowrap rounded-full border border-edu-line px-2 py-0.5 font-neo-body text-xs font-bold text-edu-ink/80 @4xl/lobby:text-sm';
+  'inline-flex min-w-0 items-center gap-1 whitespace-nowrap rounded-full border border-neo-cream/35 edu-sky:border-edu-line px-2 py-0.5 font-neo-body text-xs font-bold text-neo-cream/80 edu-sky:text-edu-ink/80 @4xl/lobby:text-sm';
 const EXPANDED_HIDE = 'group-has-[[data-lobby-expanded]]/lobby:hidden';
 
 function Spec({ testId, icon: Icon, label, value, className }: { testId: string; icon: typeof Clock; label: string; value: string; className?: string }) {
@@ -53,7 +53,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
       data-testid="mode-spotlight"
       dir={dir}
       aria-live="polite"
-      className="flex min-h-0 flex-1 flex-col gap-3 rounded-neo-xl border-[3px] border-edu-line bg-edu-surface p-3 shadow-hard-xl @4xl/lobby:flex-row @4xl/lobby:gap-8 @4xl/lobby:p-6 group-has-[[data-lobby-expanded]]/lobby:@4xl/lobby:p-4"
+      className="flex min-h-0 flex-1 flex-col gap-3 rounded-neo-xl border-[3px] border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface p-3 shadow-hard-xl @4xl/lobby:flex-row @4xl/lobby:gap-8 @4xl/lobby:p-6 group-has-[[data-lobby-expanded]]/lobby:@4xl/lobby:p-4"
     >
       <div
         data-testid="spotlight-art"
@@ -81,9 +81,9 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
           transition={reduced ? { duration: 0 } : EDU_MOTION.spring.settle}
           className="flex min-h-0 min-w-0 flex-col gap-1.5 overflow-y-auto text-start @4xl/lobby:gap-2.5 group-has-[[data-lobby-expanded]]/lobby:@4xl/lobby:flex-1"
         >
-          <span data-testid="spotlight-category" className={cn('font-neo-body text-xs font-black uppercase tracking-[0.08em] text-edu-ink/60 @4xl/lobby:text-sm', EXPANDED_HIDE)}>{t(keys.category)}</span>
-          <h2 className="font-neo-display text-2xl font-bold leading-tight text-edu-ink @4xl/lobby:text-5xl">{name}</h2>
-          <p data-testid="spotlight-how" className={cn('font-neo-body text-sm leading-snug text-edu-ink/80 @4xl/lobby:text-lg', EXPANDED_HIDE)}>
+          <span data-testid="spotlight-category" className={cn('font-neo-body text-xs font-black uppercase tracking-[0.08em] text-neo-cream/60 edu-sky:text-edu-ink/60 @4xl/lobby:text-sm', EXPANDED_HIDE)}>{t(keys.category)}</span>
+          <h2 className="font-neo-display text-2xl font-bold leading-tight text-neo-cream edu-sky:text-edu-ink @4xl/lobby:text-5xl">{name}</h2>
+          <p data-testid="spotlight-how" className={cn('font-neo-body text-sm leading-snug text-neo-cream/80 edu-sky:text-edu-ink/80 @4xl/lobby:text-lg', EXPANDED_HIDE)}>
             <span className="line-clamp-2 @4xl/lobby:line-clamp-none">{t(keys.how)}</span>
           </p>
           <button
@@ -93,7 +93,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
             aria-controls="how-it-plays-details"
             title={t(stepsOpen ? 'eg2Modes.hideHowItPlays' : 'eg2Modes.howItPlays')}
             onClick={() => setStepsOpen((v) => !v)}
-            className={cn('inline-flex min-h-11 items-center gap-1 self-start rounded-neo px-1 font-neo-body text-sm font-bold text-edu-ink/85 underline decoration-2 underline-offset-4 hover:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line', EXPANDED_HIDE)}
+            className={cn('inline-flex min-h-11 items-center gap-1 self-start rounded-neo px-1 font-neo-body text-sm font-bold text-neo-cream/85 edu-sky:text-edu-ink/85 underline decoration-2 underline-offset-4 hover:text-neo-cream edu-sky:hover:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream edu-sky:focus-visible:ring-edu-line', EXPANDED_HIDE)}
           >
             {t(stepsOpen ? 'eg2Modes.hideHowItPlays' : 'eg2Modes.howItPlays')}
             {stepsOpen ? <ChevronUp className="size-4" strokeWidth={3} aria-hidden="true" /> : <ChevronDown className="size-4" strokeWidth={3} aria-hidden="true" />}
@@ -107,7 +107,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
                 <Spec testId="spec-style" icon={Gamepad2} label={t('eg2Modes.spec.style')} value={t(keys.style)} />
               </div>
               <div data-testid="spotlight-best-for" className="flex flex-wrap items-center gap-1.5">
-                <span className="font-neo-body text-sm font-bold text-edu-ink/60">{t('eg2Modes.bestForLabel')}</span>
+                <span className="font-neo-body text-sm font-bold text-neo-cream/60 edu-sky:text-edu-ink/60">{t('eg2Modes.bestForLabel')}</span>
                 {keys.bestFor.map((k) => (
                   <span key={k} data-testid="best-for-chip" className={CHIP}>
                     {t(k)}
@@ -116,7 +116,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
               </div>
               <ol id="how-it-plays" data-testid="how-it-plays" aria-label={t('eg2Modes.howItPlays')} className="grid gap-1.5 text-start">
                 {keys.steps.map((k, i) => (
-                  <li key={k} className="flex items-start gap-2 font-neo-body text-sm leading-snug text-edu-ink/90">
+                  <li key={k} className="flex items-start gap-2 font-neo-body text-sm leading-snug text-neo-cream/90 edu-sky:text-edu-ink/90">
                     <StepNumber n={i + 1} />
                     {t(k)}
                   </li>
@@ -129,7 +129,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
 
         <div className="flex shrink-0 flex-col gap-1.5 group-has-[[data-lobby-expanded]]/lobby:@4xl/lobby:w-[24rem]">
           {blockedKey && (
-            <p data-testid="go-live-blocked" role="status" className="text-center font-neo-body text-sm font-bold text-edu-ink/80">
+            <p data-testid="go-live-blocked" role="status" className="text-center font-neo-body text-sm font-bold text-neo-cream/80 edu-sky:text-edu-ink/80">
               {t(blockedKey)}
             </p>
           )}
@@ -141,13 +141,13 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
             disabled={!!blockedKey || busy}
             {...(blockedKey || busy ? {} : pressMotion(reduced))}
             className={cn(
-              'mb-1 flex min-h-[72px] w-full items-center justify-center gap-3 rounded-neo-lg border-[3px] border-neo-black px-4 py-2 @4xl/lobby:min-h-[88px]',
-              'bg-neo-lime font-neo-display text-neo-black',
+              'mb-1 flex min-h-[72px] w-full items-center justify-center gap-3 rounded-neo-lg border-[3px] border-neo-black edu-sky:border-neo-black px-4 py-2 @4xl/lobby:min-h-[88px]',
+              'bg-neo-lime edu-sky:bg-neo-lime font-neo-display text-neo-black edu-sky:text-neo-black',
               pressClasses(4),
-              'disabled:cursor-not-allowed disabled:border-edu-line/20 disabled:bg-edu-surface disabled:text-edu-ink/70',
+              'disabled:cursor-not-allowed disabled:border-neo-cream/20 edu-sky:disabled:border-edu-line/20 disabled:bg-neo-navy-light edu-sky:disabled:bg-edu-surface disabled:text-neo-cream/70 edu-sky:disabled:text-edu-ink/70',
             )}
           >
-            <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-full border-2 border-edu-line bg-neo-black/10 @4xl/lobby:size-12">
+            <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-full border-2 border-neo-cream/40 edu-sky:border-edu-line bg-neo-black/10 @4xl/lobby:size-12">
               <Play className={cn('size-5 shrink-0 fill-current @4xl/lobby:size-6', !reduced && !blockedKey && 'animate-pulse')} strokeWidth={3} />
             </span>
             <span className="flex min-w-0 flex-col items-start leading-tight">
@@ -167,7 +167,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
 
 function StepNumber({ n }: { n: number }) {
   return (
-    <span className="grid size-5 shrink-0 place-items-center rounded-full border border-edu-line font-neo-body text-xs font-bold text-edu-ink @4xl/lobby:size-6">
+    <span className="grid size-5 shrink-0 place-items-center rounded-full border border-neo-cream/40 edu-sky:border-edu-line font-neo-body text-xs font-bold text-neo-cream edu-sky:text-edu-ink @4xl/lobby:size-6">
       {n}
     </span>
   );

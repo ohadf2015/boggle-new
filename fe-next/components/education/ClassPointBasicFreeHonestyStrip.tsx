@@ -38,11 +38,11 @@ export function ClassPointBasicFreeHonestyStrip({
       data-testid="classpoint-basic-free-honesty-strip"
       aria-labelledby="classpoint-basic-free-honesty-heading"
       className={cn(
-        'mb-12 rounded-neo border-3 border-neo-cyan/50 bg-edu-surface/60 p-5 shadow-hard sm:p-6',
+        'mb-12 rounded-neo border-3 border-neo-cyan/50 bg-neo-navy/60 edu-sky:bg-edu-surface/60 p-5 shadow-hard sm:p-6',
         className,
       )}
     >
-      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-edu-cyan-ink">
+      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-neo-cyan edu-sky:text-edu-cyan-ink">
         {t('education.vsClassPoint.basicFree.eyebrow')}
       </p>
       <h2
@@ -51,19 +51,19 @@ export function ClassPointBasicFreeHonestyStrip({
       >
         {t('education.vsClassPoint.basicFree.title')}
       </h2>
-      <p className="mb-5 text-sm leading-relaxed text-edu-ink/80 sm:text-base">
+      <p className="mb-5 text-sm leading-relaxed text-neo-gray-200 edu-sky:text-edu-ink/80 sm:text-base">
         {t('education.vsClassPoint.basicFree.lede')}
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <article
           data-testid="classpoint-basic-free-25-5q-caps-card"
-          className="rounded-neo border-3 border-edu-line/30 bg-edu-surface/40 p-4"
+          className="rounded-neo border-3 border-neo-gray-400/50 edu-sky:border-edu-line/30 bg-neo-navy/40 edu-sky:bg-edu-surface/40 p-4"
         >
-          <h3 className="mb-2 font-bold text-edu-ink/70">
+          <h3 className="mb-2 font-bold text-neo-gray-300 edu-sky:text-edu-ink/70">
             {t('education.vsClassPoint.basicFree.cpTitle')}
           </h3>
-          <p className="text-sm text-edu-ink/80">
+          <p className="text-sm text-neo-gray-200 edu-sky:text-edu-ink/80">
             {t('education.vsClassPoint.basicFree.cpBody')}
           </p>
         </article>
@@ -71,22 +71,22 @@ export function ClassPointBasicFreeHonestyStrip({
           data-testid="lexiclash-classpoint-basic-free-50-card"
           className="rounded-neo border-3 border-neo-lime/50 bg-neo-lime/10 p-4"
         >
-          <h3 className="mb-2 font-bold text-edu-lime-ink">
+          <h3 className="mb-2 font-bold text-neo-lime edu-sky:text-edu-lime-ink">
             {t('education.vsClassPoint.basicFree.lexiTitle')}
           </h3>
-          <p className="text-sm text-edu-ink/80">
+          <p className="text-sm text-neo-gray-200 edu-sky:text-edu-ink/80">
             {t('education.vsClassPoint.basicFree.lexiBody')}
           </p>
         </article>
       </div>
 
-      <p className="mt-4 text-xs text-edu-ink/70">
+      <p className="mt-4 text-xs text-neo-gray-300 edu-sky:text-edu-ink/70">
         {t('education.vsClassPoint.basicFree.citePrefix')}{' '}
         <a
           href={PRICING_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-edu-cyan-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan edu-sky:hover:text-edu-cyan-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="classpoint-basic-free-pricing-link"
         >
           {t('education.vsClassPoint.basicFree.citePlansLabel')}
@@ -96,7 +96,7 @@ export function ClassPointBasicFreeHonestyStrip({
           href={SCHOOLS_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-edu-cyan-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan edu-sky:hover:text-edu-cyan-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="classpoint-basic-free-schools-link"
         >
           {t('education.vsClassPoint.basicFree.citeSchoolsLabel')}

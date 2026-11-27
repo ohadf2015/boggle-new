@@ -109,7 +109,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
     // fit a 16:9 layout and clipping REMATCH/the podium is worse than scrolling.
     <div
       data-testid="vocab-quiz-host"
-      className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-edu-page text-edu-ink p-3 gap-3 md:p-6 md:gap-5"
+      className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-neo-navy edu-sky:bg-edu-page text-neo-white edu-sky:text-edu-ink p-3 gap-3 md:p-6 md:gap-5"
     >
       <header className="flex items-center gap-2 md:gap-4 flex-wrap shrink-0">
         <VocabQuizMascotFace
@@ -124,7 +124,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
             join code stays, because a phone that lost the room mid-celebration
             is the commonest reason a student is stuck. */}
         {phase !== 'ended' && (
-          <span className="font-neo-display font-bold text-lg md:text-2xl text-edu-ink/70">
+          <span className="font-neo-display font-bold text-lg md:text-2xl text-neo-white/70 edu-sky:text-edu-ink/70">
             {t('vocabQuiz.progress', {
               current: quiz.questionNumber || 1,
               total: quiz.totalQuestions || 1,
@@ -132,7 +132,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
           </span>
         )}
         {typeof playerCount === 'number' && (
-          <span className="flex items-center gap-2 text-base md:text-xl text-edu-ink/70">
+          <span className="flex items-center gap-2 text-base md:text-xl text-neo-white/70 edu-sky:text-edu-ink/70">
             <Users className="w-6 h-6" aria-hidden />
             {playerCount}
           </span>
@@ -140,12 +140,12 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
         {/* How much of the room has committed — the number a teacher watches to
             decide whether to let the clock run out or cut to the reveal. */}
         {phase === 'question' && quiz.lockIn && quiz.lockIn.total > 0 && (
-          <span className="rounded-neo border-[2px] border-edu-line bg-edu-surface px-2 py-1 md:px-4 md:py-1.5 font-neo-display font-bold text-base md:text-xl tabular-nums text-edu-cyan-ink">
+          <span className="rounded-neo border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface px-2 py-1 md:px-4 md:py-1.5 font-neo-display font-bold text-base md:text-xl tabular-nums text-neo-cyan edu-sky:text-edu-cyan-ink">
             {t('vocabQuiz.lockedInCount', { locked: quiz.lockIn.locked, total: quiz.lockIn.total })}
           </span>
         )}
         <span className="ms-auto flex items-center gap-2 md:gap-3">
-          <span className="font-neo-body text-sm md:text-lg text-edu-ink/70">{t('vocabQuiz.host.joinCode')}</span>
+          <span className="font-neo-body text-sm md:text-lg text-neo-white/70 edu-sky:text-edu-ink/70">{t('vocabQuiz.host.joinCode')}</span>
           <span className="rounded-neo border-[2px] border-neo-black bg-neo-lime px-3 py-1 md:px-5 md:py-2 font-neo-display font-bold text-xl md:text-3xl tracking-wider md:tracking-widest text-neo-black shadow-hard">
             {joinCode}
           </span>
@@ -157,7 +157,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
       {phase === 'question' && (
         <div
           className={cn(
-            'h-5 w-full shrink-0 rounded-neo border-[2px] border-edu-line bg-edu-surface overflow-hidden',
+            'h-5 w-full shrink-0 rounded-neo border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface overflow-hidden',
             juice.ticking && 'animate-pulse'
           )}
           role="timer"
@@ -178,15 +178,15 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
       )}
 
       {phase === 'idle' && (
-        <p className="flex-1 grid place-items-center text-center font-neo-body text-lg md:text-2xl text-edu-ink/70">
+        <p className="flex-1 grid place-items-center text-center font-neo-body text-lg md:text-2xl text-neo-white/70 edu-sky:text-edu-ink/70">
           {t('vocabQuiz.host.waiting')}
         </p>
       )}
 
       {(phase === 'question' || phase === 'reveal') && question && (
         <div className="flex flex-col gap-3 md:gap-5 md:flex-1 md:min-h-0 md:overflow-hidden">
-          <div className="shrink-0 rounded-neo border-[2px] border-edu-line bg-edu-surface p-4 md:p-6 shadow-hard">
-            <p className="text-sm font-bold uppercase tracking-widest text-edu-cyan-ink mb-2">
+          <div className="shrink-0 rounded-neo border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface p-4 md:p-6 shadow-hard">
+            <p className="text-sm font-bold uppercase tracking-widest text-neo-cyan edu-sky:text-edu-cyan-ink mb-2">
               {t(`vocabQuiz.focus.${question.focus}`)}
             </p>
             <p className="font-neo-display font-bold text-2xl md:text-4xl leading-snug break-words">{question.prompt}</p>
@@ -209,8 +209,8 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
           </div>
 
           {reveal?.definition && (
-            <p className="font-neo-body text-base md:text-xl text-edu-ink/80">
-              <span className="font-bold text-edu-cyan-ink">{reveal.word}</span>
+            <p className="font-neo-body text-base md:text-xl text-neo-white/80 edu-sky:text-edu-ink/80">
+              <span className="font-bold text-neo-cyan edu-sky:text-edu-cyan-ink">{reveal.word}</span>
               <span className="mx-2">—</span>
               {reveal.definition}
             </p>

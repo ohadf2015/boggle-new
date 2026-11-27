@@ -79,7 +79,7 @@ describe('BeforeAfterNumber', () => {
     tick(2000);
     expect(el.textContent).toContain('950');
     expect(el.getAttribute('data-state')).toBe('after');
-    expect(el.querySelector('.text-edu-yellow-ink')).toBeTruthy();
+    expect(el.querySelector('[class~="edu-sky:text-edu-yellow-ink"]')).toBeTruthy();
     expect(onIgnite).toHaveBeenCalledTimes(1);
   });
 

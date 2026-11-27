@@ -7,7 +7,7 @@ import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
 import { isLeaderboardHidden, isStudentTimerHidden, trimLeaderboardForPressure } from '@/shared/utils/classroomPressure';
 import type { Translate } from './eduLiveStyles';
 
-const CARD = 'rounded-neo-lg border-4 border-edu-line bg-edu-surface shadow-hard-lg';
+const CARD = 'rounded-neo-lg border-4 border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface shadow-hard-lg';
 const MAX_ROWS = 8;
 
 function formatClock(sec: number | null | undefined): string {
@@ -30,7 +30,7 @@ function GridSilhouette({ puzzle, t }: { puzzle: CrosswordPuzzle; t: Translate }
         {puzzle.cells.map((cell) => (
           <span
             key={`${cell.row},${cell.col}`}
-            className={`relative ${cell.block ? 'bg-edu-surface' : 'bg-neo-cream'}`}
+            className={`relative ${cell.block ? 'bg-neo-navy edu-sky:bg-edu-surface' : 'bg-neo-cream edu-sky:bg-neo-cream'}`}
           >
             {cell.number != null && (
               <span className="absolute start-[6%] top-[2%] font-neo-display text-[min(2.2cqmin,1.25rem)] font-black leading-none text-neo-black">
@@ -46,8 +46,8 @@ function GridSilhouette({ puzzle, t }: { puzzle: CrosswordPuzzle; t: Translate }
 
 function StandingRow({ row, t }: { row: CrosswordStanding; t: Translate }) {
   return (
-    <li className="flex min-h-0 items-center gap-3 overflow-hidden rounded-neo border-[3px] border-edu-line bg-edu-page px-3 py-1 shadow-hard-sm">
-      <span className="w-8 shrink-0 font-neo-display text-xl font-black tabular-nums text-edu-ink/70">{row.rank}</span>
+    <li className="flex min-h-0 items-center gap-3 overflow-hidden rounded-neo border-[3px] border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-page px-3 py-1 shadow-hard-sm">
+      <span className="w-8 shrink-0 font-neo-display text-xl font-black tabular-nums text-neo-cream/70 edu-sky:text-edu-ink/70">{row.rank}</span>
       <span className="min-w-0 flex-1">
         <span className="block truncate font-neo-display text-lg font-black md:text-2xl">{row.username}</span>
         <span className="mt-1 block h-2 overflow-hidden rounded-full bg-neo-black/60" aria-hidden="true">
@@ -57,7 +57,7 @@ function StandingRow({ row, t }: { row: CrosswordStanding; t: Translate }) {
           />
         </span>
       </span>
-      <span dir="ltr" className={`shrink-0 font-neo-display text-lg font-black tabular-nums md:text-2xl ${row.solved ? 'text-edu-lime-ink' : 'text-edu-ink'}`}>
+      <span dir="ltr" className={`shrink-0 font-neo-display text-lg font-black tabular-nums md:text-2xl ${row.solved ? 'text-neo-lime edu-sky:text-edu-lime-ink' : 'text-neo-cream edu-sky:text-edu-ink'}`}>
         {row.solved ? t('eduCrossword.done') : t('eduCrossword.percent', { percent: row.percent })}
       </span>
     </li>
@@ -82,7 +82,7 @@ export function ProjectorCrosswordStage({ socket, remainingTime, t }: ProjectorC
   const hiddenCount = visible.length - shown.length;
 
   return (
-    <div data-testid="projector-crossword-stage" className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden bg-edu-page p-3 font-neo-body text-edu-ink md:gap-4 md:p-5">
+    <div data-testid="projector-crossword-stage" className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden bg-neo-navy edu-sky:bg-edu-page p-3 font-neo-body text-neo-cream edu-sky:text-edu-ink md:gap-4 md:p-5">
       <div className="flex shrink-0 flex-wrap items-center gap-3 md:flex-nowrap md:gap-5">
         <span className="inline-flex shrink-0 items-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-cyan px-3 py-1.5 font-neo-display text-base font-black uppercase text-neo-black shadow-hard md:text-2xl">
           <Grid3x3 className="size-5 md:size-7" aria-hidden="true" />
@@ -92,7 +92,7 @@ export function ProjectorCrosswordStage({ socket, remainingTime, t }: ProjectorC
           {t('eduCrossword.finished', { count: finished, total: mp.standings.length })}
         </span>
         {!timerHidden && (
-          <span data-testid="race-clock" className="ms-auto shrink-0 rounded-neo border-[3px] border-edu-line bg-edu-surface px-4 py-1 font-neo-display text-2xl font-black tabular-nums shadow-hard md:text-5xl">
+          <span data-testid="race-clock" className="ms-auto shrink-0 rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface px-4 py-1 font-neo-display text-2xl font-black tabular-nums shadow-hard md:text-5xl">
             {formatClock(remainingTime)}
           </span>
         )}
@@ -121,7 +121,7 @@ export function ProjectorCrosswordStage({ socket, remainingTime, t }: ProjectorC
             >
               {shown.map((row) => <StandingRow key={row.username} row={row} t={t} />)}
               {hiddenCount > 0 && (
-                <li className="grid min-h-0 place-items-center font-neo-display text-lg font-black text-edu-ink/70">{t('eduCrossword.more', { count: hiddenCount })}</li>
+                <li className="grid min-h-0 place-items-center font-neo-display text-lg font-black text-neo-cream/70 edu-sky:text-edu-ink/70">{t('eduCrossword.more', { count: hiddenCount })}</li>
               )}
             </ol>
           )}

@@ -8,7 +8,7 @@ import styles from './boss.module.css';
 import { bossImpactBus } from './fx/bossFxBus';
 
 const MAX_IN_FLIGHT = 8;
-const COLORS = ['text-edu-cyan-ink', 'text-edu-lime-ink', 'text-edu-purple-ink', 'text-edu-orange-ink', 'text-edu-cyan-ink'];
+const COLORS = ['text-neo-cyan edu-sky:text-edu-cyan-ink', 'text-neo-lime edu-sky:text-edu-lime-ink', 'text-neo-purple-light edu-sky:text-edu-purple-ink', 'text-neo-orange edu-sky:text-edu-orange-ink', 'text-neo-cyan-light edu-sky:text-edu-cyan-ink'];
 const LAUNCH = [
   { x: '-38cqw', y: '26cqw', r: '-30deg' },
   { x: '36cqw', y: '25cqw', r: '28deg' },
@@ -50,7 +50,7 @@ export const BossProjectiles = memo(function BossProjectiles({ hits }: { hits: C
             <span
               className={cn(
                 'absolute -translate-x-1/2 whitespace-nowrap font-neo-display font-black uppercase tracking-wide [text-shadow:0.15cqw_0.15cqw_0_rgb(var(--neo-black))]',
-                f.crit ? 'text-[3cqw] text-edu-pink-ink' : cn('text-[2.8cqw]', COLORS[f.id % COLORS.length]),
+                f.crit ? 'text-[3cqw] text-neo-pink edu-sky:text-edu-pink-ink' : cn('text-[2.8cqw]', COLORS[f.id % COLORS.length]),
                 styles.projectile,
               )}
               style={{ '--x0': from.x, '--y0': from.y, '--r0': from.r } as React.CSSProperties}
@@ -60,13 +60,13 @@ export const BossProjectiles = memo(function BossProjectiles({ hits }: { hits: C
             <span
               className={cn(
                 'absolute -translate-x-1/2 whitespace-nowrap text-center font-neo-display font-black leading-none [text-shadow:0.18cqw_0.18cqw_0_rgb(var(--neo-black))]',
-                f.crit ? 'text-[3.4cqw] text-edu-pink-ink' : 'text-[2.6cqw] text-edu-ink',
+                f.crit ? 'text-[3.4cqw] text-neo-pink edu-sky:text-edu-pink-ink' : 'text-[2.6cqw] text-neo-white edu-sky:text-edu-ink',
                 styles.pop,
               )}
               style={{ animationDelay: '600ms', animationFillMode: 'both', marginInlineStart: `${(f.slot % 2 ? 1 : -1) * 5}cqw` }}
             >
               -{f.dmg}
-              {f.crit && <span className="block text-[2.2cqw] text-edu-yellow-ink">{t(f.lesson ? 'classroomBoss.lessonHit' : 'classroomBoss.crit')}</span>}
+              {f.crit && <span className="block text-[2.2cqw] text-neo-yellow edu-sky:text-edu-yellow-ink">{t(f.lesson ? 'classroomBoss.lessonHit' : 'classroomBoss.crit')}</span>}
             </span>
           </div>
         );

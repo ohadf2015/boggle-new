@@ -166,14 +166,14 @@ function TeacherReportPdfExport({ language, summary, players, proLabel = 'Pro', 
           disabled={busy}
           aria-busy={busy}
           onClick={() => void exportPdf()}
-          className={cn(BUTTON, 'border-edu-line bg-edu-surface text-edu-ink')}
+          className={cn(BUTTON, 'border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink')}
         >
           {busy ? <Loader2 className="size-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Download className="size-4 shrink-0" aria-hidden="true" />}
           {busy ? copy.preparing : copy.button}
           <ProPoweredChip />
         </button>
         {state === 'failed' && (
-          <p role="alert" data-testid="report-pdf-export-failed" className="text-center text-xs font-semibold text-edu-pink-ink">
+          <p role="alert" data-testid="report-pdf-export-failed" className="text-center text-xs font-semibold text-neo-pink-light edu-sky:text-edu-pink-ink">
             {copy.failed}
           </p>
         )}
@@ -191,15 +191,15 @@ function TeacherReportPdfExport({ language, summary, players, proLabel = 'Pro', 
         aria-busy={busy}
         aria-label={copy.lockedLabel}
         onClick={() => void startCheckout()}
-        className={cn(BUTTON, 'border-dashed border-edu-line bg-edu-surface text-edu-ink')}
+        className={cn(BUTTON, 'border-dashed border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink')}
       >
         {busy ? <Loader2 className="size-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Lock className="size-4 shrink-0" aria-hidden="true" />}
         <span className="min-w-0">{copy.button}</span>
         <ProPill label={proLabel} />
       </button>
       {!hideOffer && (
-        <p data-testid="report-pdf-offer" className="text-center text-xs font-semibold text-edu-ink/80 @[96rem]/results:text-sm">
-          <span className="font-bold text-edu-ink">{proOffer.label}</span>
+        <p data-testid="report-pdf-offer" className="text-center text-xs font-semibold text-neo-cream/80 edu-sky:text-edu-ink/80 @[96rem]/results:text-sm">
+          <span className="font-bold text-neo-cream edu-sky:text-edu-ink">{proOffer.label}</span>
           {' · '}
           {proOffer.note}
         </p>

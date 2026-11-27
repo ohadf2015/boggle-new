@@ -29,13 +29,13 @@ export function CompactBossOutcome({ view, name, left, hitters, reduce, classNam
       data-outcome={view.status}
       data-density="compact"
       className={cn(
-        'flex w-full flex-wrap items-center gap-x-4 gap-y-1.5 rounded-neo border-2 border-edu-line bg-edu-surface px-3 py-2 text-edu-ink',
+        'flex w-full flex-wrap items-center gap-x-4 gap-y-1.5 rounded-neo border-2 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface px-3 py-2 text-neo-cream edu-sky:text-edu-ink',
         '@5xl/results:flex-nowrap @5xl/results:gap-x-6 @5xl/results:px-4 @[96rem]/results:py-3',
         className,
       )}
     >
       <div className="flex min-w-0 flex-1 basis-full items-center gap-3 @5xl/results:basis-auto">
-        <span className="relative size-10 shrink-0 overflow-hidden rounded-neo border-2 border-edu-line bg-edu-surface @5xl/results:size-12 @[96rem]/results:size-16">
+        <span className="relative size-10 shrink-0 overflow-hidden rounded-neo border-2 border-neo-cream/60 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface @5xl/results:size-12 @[96rem]/results:size-16">
           <Image src={bossImage(view.bossId, won ? 'defeated' : 'enraged')} alt="" fill sizes="64px" className="object-cover object-top" />
         </span>
         <div className="min-w-0 flex-1">
@@ -46,14 +46,14 @@ export function CompactBossOutcome({ view, name, left, hitters, reduce, classNam
             </span>
           </p>
           <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-            <p className="font-neo-body text-sm font-bold text-edu-ink/85 @5xl/results:text-base @[96rem]/results:text-lg">
+            <p className="font-neo-body text-sm font-bold text-neo-cream/85 edu-sky:text-edu-ink/85 @5xl/results:text-base @[96rem]/results:text-lg">
               {t('classroomBoss.dealtPct', { pct: view.pctDealt })}
             </p>
             {!won && (
               <div className="flex items-center gap-2">
                 <div
                   aria-hidden="true"
-                  className="relative h-3 w-24 shrink-0 overflow-hidden rounded-full border-2 border-edu-line bg-edu-surface @[96rem]/results:h-4 @[96rem]/results:w-40"
+                  className="relative h-3 w-24 shrink-0 overflow-hidden rounded-full border-2 border-neo-cream/60 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface @[96rem]/results:h-4 @[96rem]/results:w-40"
                 >
                   <m.div
                     className="absolute inset-0 origin-left bg-neo-cream rtl:origin-right"
@@ -75,7 +75,7 @@ export function CompactBossOutcome({ view, name, left, hitters, reduce, classNam
             {view.staggers > 0 && (
               <span
                 data-testid="boss-staggers"
-                className="inline-flex shrink-0 items-center gap-1 rounded-neo border-2 border-edu-line px-1.5 py-0.5 font-neo-display text-xs font-black @[96rem]/results:text-base"
+                className="inline-flex shrink-0 items-center gap-1 rounded-neo border-2 border-neo-cream/60 edu-sky:border-edu-line px-1.5 py-0.5 font-neo-display text-xs font-black @[96rem]/results:text-base"
               >
                 <ShieldCheck className="size-3.5 @[96rem]/results:size-4" aria-hidden="true" />
                 {t('eduResultsV3.bossStaggers', { count: view.staggers })}
@@ -87,17 +87,17 @@ export function CompactBossOutcome({ view, name, left, hitters, reduce, classNam
 
       {hitters.length > 0 && (
         <div className="flex min-w-0 basis-full items-center gap-2 @5xl/results:shrink-0 @5xl/results:basis-auto">
-          <p className="shrink-0 font-neo-body text-sm font-bold text-edu-ink/80 @[96rem]/results:text-base">{t('classroomBoss.topHitters')}</p>
+          <p className="shrink-0 font-neo-body text-sm font-bold text-neo-cream/80 edu-sky:text-edu-ink/80 @[96rem]/results:text-base">{t('classroomBoss.topHitters')}</p>
           <ol className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5 @5xl/results:flex-nowrap">
             {hitters.map((h, i) => (
               <li key={h.username} data-testid="boss-top-hitter" data-username={h.username} className="flex min-w-0 items-center gap-1.5">
-                <span className="grid size-5 shrink-0 place-items-center rounded-full border-2 border-edu-line font-neo-display text-xs font-black @[96rem]/results:size-6 @[96rem]/results:text-sm">
+                <span className="grid size-5 shrink-0 place-items-center rounded-full border-2 border-neo-cream/60 edu-sky:border-edu-line font-neo-display text-xs font-black @[96rem]/results:size-6 @[96rem]/results:text-sm">
                   {i + 1}
                 </span>
                 <span dir="auto" className="min-w-0 font-neo-display text-sm font-black @[96rem]/results:text-lg">
                   {h.username}
                 </span>
-                <span className="shrink-0 font-neo-body text-xs font-bold tabular-nums text-edu-ink/80 @[96rem]/results:text-base">
+                <span className="shrink-0 font-neo-body text-xs font-bold tabular-nums text-neo-cream/80 edu-sky:text-edu-ink/80 @[96rem]/results:text-base">
                   {t('eduResultsV3.bossDamage', { dmg: h.dmg })}
                 </span>
               </li>

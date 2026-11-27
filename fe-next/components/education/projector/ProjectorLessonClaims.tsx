@@ -33,13 +33,13 @@ export const ProjectorLessonClaims = memo(function ProjectorLessonClaims({ t, cl
       aria-label={t('education.race.projectorTitle')}
       className={cn(
         'flex h-full min-h-0 flex-col gap-[clamp(6px,1.6cqh,18px)] overflow-hidden [container-type:size]',
-        'rounded-neo-lg border-[3px] border-edu-line bg-edu-surface p-[clamp(8px,2cqh,24px)] text-edu-ink shadow-hard-lg',
+        'rounded-neo-lg border-[3px] border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface p-[clamp(8px,2cqh,24px)] text-neo-cream edu-sky:text-edu-ink shadow-hard-lg',
         className,
       )}
     >
       <header className="flex shrink-0 items-center justify-between gap-2 font-neo-display font-black uppercase tracking-wide text-[clamp(18px,min(8cqh,4.6cqw),40px)] @max-[15rem]:flex-col @max-[15rem]:items-start @max-[15rem]:gap-1 @max-[15rem]:text-base">
         <span className="flex min-w-0 items-center gap-2">
-          <Target className="size-[1em] shrink-0 text-edu-cyan-ink" aria-hidden />
+          <Target className="size-[1em] shrink-0 text-neo-cyan edu-sky:text-edu-cyan-ink" aria-hidden />
           <span className="truncate">{t('education.race.projectorTitle')}</span>
         </span>
         <Pop pulseKey={race.claimedCount} className="shrink-0 rounded-full border-2 border-neo-black bg-neo-yellow px-[0.6em] text-neo-black tabular-nums shadow-hard-sm">
@@ -49,7 +49,7 @@ export const ProjectorLessonClaims = memo(function ProjectorLessonClaims({ t, cl
       <ul ref={listRef} className="grid min-h-0 flex-1 grid-cols-2 content-start gap-2 overflow-hidden @max-[15rem]:grid-cols-1 @min-[24rem]:grid-cols-3">
         {shown.map((slot) => <ClaimTile key={slot.index} slot={slot} reduced={reduced} t={t} />)}
         {hidden > 0 && (
-          <li data-testid="claim-tiles-more" className={cn(TILE, 'justify-center border-dashed border-edu-line bg-edu-surface text-edu-ink')}>
+          <li data-testid="claim-tiles-more" className={cn(TILE, 'justify-center border-dashed border-neo-cream/60 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink')}>
             {t('education.projectorLobby.moreWords', { count: hidden })}
           </li>
         )}

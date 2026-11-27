@@ -20,14 +20,14 @@ export default function ClassroomBoardMoment({ board, currentUserId }: Classroom
 
   return (
     <section aria-labelledby="economy-board-title" className="flex flex-col items-center gap-3">
-      <h2 id="economy-board-title" className="text-lg font-bold text-edu-ink">{t('economy.board.title')}</h2>
+      <h2 id="economy-board-title" className="text-lg font-bold text-white edu-sky:text-edu-ink">{t('economy.board.title')}</h2>
       {entries.length === 0 ? (
-        <p className="text-sm text-edu-ink/80">{t('economy.board.empty')}</p>
+        <p className="text-sm text-white/80 edu-sky:text-edu-ink/80">{t('economy.board.empty')}</p>
       ) : (
         <LeaderboardPodium entries={entries} language={language} currentUserId={currentUserId} />
       )}
       {board.you && (
-        <p className="text-sm font-bold text-edu-lime-ink" data-testid="board-you">
+        <p className="text-sm font-bold text-neo-lime edu-sky:text-edu-lime-ink" data-testid="board-you">
           {t('economy.board.you', { rank: board.you.rank, cash: board.you.cashEarned })}
         </p>
       )}

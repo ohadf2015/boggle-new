@@ -100,9 +100,9 @@ export function VocabQuizChoiceBars({
             <li
               key={`${index}-${choice}`}
               className={cn(
-                'relative overflow-hidden rounded-neo border-[2px] border-edu-line bg-edu-surface shadow-hard',
+                'relative overflow-hidden rounded-neo border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface shadow-hard',
                 faded && 'opacity-60',
-                isCorrect && 'border-neo-black ring-4 ring-neo-yellow shadow-hard-lg'
+                isCorrect && 'border-neo-black edu-sky:border-neo-black ring-4 ring-neo-yellow shadow-hard-lg'
               )}
             >
               {/* Which one was RIGHT, stated independently of how many picked

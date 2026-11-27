@@ -21,10 +21,10 @@ export function TeacherHelpButton() {
         className={cn(
           'flex items-center justify-center shrink-0',
           'h-10 w-10 min-w-[40px] min-h-[40px]',
-          'bg-edu-surface text-edu-ink',
-          'border-2 border-edu-line',
+          'bg-neo-navy-light edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink',
+          'border-2 border-neo-cream/40 edu-sky:border-edu-line',
           'rounded-neo shadow-hard-sm',
-          'hover:-translate-y-px hover:bg-neo-cyan hover:text-neo-black hover:shadow-hard',
+          'hover:-translate-y-px hover:bg-neo-cyan edu-sky:hover:bg-neo-cyan hover:text-neo-black edu-sky:hover:text-neo-black hover:shadow-hard',
           'active:translate-y-px active:shadow-none',
           'transition duration-100',
           'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2',

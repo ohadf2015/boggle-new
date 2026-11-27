@@ -19,7 +19,7 @@ export function chipAccent(name: string, index: number): string {
   return CHIP_ACCENTS[seed % CHIP_ACCENTS.length];
 }
 
-export const STUDENT_CHIP = 'bg-edu-surface text-edu-ink border-edu-line';
+export const STUDENT_CHIP = 'bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink border-neo-cream/50 edu-sky:border-edu-line';
 
 /** Container width (rem) from which the lobby splits into join hero | roster columns; matches `@5xl`. */
 export const WIDE_MIN_REM = 64;

@@ -27,7 +27,7 @@ export function ParentShareLink({ language, hasPro, label, proLabel, className }
       data-testid="edu-results-parent-share"
       onClick={() => trackResultsAction('share_parents', 'projector')}
       className={cn(
-        'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo-lg border-[3px] border-edu-line bg-edu-surface px-4 py-2 text-center font-neo-display text-base font-black text-edu-ink shadow-hard-lg',
+        'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo-lg border-[3px] border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface px-4 py-2 text-center font-neo-display text-base font-black text-neo-cream edu-sky:text-edu-ink shadow-hard-lg',
         'transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
         '@5xl/results:min-h-12 @5xl/results:text-lg @[96rem]/results:min-h-16 @[96rem]/results:text-2xl',
         className

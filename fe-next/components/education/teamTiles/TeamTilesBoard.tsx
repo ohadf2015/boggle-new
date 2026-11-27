@@ -81,10 +81,10 @@ export function TeamTilesBoard({
                 'hover:-translate-y-0.5 hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-[1px]',
               !reducedMotion && clickable && 'transition-all',
               isDown && tone,
-              isActive && 'bg-neo-cream text-neo-black ring-4 ring-neo-lime',
-              isCleared && 'bg-neo-lime/80 text-neo-black opacity-90',
-              isMissed && 'bg-edu-surface text-edu-ink/70 opacity-80',
-              tile.face === 'up' && !isActive && 'bg-neo-cream text-neo-black',
+              isActive && 'bg-neo-cream edu-sky:bg-neo-cream text-neo-black edu-sky:text-neo-black ring-4 ring-neo-lime',
+              isCleared && 'bg-neo-lime/80 edu-sky:bg-neo-lime/80 text-neo-black edu-sky:text-neo-black opacity-90',
+              isMissed && 'bg-neo-navy-elevated edu-sky:bg-edu-surface text-neo-cream/70 edu-sky:text-edu-ink/70 opacity-80',
+              tile.face === 'up' && !isActive && 'bg-neo-cream edu-sky:bg-neo-cream text-neo-black edu-sky:text-neo-black',
             )}
           >
             {isDown ? (

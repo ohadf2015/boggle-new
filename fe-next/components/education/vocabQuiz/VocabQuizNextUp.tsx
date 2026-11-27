@@ -41,7 +41,7 @@ export function VocabQuizNextUp({ secondsLeft, hint, isLast, t }: VocabQuizNextU
     <div
       className={cn(
         'flex items-center gap-5 rounded-neo border-[2px] border-neo-black px-5 py-4 shadow-hard',
-        isLast ? 'bg-neo-yellow text-neo-black' : 'bg-edu-surface text-edu-ink'
+        isLast ? 'bg-neo-yellow edu-sky:bg-neo-yellow text-neo-black edu-sky:text-neo-black' : 'bg-neo-navy-elevated edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink'
       )}
       role="status"
     >
@@ -65,7 +65,7 @@ export function VocabQuizNextUp({ secondsLeft, hint, isLast, t }: VocabQuizNextU
         </span>
       ) : (
         <div className="flex flex-col gap-1 min-w-0">
-          <span className="font-neo-body text-sm uppercase tracking-widest text-edu-cyan-ink">
+          <span className="font-neo-body text-sm uppercase tracking-widest text-neo-cyan edu-sky:text-edu-cyan-ink">
             {t('vocabQuiz.nextUp.label')}
           </span>
           <span
@@ -73,7 +73,7 @@ export function VocabQuizNextUp({ secondsLeft, hint, isLast, t }: VocabQuizNextU
             className="flex items-end gap-1.5 font-neo-display font-black text-4xl leading-none"
             aria-label={t('vocabQuiz.nextUp.tease', { letter: hint.letter, count: hint.length })}
           >
-            <span aria-hidden className="text-edu-orange-ink">
+            <span aria-hidden className="text-neo-orange edu-sky:text-edu-orange-ink">
               {hint.letter}
             </span>
             {Array.from({ length: blanks }, (_, i) => (
@@ -81,7 +81,7 @@ export function VocabQuizNextUp({ secondsLeft, hint, isLast, t }: VocabQuizNextU
                 key={i}
                 data-blank=""
                 aria-hidden
-                className="inline-block w-5 h-1.5 rounded-neo-sm bg-edu-paper/40"
+                className="inline-block w-5 h-1.5 rounded-neo-sm bg-neo-white/40 edu-sky:bg-edu-paper/40"
               />
             ))}
           </span>

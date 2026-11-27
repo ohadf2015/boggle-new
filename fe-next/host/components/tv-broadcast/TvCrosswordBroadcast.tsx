@@ -18,7 +18,7 @@ export default function TvCrosswordBroadcast({ joinBar, socket, remainingTime, t
   return (
     <div
       data-testid="tv-crossword-broadcast"
-      className="flex-1 flex flex-col min-h-0 bg-edu-page overflow-hidden"
+      className="flex-1 flex flex-col min-h-0 bg-neo-navy edu-sky:bg-edu-page overflow-hidden"
       style={TEACHER_CONTROLS_INSET}
     >
       {joinBar}

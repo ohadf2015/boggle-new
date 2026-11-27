@@ -126,7 +126,7 @@ export function WordCoverageGlance({
   const swept = total > 0 && found >= total;
   const meterLabel = t('education.results.coverageMeterLabel', { percent: pct });
   const meterClass = cn(
-    'border-edu-line bg-edu-surface',
+    'border-neo-cream edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface',
     projector ? (calm ? 'h-4 @[96rem]/results:h-6' : 'h-6 @[96rem]/results:h-10') : calm ? 'h-3' : 'h-4'
   );
   // The room's answer, which is not the same question as the meter's. A student
@@ -188,7 +188,7 @@ export function WordCoverageGlance({
         <p
           data-testid="coverage-heading"
           dir="auto"
-          className={cn('shrink-0 mb-2 font-neo-display text-edu-ink/85', calm ? 'font-bold' : 'font-black uppercase tracking-wide', projector ? 'text-xl @[96rem]/results:text-2xl' : 'text-sm')}
+          className={cn('shrink-0 mb-2 font-neo-display text-neo-white/85 edu-sky:text-edu-ink/85', calm ? 'font-bold' : 'font-black uppercase tracking-wide', projector ? 'text-xl @[96rem]/results:text-2xl' : 'text-sm')}
         >
           {heading}
         </p>
@@ -200,18 +200,18 @@ export function WordCoverageGlance({
                 'font-neo-display font-black leading-none tabular-nums',
                 // Gold is reserved for celebration, and a full sweep is the only
                 // thing on this card that earns it.
-                swept ? 'text-edu-yellow-ink' : calm ? 'text-edu-ink' : 'text-edu-lime-ink',
+                swept ? 'text-neo-yellow edu-sky:text-edu-yellow-ink' : calm ? 'text-neo-cream edu-sky:text-edu-ink' : 'text-neo-lime edu-sky:text-edu-lime-ink',
                 projector ? (calm ? 'text-5xl @[96rem]/results:text-7xl' : 'text-6xl @[96rem]/results:text-9xl') : calm ? 'text-3xl' : 'text-4xl'
               )}
             >
               {found}
-              <span className={cn('text-edu-ink/50', projector ? (calm ? 'text-2xl @[96rem]/results:text-4xl' : 'text-3xl @[96rem]/results:text-6xl') : calm ? 'text-xl' : 'text-2xl')}>
+              <span className={cn('text-neo-white/50 edu-sky:text-edu-ink/50', projector ? (calm ? 'text-2xl @[96rem]/results:text-4xl' : 'text-3xl @[96rem]/results:text-6xl') : calm ? 'text-xl' : 'text-2xl')}>
                 /{total}
               </span>
             </span>
             <p
               className={cn(
-                'flex-1 text-edu-ink font-neo-body font-bold leading-tight pb-1',
+                'flex-1 text-neo-white edu-sky:text-edu-ink font-neo-body font-bold leading-tight pb-1',
                 projector ? (calm ? 'text-lg @[96rem]/results:text-2xl' : 'text-xl @[96rem]/results:text-4xl') : 'text-sm'
               )}
             >
@@ -293,13 +293,13 @@ export function WordCoverageGlance({
                     ? 'px-2.5 py-1 text-base @[96rem]/results:px-3.5 @[96rem]/results:py-1.5 @[96rem]/results:text-2xl'
                     : cn('px-3 py-1.5 text-xl', wallXL && '@5xl/results:text-2xl @[96rem]/results:px-5 @[96rem]/results:py-2.5 @[96rem]/results:text-3xl')
                   : calm ? 'px-2.5 py-1 text-sm' : 'px-3 py-1.5 text-sm',
-                hit && 'border-[2px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm',
-                !hit && !unplaced && 'border-[2px] border-edu-line bg-edu-surface text-edu-ink/60',
+                hit && 'border-[2px] border-neo-black edu-sky:border-neo-black bg-neo-lime edu-sky:bg-neo-lime text-neo-black edu-sky:text-neo-black shadow-hard-sm',
+                !hit && !unplaced && 'border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface text-neo-white/60 edu-sky:text-edu-ink/60',
                 // A word the board never carried is still a word a teacher
                 // reads off a wall: the dash says "not the class's fault",
                 // the 75% keeps it legible (50% measured 4.61:1 — over the
                 // line, but only just, and this is read from six metres).
-                unplaced && 'border-2 border-dashed border-edu-line text-edu-ink/75'
+                unplaced && 'border-2 border-dashed border-neo-cream/70 edu-sky:border-edu-line text-neo-white/75 edu-sky:text-edu-ink/75'
               )}
             >
               {hit ? (
@@ -347,8 +347,8 @@ export function WordCoverageGlance({
                 'flex items-center gap-2 rounded-neo font-bold',
                 // Cream edge on navy measures 16.8:1 — this has to read as a
                 // control from six metres, not as one more grey chip.
-                'border-[2px] border-edu-line bg-edu-surface text-edu-ink',
-                'min-h-11 hover:bg-edu-surface transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+                'border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink',
+                'min-h-11 hover:bg-neo-navy-light edu-sky:hover:bg-edu-surface transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
                 projector ? (calm ? 'px-2.5 py-1 text-base @[96rem]/results:text-2xl' : 'px-4 py-2.5 text-2xl') : calm ? 'px-2.5 py-1 text-sm' : 'px-3 py-1.5 text-sm'
               )}
             >

@@ -38,7 +38,7 @@ export function ResultsSchoolQuoteLink({ language, className }: { language: stri
   if (!show) return null;
   const copy = resultsTrialCopy(language);
   return (
-    <p ref={ref} data-testid="results-school-quote" className={cn('text-center text-xs text-edu-ink/80 @[96rem]/results:text-sm', className)}>
+    <p ref={ref} data-testid="results-school-quote" className={cn('text-center text-xs text-neo-cream/80 edu-sky:text-edu-ink/80 @[96rem]/results:text-sm', className)}>
       <Link
         href={schoolQuoteHref(language)}
         target="_blank"
@@ -52,7 +52,7 @@ export function ResultsSchoolQuoteLink({ language, className }: { language: stri
             /* analytics must never block */
           }
         }}
-        className="inline-flex min-h-11 items-center gap-1 font-bold text-edu-ink underline underline-offset-2 hover:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+        className="inline-flex min-h-11 items-center gap-1 font-bold text-neo-cream edu-sky:text-edu-ink underline underline-offset-2 hover:text-neo-white edu-sky:hover:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
       >
         <Building2 className="size-[1.1em] shrink-0" aria-hidden="true" />
         {copy.quoteCta}

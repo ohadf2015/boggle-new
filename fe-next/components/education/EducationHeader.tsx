@@ -34,9 +34,9 @@ import {
  * Spelled out in full: Tailwind v4 only emits class names it can read verbatim.
  */
 const UTILITY_BAR = [
-  'bg-edu-ink/5',
-  '[&>*>button]:border-0! [&>*>button]:shadow-none! [&>*>button]:bg-transparent! [&>*>button]:translate-none! [&>*>button]:rounded-neo! [&>*>button]:text-edu-ink! [&>*>button]:hover:bg-edu-ink/15!',
-  '[&>*>*>button]:border-0! [&>*>*>button]:shadow-none! [&>*>*>button]:bg-transparent! [&>*>*>button]:translate-none! [&>*>*>button]:rounded-neo! [&>*>*>button]:text-edu-ink! [&>*>*>button]:hover:bg-edu-ink/15!',
+  'bg-neo-cream/5 edu-sky:bg-edu-ink/5',
+  '[&>*>button]:border-0! [&>*>button]:shadow-none! [&>*>button]:bg-transparent! edu-sky:[&>*>button]:bg-transparent! [&>*>button]:translate-none! [&>*>button]:rounded-neo! [&>*>button]:text-neo-cream! edu-sky:[&>*>button]:text-edu-ink! [&>*>button]:hover:bg-neo-cream/15! edu-sky:[&>*>button]:hover:bg-edu-ink/15!',
+  '[&>*>*>button]:border-0! [&>*>*>button]:shadow-none! [&>*>*>button]:bg-transparent! edu-sky:[&>*>*>button]:bg-transparent! [&>*>*>button]:translate-none! [&>*>*>button]:rounded-neo! [&>*>*>button]:text-neo-cream! edu-sky:[&>*>*>button]:text-edu-ink! [&>*>*>button]:hover:bg-neo-cream/15! edu-sky:[&>*>*>button]:hover:bg-edu-ink/15!',
 ].join(' ');
 
 interface EducationHeaderProps {
@@ -152,7 +152,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
         'w-full mb-1 sm:mb-2 lg:mb-3 px-2 sm:px-3 lg:px-4 pb-1 lg:pb-2',
         // Positioned at every width so the desktop menu paints over the page below, yet under body-level z-50 overlays.
         'sticky lg:relative lg:top-0!',
-        'z-[60] lg:z-40 bg-edu-surface',
+        'z-[60] lg:z-40 bg-neo-navy edu-sky:bg-edu-surface',
         'min-h-[60px] sm:min-h-[70px] lg:min-h-[80px]',
         className
       )}
@@ -166,8 +166,8 @@ export const EducationHeader = memo<EducationHeaderProps>(({
           'w-full mx-auto',
           'flex items-center justify-between',
           'px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-2.5',
-          'bg-edu-surface',
-          'border-4 lg:border-4 border-edu-line',
+          'bg-neo-navy edu-sky:bg-edu-surface',
+          'border-4 lg:border-4 border-neo-cream/40 edu-sky:border-edu-line',
           'shadow-hard-lg',
           'rounded-neo-lg',
           'transition duration-100',
@@ -184,8 +184,8 @@ export const EducationHeader = memo<EducationHeaderProps>(({
               className={cn(
                 'flex items-center justify-center',
                 'size-11 min-w-11 min-h-11',
-                'bg-edu-surface text-edu-ink',
-                'border-3 border-edu-line',
+                'bg-neo-navy edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink',
+                'border-3 border-neo-cream edu-sky:border-edu-line',
                 'rounded-neo shadow-hard-sm',
                 'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard',
                 'active:translate-x-px active:translate-y-px active:shadow-none',
@@ -214,8 +214,8 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 'flex items-center justify-center',
                 'w-8 h-8 sm:w-10 sm:h-10',
                 compact
-                  ? 'bg-edu-surface text-edu-ink border-2 border-edu-line'
-                  : 'bg-neo-cyan text-neo-black border-neo sm:border-3 border-neo-black shadow-hard-sm',
+                  ? 'bg-neo-navy-light edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink border-2 border-neo-cream/40 edu-sky:border-edu-line'
+                  : 'bg-neo-cyan edu-sky:bg-neo-cyan text-neo-black edu-sky:text-neo-black border-neo sm:border-3 border-neo-black edu-sky:border-neo-black shadow-hard-sm',
                 'rounded-neo'
               )}
             >
@@ -230,7 +230,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                   compact
                     ? 'font-neo-display text-base font-bold leading-[1.1] sm:text-lg lg:text-xl'
                     : 'truncate text-lg sm:text-xl lg:text-2xl font-black uppercase tracking-tight leading-none',
-                  'text-edu-ink',
+                  'text-neo-white edu-sky:text-edu-ink',
                   !title && 'hidden sm:block'
                 )}
               >
@@ -238,10 +238,10 @@ export const EducationHeader = memo<EducationHeaderProps>(({
               </span>
               {!title && (
                 <span data-testid="edu-header-phone-title" className="flex min-w-0 flex-col leading-none sm:hidden">
-                  <span className="truncate text-lg font-black uppercase tracking-tight text-edu-ink">
+                  <span className="truncate text-lg font-black uppercase tracking-tight text-neo-white edu-sky:text-edu-ink">
                     {t('eg2Polish.header.brand')}
                   </span>
-                  <span className="truncate text-xs font-black uppercase tracking-wide text-edu-cyan-ink">
+                  <span className="truncate text-xs font-black uppercase tracking-wide text-neo-cyan edu-sky:text-edu-cyan-ink">
                     {t('eg2Polish.header.section')}
                   </span>
                 </span>
@@ -250,7 +250,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 className={cn(
                   compact ? 'hidden' : 'hidden sm:block',
                   'text-xs sm:text-sm font-bold uppercase tracking-wide',
-                  'text-edu-cyan-ink',
+                  'text-neo-cyan edu-sky:text-edu-cyan-ink',
                   'leading-none'
                 )}
               >
@@ -268,7 +268,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
           data-testid="edu-header-crumbs"
           className={cn(
             'hidden xl:flex min-w-0 flex-1 justify-center px-4',
-            compact && '[&_a]:text-edu-ink/70 [&_[aria-current=page]]:text-edu-ink'
+            compact && '[&_a]:text-neo-cream/70 edu-sky:[&_a]:text-edu-ink/70 [&_[aria-current=page]]:text-neo-cream edu-sky:[&_[aria-current=page]]:text-edu-ink'
           )}
         >
           <EducationBreadcrumbs />
@@ -287,7 +287,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
           className={cn(
             'flex shrink-0 items-center gap-0.5 rounded-neo-lg p-1 sm:gap-1',
             UTILITY_BAR,
-            compact && '[&_[data-testid=whats-new-dot]]:bg-neo-cream'
+            compact && '[&_[data-testid=whats-new-dot]]:bg-neo-cream edu-sky:[&_[data-testid=whats-new-dot]]:bg-neo-cream'
           )}
         >
           {/* ponytail: What's new + Search are desktop conveniences; at 390px they pushed the hamburger off-screen */}
@@ -299,7 +299,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
               <span className="hidden sm:flex">
                 <SearchIconButton />
               </span>
-              <span aria-hidden="true" className="mx-1 hidden h-6 w-px bg-edu-ink/25 sm:block" />
+              <span aria-hidden="true" className="mx-1 hidden h-6 w-px bg-neo-cream/25 edu-sky:bg-edu-ink/25 sm:block" />
             </>
           )}
 

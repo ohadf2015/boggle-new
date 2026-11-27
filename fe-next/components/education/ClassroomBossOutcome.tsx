@@ -18,7 +18,7 @@ export function ClassroomBossOutcome({ boss, compact = false, tone = 'default', 
       data-outcome={won ? 'defeated' : 'escaped'}
       className={cn(
         'flex shrink-0 items-center gap-3 rounded-neo',
-        calm ? 'border-2 border-edu-line bg-edu-surface text-edu-ink' : cn('border-[3px] border-neo-black shadow-hard-lg', won ? 'bg-neo-lime text-neo-black' : 'bg-edu-surface text-edu-ink'),
+        calm ? 'border-2 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink' : cn('border-[3px] border-neo-black shadow-hard-lg', won ? 'bg-neo-lime edu-sky:bg-neo-lime text-neo-black edu-sky:text-neo-black' : 'bg-neo-navy-light edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink'),
         compact ? 'p-2' : 'p-3 md:gap-5 md:p-3 md:[@media(min-height:1000px)]:p-4'
       )}
     >

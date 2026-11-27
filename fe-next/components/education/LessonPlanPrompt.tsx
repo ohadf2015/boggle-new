@@ -117,7 +117,7 @@ export function LessonPlanPrompt({
       <div
         data-testid="lesson-plan-placeholder"
         aria-hidden="true"
-        className={cn('min-h-[220px] rounded-neo-lg border-[3px] border-edu-line bg-edu-surface', className)}
+        className={cn('min-h-[220px] rounded-neo-lg border-[3px] border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface', className)}
       />
     ) : null;
   }
@@ -176,7 +176,7 @@ export function LessonPlanPrompt({
           <h2 id={titleId} className="font-neo-display text-lg font-black leading-tight @5xl/results:text-xl">
             {t(status === 'saved' && source === 'teacher_home' ? `${K}.nextTitle` : COPY[source].title)}
           </h2>
-          {status !== 'saved' && <p className="mt-1 font-neo-body text-sm font-bold text-edu-ink/80">{t(COPY[source].body)}</p>}
+          {status !== 'saved' && <p className="mt-1 font-neo-body text-sm font-bold text-neo-cream/80 edu-sky:text-edu-ink/80">{t(COPY[source].body)}</p>}
         </div>
       </div>
 
@@ -193,14 +193,14 @@ export function LessonPlanPrompt({
         />
       ) : status === 'saved' && savedAt ? (
         <div data-testid="lesson-plan-saved" role="status" className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <p className="flex min-w-0 items-start gap-2 font-neo-body text-sm font-bold text-edu-ink">
-            <Check className="mt-0.5 size-4 shrink-0 text-edu-lime-ink" aria-hidden="true" />
+          <p className="flex min-w-0 items-start gap-2 font-neo-body text-sm font-bold text-neo-cream edu-sky:text-edu-ink">
+            <Check className="mt-0.5 size-4 shrink-0 text-neo-lime edu-sky:text-edu-lime-ink" aria-hidden="true" />
             {t(`${K}.saved`, { when: formatLessonTime(savedAt, timezone, language) })}
           </p>
           <button
             type="button"
             onClick={() => setStatus('idle')}
-            className={cn(PRESS, 'min-h-11 font-neo-display text-sm font-black text-edu-cyan-ink underline underline-offset-4')}
+            className={cn(PRESS, 'min-h-11 font-neo-display text-sm font-black text-neo-cyan edu-sky:text-edu-cyan-ink underline underline-offset-4')}
           >
             {t(`${K}.change`)}
           </button>
@@ -219,7 +219,7 @@ export function LessonPlanPrompt({
           </button>
 
           <div className="flex flex-col gap-1">
-            <label htmlFor={inputId} className="font-neo-body text-xs font-bold text-edu-ink/80">
+            <label htmlFor={inputId} className="font-neo-body text-xs font-bold text-neo-cream/80 edu-sky:text-edu-ink/80">
               {t(`${K}.pickLabel`)}
             </label>
             <div className="flex flex-wrap gap-2">
@@ -244,7 +244,7 @@ export function LessonPlanPrompt({
 
           {status === 'error' && (
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <p role="alert" className="font-neo-body text-xs font-bold text-edu-pink-ink">
+              <p role="alert" className="font-neo-body text-xs font-bold text-neo-pink edu-sky:text-edu-pink-ink">
                 {t(`${K}.${errorKey}`)}
               </p>
               {errorKey === 'error' && lastAttempt.current && (
@@ -252,7 +252,7 @@ export function LessonPlanPrompt({
                   type="button"
                   data-testid="lesson-plan-retry"
                   onClick={() => lastAttempt.current && save(lastAttempt.current)}
-                  className={cn(PRESS, 'inline-flex min-h-11 items-center gap-1 font-neo-display text-sm font-black text-edu-cyan-ink underline underline-offset-4')}
+                  className={cn(PRESS, 'inline-flex min-h-11 items-center gap-1 font-neo-display text-sm font-black text-neo-cyan edu-sky:text-edu-cyan-ink underline underline-offset-4')}
                 >
                   <RotateCcw className="size-4 shrink-0" aria-hidden="true" />
                   {t(`${K}.retry`)}

@@ -91,7 +91,7 @@ export function MissGapUnpluggedReteachLiveCta({
         className,
       )}
     >
-      <p className="text-xs font-bold text-edu-ink/80 sm:basis-full">
+      <p className="text-xs font-bold text-neo-cream/80 edu-sky:text-edu-ink/80 sm:basis-full">
         {t('teacher.digest.unpluggedReteachLiveFoil')}
       </p>
       <Link

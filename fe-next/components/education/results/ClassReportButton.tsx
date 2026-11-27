@@ -119,10 +119,10 @@ function FreeClassReport({ language, underHalf, bars, proLabel = 'Pro', round, s
         data-testid="class-report-teaser"
         data-offer={proOffer.offer}
         aria-labelledby="class-report-teaser-title"
-        className="flex flex-col gap-2 rounded-neo-xl border-[3px] border-dashed border-edu-line bg-edu-surface px-3 py-3 text-edu-ink shadow-hard-xl @5xl/results:px-4"
+        className="flex flex-col gap-2 rounded-neo-xl border-[3px] border-dashed border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface px-3 py-3 text-neo-cream edu-sky:text-edu-ink shadow-hard-xl @5xl/results:px-4"
       >
         <div className="flex items-start justify-between gap-2">
-          <h2 id="class-report-teaser-title" className="flex min-w-0 items-center gap-2 font-neo-display text-sm font-black leading-tight text-edu-ink @5xl/results:text-base @[96rem]/results:text-xl">
+          <h2 id="class-report-teaser-title" className="flex min-w-0 items-center gap-2 font-neo-display text-sm font-black leading-tight text-neo-cream edu-sky:text-edu-ink @5xl/results:text-base @[96rem]/results:text-xl">
             <BarChart3 className="size-[1.1em] shrink-0" aria-hidden="true" />
             {trialOpen ? copy.trialOpenTitle : t('eduProResults.freeTitle')}
           </h2>
@@ -132,14 +132,14 @@ function FreeClassReport({ language, underHalf, bars, proLabel = 'Pro', round, s
             {shownBars.map((pct, i) => (
               <li key={i} className="flex items-center gap-1.5">
                 <span className="h-2 w-6 shrink-0 rounded-sm bg-neo-cream/50" />
-                <span className="h-2 flex-1 overflow-hidden rounded-sm bg-edu-page">
+                <span className="h-2 flex-1 overflow-hidden rounded-sm bg-neo-navy edu-sky:bg-edu-page">
                   <span className="block h-full origin-left bg-neo-cream rtl:origin-right" style={{ transform: `scaleX(${Math.max(0.06, pct / 100)})` }} />
                 </span>
               </li>
             ))}
           </ul>
           <div className="min-w-0 flex-1">
-            <p data-testid="class-report-teaser-body" className="text-sm leading-snug text-edu-ink @[96rem]/results:text-lg">
+            <p data-testid="class-report-teaser-body" className="text-sm leading-snug text-neo-cream edu-sky:text-edu-ink @[96rem]/results:text-lg">
               {classReportTeaserBody(copy, underHalf)}
             </p>
           </div>
@@ -155,23 +155,23 @@ function FreeClassReport({ language, underHalf, bars, proLabel = 'Pro', round, s
               <Table2 className="size-4 shrink-0" aria-hidden="true" />
               {t('eduProResults.openGrid')}
             </button>
-            <p data-testid="class-report-open-grid-note" className="text-center text-xs font-semibold text-edu-ink/80 @[96rem]/results:text-sm">
+            <p data-testid="class-report-open-grid-note" className="text-center text-xs font-semibold text-neo-cream/80 edu-sky:text-edu-ink/80 @[96rem]/results:text-sm">
               {t('eduProResults.openGridNote')}
             </p>
           </div>
         ) : null}
         {!suppressOffer && (
-          <div ref={depthRef} data-testid="class-report-depth" className="flex flex-col gap-0.5 border-t-2 border-dashed border-edu-line pt-2">
-            <p className="flex items-center gap-2 text-sm font-black text-edu-ink @[96rem]/results:text-lg">
+          <div ref={depthRef} data-testid="class-report-depth" className="flex flex-col gap-0.5 border-t-2 border-dashed border-neo-cream/60 edu-sky:border-edu-line pt-2">
+            <p className="flex items-center gap-2 text-sm font-black text-neo-cream edu-sky:text-edu-ink @[96rem]/results:text-lg">
               <Lock className="size-[1em] shrink-0" aria-hidden="true" />
               {t('eduProResults.proDepthTitle')}
               <ProPill label={proLabel} />
             </p>
-            <p className="text-xs font-semibold text-edu-ink/80 @[96rem]/results:text-base">{t('eduProResults.proDepth')}</p>
+            <p className="text-xs font-semibold text-neo-cream/80 edu-sky:text-edu-ink/80 @[96rem]/results:text-base">{t('eduProResults.proDepth')}</p>
           </div>
         )}
         {!suppressOffer && proOffer.title ? (
-          <p data-testid="class-report-teaser-offer-title" className="text-sm font-bold text-edu-ink @[96rem]/results:text-lg">
+          <p data-testid="class-report-teaser-offer-title" className="text-sm font-bold text-neo-cream edu-sky:text-edu-ink @[96rem]/results:text-lg">
             {proOffer.title}
           </p>
         ) : null}
@@ -188,7 +188,7 @@ function FreeClassReport({ language, underHalf, bars, proLabel = 'Pro', round, s
                 /* analytics must never block */
               }
             }}
-            className={cn(LINK, 'border-edu-line bg-edu-surface text-edu-ink')}
+            className={cn(LINK, 'border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink')}
           >
             <BarChart3 className="size-4 shrink-0" aria-hidden="true" />
             {copy.openReport}
@@ -201,12 +201,12 @@ function FreeClassReport({ language, underHalf, bars, proLabel = 'Pro', round, s
               rel="noopener noreferrer"
               data-testid="class-report-teaser-cta"
               onClick={onUpgradeClick}
-              className={cn(LINK, 'border-neo-black bg-neo-pink text-edu-ink')}
+              className={cn(LINK, 'border-neo-black bg-neo-pink text-neo-white edu-sky:text-edu-ink')}
             >
               <Sparkles className="size-4 shrink-0" aria-hidden="true" />
               {proOffer.label}
             </Link>
-            <p data-testid="class-report-teaser-note" className="text-center text-xs font-semibold text-edu-ink/80 @[96rem]/results:text-sm">
+            <p data-testid="class-report-teaser-note" className="text-center text-xs font-semibold text-neo-cream/80 edu-sky:text-edu-ink/80 @[96rem]/results:text-sm">
               {proOffer.note}
             </p>
           </>

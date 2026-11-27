@@ -95,7 +95,7 @@ export function StudentWordBank({
       className={cn(
         // Bottom sheet: pinned to the viewport bottom, above the board, safe-area aware.
         'fixed bottom-0 inset-x-0 z-40 mx-auto w-full max-w-lg',
-        'border-3 border-b-0 border-edu-line rounded-t-neo bg-edu-surface text-edu-ink shadow-hard',
+        'border-3 border-b-0 border-neo-cream edu-sky:border-edu-line rounded-t-neo bg-neo-navy edu-sky:bg-edu-surface text-white edu-sky:text-edu-ink shadow-hard',
         'pb-[env(safe-area-inset-bottom)]',
         className
       )}
@@ -112,7 +112,7 @@ export function StudentWordBank({
         )}
       >
         <span className="flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-edu-cyan-ink shrink-0" aria-hidden="true" />
+          <BookOpen className="w-5 h-5 text-neo-cyan edu-sky:text-edu-cyan-ink shrink-0" aria-hidden="true" />
           <span>{t('education.wordBank.title', { count: words.length })}</span>
         </span>
         <ChevronUp
@@ -123,7 +123,7 @@ export function StudentWordBank({
 
       {open && (
         <div id={panelId} className="border-t-3 border-neo-black px-4 pt-3 pb-4 max-h-[40vh] overflow-y-auto">
-          <p className="text-xs font-bold text-edu-ink/70 mb-2">{t('education.wordBank.hint')}</p>
+          <p className="text-xs font-bold text-white/70 edu-sky:text-edu-ink/70 mb-2">{t('education.wordBank.hint')}</p>
           <ul className="grid grid-cols-2 gap-2">
             {words.map((word) => (
               <li

@@ -43,18 +43,18 @@ export default function PostGameWordReview({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3, type: 'spring', stiffness: 120, damping: 20 }}
-      className="bg-edu-surface border-neo border-edu-line shadow-hard-lg rounded-neo p-4 space-y-4"
+      className="bg-neo-navy edu-sky:bg-edu-surface border-neo border-neo-cream/40 edu-sky:border-edu-line shadow-hard-lg rounded-neo p-4 space-y-4"
     >
       {/* Header */}
       <div className="flex items-center gap-2">
-        <BookOpen className="w-5 h-5 text-edu-lime-ink" />
-        <h3 className="text-lg font-bold text-edu-lime-ink font-neo-display">
+        <BookOpen className="w-5 h-5 text-neo-lime edu-sky:text-edu-lime-ink" />
+        <h3 className="text-lg font-bold text-neo-lime edu-sky:text-edu-lime-ink font-neo-display">
           {t('education.postGame.wordsYouLearned')}
         </h3>
       </div>
 
       {/* Score */}
-      <p className="text-sm text-edu-ink">
+      <p className="text-sm text-neo-white edu-sky:text-edu-ink">
         {t('education.postGame.vocabScore', {
           found: found.length,
           total: vocabularyWords.length,
@@ -64,16 +64,16 @@ export default function PostGameWordReview({
       {/* Found words */}
       {found.length > 0 && (
         <div className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-edu-lime-ink/70">
+          <span className="text-xs font-bold uppercase tracking-wider text-neo-lime/70 edu-sky:text-edu-lime-ink/70">
             {t('education.postGame.found')}
           </span>
           <div className="flex flex-wrap gap-2">
             {found.map((word) => (
               <span
                 key={word}
-                className="inline-flex items-center gap-1 px-2 py-1 rounded-neo bg-neo-lime/15 border border-neo-lime/50 text-edu-ink font-bold text-sm"
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-neo bg-neo-lime/15 border border-neo-lime/50 text-neo-white edu-sky:text-edu-ink font-bold text-sm"
               >
-                <Check className="w-3 h-3 text-edu-lime-ink" />
+                <Check className="w-3 h-3 text-neo-lime edu-sky:text-edu-lime-ink" />
                 {word}
               </span>
             ))}
@@ -84,17 +84,17 @@ export default function PostGameWordReview({
       {/* Missed words */}
       {missed.length > 0 && (
         <div className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-edu-ink">
+          <span className="text-xs font-bold uppercase tracking-wider text-neo-white edu-sky:text-edu-ink">
             {t('education.postGame.wordsToLearn')}
           </span>
-          <p className="text-xs text-edu-ink">
+          <p className="text-xs text-neo-white edu-sky:text-edu-ink">
             {t('education.postGame.studyTheseNext')}
           </p>
           <div className="flex flex-wrap gap-2">
             {missed.map((word) => (
               <span
                 key={word}
-                className="inline-flex items-center px-2 py-1 rounded-neo bg-edu-ink/5 border border-edu-line text-edu-ink text-sm"
+                className="inline-flex items-center px-2 py-1 rounded-neo bg-neo-white/5 edu-sky:bg-edu-ink/5 border border-neo-white/40 edu-sky:border-edu-line text-neo-white edu-sky:text-edu-ink text-sm"
               >
                 {word}
               </span>

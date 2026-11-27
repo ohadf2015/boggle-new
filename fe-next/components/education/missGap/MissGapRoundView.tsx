@@ -52,7 +52,7 @@ const TILE_TONES = [
  * vanishes — so these keep a cream border to stay visibly a control, and the
  * ink sits at 70% (8.4:1) rather than the 25-45% that fell under AA.
  */
-const MUTED_TILE = 'bg-edu-surface text-edu-ink border-edu-line';
+const MUTED_TILE = 'bg-neo-navy-light edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink border-neo-cream edu-sky:border-edu-line';
 
 export function MissGapRoundView({
   round,
@@ -106,7 +106,7 @@ export function MissGapRoundView({
     <div className="flex flex-col flex-1 min-h-0 gap-3">
       {/* Timer bar — a shrinking strip reads faster than a number on a phone. */}
       <div
-        className="h-3 w-full rounded-neo border-[2px] border-edu-line bg-edu-surface overflow-hidden shrink-0"
+        className="h-3 w-full rounded-neo border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface overflow-hidden shrink-0"
         role="timer"
         aria-label={t('education.homework.timeLeft', { seconds: Math.ceil(secondsLeft) })}
       >
@@ -134,14 +134,14 @@ export function MissGapRoundView({
       <div className="shrink-0 lg:flex lg:flex-col lg:justify-center">
         <p
           data-testid="miss-gap-round-prompt"
-          className="text-edu-cyan-ink font-bold text-xs uppercase tracking-widest"
+          className="text-neo-cyan edu-sky:text-edu-cyan-ink font-bold text-xs uppercase tracking-widest"
         >
           {prompt}
         </p>
         {round.kind === 'meaning' || round.kind === 'spell' ? (
           <p
             data-testid="miss-gap-round-word"
-            className="text-edu-ink font-neo-display font-bold text-3xl lg:text-5xl leading-tight break-words"
+            className="text-neo-white edu-sky:text-edu-ink font-neo-display font-bold text-3xl lg:text-5xl leading-tight break-words"
           >
             {/* A spell round hides the word ONLY when a definition is there to
                 go on. With no definition there is nothing to recall from, so
@@ -151,12 +151,12 @@ export function MissGapRoundView({
               : round.word}
           </p>
         ) : (
-          <p className="text-edu-ink font-neo-body text-sm">
+          <p className="text-neo-cream edu-sky:text-edu-ink font-neo-body text-sm">
             {t('education.homework.promptSpellingHint')}
           </p>
         )}
         {round.kind === 'spell' && round.hint ? (
-          <p className="text-edu-ink font-neo-body text-sm mt-1">{round.hint}</p>
+          <p className="text-neo-cream edu-sky:text-edu-ink font-neo-body text-sm mt-1">{round.hint}</p>
         ) : null}
       </div>
 
@@ -184,10 +184,10 @@ export function MissGapRoundView({
                     'w-10 h-12 grid place-items-center rounded-neo border-[3px]',
                     'font-neo-display font-bold text-2xl',
                     locked && outcome === 'correct'
-                      ? 'bg-neo-lime text-neo-black border-neo-black'
+                      ? 'bg-neo-lime edu-sky:bg-neo-lime text-neo-black edu-sky:text-neo-black border-neo-black edu-sky:border-neo-black'
                       : spelled[i]
-                        ? 'bg-neo-cyan text-neo-black border-neo-black'
-                        : 'bg-edu-surface text-edu-ink border-edu-line',
+                        ? 'bg-neo-cyan edu-sky:bg-neo-cyan text-neo-black edu-sky:text-neo-black border-neo-black edu-sky:border-neo-black'
+                        : 'bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink border-neo-cream edu-sky:border-edu-line',
                   )}
                 >
                   {locked ? letter : (spelled[i] ?? '')}
@@ -208,7 +208,7 @@ export function MissGapRoundView({
                     'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
                     typed.includes(index)
                       ? MUTED_TILE
-                      : 'bg-neo-cream text-neo-black border-neo-black',
+                      : 'bg-neo-cream edu-sky:bg-neo-cream text-neo-black edu-sky:text-neo-black border-neo-black edu-sky:border-neo-black',
                   )}
                 >
                   {letter}
@@ -243,9 +243,9 @@ export function MissGapRoundView({
                       'font-neo-display font-bold text-base leading-snug shadow-hard-sm',
                       'transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
                       reveal
-                        ? 'bg-neo-lime text-neo-black border-neo-black'
+                        ? 'bg-neo-lime edu-sky:bg-neo-lime text-neo-black edu-sky:text-neo-black border-neo-black edu-sky:border-neo-black'
                         : isPicked
-                          ? 'bg-neo-pink text-neo-black border-neo-black'
+                          ? 'bg-neo-pink edu-sky:bg-neo-pink text-neo-black edu-sky:text-neo-black border-neo-black edu-sky:border-neo-black'
                           : locked
                             ? MUTED_TILE
                             : TILE_TONES[index % TILE_TONES.length],
@@ -286,10 +286,10 @@ export function MissGapRoundView({
             'font-neo-display font-bold',
             locked ? 'text-xl' : 'text-base',
             !locked
-              ? 'text-edu-ink'
+              ? 'text-neo-cream edu-sky:text-edu-ink'
               : outcome === 'correct'
-                ? 'text-edu-lime-ink'
-                : 'text-edu-ink',
+                ? 'text-neo-lime edu-sky:text-edu-lime-ink'
+                : 'text-neo-cream edu-sky:text-edu-ink',
           )}
         >
           {!locked

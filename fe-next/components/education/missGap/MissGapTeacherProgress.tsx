@@ -34,29 +34,29 @@ export function MissGapTeacherProgress({ data, failed, payload }: MissGapTeacher
   return (
     <section
       data-testid="miss-gap-teacher-progress"
-      className="p-4 rounded-neo border-[3px] border-edu-line bg-edu-surface shadow-hard"
+      className="p-4 rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface shadow-hard"
     >
-      <p className="text-edu-cyan-ink font-bold text-xs uppercase tracking-widest mb-2">
+      <p className="text-neo-cyan edu-sky:text-edu-cyan-ink font-bold text-xs uppercase tracking-widest mb-2">
         {t('education.homework.teacherEyebrow')}
       </p>
 
       <MissGapStreakFlame streak={data?.streak?.currentStreak ?? 0} size="hero" />
 
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <p className="rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 py-2">
-          <span className="flex items-center gap-1.5 font-neo-display font-bold text-2xl text-edu-ink">
-            <Users className="w-5 h-5 text-edu-cyan-ink" aria-hidden />
+        <p className="rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface px-3 py-2">
+          <span className="flex items-center gap-1.5 font-neo-display font-bold text-2xl text-neo-white edu-sky:text-edu-ink">
+            <Users className="w-5 h-5 text-neo-cyan edu-sky:text-edu-cyan-ink" aria-hidden />
             <span data-testid="miss-gap-teacher-players">{data?.players ?? 0}</span>
           </span>
-          <span className="block font-neo-body text-xs uppercase tracking-wider text-edu-ink">
+          <span className="block font-neo-body text-xs uppercase tracking-wider text-neo-cream edu-sky:text-edu-ink">
             {t('education.homework.teacherPlayed')}
           </span>
         </p>
-        <p className="rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 py-2">
-          <span className="block font-neo-display font-bold text-2xl text-edu-lime-ink">
+        <p className="rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface px-3 py-2">
+          <span className="block font-neo-display font-bold text-2xl text-neo-lime edu-sky:text-edu-lime-ink">
             {data?.averageAccuracy ?? 0}%
           </span>
-          <span className="block font-neo-body text-xs uppercase tracking-wider text-edu-ink">
+          <span className="block font-neo-body text-xs uppercase tracking-wider text-neo-cream edu-sky:text-edu-ink">
             {t('education.homework.teacherAverage')}
           </span>
         </p>
@@ -72,7 +72,7 @@ export function MissGapTeacherProgress({ data, failed, payload }: MissGapTeacher
         // played" next to "2 finished" would be a flat contradiction.
         <p
           data-testid="miss-gap-teacher-empty"
-          className="mt-3 font-neo-body text-sm text-edu-ink"
+          className="mt-3 font-neo-body text-sm text-neo-cream edu-sky:text-edu-ink"
         >
           {(data?.players ?? 0) > 0
             ? t('education.homework.teacherNamesSignedOut')
@@ -84,12 +84,12 @@ export function MissGapTeacherProgress({ data, failed, payload }: MissGapTeacher
             <li
               key={`${run.name}-${i}`}
               data-testid="miss-gap-teacher-run"
-              className="flex items-center gap-2 px-3 py-2 rounded-neo border-[3px] border-edu-line bg-edu-surface"
+              className="flex items-center gap-2 px-3 py-2 rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface"
             >
-              <span className="flex-1 min-w-0 truncate font-neo-display font-bold text-edu-ink text-sm">
+              <span className="flex-1 min-w-0 truncate font-neo-display font-bold text-neo-white edu-sky:text-edu-ink text-sm">
                 {run.name || t('education.homework.anonStudent')}
               </span>
-              <span className="font-neo-body text-xs text-edu-ink tabular-nums">
+              <span className="font-neo-body text-xs text-neo-cream edu-sky:text-edu-ink tabular-nums">
                 {run.wordsCorrect}/{run.wordsTotal}
               </span>
               <span className="flex items-center" aria-hidden>
@@ -99,8 +99,8 @@ export function MissGapTeacherProgress({ data, failed, payload }: MissGapTeacher
                     className={cn(
                       'w-4 h-4',
                       n <= run.stars
-                        ? 'fill-neo-yellow text-neo-black'
-                        : 'fill-transparent text-edu-ink/60',
+                        ? 'fill-neo-yellow text-neo-black edu-sky:text-neo-black'
+                        : 'fill-transparent text-neo-cream/60 edu-sky:text-edu-ink/60',
                     )}
                   />
                 ))}

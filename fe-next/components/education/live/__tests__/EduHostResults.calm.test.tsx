@@ -43,7 +43,7 @@ describe('EduHostResults: calm round-end wall', () => {
     render(<ZeroRoundNote t={t} />);
     const note = screen.getByTestId('podium-zero-note');
     expect(tokens(note).filter((c) => /^bg-neo-navy[\w-]*\/\d+$/.test(c))).toEqual([]);
-    expect(tokens(note)).toContain('bg-edu-surface');
+    expect(tokens(note)).toContain('edu-sky:bg-edu-surface');
   });
 
   it('reads the class numbers in cream, with no lime or cyan accents competing with Play again', () => {

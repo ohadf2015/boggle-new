@@ -163,3 +163,59 @@ describe('edu-sky codemod: source files', () => {
     );
   });
 });
+
+describe('edu-sky codemod: files a dark page imports', () => {
+  const twin = (s: string, group?: string) => mapClassString(s, group, { shared: true });
+  const twinSource = (src: string) => transformSource(src, 'x.tsx', { shared: true });
+
+  it('keeps the master class and adds the sky class behind edu-sky:', () => {
+    expect(twin('rounded border-2 border-neo-cream/40 bg-neo-navy text-neo-cream')).toBe(
+      'rounded border-2 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink',
+    );
+  });
+
+  it('keeps variants and important markers inside the twin', () => {
+    expect(twin('hover:border-neo-cream/60 md:!text-neo-gray-300')).toBe(
+      'hover:border-neo-cream/60 edu-sky:hover:border-edu-line md:!text-neo-gray-300 edu-sky:md:!text-edu-ink/70',
+    );
+  });
+
+  it('twins a state class on a twinned property so it still beats the sky base', () => {
+    expect(twin('bg-neo-navy hover:bg-neo-lime text-neo-black')).toBe(
+      'bg-neo-navy edu-sky:bg-edu-surface hover:bg-neo-lime edu-sky:hover:bg-neo-lime text-neo-black',
+    );
+    expect(twin('bg-neo-lime', 'bg-neo-navy bg-neo-lime')).toBe('bg-neo-lime edu-sky:bg-neo-lime');
+    expect(twin('border-b-neo-pink', 'border-neo-cream/40 border-b-neo-pink')).toBe('border-b-neo-pink edu-sky:border-b-neo-pink');
+  });
+
+  it('leaves size, style and unrelated colour classes alone', () => {
+    expect(twin('border-2 border-dashed text-sm bg-neo-lime text-neo-black', 'border-neo-cream/40 border-2 border-dashed text-sm bg-neo-lime text-neo-black')).toBe(
+      'border-2 border-dashed text-sm bg-neo-lime text-neo-black',
+    );
+  });
+
+  it('twins across the literals of one className group', () => {
+    const src = "const a = <div className={cn('bg-neo-navy p-2', on && 'bg-neo-lime')} />;\n";
+    expect(twinSource(src)).toBe(
+      "const a = <div className={cn('bg-neo-navy edu-sky:bg-edu-surface p-2', on && 'bg-neo-lime edu-sky:bg-neo-lime')} />;\n",
+    );
+  });
+
+  it('twins an override composed with a twinned constant, so the override still wins on sky', () => {
+    const src = "const TAG = 'border-2 border-neo-cream/40 bg-neo-navy';\nconst a = <span className={cn(TAG, 'border-neo-black bg-neo-orange p-1')} />;\n";
+    expect(twinSource(src)).toBe(
+      "const TAG = 'border-2 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface';\nconst a = <span className={cn(TAG, 'border-neo-black edu-sky:border-neo-black bg-neo-orange edu-sky:bg-neo-orange p-1')} />;\n",
+    );
+  });
+
+  it('is a fixed point in both modes, so the sky ratchet does not rewrite a twinned class', () => {
+    const src = "const a = <div className={cn('border-neo-cream/40 hover:border-neo-lime bg-neo-navy-elevated', on && 'bg-neo-lime')} />;\n";
+    const once = twinSource(src);
+    expect(twinSource(once)).toBe(once);
+    expect(transformSource(once, 'x.tsx')).toBe(once);
+  });
+
+  it('never maps a token already behind edu-sky:', () => {
+    expect(map('edu-sky:bg-neo-navy edu-sky:text-white')).toBe('edu-sky:bg-neo-navy edu-sky:text-white');
+  });
+});

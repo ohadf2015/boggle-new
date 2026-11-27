@@ -98,7 +98,7 @@ describe('VocabQuizView — pressure dials', () => {
     const { socket, server } = makeSocket();
     const { container } = render(<VocabQuizView socket={socket} username="ana" t={t} />);
     server(VOCAB_QUIZ_EVENTS.question, QUESTION);
-    expect(container.querySelector('[role="timer"].text-edu-orange-ink')).not.toBeNull();
+    expect(container.querySelector('[role="timer"][class~="edu-sky:text-edu-orange-ink"]')).not.toBeNull();
   });
 
   it('leaderboard=hidden: the reveal shows no rank in the header', () => {

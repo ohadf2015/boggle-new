@@ -93,16 +93,16 @@ export function LobbyModeSwitcher({
         disabled={!!pendingMode}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'inline-flex min-h-11 items-center gap-2 rounded-neo border-[2px] border-edu-line bg-edu-surface',
+          'inline-flex min-h-11 items-center gap-2 rounded-neo border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface',
           // PHONE FIRST. Every sibling chip in this footer is sized in `vw`,
           // which is right on a projector and 10px in a 22px-tall box on the
           // 390px phone the teacher actually holds (measured 2026-09-11:
           // 56x22, font 10.14px). This one is a control, so it gets a 44px
           // target and 15px body text; `vw` returns only from `md` up, where
           // the wall is the audience again.
-          'px-3 py-2 font-neo-body text-[15px] font-bold text-edu-ink',
+          'px-3 py-2 font-neo-body text-[15px] font-bold text-neo-cream edu-sky:text-edu-ink',
           'md:min-h-0 md:px-[1vw] md:py-[0.4vw] md:text-[clamp(0.75rem,1vw,4rem)]',
-          'transition-colors hover:bg-edu-surface',
+          'transition-colors hover:bg-neo-navy edu-sky:hover:bg-edu-surface',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
           'disabled:cursor-wait disabled:opacity-70'
         )}

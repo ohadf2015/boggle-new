@@ -66,7 +66,7 @@ export function UnpluggedMascot({
       className={cn(
         'relative shrink-0',
         // Plain concatenation, not a cn() merge — see MOOD_RING.
-        clipped && `overflow-hidden rounded-full ${MOOD_RING[mood]} bg-edu-surface shadow-hard`,
+        clipped && `overflow-hidden rounded-full ${MOOD_RING[mood]} bg-neo-navy edu-sky:bg-edu-surface shadow-hard`,
         animate && 'animate-neo-pop',
         className,
       )}

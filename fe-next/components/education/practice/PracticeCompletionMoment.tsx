@@ -218,7 +218,7 @@ export default function PracticeCompletionMoment({
       data-rank={plan.rank}
       dir={dir}
       className={cn(
-        'relative mx-auto w-full max-w-sm overflow-hidden sm:max-w-md rounded-neo border-[3px] border-edu-line bg-edu-surface',
+        'relative mx-auto w-full max-w-sm overflow-hidden sm:max-w-md rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface',
         RANK_SHADOW[plan.rank],
         className
       )}
@@ -235,7 +235,7 @@ export default function PracticeCompletionMoment({
         data-testid="practice-completion-exit"
         onClick={onBack}
         aria-label={t('student.practiceFun.allGames')}
-        className="absolute end-2 top-3 flex h-11 w-11 items-center justify-center rounded-neo border-[2px] border-edu-line bg-edu-surface text-edu-ink transition-colors hover:bg-edu-surface focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+        className="absolute end-2 top-3 flex h-11 w-11 items-center justify-center rounded-neo border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink transition-colors hover:bg-neo-navy-light edu-sky:hover:bg-edu-surface focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
       >
         <X className="h-4 w-4" aria-hidden="true" />
       </button>
@@ -268,7 +268,7 @@ export default function PracticeCompletionMoment({
                   // A game-style rating: the middle star sits higher and larger.
                   'relative flex items-center justify-center rounded-neo',
                   slot === 2 ? 'mb-2 h-16 w-16' : 'h-[52px] w-[52px]',
-                  !filled && 'border-[3px] border-dashed border-edu-line bg-neo-black/20'
+                  !filled && 'border-[3px] border-dashed border-neo-cream/35 edu-sky:border-edu-line bg-neo-black/20'
                 )}
               >
                 {filled && !skipAnimations && (
@@ -280,7 +280,7 @@ export default function PracticeCompletionMoment({
                   />
                 )}
                 <Star
-                  className={cn(slot === 2 ? 'h-9 w-9' : 'h-7 w-7', filled ? 'fill-neo-navy text-neo-navy' : 'text-edu-ink/35')}
+                  className={cn(slot === 2 ? 'h-9 w-9' : 'h-7 w-7', filled ? 'fill-neo-navy text-neo-navy edu-sky:text-neo-navy' : 'text-neo-white/35 edu-sky:text-edu-ink/35')}
                   aria-hidden="true"
                 />
               </AdaptiveMotion.div>
@@ -288,7 +288,7 @@ export default function PracticeCompletionMoment({
           })}
         </div>
 
-        <h2 className="font-neo-display text-2xl font-black uppercase leading-none text-edu-ink text-balance">
+        <h2 className="font-neo-display text-2xl font-black uppercase leading-none text-neo-white edu-sky:text-edu-ink text-balance">
           {headline}
         </h2>
         {badge}
@@ -333,7 +333,7 @@ export default function PracticeCompletionMoment({
         </div>
 
         {/* The score counts up as the card lands; the final line is what assistive tech reads. */}
-        <p className="font-neo-display text-lg font-black text-edu-ink tabular-nums">
+        <p className="font-neo-display text-lg font-black text-neo-white edu-sky:text-edu-ink tabular-nums">
           <span className="sr-only">{t('student.practiceFun.scoreLine', { correct, total, percent: plan.percent })}</span>
           <span aria-hidden="true" data-testid="practice-completion-score">
             {t('student.practiceFun.scoreLine', { correct: shownCorrect, total, percent: shownPercent })}
@@ -379,12 +379,12 @@ export default function PracticeCompletionMoment({
               <div
                 key={stat.key}
                 data-testid={`practice-completion-stat-${stat.key}`}
-                className="basis-[calc(50%-0.25rem)] rounded-neo border-[2px] border-edu-line bg-neo-black/25 px-2 py-1.5"
+                className="basis-[calc(50%-0.25rem)] rounded-neo border-[2px] border-neo-cream/40 edu-sky:border-edu-line bg-neo-black/25 px-2 py-1.5"
               >
-                <p className="font-neo-display text-lg font-black tabular-nums leading-none text-edu-cyan-ink">
+                <p className="font-neo-display text-lg font-black tabular-nums leading-none text-neo-cyan edu-sky:text-edu-cyan-ink">
                   {stat.value}
                 </p>
-                <p className="mt-0.5 font-neo-body text-xs font-bold leading-tight text-edu-ink">
+                <p className="mt-0.5 font-neo-body text-xs font-bold leading-tight text-neo-cream edu-sky:text-edu-ink">
                   {stat.label}
                 </p>
               </div>
@@ -425,7 +425,7 @@ export default function PracticeCompletionMoment({
               type="button"
               data-testid="practice-completion-again"
               onClick={onAgain}
-              className="flex min-h-11 w-3/5 items-center justify-center gap-1.5 rounded-neo border-[2px] border-edu-line bg-edu-page px-3 font-neo-body text-sm font-bold uppercase text-edu-ink transition-colors hover:bg-edu-surface focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+              className="flex min-h-11 w-3/5 items-center justify-center gap-1.5 rounded-neo border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-page px-3 font-neo-body text-sm font-bold uppercase text-neo-cream edu-sky:text-edu-ink transition-colors hover:bg-neo-navy-light edu-sky:hover:bg-edu-surface focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
             >
               <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
               {t('student.practiceFun.again')}

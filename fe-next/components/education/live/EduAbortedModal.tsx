@@ -25,7 +25,7 @@ export default function EduAbortedModal({ wordCount, onReturnToLobby }: EduAbort
       <DialogContent
         noDescription
         hideCloseButton
-        className="max-w-sm border-4! border-neo-black! rounded-neo-lg! shadow-hard-lg! bg-edu-surface! p-0!"
+        className="max-w-sm border-4! border-neo-black! rounded-neo-lg! shadow-hard-lg! bg-neo-navy-light! edu-sky:bg-edu-surface! p-0!"
       >
         <DialogTitle className="sr-only">{t('mp.abort.title')}</DialogTitle>
         <div className="flex flex-col items-center gap-5 px-6 py-7 text-center">
@@ -33,10 +33,10 @@ export default function EduAbortedModal({ wordCount, onReturnToLobby }: EduAbort
             <Unplug className="h-7 w-7 text-neo-black" />
           </span>
           <div className="flex flex-col gap-2">
-            <p aria-hidden="true" className="font-neo-display text-2xl font-bold uppercase tracking-tight text-edu-ink">
+            <p aria-hidden="true" className="font-neo-display text-2xl font-bold uppercase tracking-tight text-neo-white edu-sky:text-edu-ink">
               {t('mp.abort.title')}
             </p>
-            <p className="font-neo-body text-sm text-edu-ink">
+            <p className="font-neo-body text-sm text-neo-white edu-sky:text-edu-ink">
               {t('mp.abort.body')}{' '}
               <span className="inline-block rounded-full border-2 border-neo-black bg-neo-lime px-2 font-neo-display font-bold tabular-nums text-neo-black">
                 {wordCount}

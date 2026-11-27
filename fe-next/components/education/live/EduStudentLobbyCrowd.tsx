@@ -54,9 +54,9 @@ export function EduStudentLobbyCrowd({ others, statusSlot, t }: { others: Waitin
       </p>
       <EduStudentLobbyFold
         testId="edu-student-crowd"
-        label={<>{t('academy.waiting.classmates')} <span dir="ltr" className="tabular-nums text-edu-ink/70">{others.length}</span></>}
+        label={<>{t('academy.waiting.classmates')} <span dir="ltr" className="tabular-nums text-neo-cream/70 edu-sky:text-edu-ink/70">{others.length}</span></>}
       >
-      {faces.length === 0 && <p className="font-neo-body text-sm font-bold text-edu-ink/80">{t('academy.waiting.firstIn')}</p>}
+      {faces.length === 0 && <p className="font-neo-body text-sm font-bold text-neo-cream/80 edu-sky:text-edu-ink/80">{t('academy.waiting.firstIn')}</p>}
       <ul aria-label={t('academy.waiting.classmates')} className="grid grid-cols-4 content-start gap-x-2 gap-y-3">
         {faces.map((mate) => {
           const isNew = fresh.has(mate.username);
@@ -67,21 +67,21 @@ export function EduStudentLobbyCrowd({ others, statusSlot, t }: { others: Waitin
               data-new={isNew ? 'true' : undefined}
               className="flex min-w-0 flex-col items-center gap-1 motion-safe:animate-[edu-live-pop_360ms_cubic-bezier(0.34,1.56,0.64,1)_both]"
             >
-              <span className={cn(FACE, 'relative bg-edu-surface [&_svg]:h-full [&_svg]:w-full', isNew ? 'border-neo-lime ring-4 ring-neo-lime/40' : 'border-edu-line')}>
-                <span data-testid="edu-student-mate-initial" aria-hidden="true" className="absolute inset-0 grid place-items-center font-neo-display text-lg font-black uppercase text-edu-ink">
+              <span className={cn(FACE, 'relative bg-neo-navy edu-sky:bg-edu-surface [&_svg]:h-full [&_svg]:w-full', isNew ? 'border-neo-lime edu-sky:border-neo-lime ring-4 ring-neo-lime/40' : 'border-neo-cream edu-sky:border-edu-line')}>
+                <span data-testid="edu-student-mate-initial" aria-hidden="true" className="absolute inset-0 grid place-items-center font-neo-display text-lg font-black uppercase text-neo-cream edu-sky:text-edu-ink">
                   {Array.from(mate.username.trim())[0] ?? '?'}
                 </span>
                 <span className="relative size-full">
                   <Avatar userId={mate.username} customAvatar={mate.avatar?.customAvatar ?? undefined} size="lg" disableEffects className="!h-full !w-full" />
                 </span>
               </span>
-              <bdi className="w-full text-center font-neo-body text-[11px] font-bold leading-tight text-edu-ink [overflow-wrap:anywhere]">{mate.username}</bdi>
+              <bdi className="w-full text-center font-neo-body text-[11px] font-bold leading-tight text-neo-cream edu-sky:text-edu-ink [overflow-wrap:anywhere]">{mate.username}</bdi>
             </li>
           );
         })}
         {Array.from({ length: seats }, (_, i) => (
           <li key={`seat-${i}`} data-testid="edu-student-seat" aria-hidden="true" className="flex flex-col items-center">
-            <span className={cn(FACE, 'border-dashed border-edu-line shadow-none')} />
+            <span className={cn(FACE, 'border-dashed border-neo-cream/25 edu-sky:border-edu-line shadow-none')} />
           </li>
         ))}
         {hidden > 0 && (
