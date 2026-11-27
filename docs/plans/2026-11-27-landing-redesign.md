@@ -56,6 +56,9 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
 - 14:2x: builder B done and committed (6508218e2): comparisons, RU, classroom keyword, daily-word-wheel; parity 90 shots 0 failing. A and C still running.
 - Review pending for B: view cabanagrams, popple, wordfeud, contra-wordle shots.
 - 14:3x: builder C done and committed (b64b82502): tools, blog, words, content, legal; parity 148 pairs 0 failing; guard suite 143 files green. Requests: scratchpad builder-c/requests.md (table align, callout link restyle). Types unverified until tsc.
+- 15:xx: builder A done and committed; all three batches in. A parity: 4 pages under 95% words only because
+  repeated slogan marquees/decor glyphs were removed (words-with-friends-alt, download-android, word-craft-game, ja).
+  Copy facts changed (verified against lib/seo/dictionaryStats.generated.json): sv/he/ja counts, 5->6 languages.
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
