@@ -65,6 +65,9 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
 - 15:xx: review findings fixed and committed (766 related tests green). Full parity: 266 shots, 8 failing = the 4
   explained pages. Left: heading parity, word-shake CLS check, stop dev server, tsc+build+suite, review page.
   Back button -> logo is deliberate (parentRoute == home for top-level pages; education keyword pages keep links).
+- 15:30: all fixes committed; parity 266 shots (only the 4 explained pages), headings and CLS checked, dev :3011
+  stopped. NOW: tsc -> `npm run build` -> `test:frontend` + `test:backend` once -> review page artifact
+  (before/after from ~/.cache/lexiclash/lp1127/{before,after-final,after-fix*}) -> owner approval -> PR/merge.
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
