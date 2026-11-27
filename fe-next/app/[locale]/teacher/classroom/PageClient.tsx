@@ -38,7 +38,7 @@ export default function TeacherClassroomsPage() {
 function ClassesTitle() {
   const { t } = useLanguage();
   return (
-    <h1 data-wipe className="min-w-0 whitespace-nowrap font-neo-display text-2xl font-bold leading-tight tracking-tight text-edu-ink sm:text-3xl [@media(orientation:landscape)_and_(max-height:500px)]:text-xl">
+    <h1 data-wipe className="min-w-0 whitespace-nowrap font-neo-display text-3xl font-black leading-tight tracking-tight text-edu-ink sm:text-5xl [@media(orientation:landscape)_and_(max-height:500px)]:text-xl">
       {t('academy.teacher.classesTitle', 'Your classes')}
     </h1>
   );

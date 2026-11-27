@@ -28,7 +28,7 @@ export function ClassesPreview() {
     <PreviewTeacherAuth>
       <EducationShell scrollRegionLabel={t('teacher.nav.classes')} contentClassName="relative p-4 sm:p-6 lg:px-8 lg:py-5">
         <main className="relative mx-auto max-w-6xl space-y-4">
-          <h1 className="font-neo-display text-2xl font-bold text-edu-ink sm:text-3xl">{t('academy.teacher.classesTitle')}</h1>
+          <h1 className="font-neo-display text-3xl font-black text-edu-ink sm:text-5xl">{t('academy.teacher.classesTitle')}</h1>
           <ul className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {classes.map((c, i) => (
               <li key={c.id} className="flex">

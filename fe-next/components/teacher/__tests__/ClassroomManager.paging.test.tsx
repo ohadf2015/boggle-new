@@ -72,12 +72,12 @@ describe('ClassroomManager — swipe carousel instead of page scroll', () => {
     Element.prototype.scrollIntoView = scrollIntoView;
   });
 
-  it('Given three classes, Then every row sits in one list, each with its own colour edge, and no carousel', () => {
+  it('Given three classes, Then every card sits in one list, each with its own colour band, and no carousel', () => {
     render(<ClassroomManager />);
     const grid = screen.getByTestId('classroom-grid');
     expect(grid.querySelectorAll('[data-testid="classroom-card"]')).toHaveLength(3);
     expect(screen.queryByTestId('class-carousel-track')).toBeNull();
-    const accents = screen.getAllByTestId('classroom-card').map((c) => c.className.match(/border-s-neo-[a-z]+/)?.[0]);
+    const accents = screen.getAllByTestId('classroom-card-band').map((band) => band.className.match(/bg-neo-[a-z]+/)?.[0]);
     expect(new Set(accents).size).toBe(3);
   });
 
@@ -127,10 +127,10 @@ describe('ClassroomManager — swipe carousel instead of page scroll', () => {
     expect(screen.queryByTestId('classroom-new-card')).toBeNull();
   });
 
-  it('Given several classes, Then each card is a navy body under its color band', () => {
+  it('Given several classes, Then each card is a white outlined body under its color band', () => {
     mq.wide = true;
     render(<ClassroomManager />);
-    for (const card of screen.getAllByTestId('classroom-card')) expect(card.className).toContain('bg-edu-surface');
+    for (const card of screen.getAllByTestId('classroom-card')) expect(card.className).toContain('edu-card');
   });
 
   it('Given three classes on a desktop row, Then they all fit and there is no arrow nav', () => {
