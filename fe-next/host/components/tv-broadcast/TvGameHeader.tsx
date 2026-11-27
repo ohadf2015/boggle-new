@@ -20,6 +20,8 @@ interface TvGameHeaderProps {
   wordHuntAliveCount?: number;
   /** Classroom host on a phone: a smaller timer so the leaderboard stays on screen. */
   compact?: boolean;
+  /** Classroom wall on the sky page: the timer sits on a light plate. */
+  classroom?: boolean;
   toastSlot?: ReactNode;
   /** Replaces the LIVE and mode chips, e.g. a classroom's round and lesson. */
   leading?: ReactNode;
@@ -33,6 +35,8 @@ const HEARTBEAT_DURATION: Record<UrgencyLevel, number> = {
   critical: 0.5,
   extreme: 0.15,
 };
+
+const TIMER_PLATE = 'rounded-neo-xl border-[3px] border-neo-black bg-edu-paper p-1 shadow-edu-lip';
 
 const MODE_COLORS: Record<string, string> = {
   classic: 'bg-neo-cyan text-neo-black',
@@ -55,6 +59,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
   wordHuntTargetLength = 0,
   wordHuntAliveCount = 0,
   compact = false,
+  classroom = false,
   toastSlot,
   leading,
   trailing,
@@ -62,6 +67,9 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
 }) => {
   const totalTimeSeconds = timerValue * 60;
   const showHeartbeat = urgencyLevel !== 'normal';
+  const timer = remainingTime !== null && (
+    <CircularTimer remainingTime={remainingTime} totalTime={totalTimeSeconds} size="lg" ink={classroom ? 'dark' : undefined} />
+  );
 
   return (
     <div className={compact ? 'w-full px-4 py-1 md:py-3 md:medium-short:py-1' : 'w-full px-4 py-3'}>
@@ -123,18 +131,12 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
                 }}
                 className={urgencyLevel === 'extreme' ? 'rounded-full ring-4 ring-neo-red/60' : ''}
               >
-                <CircularTimer
-                  remainingTime={remainingTime}
-                  totalTime={totalTimeSeconds}
-                  size="lg"
-                />
+                {classroom ? <div data-testid="tv-timer-plate" className={TIMER_PLATE}>{timer}</div> : timer}
               </m.div>
+            ) : classroom ? (
+              <div data-testid="tv-timer-plate" className={TIMER_PLATE}>{timer}</div>
             ) : (
-              <CircularTimer
-                remainingTime={remainingTime}
-                totalTime={totalTimeSeconds}
-                size="lg"
-              />
+              timer
             )
           )}
         </div>

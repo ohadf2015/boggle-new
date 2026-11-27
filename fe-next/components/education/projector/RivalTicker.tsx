@@ -114,7 +114,9 @@ export default function RivalTicker({ socket, className }: RivalTickerProps) {
             data-kind="lead"
             className={cn(ITEM, 'max-w-full shrink-0 px-[1cqi]', lead.fading ? 'opacity-0' : 'motion-safe:animate-pop-in')}
           >
-            <Zap className="size-[1.1em] shrink-0 text-edu-lime-ink" aria-hidden="true" />
+            <span data-testid="rival-ticker-bolt" className="grid size-[1.5em] shrink-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-pink text-neo-black" aria-hidden="true">
+              <Zap className="size-[0.9em]" />
+            </span>
             <TickerAvatar item={lead} />
             <span>{t('education.rivals.ticker.flip', { name: lead.name })}</span>
           </li>

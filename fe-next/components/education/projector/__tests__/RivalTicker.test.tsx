@@ -71,6 +71,13 @@ describe('RivalTicker', () => {
     expect(item.textContent).not.toMatch(/\d|Dana/);
   });
 
+  it('Given a flip, Then its bolt sits in a pink outlined square, an accent fill with black ink', () => {
+    const s = fakeSocket();
+    render(<RivalTicker socket={s.socket} />);
+    s.fire('rivalFlip', flip('Maya'));
+    expect(screen.getByTestId('rival-ticker-bolt')).toHaveClass('bg-neo-pink', 'border-neo-black', 'text-neo-black');
+  });
+
   it('Given older flips, When a few seconds pass, Then the older chips fade and leave while the newest flip stays', () => {
     const s = fakeSocket();
     render(<RivalTicker socket={s.socket} />);

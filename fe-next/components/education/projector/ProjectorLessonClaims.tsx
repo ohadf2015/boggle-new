@@ -23,7 +23,7 @@ export const ProjectorLessonClaims = memo(function ProjectorLessonClaims({ t, cl
   const race = useLessonClaims();
   const reduced = useEduReducedMotion();
   const listRef = useRef<HTMLUListElement>(null);
-  const capacity = useTileCapacity(listRef);
+  const capacity = useTileCapacity(listRef, !!race);
   if (!race) return null;
   const { shown, hidden } = raceTilesToShow(race.slots, capacity);
 
@@ -61,7 +61,7 @@ export const ProjectorLessonClaims = memo(function ProjectorLessonClaims({ t, cl
 const TILE = 'flex min-h-[2em] min-w-0 flex-row items-center gap-[0.35em] rounded-neo border-[3px] px-[0.45em] font-neo-display font-black leading-none shadow-hard-sm text-[clamp(16px,min(3.6cqw,7cqh),30px)]';
 
 /** How many whole tiles fit the list: rows that fit times the columns the grid resolved to. Unmeasured (SSR, jsdom) = all. */
-function useTileCapacity(ref: RefObject<HTMLUListElement | null>): number {
+function useTileCapacity(ref: RefObject<HTMLUListElement | null>, mounted: boolean): number {
   const [capacity, setCapacity] = useState(Infinity);
   useEffect(() => {
     const list = ref.current;
@@ -78,7 +78,7 @@ function useTileCapacity(ref: RefObject<HTMLUListElement | null>): number {
     const ro = new ResizeObserver(measure);
     ro.observe(list);
     return () => ro.disconnect();
-  }, [ref]);
+  }, [ref, mounted]);
   return capacity;
 }
 

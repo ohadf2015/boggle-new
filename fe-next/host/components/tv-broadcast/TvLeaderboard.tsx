@@ -139,7 +139,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
     const hiddenStudents = classroomStudents - classroomRows;
     return (
       <div className="h-full overflow-hidden p-4 flex flex-col" data-testid="tv-classroom-standings">
-        <h3 className="font-neo-display text-xl 2xl:text-3xl font-black uppercase tracking-widest text-neo-yellow mb-2 text-center border-b-3 border-neo-cream/15 pb-2 shrink-0">
+        <h3 className="font-neo-display text-xl 2xl:text-3xl font-black uppercase tracking-widest text-edu-ink mb-2 text-center border-b-3 border-edu-line pb-2 shrink-0">
           {t('tvBroadcast.leaderboard')}
         </h3>
         <div ref={classroomRowsRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
@@ -154,7 +154,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
         {hiddenStudents > 0 && (
           <p
             data-testid="tv-classroom-more"
-            className="shrink-0 pt-1 text-center font-neo-display text-lg font-black uppercase text-neo-cream/70"
+            className="shrink-0 pt-1 text-center font-neo-display text-lg font-black uppercase text-edu-ink/70"
           >
             {t('tvBroadcast.moreStudents', { count: hiddenStudents })}
           </p>

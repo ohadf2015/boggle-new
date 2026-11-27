@@ -33,8 +33,8 @@ describe('Classroom host on a short projector (1366x768)', () => {
   it('Given the dense classroom join bar, When the screen is short, Then the bar tightens and the address stays on one line', () => {
     render(<TvJoinBar gameCode="4MYA47" playerCount={4} language="en" baseUrl="https://www.lexiclash.live" t={t} dense />);
     const row = screen.getByTestId('tv-join-row');
-    expect((row.parentElement as HTMLElement).className).toContain('md:medium-short:py-2');
-    expect(screen.getByText(/join\/4MYA47/).className).toContain('md:medium-short:text-xl');
+    expect((row.parentElement as HTMLElement).className).toContain('md:medium-short:pt-2');
+    expect(screen.getByText(/join\/4MYA47/).className).toContain('lg:whitespace-nowrap');
   });
 
   it('Given the battle bar, When the screen is short, Then the lesson name drops a size', () => {

@@ -42,11 +42,11 @@ export function TvRoundLabel({ classroom, t }: LabelProps) {
   if (!classroom) return null;
   return (
     <span className="flex min-w-0 items-center gap-x-4 max-md:gap-x-2">
-      <span className="px-3 py-1 rounded-neo bg-neo-lime text-neo-black font-neo-display font-bold text-sm md:text-lg uppercase tracking-wide shrink-0">
+      <span className="px-3 py-1 rounded-neo border-[3px] border-neo-black bg-neo-yellow text-neo-black shadow-edu-lip-sm font-neo-display font-bold text-sm md:text-lg uppercase tracking-wide shrink-0">
         {t('tvBroadcast.classroom.round', { number: classroom.round })}
       </span>
       {classroom.lessonName && (
-        <span className="font-neo-display font-bold text-neo-cream text-base sm:text-lg md:text-3xl md:medium-short:text-2xl truncate min-w-0 md:whitespace-normal md:line-clamp-2 md:leading-tight">
+        <span className="font-neo-display font-bold text-edu-ink text-base sm:text-lg md:text-3xl md:medium-short:text-2xl truncate min-w-0 md:whitespace-normal md:line-clamp-2 md:leading-tight">
           {classroom.lessonName}
         </span>
       )}
@@ -57,7 +57,7 @@ export function TvRoundLabel({ classroom, t }: LabelProps) {
 export function TvFormatChip({ classroom, t }: LabelProps) {
   if (!classroom) return null;
   return (
-    <span className="px-3 max-md:px-2 py-1 rounded-neo border-neo-thick border-neo-cream text-neo-cream font-neo-body font-bold text-xs max-md:text-[10px] md:text-base uppercase tracking-widest max-md:tracking-wide shrink-0">
+    <span className="px-3 max-md:px-2 py-1 rounded-neo border-neo-thick border-edu-line bg-edu-surface text-edu-ink font-neo-body font-bold text-xs max-md:text-[10px] md:text-base uppercase tracking-widest max-md:tracking-wide shrink-0">
       {formatLabelOf(classroom, t)}
     </span>
   );
