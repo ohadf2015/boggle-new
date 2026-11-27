@@ -50,13 +50,17 @@ export const PRO_FEATURES_SHOWN = 4;
 const BTN =
   'inline-flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-neo-black px-4 font-neo-display text-base font-black shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:cursor-wait disabled:opacity-70 motion-reduce:transition-none';
 
+// A plan's name as a solid colour tag; add the fill.
+const PLAN_TAG =
+  'inline-flex items-center gap-2 self-start rounded-neo border-[3px] border-neo-black px-2.5 py-0.5 font-neo-display text-lg font-black uppercase text-neo-black shadow-edu-lip-sm';
+
 const BUY_LINK =
   'inline-flex min-h-11 items-center justify-center gap-2 self-center rounded-neo px-2 font-neo-body text-sm font-black text-neo-black underline decoration-2 underline-offset-4 hover:decoration-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:cursor-wait disabled:opacity-70';
 
 function Price({ amount, per, testId, dark }: { amount: string; per: string; testId?: string; dark?: boolean }) {
   return (
     <p className={cn('flex items-baseline gap-1.5 font-neo-display font-black leading-none', dark ? 'text-neo-black' : 'text-edu-ink')}>
-      <bdi dir="ltr" data-testid={testId} className="text-4xl">{amount}</bdi>
+      <bdi dir="ltr" data-testid={testId} className="text-5xl">{amount}</bdi>
       <span className={cn('text-sm font-bold', dark ? 'text-neo-black/75' : 'text-edu-ink/70')}>{per}</span>
     </p>
   );
@@ -74,13 +78,13 @@ function BestFor({ text, dark }: { text: string; dark?: boolean }) {
   );
 }
 
-function FeatureRow({ label, dark }: { label: string; dark?: boolean }) {
+function FeatureRow({ label, dark, box }: { label: string; dark?: boolean; box: string }) {
   return (
     <li className="flex items-start gap-2">
       <span
         className={cn(
-          'mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded border-2 border-neo-black',
-          dark ? 'bg-neo-black text-neo-yellow' : 'bg-neo-lime text-neo-black',
+          'mt-0.5 grid size-5 shrink-0 place-items-center rounded border-2 border-neo-black text-neo-black',
+          box,
         )}
       >
         <Check className="h-3 w-3" strokeWidth={3} aria-hidden />
@@ -94,14 +98,14 @@ function FeatureRow({ label, dark }: { label: string; dark?: boolean }) {
  * The first `visible` items show; the rest fold under "N more", so the three cards and their
  * buttons fit one screen and the list still has every feature one tap away.
  */
-function FeatureList({ items, dark, visible }: { items: Array<{ label: string }>; dark?: boolean; visible?: number }) {
+function FeatureList({ items, dark, visible, box }: { items: Array<{ label: string }>; dark?: boolean; visible?: number; box: string }) {
   const { t } = useLanguage();
   const shown = visible === undefined ? items : items.slice(0, visible);
   const rest = visible === undefined ? [] : items.slice(visible);
   return (
     <>
       <ul className="mt-3 space-y-1.5">
-        {shown.map((f) => <FeatureRow key={f.label} label={f.label} dark={dark} />)}
+        {shown.map((f) => <FeatureRow key={f.label} label={f.label} dark={dark} box={box} />)}
       </ul>
       {rest.length > 0 ? (
         <details data-testid="plan-more-features" className="group mt-1.5">
@@ -115,7 +119,7 @@ function FeatureList({ items, dark, visible }: { items: Array<{ label: string }>
             <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden />
           </summary>
           <ul className="mt-1 space-y-1.5">
-            {rest.map((f) => <FeatureRow key={f.label} label={f.label} dark={dark} />)}
+            {rest.map((f) => <FeatureRow key={f.label} label={f.label} dark={dark} box={box} />)}
           </ul>
         </details>
       ) : null}
@@ -171,10 +175,10 @@ export function UpgradePlanCards({
       <article
         data-testid="plan-card-free"
         data-tilt
-        className="order-2 flex flex-col rounded-neo border-[3px] border-edu-line bg-edu-surface p-4 shadow-hard-lg lg:order-1 sm:p-5"
+        className="edu-card order-2 flex flex-col p-4 lg:order-1 sm:p-5"
       >
-        <h2 className="font-neo-display text-lg font-black text-edu-ink">{t('teacher.subscription.freePlanName')}</h2>
-        <p className="mb-3 text-xs font-bold text-edu-ink/65">{t('teacher.subscription.freeForever')}</p>
+        <h2 className={cn(PLAN_TAG, 'bg-neo-pink')}>{t('teacher.subscription.freePlanName')}</h2>
+        <p className="mb-3 mt-2 text-sm font-bold text-edu-ink/75">{t('teacher.subscription.freeForever')}</p>
         <Price amount="$0" per={perMonth} />
         <p data-testid="plan-free-note" className="mt-1.5 text-xs font-bold text-edu-ink/65">
           {t('eg2Polish.plans.freeNote')}
@@ -202,20 +206,20 @@ export function UpgradePlanCards({
         </div>
         <BestFor text={t('eg2Pro.plans.freeBestFor')} />
         {/* Free is sold by what it includes; what Pro adds lives in the comparison table. */}
-        <FeatureList items={freeFeatures.filter((f) => f.included)} />
+        <FeatureList items={freeFeatures.filter((f) => f.included)} box="bg-neo-pink" />
       </article>
 
       <article
         data-testid="plan-card-pro"
         data-tilt
-        className="relative order-1 flex flex-col rounded-neo border-3 border-neo-black bg-neo-yellow p-4 shadow-hard-lg lg:order-2 sm:p-5"
+        className="edu-card relative order-1 flex flex-col p-4 lg:order-2 sm:p-5"
       >
         <span className="absolute -top-3 start-4 inline-flex items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-pink px-2.5 py-0.5 font-neo-display text-xs font-black text-neo-black">
           <Sparkles className="h-3 w-3" strokeWidth={3} aria-hidden />
           {freeWindow ? freeWindow.badge : keep ? keep.badge : ended ? ended.badge : showTrial ? t('eg2Pro.plans.trialBadge', { days: TEACHER_PRO_TRIAL_DAYS }) : t('eg2Pro.plans.recommended')}
         </span>
-        <h2 className="mt-1 font-neo-display text-lg font-black text-neo-black">{t('teacher.subscription.proPlanName')}</h2>
-        <p className="mb-3 text-xs font-bold text-neo-black/75">{t('teacher.subscription.unlimitedAccess')}</p>
+        <h2 className={cn(PLAN_TAG, 'mt-1 bg-neo-yellow')}>{t('teacher.subscription.proPlanName')}</h2>
+        <p className="mb-3 mt-2 text-sm font-bold text-neo-black/75">{t('teacher.subscription.unlimitedAccess')}</p>
         <Price amount={price} per={perMonth} testId="plan-pro-price" dark />
         <p className="mt-1.5 text-xs font-bold text-neo-black/75">
           {t('teacher.subscription.pricePerDay')} · {t('teacher.subscription.priceTaxNote')}
@@ -240,7 +244,7 @@ export function UpgradePlanCards({
           ) : (
             <>
               {showTrial && (
-                <button type="button" onClick={onTrial} disabled={busy} aria-busy={pending === 'trial' || undefined} data-testid="pricing-trial-cta" className={cn(BTN, 'gap-2 bg-neo-black text-neo-white')}>
+                <button type="button" onClick={onTrial} disabled={busy} aria-busy={pending === 'trial' || undefined} data-testid="pricing-trial-cta" className={cn(BTN, 'min-h-14 gap-2 bg-neo-lime text-lg text-neo-black')}>
                   {pending === 'trial' ? <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden /> : null}
                   {pending === 'trial' ? t('common.loading') : keep ? keep.cta : t('eg2Pro.plans.trialCta', { days: TEACHER_PRO_TRIAL_DAYS })}
                 </button>
@@ -251,7 +255,7 @@ export function UpgradePlanCards({
                 disabled={busy}
                 data-testid="pricing-paid-cta"
                 aria-busy={pending === 'paid' || undefined}
-                className={showTrial ? BUY_LINK : cn(BTN, 'gap-2 bg-neo-black text-neo-white')}
+                className={showTrial ? BUY_LINK : cn(BTN, 'min-h-14 gap-2 bg-neo-lime text-lg text-neo-black')}
               >
                 {pending === 'paid' ? <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> : null}
                 {pending === 'paid' ? t('common.loading') : ended ? ended.cta : showTrial ? t('eg2Pro.plans.buyNowInstead', { price }) : t('eg2Pro.plans.buyCta', { price })}
@@ -264,37 +268,38 @@ export function UpgradePlanCards({
           )}
         </div>
         <BestFor text={t('eg2Pro.plans.proBestFor')} dark />
-        <FeatureList items={proFeatures.map((label) => ({ label }))} dark visible={PRO_FEATURES_SHOWN} />
+        <FeatureList items={proFeatures.map((label) => ({ label }))} dark visible={PRO_FEATURES_SHOWN} box="bg-neo-yellow" />
       </article>
 
       <article
         data-testid="plan-card-school"
         data-tilt
-        className="order-3 flex flex-col rounded-neo border-3 border-neo-black bg-neo-purple p-4 text-neo-white shadow-hard sm:p-5"
+        className="edu-card order-3 flex flex-col p-4 sm:p-5"
       >
-        <h2 className="flex items-center gap-2 font-neo-display text-lg font-black">
+        <h2 className={cn(PLAN_TAG, 'bg-neo-cyan')}>
           <School className="h-5 w-5" aria-hidden /> {t('eg2Pro.plans.schoolName')}
         </h2>
-        <p className="mb-3 text-xs font-bold text-edu-ink/80">{t('eg2Pro.plans.schoolTagline', { min: SCHOOL_PRICING.minTeachers })}</p>
+        <p className="mb-3 mt-2 text-sm font-bold text-edu-ink/80">{t('eg2Pro.plans.schoolTagline', { min: SCHOOL_PRICING.minTeachers })}</p>
         <SchoolPriceTag />
         <p data-testid="school-monthly" className="mt-1.5 text-xs font-bold text-edu-ink/85">
           {t('eduPlans.cards.schoolMonthly', schoolMonthlyParams())}
         </p>
         <div className="mt-4 min-h-12">
-          <button type="button" onClick={onSchool} data-testid="plan-school-cta" className={cn(BTN, 'bg-neo-yellow text-neo-black')}>
+          <button type="button" onClick={onSchool} data-testid="plan-school-cta" className={cn(BTN, 'border-edu-line bg-edu-surface text-edu-ink')}>
             {t('eg2Pro.plans.schoolCta')}
           </button>
         </div>
         <BestFor text={t('eg2Pro.plans.schoolBestFor')} />
         <FeatureList
           items={['schoolF1', 'schoolF2', 'schoolF3'].map((k) => ({ label: t(`eg2Pro.plans.${k}`) }))}
+          box="bg-neo-cyan"
         />
         <div className="pt-4">
           <p className="text-[11px] font-black uppercase tracking-widest text-edu-ink/60">{t('eg2Pro.plans.howItWorks')}</p>
           <ol className="mt-2 space-y-2">
             {(['step1', 'step2', 'step3'] as const).map((step, i) => (
               <li key={step} className="flex items-center gap-2 text-sm font-bold">
-                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 border-neo-black bg-neo-yellow text-xs font-black text-neo-black">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 border-neo-black bg-neo-cyan text-xs font-black text-neo-black">
                   {i + 1}
                 </span>
                 {t(`eg2Pro.school.${step}Title`)}

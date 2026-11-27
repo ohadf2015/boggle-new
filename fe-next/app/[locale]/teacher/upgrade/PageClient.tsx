@@ -184,10 +184,10 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
       aria-controls={`upgrade-panel-${value}`}
       onClick={() => setTab(value)}
       className={cn(
-        'min-h-11 flex-1 rounded-neo border-2 px-4 font-neo-display text-sm font-black transition-colors sm:flex-none sm:px-6',
+        'min-h-12 flex-1 rounded-neo-lg border-[3px] px-4 font-neo-display text-base font-black shadow-edu-lip-sm transition-colors sm:flex-none sm:px-6',
         tab === value
-          ? 'border-neo-black bg-neo-lime text-neo-black shadow-hard-sm'
-          : 'border-edu-line bg-edu-surface text-edu-ink hover:border-neo-lime',
+          ? 'border-neo-black bg-neo-purple text-white'
+          : 'border-edu-line bg-edu-surface text-edu-ink hover:bg-edu-tile',
       )}
     >
       {label}
@@ -210,7 +210,6 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
       chromeFree={publicVisitor}
       header={publicVisitor ? <LandingHeader /> : undefined}
       contentClassName={cn('w-full px-4 lg:px-6', isRTL && 'rtl')}
-      className="bg-edu-surface"
     >
       <div ref={revealRef} className="mx-auto max-w-6xl pb-8 pt-4 lg:pt-6">
         {resolvingPlan ? (
@@ -244,10 +243,10 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                   </p>
                   <TeacherProofLine className="flex items-center gap-1.5 text-xs font-bold text-edu-ink/85" />
                 </div>
-                <h1 className="font-neo-poster text-2xl font-extrabold tracking-[-0.01em] text-edu-ink [overflow-wrap:anywhere] md:text-3xl" style={{ textWrap: 'balance' }}>
+                <h1 className="font-neo-display text-3xl font-black leading-tight text-edu-ink [overflow-wrap:anywhere] md:text-4xl" style={{ textWrap: 'balance' }}>
                   {t('teacher.subscription.upgradePricingTitle')}
                 </h1>
-                <p data-testid="upgrade-value-prop" className="mt-0.5 text-sm font-bold text-edu-lime-ink">
+                <p data-testid="upgrade-value-prop" className="mt-1 text-base font-bold text-edu-ink/85">
                   {t('teacher.subscription.valueHeadline')}
                 </p>
               </div>

@@ -229,3 +229,23 @@ describe('UpgradePlanCards: one Pro button', () => {
     expect(screen.getByTestId('plan-card-school').innerHTML).not.toMatch(/\bmt-auto\b/);
   });
 });
+
+describe('UpgradePlanCards on the sky page', () => {
+  it('Then all three plans are cream lipped cards, each named on its own colour tag', () => {
+    setup('free', { showTrial: true });
+    for (const [id, tag] of [['plan-card-free', 'bg-neo-pink'], ['plan-card-pro', 'bg-neo-yellow'], ['plan-card-school', 'bg-neo-cyan']] as const) {
+      const card = screen.getByTestId(id);
+      expect(card.className).toContain('edu-card');
+      expect(card.className).not.toMatch(/(^|\s)bg-neo-(yellow|purple)(\s|$)/);
+      expect(card.querySelector('h2')!.className).toContain(tag);
+    }
+  });
+
+  it('Then the trial is the one lime button and the school quote is an outlined cream button', () => {
+    setup('free', { showTrial: true });
+    expect(screen.getByTestId('pricing-trial-cta').className).toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+    const quote = screen.getByTestId('plan-school-cta').className;
+    expect(quote).toContain('bg-edu-surface');
+    expect(quote).not.toMatch(/(^|\s)bg-neo-(lime|yellow)(\s|$)/);
+  });
+});
