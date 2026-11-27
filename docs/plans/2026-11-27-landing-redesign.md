@@ -78,6 +78,9 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
   out of edu-sky's scope ("stay dark") and were not done here. Doing them now as batch D. `/pricing` = edu session's
   `teacher/upgrade`, in neither scope. Review page line "redesigned separately" must be corrected and republished.
   Before PR: re-check file overlap with current edu branch (incl. components/seo/EducationCalloutLink.tsx).
+- 16:35: builder D running (education article + lists + for-schools, new files in components/landing/education,
+  dev :3011, baselines before/report-edu*.json, list `edu-all.txt`, shots after-edu/). Review page v2 says so.
+  After D: review, commit, tsc/build/suite again, prod-build shots, add "Education articles" group to the review page.
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
