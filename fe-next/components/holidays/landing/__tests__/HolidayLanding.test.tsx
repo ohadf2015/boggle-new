@@ -47,6 +47,37 @@ describe('HolidayLanding', () => {
     expect(screen.getByText('Когда проходит событие?')).toBeTruthy();
   });
 
+  it('Given late November, When each of the 7 pages renders, Then the pill names the Dec 1 return and the event start, matching the gift copy', () => {
+    const cases = [
+      ['christmas', 'en', 'December 1, 2026', 'December 13, 2026'],
+      ['christmas', 'es', '1 de diciembre de 2026', '13 de diciembre de 2026'],
+      ['christmas', 'sv', '1 december 2026', '13 december 2026'],
+      ['christmas', 'ja', '2026年12月1日', '2026年12月13日'],
+      ['christmas', 'ru', '1 декабря 2026', '13 декабря 2026'],
+      ['hanukkah', 'he', '1 בדצמבר 2026', '4 בדצמבר 2026'],
+      ['hanukkah', 'en', 'December 1, 2026', 'December 4, 2026'],
+    ] as const;
+    for (const [holiday, locale, preview, start] of cases) {
+      const { unmount } = render(<HolidayLanding page={landingFor(holiday, locale)!} now={at('2026-11-27')} />);
+      const pill = screen.getByTestId('holiday-landing-status').textContent!;
+      expect(pill, `${holiday}/${locale}`).toContain(preview);
+      expect(pill, `${holiday}/${locale}`).toContain(start);
+      unmount();
+    }
+  });
+
+  it('Given the Dec 5 coming-soon preview, When the en Christmas page renders, Then it is in season with an event-opens pill', () => {
+    render(<HolidayLanding page={landingFor('christmas', 'en')!} now={at('2026-12-05')} />);
+    const pill = screen.getByTestId('holiday-landing-status');
+    expect(pill.textContent).toContain('December 13, 2026');
+    expect(pill).toHaveAttribute('data-phase', 'preview');
+  });
+
+  it('Given any holiday page, Then the standard landing header with the home link renders', () => {
+    render(<HolidayLanding page={landingFor('christmas', 'sv')!} now={at('2026-12-20')} />);
+    expect(screen.getByRole('link', { name: 'LexiClash' })).toHaveAttribute('href', '/sv');
+  });
+
   it('renders the hero art, the locale mascot and every feature art for each page', () => {
     for (const [holiday, locale, mascot] of [
       ['christmas', 'sv', 'm-lucia'],

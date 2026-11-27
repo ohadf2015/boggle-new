@@ -4,7 +4,10 @@ import { useEffect, useSyncExternalStore } from 'react';
 import { getHolidayState, keepHolidayClass, subscribeHoliday } from '@/lib/holidays/holidayDom';
 import { PermanentEggView } from './PermanentEgg';
 
-const holidayNow = () => getHolidayState().holiday;
+const holidayNow = () => {
+  const s = getHolidayState();
+  return s.phase === 'live' ? s.holiday : null;
+};
 const none = () => null;
 
 export default function NotFoundLatke({ text, label }: { text: string; label: string }) {

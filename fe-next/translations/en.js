@@ -102,6 +102,7 @@ const en = {
       "coinNote": "Every game counts for today's holiday track. Coins are capped per day.",
       "tileTitle": "Holiday Arcade",
       "tileSubtitle": "Family party games and word games, only this season",
+      "tileLocked": "Opens {date}",
       "shareText": "I scored {score} in {game} on LexiClash! Can you beat it?",
       "wordsFound_one": "{count} word",
       "wordsFound_other": "{count} words",
@@ -238,11 +239,15 @@ const en = {
     "event": {
       "hanukkah": {
         "title": "Festival of Lights",
-        "subtitle": "Light a candle every night you play"
+        "subtitle": "Light a candle every night you play",
+        "startsIn_other": "First candle in {count} days",
+        "startsTomorrow": "First candle tomorrow evening"
       },
       "christmas": {
         "title": "Snow Clash",
-        "subtitle": "A gift for every day you play"
+        "subtitle": "A gift for every day you play",
+        "startsIn_other": "The 12 Gifts start in {count} days",
+        "startsTomorrow": "The 12 Gifts start tomorrow"
       },
       "progress": "{lit} of {total}",
       "dayLit": "Day {day}: collected",
@@ -475,6 +480,7 @@ const en = {
       "giftN": "Gift {n}",
       "nightlyIntro": "{n} gold gelt tiles shine on tonight’s board. Trace words through them for coins, then spin the dreidel.",
       "adventIntro": "One holiday word is wrapped on today’s board. Find it to unwrap today’s gift.",
+      "adventSoon": "The Advent Board opens on {date}. From then until Christmas, one holiday word is wrapped on the board every day.",
       "guestLine": "Sign in to light tonight’s candle and keep your holiday streak.",
       "litByBoard": "Night {n} lit by the Nightly Board. {words} gelt words, +{coins} coins.",
       "giftUnwrapped": "Gift {n} unwrapped! +{coins} coins.",

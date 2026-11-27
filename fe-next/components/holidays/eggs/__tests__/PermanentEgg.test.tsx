@@ -13,7 +13,7 @@ import { HOLIDAY_EGG_EVENT, resetHolidayClientForTests } from '@/lib/holidays/ho
 describe('PermanentEgg', () => {
   beforeEach(() => {
     resetHolidayClientForTests();
-    document.documentElement.className = 'holiday-hanukkah';
+    document.documentElement.className = 'holiday-hanukkah holiday-live';
   });
 
   it('Given no holiday, then nothing renders', () => {

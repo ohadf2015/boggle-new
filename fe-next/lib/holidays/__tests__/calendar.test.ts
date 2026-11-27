@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { finaleDate, holidayWindows, localDateIn, trackIndex, windowFor } from '../calendar';
+import { daysUntilTrack, finaleDate, holidayPhase, holidayWindows, localDateIn, previewWindowFor, trackIndex, windowFor } from '../calendar';
 
 describe('holidayWindows', () => {
   it('given 2026, returns hanukkah Dec 4-12 with 8 nights and christmas Dec 13 - Jan 1 with 12 gifts', () => {
@@ -125,5 +125,50 @@ describe('finaleDate', () => {
     expect(finaleDate(windowFor('christmas', '2026-12-20')!)).toBe('2026-12-25');
     expect(finaleDate(windowFor('christmas', '2026-12-20', 'ru')!)).toBe('2026-12-25');
     expect(finaleDate(windowFor('christmas', '2026-12-20', 'es')!)).toBe('2027-01-06');
+  });
+});
+
+describe('holidayPhase', () => {
+  it('given christmas, Nov 30 is off, Dec 1-12 preview, Dec 13 to Jan 1 live, Jan 2 off', () => {
+    expect(holidayPhase('christmas', '2026-11-30')).toBe('off');
+    expect(holidayPhase('christmas', '2026-12-01')).toBe('preview');
+    expect(holidayPhase('christmas', '2026-12-12')).toBe('preview');
+    expect(holidayPhase('christmas', '2026-12-13')).toBe('live');
+    expect(holidayPhase('christmas', '2027-01-01')).toBe('live');
+    expect(holidayPhase('christmas', '2027-01-02')).toBe('off');
+    expect(holidayPhase('christmas', '2027-01-07', 'ru')).toBe('live');
+  });
+
+  it('given hanukkah, the preview opens Dec 1 and the event on night 1 every year', () => {
+    expect(holidayPhase('hanukkah', '2026-11-30')).toBe('off');
+    expect(holidayPhase('hanukkah', '2026-12-01')).toBe('preview');
+    expect(holidayPhase('hanukkah', '2026-12-03')).toBe('preview');
+    expect(holidayPhase('hanukkah', '2026-12-04')).toBe('live');
+    expect(holidayPhase('hanukkah', '2026-12-13')).toBe('off');
+    expect(holidayPhase('hanukkah', '2027-12-01')).toBe('preview');
+    expect(holidayPhase('hanukkah', '2027-12-23')).toBe('preview');
+    expect(holidayPhase('hanukkah', '2027-12-24')).toBe('live');
+    expect(holidayPhase('hanukkah', '2028-12-11')).toBe('preview');
+    expect(holidayPhase('hanukkah', '2028-12-12')).toBe('live');
+  });
+
+  it('keeps the event start on the window and puts the Dec 1 preview start next to it', () => {
+    const c = previewWindowFor('christmas', '2026-12-05')!;
+    expect(c).toMatchObject({ previewStart: '2026-12-01', start: '2026-12-13' });
+    expect(previewWindowFor('hanukkah', '2026-12-02')).toMatchObject({ previewStart: '2026-12-01', start: '2026-12-04' });
+    expect(windowFor('christmas', '2026-12-05')).toBeNull();
+  });
+});
+
+describe('daysUntilTrack', () => {
+  it('counts down to the first gift or candle and stops on it', () => {
+    const c = holidayWindows(2026).find((w) => w.key === 'christmas')!;
+    expect(daysUntilTrack(c, '2026-12-01')).toBe(13);
+    expect(daysUntilTrack(c, '2026-12-13')).toBe(1);
+    expect(daysUntilTrack(c, '2026-12-14')).toBeNull();
+    const h = holidayWindows(2026).find((w) => w.key === 'hanukkah')!;
+    expect(daysUntilTrack(h, '2026-12-01')).toBe(3);
+    expect(daysUntilTrack(h, '2026-12-03')).toBe(1);
+    expect(daysUntilTrack(h, '2026-12-04')).toBeNull();
   });
 });

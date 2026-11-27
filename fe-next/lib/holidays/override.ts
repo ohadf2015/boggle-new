@@ -1,4 +1,4 @@
-import type { HolidayKey } from './calendar';
+import { HOLIDAY_KEYS, type HolidayKey } from './calendar';
 import type { HolidayOverride } from './region';
 
 export const HOLIDAY_COOKIE = 'lx_holiday';
@@ -22,4 +22,9 @@ export function holidayCookie(v: HolidayOverride): string {
 
 export function holidayClass(key: HolidayKey): string {
   return `${HOLIDAY_CLASS_PREFIX}${key}`;
+}
+
+export function liveHolidayIn(classList: DOMTokenList): HolidayKey | null {
+  if (!classList.contains('holiday-live')) return null;
+  return HOLIDAY_KEYS.find((k) => classList.contains(holidayClass(k))) ?? null;
 }

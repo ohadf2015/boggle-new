@@ -14,8 +14,8 @@ import { useMusicFocusManager } from '@/lib/audio/useMusicFocusManager';
 import { restartStalledHowl } from '@/lib/audio/howlStall';
 import { usePlayerStyle } from '@/contexts/PlayerStyleContext';
 import { resolveStyleTrack } from '@/lib/playerStyle/styles';
-import { HOLIDAY_KEYS, type HolidayKey } from '@/lib/holidays/calendar';
-import { holidayClass } from '@/lib/holidays/override';
+import type { HolidayKey } from '@/lib/holidays/calendar';
+import { liveHolidayIn } from '@/lib/holidays/override';
 
 type TrackKey = 'lobby' | 'beforeGame' | 'inGame' | 'almostOutOfTime' | 'bossaArcade' | 'bossa' | 'blast' | 'daily' | 'boss' | 'results' | 'wordTower' | 'connections' | 'crossword' | 'adventure';
 
@@ -96,7 +96,7 @@ const HOLIDAY_SWAPPABLE_TRACKS: ReadonlySet<TrackKey> = new Set<TrackKey>(['boss
 
 function domHoliday(): HolidayKey | null {
   if (typeof document === 'undefined') return null;
-  return HOLIDAY_KEYS.find((k) => document.documentElement.classList.contains(holidayClass(k))) ?? null;
+  return liveHolidayIn(document.documentElement.classList);
 }
 
 export function resolveTrackSrc(key: TrackKey, styleKey: string, holiday: HolidayKey | null = null): string {

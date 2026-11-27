@@ -17,6 +17,7 @@ export interface LandingCopy {
   mascotLabel: string;
   intro: string;
   liveBadge: string;
+  soonBadge: string;
   offBanner: string;
   offUnknown: string;
   ctaLive: string;

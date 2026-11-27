@@ -26,7 +26,7 @@ function serve(gift: unknown, hunt: unknown) {
 describe('HolidayCardExtras', () => {
   beforeEach(() => {
     resetHolidayClientForTests();
-    document.documentElement.className = 'holiday-hanukkah';
+    document.documentElement.className = 'holiday-hanukkah holiday-live';
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date(2026, 11, 9, 12, 0));
     vi.stubGlobal('fetch', fetchMock);

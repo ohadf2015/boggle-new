@@ -14,7 +14,7 @@ const ok = (json: unknown) => ({ ok: true, json: async () => json });
 
 beforeEach(() => {
   resetHolidayClientForTests();
-  document.documentElement.className = 'holiday-hanukkah';
+  document.documentElement.className = 'holiday-hanukkah holiday-live';
   document.documentElement.lang = 'en';
   hasSession.mockReset().mockReturnValue(true);
   fetchMock.mockReset().mockResolvedValue(ok({}));

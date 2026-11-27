@@ -44,8 +44,17 @@ describe('holidays.css', () => {
   });
 
   it('leaves paid board themes and tile skins alone', () => {
-    for (const rule of css.match(/html\.holiday-[a-z]+ \.game-board-frame[^{,]*/g) ?? []) {
+    const rules = css.match(/html\.holiday-[a-z]+(?:\.holiday-live)? \.game-board-frame[^{,]*/g) ?? [];
+    expect(rules.length).toBeGreaterThan(0);
+    for (const rule of rules) {
       expect(rule).toContain(":not([class*='cosmetic-board-']):not([data-tile-skin])");
     }
+  });
+
+  it('skins boards, bonus tiles and the page ambience only while the event is live, never in the Dec 1 preview', () => {
+    for (const rule of css.match(/[^}/]*(?:\.game-board-frame|\.holiday-bonus-tile|body:not)[^{]*\{/g) ?? []) {
+      for (const sel of rule.split(',').filter((s) => /html\.holiday-(hanukkah|christmas)/.test(s))) expect(sel).toContain('.holiday-live');
+    }
+    expect(css).not.toMatch(/holiday-preview[^{]*body/);
   });
 });

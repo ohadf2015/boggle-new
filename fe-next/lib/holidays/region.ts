@@ -1,4 +1,4 @@
-import { windowFor, type HolidayKey } from './calendar';
+import { previewWindowFor, type HolidayKey } from './calendar';
 
 export type HolidayRegion = 'IL' | 'world';
 export type HolidayOverride = HolidayKey | 'off';
@@ -28,7 +28,7 @@ export function activeHoliday(i: {
   locale?: string | null;
 }): HolidayKey | null {
   if (i.override === 'off') return null;
-  if (i.override && (i.preview || windowFor(i.override, i.localDate, i.locale))) return i.override;
+  if (i.override && (i.preview || previewWindowFor(i.override, i.localDate, i.locale))) return i.override;
   const key = defaultHoliday(i.region);
-  return windowFor(key, i.localDate, i.locale) ? key : null;
+  return previewWindowFor(key, i.localDate, i.locale) ? key : null;
 }

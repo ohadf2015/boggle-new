@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { holidayWindows, localDateIn, windowFor, type HolidayKey, type HolidayWindow } from './calendar';
+import { holidayPhase, holidayWindows, localDateIn, previewWindowFor, type HolidayKey, type HolidayPhase, type HolidayWindow } from './calendar';
 
 export type LandingLocale = 'en' | 'he' | 'es' | 'sv' | 'ja' | 'ru';
 
@@ -16,6 +16,7 @@ export interface HolidayLanding {
 
 export interface LandingSeason {
   live: boolean;
+  phase: HolidayPhase;
   window: HolidayWindow | null;
 }
 
@@ -154,13 +155,13 @@ export function landingAlternates(p: HolidayLanding): Record<string, string> {
 
 export function landingSeason(holiday: HolidayKey, locale: LandingLocale, now: Date): LandingSeason {
   const today = localDateIn(now, LOCALE_TZ[locale]);
-  const live = windowFor(holiday, today, locale);
-  if (live) return { live: true, window: live };
+  const live = previewWindowFor(holiday, today, locale);
+  if (live) return { live: true, phase: holidayPhase(holiday, today, locale), window: live };
   const year = Number(today.slice(0, 4));
   const next = [year, year + 1]
     .flatMap((y) => holidayWindows(y, locale))
-    .find((w) => w.key === holiday && w.start > today);
-  return { live: false, window: next ?? null };
+    .find((w) => w.key === holiday && w.previewStart > today);
+  return { live: false, phase: 'off', window: next ?? null };
 }
 
 export function landingMetadata(p: HolidayLanding, requestLocale: string): Metadata {

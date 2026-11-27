@@ -102,6 +102,7 @@ const es = {
       "coinNote": "Cada partida cuenta para el reto festivo de hoy. Las monedas tienen un límite diario.",
       "tileTitle": "Arcade festivo",
       "tileSubtitle": "Juegos de fiesta en familia y juegos de palabras, solo esta temporada",
+      "tileLocked": "Abre el {date}",
       "shareText": "¡Hice {score} puntos en {game} en LexiClash! ¿Me superas?",
       "wordsFound_one": "{count} palabra",
       "wordsFound_other": "{count} palabras",
@@ -238,11 +239,15 @@ const es = {
     "event": {
       "hanukkah": {
         "title": "Fiesta de las Luces",
-        "subtitle": "Enciende una vela cada noche que juegues"
+        "subtitle": "Enciende una vela cada noche que juegues",
+        "startsIn_other": "Primera vela en {count} días",
+        "startsTomorrow": "Primera vela mañana por la noche"
       },
       "christmas": {
         "title": "Batalla de Nieve",
-        "subtitle": "Un regalo por cada día que juegues"
+        "subtitle": "Un regalo por cada día que juegues",
+        "startsIn_other": "Los 12 regalos empiezan en {count} días",
+        "startsTomorrow": "Los 12 regalos empiezan mañana"
       },
       "progress": "{lit} de {total}",
       "dayLit": "Día {day}: conseguido",
@@ -475,6 +480,7 @@ const es = {
       "giftN": "Regalo {n}",
       "nightlyIntro": "Esta noche brillan {n} casillas de gelt dorado en el tablero. Forma palabras que pasen por ellas para ganar monedas y luego gira la perinola.",
       "adventIntro": "En el tablero de hoy hay una palabra navideña envuelta. Encuéntrala y abre el regalo del día.",
+      "adventSoon": "El Tablero de Adviento se abre el {date}. Desde ese día hasta Navidad, cada día hay una palabra navideña envuelta en el tablero.",
       "guestLine": "Inicia sesión para encender la vela de esta noche y no perder tu racha.",
       "litByBoard": "Noche {n} encendida con el Tablero de la noche. {words} palabras de gelt, +{coins} monedas.",
       "giftUnwrapped": "¡Regalo {n} abierto! +{coins} monedas.",

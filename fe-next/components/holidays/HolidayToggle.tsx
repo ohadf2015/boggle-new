@@ -13,11 +13,11 @@ const ACTIVE: Record<HolidayOverride, string> = {
 
 export default function HolidayToggle({ className }: { className?: string }) {
   const { t } = useLanguage();
-  const { holiday, resolved, available, setOverride } = useHoliday();
+  const { theme, resolved, available, setOverride } = useHoliday();
   if (!resolved || available.length === 0) return null;
 
   const options: HolidayOverride[] = [...available, 'off'];
-  const current: HolidayOverride = holiday ?? 'off';
+  const current: HolidayOverride = theme ?? 'off';
 
   return (
     <div role="group" aria-label={t('holiday.toggle.label')} className={cn('inline-flex gap-2', className)}>

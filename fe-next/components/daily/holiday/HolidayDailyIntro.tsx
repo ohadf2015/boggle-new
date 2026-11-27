@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useHoliday } from '@/hooks/useHoliday';
+import { daysUntilTrack, formatHolidayDay, windowFor } from '@/lib/holidays/calendar';
 import { holidayDailyDay } from '@/lib/holidays/dailyBoard';
 import { cn } from '@/lib/utils';
 import HolidayCandles from './HolidayCandles';
@@ -14,6 +15,30 @@ import styles from './holidayDaily.module.css';
 interface Props {
   puzzleDate: string;
   language: string;
+}
+
+function firstGiftDate(puzzleDate: string, language: string): string | null {
+  const win = windowFor('christmas', puzzleDate, language);
+  if (!win || daysUntilTrack(win, puzzleDate) === null) return null;
+  return formatHolidayDay(win.trackDays[0], language);
+}
+
+function AdventTeaser({ date }: { date: string }) {
+  const { t } = useLanguage();
+  return (
+    <section
+      data-testid="holiday-daily-teaser"
+      data-holiday="christmas"
+      className={cn('mx-auto w-full max-w-sm rounded-2xl border-[3px] border-black bg-neo-navy-light p-3 text-start text-neo-white shadow-hard', styles.pop)}
+    >
+      <h2 className="font-neo-display text-base font-bold">{t('holiday.daily.adventTitle', 'Advent Board')}</h2>
+      <HolidayGifts total={12} opened={0} className="mt-2" />
+      <p className="mt-2 text-xs font-bold leading-snug text-neo-white/80">
+        {t('holiday.daily.adventSoon', 'The Advent Board opens on {date}. From then until Christmas, one holiday word is wrapped on the board every day.', { date })}
+      </p>
+      <HolidayTableJoinPrompt holiday="christmas" />
+    </section>
+  );
 }
 
 export default function HolidayDailyIntro({ puzzleDate, language }: Props) {
@@ -30,6 +55,10 @@ export default function HolidayDailyIntro({ puzzleDate, language }: Props) {
     return () => window.clearTimeout(id);
   }, [day, playStreakMilestoneSound]);
 
+  if (holiday === 'christmas' && !day) {
+    const date = firstGiftDate(puzzleDate, language);
+    return date ? <AdventTeaser date={date} /> : null;
+  }
   if (!holiday || !day) return null;
   const hanukkah = holiday === 'hanukkah';
 

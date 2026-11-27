@@ -148,7 +148,7 @@ export function PlayHero({ lang, t, animate, avatar, bubble, streak, streakLoadi
       ref={heroRef}
       aria-labelledby="hp-play-title"
       data-testid="hp-hero"
-      className="relative mx-auto flex w-full max-w-[480px] flex-col gap-6 px-4 pb-2 pt-6 lg:max-w-[560px] lg:pt-10"
+      className="holiday-hero-glow relative mx-auto flex w-full max-w-[480px] flex-col gap-6 px-4 pb-2 pt-6 lg:max-w-[560px] lg:pt-10"
     >
       <div data-hero-row className="flex flex-col items-center gap-3">
         <div className="relative flex w-full justify-center pt-2">

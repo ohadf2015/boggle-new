@@ -5,10 +5,11 @@ import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHoliday } from '@/hooks/useHoliday';
-import { holidayWindows, localDateIn, trackIndex, windowFor, type HolidayKey, type HolidayWindow } from '@/lib/holidays/calendar';
+import { daysUntilTrack, holidayWindows, localDateIn, trackIndex, windowFor, type HolidayKey, type HolidayWindow } from '@/lib/holidays/calendar';
 import { HOLIDAY_PROGRESS_EVENT, consumeLastLit, type LitResult } from '@/lib/holidayEvent/markHolidayPlayed';
 import { buildProgressView, type HolidayDayView, type HolidayProgressView } from '@/lib/holidayEvent/progressView';
 import type { HolidayDayReward } from '@/lib/holidayEvent/rewards';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 import { cn } from '@/lib/utils';
 import HolidayCommunityCounter from '@/components/daily/holiday/HolidayCommunityCounter';
 import HolidayRescueCard from '@/components/daily/holiday/HolidayRescueCard';
@@ -63,11 +64,12 @@ function useServerProgress(holiday: HolidayKey | null, today: string, locale: st
   return { load, refetch };
 }
 
-function Day({ day, today, theme, t }: { day: HolidayDayView; today: boolean; theme: (typeof THEME)[HolidayKey]; t: T }) {
+function Day({ day, today, locked, theme, t }: { day: HolidayDayView; today: boolean; locked: boolean; theme: (typeof THEME)[HolidayKey]; t: T }) {
   return (
     <li
       data-testid="holiday-day"
       data-lit={day.lit}
+      data-locked={locked}
       data-source={day.source}
       aria-current={today ? 'date' : undefined}
       title={rewardLabel(t, day.reward)}
@@ -99,12 +101,12 @@ function Day({ day, today, theme, t }: { day: HolidayDayView; today: boolean; th
 
 export default function HolidayEventCard() {
   const { t, language } = useLanguage();
-  const { holiday, resolved } = useHoliday();
+  const { holiday: live, theme: holiday, phase, resolved } = useHoliday();
   const { user, loading: authLoading } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [pop, setPop] = useState<LitResult | null>(null);
   const today = localDateIn(new Date());
-  const liveWin = holiday ? windowFor(holiday, today, language) : null;
+  const liveWin = live ? windowFor(live, today, language) : null;
   const signedIn = !!user;
   const tracked = signedIn && !!liveWin;
   const { load, refetch } = useServerProgress(holiday, today, language, resolved && !authLoading && tracked);
@@ -131,11 +133,13 @@ export default function HolidayEventCard() {
   const theme = THEME[holiday];
   const view = tracked && load.state === 'ready' ? load.view : buildProgressView(win, new Set());
   const todayIndex = trackIndex(win, today);
+  const untilTrack = daysUntilTrack(win, today);
   const litCount = view.days.filter((d) => d.lit).length;
 
   return (
     <section
       data-testid="holiday-event-card"
+      data-phase={phase}
       aria-labelledby="holiday-event-title"
       className="relative overflow-hidden rounded-2xl border-[3px] border-black bg-neo-navy-light p-3 text-neo-white shadow-hard"
     >
@@ -149,6 +153,11 @@ export default function HolidayEventCard() {
         </span>
       </header>
       <p className="mt-0.5 text-xs text-neo-white/70">{t(`holiday.event.${holiday}.subtitle`)}</p>
+      {untilTrack !== null && (
+        <p data-testid="holiday-countdown" className="mt-2 inline-block rounded-full border-2 border-black bg-neo-holiday-gold px-2 py-0.5 font-neo-display text-xs font-bold text-neo-navy tabular-nums">
+          {untilTrack === 1 ? t(`holiday.event.${holiday}.startsTomorrow`) : t(pluralKeyOf(`holiday.event.${holiday}.startsIn`, untilTrack, language), { count: untilTrack })}
+        </p>
+      )}
 
       {tracked && load.state === 'error' ? (
         <div className="mt-3 flex items-center justify-between gap-2 rounded-xl border-2 border-black bg-neo-navy p-2 text-xs">
@@ -160,7 +169,7 @@ export default function HolidayEventCard() {
       ) : (
         <ol className={cn('mt-4 grid gap-1.5', view.days.length > 8 ? 'grid-cols-6 lg:grid-cols-12' : 'grid-cols-8')}>
           {view.days.map((d) => (
-            <Day key={d.index} day={d} today={d.index === todayIndex} theme={theme} t={t} />
+            <Day key={d.index} day={d} today={d.index === todayIndex} locked={untilTrack !== null} theme={theme} t={t} />
           ))}
         </ol>
       )}
@@ -169,7 +178,7 @@ export default function HolidayEventCard() {
       {tracked && <HolidayRescueCard holiday={holiday} />}
       {tracked && <HolidayTablePanel holiday={holiday} />}
       {tracked && load.state === 'ready' && <HolidayCardExtras holiday={holiday} win={win} today={today} view={view} locale={language} />}
-      <ArcadeTile />
+      <ArcadeTile holiday={holiday} opensOn={phase === 'preview' ? win.start : undefined} />
       <HolidaySeasonLink className="mt-3 block text-center text-sm font-bold text-neo-holiday-gold underline-offset-4 hover:underline" />
 
       {pop && (

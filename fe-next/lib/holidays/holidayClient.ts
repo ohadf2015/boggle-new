@@ -1,8 +1,8 @@
 import { HOLIDAY_PROGRESS_EVENT } from '@/lib/holidayEvent/markHolidayPlayed';
 import { hasSupabaseSession } from '@/utils/onboardingStorage';
-import { HOLIDAY_KEYS, localDateIn, type HolidayKey } from './calendar';
+import { localDateIn, type HolidayKey } from './calendar';
 import { matchSecretWord } from './eggs';
-import { holidayClass } from './override';
+import { liveHolidayIn } from './override';
 
 export const HOLIDAY_EGG_EVENT = 'lc:holiday-egg';
 export const HOLIDAY_HUNT_EVENT = 'lc:holiday-hunt';
@@ -24,8 +24,7 @@ export interface HuntClientState {
 
 export function holidayQuery(): HolidayQuery | null {
   if (typeof document === 'undefined') return null;
-  const cl = document.documentElement.classList;
-  const holiday = HOLIDAY_KEYS.find((k) => cl.contains(holidayClass(k)));
+  const holiday = liveHolidayIn(document.documentElement.classList);
   if (!holiday) return null;
   return { holiday, localDate: localDateIn(new Date()), locale: (document.documentElement.lang || 'en').slice(0, 2) };
 }

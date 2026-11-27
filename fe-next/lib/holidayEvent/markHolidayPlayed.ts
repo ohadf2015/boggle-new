@@ -1,4 +1,5 @@
 import { localDateIn, type HolidayKey } from '@/lib/holidays/calendar';
+import { liveHolidayIn } from '@/lib/holidays/override';
 import { hasSupabaseSession } from '@/utils/onboardingStorage';
 import type { HolidayDayReward } from './rewards';
 
@@ -21,10 +22,7 @@ export function consumeLastLit(): LitResult | null {
 }
 
 function themedHoliday(): HolidayKey | null {
-  const cls = document.documentElement.classList;
-  if (cls.contains('holiday-hanukkah')) return 'hanukkah';
-  if (cls.contains('holiday-christmas')) return 'christmas';
-  return null;
+  return liveHolidayIn(document.documentElement.classList);
 }
 
 export async function markHolidayPlayed(): Promise<void> {

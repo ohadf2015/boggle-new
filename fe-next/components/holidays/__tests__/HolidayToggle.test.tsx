@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const state = {
-  holiday: 'christmas' as 'christmas' | 'hanukkah' | null,
+  theme: 'christmas' as 'christmas' | 'hanukkah' | null,
   resolved: true,
   region: 'world' as const,
   available: ['hanukkah', 'christmas'] as ('hanukkah' | 'christmas')[],
@@ -14,7 +14,7 @@ vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: stri
 import HolidayToggle from '../HolidayToggle';
 
 beforeEach(() => {
-  Object.assign(state, { holiday: 'christmas', resolved: true, available: ['hanukkah', 'christmas'] });
+  Object.assign(state, { theme: 'christmas', resolved: true, available: ['hanukkah', 'christmas'] });
   state.setOverride.mockClear();
 });
 
@@ -35,7 +35,7 @@ describe('HolidayToggle', () => {
   });
 
   it('given only the non-default holiday open and theme off, still offers it', () => {
-    Object.assign(state, { holiday: null, available: ['hanukkah'] });
+    Object.assign(state, { theme: null, available: ['hanukkah'] });
     render(<HolidayToggle />);
     expect(screen.getByRole('button', { name: 'holiday.toggle.hanukkah' }).getAttribute('aria-pressed')).toBe('false');
     expect(screen.getByRole('button', { name: 'holiday.toggle.off' }).getAttribute('aria-pressed')).toBe('true');

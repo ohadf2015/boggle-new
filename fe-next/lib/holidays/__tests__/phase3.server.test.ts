@@ -31,6 +31,13 @@ beforeEach(() => {
 });
 
 describe('parseHolidayInput', () => {
+  it('Given the Dec 1-12 preview, then hunt, eggs and gift routes get no input (event features stay closed)', () => {
+    expect(parseHolidayInput({ holiday: 'christmas', localDate: '2026-12-05', locale: 'en' }, new Date('2026-12-05T12:00:00Z'))).toBeNull();
+    expect(parseHolidayInput({ holiday: 'hanukkah', localDate: '2026-12-02', locale: 'he' }, new Date('2026-12-02T12:00:00Z'))).toBeNull();
+    expect(parseHolidayInput({ holiday: 'christmas', localDate: '2026-12-13', locale: 'en' }, new Date('2026-12-13T12:00:00Z'))).not.toBeNull();
+    expect(parseHolidayInput({ holiday: 'hanukkah', localDate: '2026-12-04', locale: 'he' }, new Date('2026-12-04T12:00:00Z'))).not.toBeNull();
+  });
+
   it('Given a Spanish player on Jan 4, then the locale-extended Christmas window is used', () => {
     expect(input('christmas', '2027-01-04', 'es').eventKey).toBe('christmas-2026');
     expect(parseHolidayInput({ holiday: 'christmas', localDate: '2027-01-04', locale: 'en' }, new Date('2027-01-04T12:00:00Z'))).toBeNull();

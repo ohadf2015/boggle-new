@@ -1,7 +1,9 @@
 export type HolidayKey = 'hanukkah' | 'christmas';
+export type HolidayPhase = 'off' | 'preview' | 'live';
 
 export interface HolidayWindow {
   key: HolidayKey;
+  previewStart: string;
   start: string;
   end: string;
   trackDays: string[];
@@ -37,16 +39,22 @@ function days(start: string, count: number): string[] {
   return Array.from({ length: count }, (_, i) => addDays(start, i));
 }
 
+function previewStart(year: number, start: string): string {
+  const dec1 = `${year}-12-01`;
+  return start < dec1 ? start : dec1;
+}
+
 export function holidayWindows(year: number, locale?: string | null): HolidayWindow[] {
   const l = lang(locale);
   const out: HolidayWindow[] = [];
   const hStart = HANUKKAH_START[year];
   if (hStart) {
     const trackDays = days(hStart, HANUKKAH_NIGHTS);
-    out.push({ key: 'hanukkah', start: hStart, end: addDays(hStart, HANUKKAH_NIGHTS), trackDays, finale: trackDays[HANUKKAH_NIGHTS - 1] });
+    out.push({ key: 'hanukkah', previewStart: previewStart(year, hStart), start: hStart, end: addDays(hStart, HANUKKAH_NIGHTS), trackDays, finale: trackDays[HANUKKAH_NIGHTS - 1] });
   }
   out.push({
     key: 'christmas',
+    previewStart: `${year}-12-01`,
     start: `${year}-12-13`,
     end: `${year + 1}-${CHRISTMAS_END[l] ?? '01-01'}`,
     trackDays: days(`${year}-12-14`, CHRISTMAS_GIFTS),
@@ -55,19 +63,38 @@ export function holidayWindows(year: number, locale?: string | null): HolidayWin
   return out;
 }
 
-export function windowFor(key: HolidayKey, localDate: string, locale?: string | null): HolidayWindow | null {
+function findWindow(key: HolidayKey, localDate: string, locale: string | null | undefined, from: 'start' | 'previewStart'): HolidayWindow | null {
   if (!DATE_RE.test(localDate)) return null;
   const year = Number(localDate.slice(0, 4));
   for (const y of [year - 1, year]) {
     const win = holidayWindows(y, locale).find((w) => w.key === key);
-    if (win && localDate >= win.start && localDate <= win.end) return win;
+    if (win && localDate >= win[from] && localDate <= win.end) return win;
   }
   return null;
+}
+
+export function windowFor(key: HolidayKey, localDate: string, locale?: string | null): HolidayWindow | null {
+  return findWindow(key, localDate, locale, 'start');
+}
+
+export function previewWindowFor(key: HolidayKey, localDate: string, locale?: string | null): HolidayWindow | null {
+  return findWindow(key, localDate, locale, 'previewStart');
+}
+
+export function holidayPhase(key: HolidayKey, localDate: string, locale?: string | null): HolidayPhase {
+  if (windowFor(key, localDate, locale)) return 'live';
+  return previewWindowFor(key, localDate, locale) ? 'preview' : 'off';
 }
 
 export function trackIndex(win: HolidayWindow, localDate: string): number | null {
   const i = win.trackDays.indexOf(localDate);
   return i < 0 ? null : i;
+}
+
+export function daysUntilTrack(win: HolidayWindow, localDate: string): number | null {
+  const first = win.trackDays[0];
+  if (!first || localDate >= first) return null;
+  return Math.round((Date.parse(first) - Date.parse(localDate)) / 86_400_000);
 }
 
 export function finaleDate(win: HolidayWindow): string {
@@ -80,4 +107,8 @@ export function localDateIn(now: Date, timeZone?: string | null): string {
   } catch {
     return now.toISOString().slice(0, 10);
   }
+}
+
+export function formatHolidayDay(date: string, language: string): string {
+  return new Intl.DateTimeFormat(language, { month: 'long', day: 'numeric', timeZone: 'UTC' }).format(new Date(`${date}T00:00:00Z`));
 }
