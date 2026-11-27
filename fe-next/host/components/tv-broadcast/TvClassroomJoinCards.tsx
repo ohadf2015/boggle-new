@@ -23,17 +23,17 @@ const BAND = 'flex items-center gap-2 border-b-[3px] border-neo-black px-3 py-1 
 export function TvClassroomJoinCards({ address, joinUrl, gameCode, playerCount, dense, trailing, t }: TvClassroomJoinCardsProps) {
   return (
     <div data-testid="tv-join-row" className="flex flex-wrap items-stretch gap-2 md:flex-nowrap md:gap-4">
-      <div data-testid="tv-join-card-address" className={cn(CARD, dense ? 'hidden lg:flex lg:flex-1' : 'basis-full md:basis-auto md:flex-1')}>
+      <div data-testid="tv-join-card-address" className={cn(CARD, dense ? 'hidden lg:flex lg:flex-auto' : 'basis-full md:basis-auto md:flex-1')}>
         <p className={cn(BAND, 'bg-neo-pink')}>
           <Globe className="size-4 shrink-0" aria-hidden="true" />
           {t('tvBroadcast.joinAt')}
         </p>
-        <p dir="ltr" className="flex flex-1 items-center px-3 py-1.5 font-neo-display font-black tracking-wide [unicode-bidi:isolate] break-all text-xl lg:whitespace-nowrap lg:break-normal lg:text-[clamp(1rem,1.3vw,2rem)]">
+        <p dir="ltr" className="flex flex-1 items-center justify-center px-3 py-1.5 font-neo-display font-black tracking-wide [unicode-bidi:isolate] break-all text-xl lg:whitespace-nowrap lg:break-normal lg:px-5 lg:text-[clamp(1.5rem,2.3vw,3.5rem)]">
           {address}
         </p>
       </div>
 
-      <div data-testid="tv-join-card-code" className={cn(CARD, 'shrink-0 max-md:flex-1')}>
+      <div data-testid="tv-join-card-code" className={cn(CARD, 'shrink-0 max-md:flex-1', dense && 'lg:flex-auto')}>
         <p id="game-code-label" className={cn(BAND, 'justify-center bg-neo-yellow')}>
           <Hash className="size-4 shrink-0" aria-hidden="true" />
           {t('tvBroadcast.gameCode')}
@@ -58,12 +58,12 @@ export function TvClassroomJoinCards({ address, joinUrl, gameCode, playerCount, 
         </div>
       </div>
 
-      <div data-testid="tv-join-card-players" className={cn(CARD, 'shrink-0')}>
+      <div data-testid="tv-join-card-players" className={cn(CARD, 'shrink-0', dense && 'lg:flex-auto')}>
         <p className={cn(BAND, 'bg-neo-cyan')}>
           <Users className="size-4 shrink-0" aria-hidden="true" />
           {t('tvBroadcast.players')}
         </p>
-        <div className="flex flex-1 items-center gap-3 px-3 py-1.5">
+        <div className="flex flex-1 items-center justify-center gap-3 px-3 py-1.5">
           <div className="hidden items-center gap-2 md:flex" data-testid="player-count-wrapper">
             <Users className="size-6" aria-hidden="true" />
             <AnimatedCounter value={playerCount} className="font-neo-display text-3xl font-black text-neo-black" size="xl" formatValue={(v) => String(Math.round(v))} />

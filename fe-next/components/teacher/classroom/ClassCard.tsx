@@ -159,16 +159,16 @@ export function ClassCard({
           <span data-testid="classroom-card-language" className="text-edu-ink/80">· {languageKey ? t(languageKey) : classroom.language}</span>
         </div>
       </div>
-      <div className="mt-auto flex min-w-0 flex-wrap items-center gap-2.5">
-        <div className="min-w-0 flex-1">
+      <div className="mt-auto flex min-w-0 flex-wrap items-center gap-2">
+        <div className="flex-[1_0_auto]">
           <button
             type="button"
             data-testid="join-code-plate"
             aria-label={`${t('teacher.classroom.copyCode')}: ${classroom.join_code}`}
             onClick={() => void copyFromPlate()}
-            className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-neo px-0.5 text-edu-ink hover:bg-edu-ink/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="inline-flex min-h-11 max-w-full items-center gap-1 rounded-neo text-edu-ink hover:bg-edu-ink/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
-            <code data-testid="classroom-join-code" dir="ltr" className="flex gap-1 font-neo-display text-sm font-black">
+            <code data-testid="classroom-join-code" dir="ltr" className="flex gap-0.5 font-neo-display text-sm font-black">
               {[...classroom.join_code].map((ch, i) => (
                 <span key={i} data-testid="classroom-join-code-tile" className="edu-tile size-7 rounded-neo border-2 shadow-edu-lip-sm">
                   {ch}
@@ -181,26 +181,28 @@ export function ClassCard({
             </span>
           </button>
         </div>
-        {count === 0 ? (
-          <PressSurface
-            lip={4}
-            data-testid="classroom-card-invite"
-            aria-haspopup="dialog"
-            aria-label={t('eduShell.home.shareCode', 'Share code')}
-            title={t('eduShell.home.shareCode', 'Share code')}
-            onClick={onInvite ?? onShare}
-            className={cn(round, roundTone(lead))}
-          >
-            <Share2 className="size-6" aria-hidden="true" />
-          </PressSurface>
-        ) : null}
-        {startGameHref ? (
-          <PressSurface asChild lip={4} className={cn(round, roundTone(lead && count > 0))}>
-            <Link href={startGameHref} data-testid="classroom-card-start-game" aria-label={t('eduShell.home.startLive', 'Start a game')} title={t('eduShell.home.startLive', 'Start a game')}>
-              <Play className="size-6 fill-current" aria-hidden="true" />
-            </Link>
-          </PressSurface>
-        ) : null}
+        <div className="ms-auto flex shrink-0 items-center gap-2">
+          {count === 0 ? (
+            <PressSurface
+              lip={4}
+              data-testid="classroom-card-invite"
+              aria-haspopup="dialog"
+              aria-label={t('eduShell.home.shareCode', 'Share code')}
+              title={t('eduShell.home.shareCode', 'Share code')}
+              onClick={onInvite ?? onShare}
+              className={cn(round, roundTone(lead))}
+            >
+              <Share2 className="size-6" aria-hidden="true" />
+            </PressSurface>
+          ) : null}
+          {startGameHref ? (
+            <PressSurface asChild lip={4} className={cn(round, roundTone(lead && count > 0))}>
+              <Link href={startGameHref} data-testid="classroom-card-start-game" aria-label={t('eduShell.home.startLive', 'Start a game')} title={t('eduShell.home.startLive', 'Start a game')}>
+                <Play className="size-6 fill-current" aria-hidden="true" />
+              </Link>
+            </PressSurface>
+          ) : null}
+        </div>
       </div>
       <div className="absolute end-3 top-6">
         <CardOverflowMenu label={t('academy.teacher.classActions', 'Class actions')} testId="classroom-card-menu">

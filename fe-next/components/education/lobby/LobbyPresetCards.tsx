@@ -55,10 +55,11 @@ export function LobbyPresetCards({ active, onApply }: LobbyPresetCardsProps) {
                 'relative flex min-h-[6.5rem] min-w-0 flex-col items-start gap-2 rounded-neo-lg border-[3px] bg-edu-surface p-2.5 text-start text-edu-ink shadow-edu-lip',
                 'transition-[transform,border-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:translate-y-0.5 motion-reduce:transition-none',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface',
-                '@2xl/presets:min-h-[clamp(11rem,calc(100cqh-22rem),15rem)] @2xl/presets:gap-3 @2xl/presets:p-4',
+                '@2xl/presets:min-h-[clamp(11rem,calc(100cqh-22rem),15rem)] @2xl/presets:gap-3 @2xl/presets:p-4 @2xl/presets:[@media(max-height:1100px)]:min-h-0 @2xl/presets:[@media(max-height:860px)]:p-3',
                 on ? 'border-neo-black ring-[3px] ring-neo-pink ring-offset-2 ring-offset-edu-page' : 'border-edu-line [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:border-edu-line',
               )}
             >
+              <span className="flex min-w-0 flex-col items-start gap-2 @2xl/presets:flex-row @2xl/presets:items-center @2xl/presets:gap-3 @2xl/presets:pe-8">
               <span
                 aria-hidden="true"
                 data-testid="preset-icon"
@@ -74,7 +75,8 @@ export function LobbyPresetCards({ active, onApply }: LobbyPresetCardsProps) {
                   {t(`teacher.classroom.presets.${key}.desc`)}
                 </span>
               </span>
-              <span data-testid="preset-values" className="mt-auto hidden flex-wrap gap-1.5 @2xl/presets:flex">
+              </span>
+              <span data-testid="preset-values" className="mt-auto hidden flex-wrap gap-1.5 @2xl/presets:flex @2xl/presets:[@media(max-height:780px)]:hidden">
                 {presetChips(id, tt).map((chip) => (
                   <span key={chip} className="whitespace-nowrap rounded-full border border-edu-line px-2 py-0.5 font-neo-body text-xs font-bold text-edu-ink/80">
                     {chip}

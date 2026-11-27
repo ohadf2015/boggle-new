@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { Gift, KeyRound, ShieldCheck } from 'lucide-react';
+import { Gift, KeyRound, ShieldCheck, Sparkle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AccessRedirectNotice } from '@/components/education/AccessRedirectNotice';
 import { AccessRequestGate } from '@/components/education/AccessRequestGate';
@@ -184,27 +184,31 @@ export function PageClient() {
   return (
     <EducationShell header={<LandingHeader showStart={false} />}>
       <main className="text-edu-ink">
-        <section className={`mx-auto px-4 py-5 sm:py-12 ${showPitch ? 'max-w-md pt-[4svh] sm:pt-[8svh]' : 'max-w-2xl'}`}>
+        <section className={`mx-auto px-4 py-5 sm:py-12 ${showPitch ? 'max-w-lg pt-[2svh] sm:pt-[4svh]' : 'max-w-2xl'}`}>
           {/* Only for someone who still has to apply — an approved teacher who
               happens to carry a `from` needs their status, not this. */}
           {showPitch && !handingOff && <AccessRedirectNotice from={redirectedFrom} />}
 
           {/* No `priority`: the h1 is the LCP; the mascot is a fixed box, so it never shifts it. */}
           {showPitch && (
-            <div aria-hidden="true" dir="ltr" data-testid="access-art" className="relative isolate flex items-center justify-center gap-3 py-3 sm:gap-5">
-              <span className="edu-tile size-14 -rotate-12 bg-neo-pink text-3xl sm:size-16 sm:text-4xl">A</span>
+            <div aria-hidden="true" dir="ltr" data-testid="access-art" className="relative isolate mx-auto flex h-[176px] sm:h-[232px] w-full max-w-[19rem] items-end justify-center sm:max-w-[25rem]">
+              <span data-testid="access-stage" className="absolute bottom-1 left-1/2 -z-10 h-9 w-44 -translate-x-1/2 rounded-[50%] border-[3px] border-neo-black bg-neo-cyan shadow-edu-lip sm:h-11 sm:w-60" />
+              <span className="edu-tile absolute left-1 top-5 size-16 -rotate-12 bg-neo-pink text-4xl sm:left-4 sm:top-6 sm:size-20 sm:text-5xl">A</span>
               <MascotRig state="hop">
                 <Image
                   src="/mascot/teacher/teacher-hero.webp"
                   alt=""
                   width={1024}
                   height={1024}
-                  sizes="176px"
+                  sizes="250px"
                   data-testid="access-mascot"
-                  className="h-[136px] w-[136px] drop-shadow-[0_4px_0_black] sm:h-[176px] sm:w-[176px]"
+                  className="-mb-3 h-[180px] w-[180px] drop-shadow-[0_4px_0_black] sm:-mb-5 sm:h-[250px] sm:w-[250px]"
                 />
               </MascotRig>
-              <span className="edu-tile size-14 rotate-12 bg-neo-cyan text-3xl sm:size-16 sm:text-4xl">B</span>
+              <span className="edu-tile absolute right-1 top-12 size-16 rotate-12 bg-neo-cyan text-4xl sm:right-4 sm:top-16 sm:size-20 sm:text-5xl">B</span>
+              <Sparkle className="absolute left-[18%] top-0 size-6 fill-neo-yellow text-neo-black sm:size-7" strokeWidth={2.5} />
+              <Sparkle className="absolute bottom-6 left-6 size-5 fill-neo-yellow text-neo-black sm:left-10 sm:size-6" strokeWidth={2.5} />
+              <Sparkle className="absolute right-[16%] top-1 size-5 fill-neo-yellow text-neo-black sm:size-6" strokeWidth={2.5} />
             </div>
           )}
 
@@ -220,7 +224,7 @@ export function PageClient() {
           <div className="mt-5 sm:mt-7">{statusCard}</div>
         </section>
 
-        <section className={`mx-auto px-4 pb-14 ${showPitch ? 'max-w-md' : 'max-w-2xl'}`}>
+        <section className={`mx-auto px-4 pb-14 ${showPitch ? 'max-w-lg' : 'max-w-2xl'}`}>
           {showPitch && (
             <ul className="flex flex-col gap-4">
               {TRUST.map(({ key, Icon, chip }) => (

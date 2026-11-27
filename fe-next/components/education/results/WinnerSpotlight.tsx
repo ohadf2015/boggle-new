@@ -2,8 +2,8 @@
  * WinnerSpotlight — the payoff.
  *
  * Blooket ends a game on the word "Victory" and a character standing on a
- * plinth. Same instinct, louder: Lexi actually celebrates (a 2s trophy loop),
- * the room hears one short sting, and confetti fires on the winner's beat —
+ * plinth. Same instinct, louder: Lexi's trophy pulses, the room hears one
+ * short sting, and confetti fires on the winner's beat —
  * the moment the podium's first placard lands, not a frame before.
  *
  * CLASS-5 RULES, all of them, on purpose:
@@ -11,10 +11,8 @@
  *    a drumroll line; revealed, it shows the name. Nothing enters from
  *    `opacity: 0`, nothing reserves an empty hole, and the projector layout
  *    does not move when the winner arrives.
- *  - Reduced motion swaps the video for its own poster still and fires no
- *    confetti — the celebration becomes a painted trophy, not a stalled one.
- *  - `bg-neo-navy-elevated` is hardcoded: this is a dark-only game surface, so
- *    the cream/dark pair that flashes cream on a lazy mount is never used.
+ *  - Reduced motion stops the pulse and fires no confetti — the celebration
+ *    becomes a painted trophy, not a stalled one.
  *
  * The sting and the confetti are ref-guarded to fire ONCE per mount: a results
  * screen re-renders every time a score payload settles, and a fanfare that
@@ -35,13 +33,6 @@ import { playRoundEndCue, ROUND_WIN_SOUND } from '@/lib/education/roundEndSound'
 import type { RoundOutcomeKind } from './roundOutcome';
 
 const TROPHY_STILL = '/mascot/teacher/badge-trophy.webp';
-/**
- * The 384px faststart encode (75KB), not the 640px master (662KB). Measured on
- * a cold profile at the back of a real round: the master was still `paused`
- * for every frame of the 4.4s reveal, so the celebration was a photograph of a
- * trophy. The reveal is the whole budget — the loop has to be moving inside it.
- */
-const TROPHY_LOOP = '/mascot/teacher/video/trophy-celebrate-384.mp4';
 
 export interface WinnerSpotlightProps {
   /** The room's first place. Absent (a room nobody scored in) renders nothing. */
@@ -157,11 +148,6 @@ export function WinnerSpotlight({
           the bar is never an empty rectangle waiting for content. */}
       <div
         data-testid="winner-mascot-frame"
-        // A headless renderer routinely leaves the <video> `paused` on its
-        // poster (the 640px encode did exactly that for every frame of a 4.4s
-        // reveal). Then the trophy is a photograph, and two shots a second
-        // apart are identical — half of why round 4's five frames matched.
-        // This CSS pulse does not care whether the video decodes.
         data-trophy-pulse={active && earned && !calm && !lostBoss ? 'on' : 'off'}
         style={
           active && earned && !calm && !lostBoss
@@ -191,28 +177,12 @@ export function WinnerSpotlight({
           <span data-testid="winner-hitter-avatar" data-username={winner.username} className="grid h-full w-full place-items-center bg-neo-yellow [&_svg]:h-full [&_svg]:w-full">
             <Avatar userId={winner.username} size="xl" disableEffects className="!h-full !w-full" />
           </span>
-        ) : calm || (active && !earned) ? (
-          // The still IS the video's own poster frame; routing it through
-          // next/image would request a second, differently-encoded copy of an
-          // asset the browser already has.
+        ) : (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             data-testid="winner-mascot-still"
             src={TROPHY_STILL}
             alt=""
-            aria-hidden
-            className="pointer-events-none w-full h-full object-cover"
-          />
-        ) : (
-          <video
-            data-testid="winner-mascot-video"
-            src={TROPHY_LOOP}
-            poster={TROPHY_STILL}
-            preload="auto"
-            autoPlay
-            loop
-            muted
-            playsInline
             aria-hidden
             className="pointer-events-none w-full h-full object-cover"
           />

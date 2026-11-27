@@ -14,14 +14,14 @@ export function SetupCodePreview({ name, t }: { name: string; t: T }) {
     <div
       data-testid="setup-code-preview"
       aria-hidden="true"
-      className="edu-card flex items-center justify-between gap-3 p-4 sm:gap-6 sm:p-5"
+      className="edu-card flex flex-wrap items-center justify-between gap-3 p-4 sm:gap-x-6 sm:p-5"
     >
-      <div className="min-w-0">
+      <div className="min-w-[12rem] flex-1">
         <p className="font-neo-body text-xs font-black uppercase tracking-wide text-edu-ink/75 sm:text-sm">{t('eduShell.setup.joinCode')}</p>
-        <p dir="auto" className={cn('line-clamp-1 font-neo-display text-xl font-black leading-tight [overflow-wrap:anywhere] sm:line-clamp-2 sm:text-3xl', !typed && 'text-edu-ink/45')}>
+        <p dir="auto" className={cn('font-neo-display text-xl font-black leading-tight [overflow-wrap:anywhere] sm:text-2xl', typed ? 'line-clamp-1 sm:line-clamp-2' : 'text-edu-ink/45')}>
           {typed || t('eduShell.setup.codePending')}
         </p>
-        <p className="mt-1 hidden font-neo-body text-sm font-bold text-edu-ink/80 sm:block [@media(min-width:1024px)_and_(max-height:860px)]:hidden">{t('eduShell.setup.side.step2')}</p>
+        <p className="mt-1 font-neo-body text-sm font-bold text-edu-ink/80">{t('eduShell.setup.side.step2')}</p>
       </div>
       <Pop pulseKey={typed ? typed.length : 0} className="shrink-0">
         <div dir="ltr" className="flex gap-1 sm:gap-2">

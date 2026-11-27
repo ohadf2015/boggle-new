@@ -164,7 +164,7 @@ function ModeTile({
           ARCADE_BLOCK[accent],
           dense
             ? 'size-10 @2xl:[@media(max-height:800px)]:aspect-[3/1]'
-            : 'size-12 @2xl:[@media(max-height:800px)]:aspect-[2/1] @2xl:min-h-[min(calc(50cqh-12rem),calc(25cqw-0.75rem))]',
+            : 'size-12 @2xl:min-h-[min(calc(50cqh-12rem),calc(25cqw-0.75rem))] @2xl:[@media(max-height:1100px)]:aspect-[4/1] @2xl:[@media(max-height:1100px)]:min-h-0',
         )}
       >
         <span className="relative block h-full w-full -rotate-2 overflow-hidden rounded-[4px] border-2 border-neo-black shadow-hard transition-transform duration-150 group-hover:rotate-0 motion-reduce:transition-none">
@@ -204,7 +204,7 @@ function ModeTile({
             </span>
           ) : null}
         </span>
-        <span className="flex min-w-0 flex-nowrap items-center gap-x-2 whitespace-nowrap font-neo-body text-xs font-bold text-edu-ink/70">
+        <span className="flex min-w-0 flex-nowrap items-center gap-x-2 whitespace-nowrap font-neo-body text-xs font-bold text-edu-ink/70 [@media(max-height:860px)]:@2xl:hidden">
           <span className="inline-flex items-center gap-1 whitespace-nowrap">
             <Clock className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
             {minutesLabel}
@@ -220,7 +220,7 @@ function ModeTile({
             {blockedReason}
           </span>
         ) : hint ? (
-          <span data-testid="mode-hint" className={cn('font-neo-body text-xs leading-snug text-edu-ink/80', mode.category !== 'together' && 'hidden @2xl:block')}>
+          <span data-testid="mode-hint" className={cn('font-neo-body text-xs leading-snug text-edu-ink/80 [@media(max-height:1100px)]:@2xl:hidden', mode.category !== 'together' && 'hidden @2xl:block')}>
             {hint}
           </span>
         ) : null}

@@ -39,7 +39,7 @@ export function LobbyHostSetup({ flowStrip, lessonStep, activePreset, onApplyPre
   }, [gamesOpen]);
 
   return (
-    <div data-testid="lobby-host-setup" data-lobby-expanded={gamesOpen || undefined} className="@container/setup flex flex-col gap-3 @4xl/setup:gap-4">
+    <div data-testid="lobby-host-setup" data-lobby-expanded={gamesOpen || undefined} className="@container/setup flex flex-col gap-3 @4xl/setup:gap-4 @4xl/setup:[@media(max-height:860px)]:gap-3">
       {flowStrip}
       <div className="flex flex-col gap-2 @2xl/setup:flex-row @2xl/setup:items-start">
         <div className="min-w-0 flex-1">{lessonStep}</div>
@@ -76,7 +76,7 @@ export function LobbyHostSetup({ flowStrip, lessonStep, activePreset, onApplyPre
         </button>
       </div>
       {gamesOpen ? (
-        <div ref={panelRef} id="lobby-more-games-panel" data-testid="lobby-more-games-panel" className="flex scroll-mt-2 flex-col gap-3 @4xl/setup:gap-4">
+        <div ref={panelRef} id="lobby-more-games-panel" data-testid="lobby-more-games-panel" className="flex scroll-mt-2 flex-col gap-3 @4xl/setup:gap-4 @4xl/setup:[@media(max-height:860px)]:gap-3">
           <LobbyPresetCards active={activePreset} onApply={onApplyPreset} />
           {options}
           {modeGrid}
