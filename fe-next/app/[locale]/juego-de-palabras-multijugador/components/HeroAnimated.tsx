@@ -1,4 +1,5 @@
 import { LandingButton, LandingHero, Mark, StatStrip } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 import { STATS, ES_DICT_FLOOR } from '../data';
 
 export function HeroAnimated({ locale }: { locale: string }) {
@@ -24,13 +25,8 @@ export function HeroAnimated({ locale }: { locale: string }) {
             </LandingButton>
           </>
         }
-        art={{
-          src: '/es-mp-hero-mascots.webp',
-          alt: 'Dos mascotas de LexiClash en scrabble online español multijugador',
-          width: 760,
-          height: 760,
-        }}
-        artTone="pink"
+        art={LANDING_ART.friends('Dos mascotas de LexiClash en scrabble online español multijugador')}
+        artTone="purple"
       >
         <p className="text-sm font-bold text-neo-lime">
           Sin registrarte. Sin email. La sala se abre en el navegador.{' '}
