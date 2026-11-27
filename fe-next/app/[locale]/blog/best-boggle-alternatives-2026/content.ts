@@ -378,7 +378,7 @@ Bonuspoäng om det inte försöker skaka ur mig 50 kronor varje gång jag förlo
       },
       {
         slug: 'wordle',
-        title: '1. Wordle — den alla känner till',
+        title: '1. Wordle — Den alla känner till',
         content: `Wordle är briljant. Ett pussel om dagen, sex gissningar, inte mer, inte mindre. Begränsningen ÄR spelet. Den delade upplevelsen av att alla löser samma pussel är vad som gjorde det till ett kulturfenomen.
 
 Men mitt problem: det tar ungefär tre minuter.
@@ -391,7 +391,7 @@ Omdöme: Perfekt för vad det är. Uselt om du vill ha mer än tre minuters dagl
       },
       {
         slug: 'words-with-friends-2',
-        title: '2. Words With Friends 2 — det din mamma spelar',
+        title: '2. Words With Friends 2 — Det din mamma spelar',
         content: `Words With Friends har funnits sedan 2009. I app-år är det ungefär 400 år gammalt. Det har den största spelarbasen av alla ordspel. Din moster spelar det. Din kollega spelar det.
 
 Grundspelet är solitt. Det är Alfapet med en annan brädlayout. Ordboken är generös (för generös, ärligt talat). Att hitta motståndare är aldrig ett problem.
@@ -406,7 +406,7 @@ Omdöme: Enorm community, solid grund, förstörd av pay-to-win och tempot av et
       },
       {
         slug: 'wordscapes',
-        title: '3. Wordscapes — den snygga',
+        title: '3. Wordscapes — Den snygga',
         content: `Wordscapes är genuint vackert. Bakgrunderna är fantastiska, och varje nytt landskap man når när man löser pussel tilltalar samlaren i en, i ungefär två veckor.
 
 Sen inser du att varje pussel i princip är likadant. Ingen tävling, ingen tidspress, inga andra människor inblandade. Det är ett ordspel för den som vill slappna av, vilket är helt okej, men jag vill känna hjärtat bulta.
@@ -415,7 +415,7 @@ Omdöme: Vackert, avslappnande, och ungefär lika spännande som att sortera kry
       },
       {
         slug: 'boggle-with-friends',
-        title: '4. Boggle With Friends (Zynga) — sveket',
+        title: '4. Boggle With Friends (Zynga) — Sveket',
         content: `Den här gör mest ont för att den borde vara bäst. Det är bokstavligen Boggle. Officiellt Boggle. Rutnätet, timern, ordletandet — allt finns där.
 
 Och sen gjorde Zynga det Zynga gör.
@@ -430,7 +430,7 @@ Omdöme: Det närmaste verklig Boggle, begravt under ett berg av pay-to-win-skr�
       },
       {
         slug: 'word-blitz',
-        title: '5. Word Blitz — sprintern',
+        title: '5. Word Blitz — Sprintern',
         content: `Word Blitz gör något rätt som många spel missar: realtidstävling. Du och motståndaren stirrar på samma rutnät samtidigt och sveper ord så fort fingrarna hinner. Det blir ingen väntan och (mestadels) inga power-ups, så allt handlar om hastighet.
 
 Det är genuint kul i de 90 sekunder varje runda varar, men det finns inget progressionssystem värt att nämna och inga dagliga utmaningar, så inget drar dig tillbaka förutom "gör samma sak igen."
@@ -439,7 +439,7 @@ Omdöme: Snabbt och kul, men tunt. Du älskar det en månad och glömmer sen att
       },
       {
         slug: 'lexiclash',
-        title: '6. LexiClash — nykomlingen med något att bevisa',
+        title: '6. LexiClash — Nykomlingen med något att bevisa',
         content: `Full transparens: det här är det jag har spelat mest på sistone. Jag ska försöka vara rättvis.
 
 LexiClash är vad som händer när någon tittar på Boggle och säger "tänk om det här, fast mer?" Multiplayer i realtid där du tävlar mot riktiga människor på samma bräde samtidigt, utan att vänta på någon tur. Det ensamt gör det annorlunda från 90% av den här listan.
