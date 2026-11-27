@@ -4,6 +4,7 @@
  * Track and manage conversion triggers for daily challenge signup prompts
  */
 
+import { publishHolidayFromResponse, themedHolidayNow } from '@/lib/holidays/dailyClient';
 import type { Language } from '@/types';
 import type {
   WordHuntResult,
@@ -353,6 +354,8 @@ export async function syncGuestDailyResultsToAccount(
         if (result.hintsUnlocked !== undefined) bodyData.hintsUnlocked = result.hintsUnlocked;
         if (result.efficiencyScore !== undefined) bodyData.efficiencyScore = result.efficiencyScore;
 
+        const holiday = themedHolidayNow();
+        if (holiday) bodyData.holiday = holiday;
         const response = await fetch('/api/daily-challenge/word-hunt/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -361,6 +364,7 @@ export async function syncGuestDailyResultsToAccount(
 
         if (response.ok) {
           successCount++;
+          publishHolidayFromResponse(response);
           syncedKeys.push({ puzzleDate, language });
         }
       } catch {

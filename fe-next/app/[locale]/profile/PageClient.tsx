@@ -1,5 +1,6 @@
 'use client';
 
+import HolidayHideSpot from '@/components/holidays/hunt/HolidayHideSpot';
 import { useState, useEffect, useCallback } from 'react';
 import { LayoutDashboard, BarChart3, Trophy, Gem } from 'lucide-react';
 import { ProfileGuestHero } from '@/components/profile/ProfileGuestHero';
@@ -229,6 +230,7 @@ export default function ProfilePageClient(): React.JSX.Element {
 
   return (
     <div className="flex-1 flex flex-col min-h-0 relative isolate bg-neo-navy">
+      <HolidayHideSpot slot="profile" />
       <AmbientBackdrop theme="profile" />
       <AutoHideHeader />
       <ProfileShowcaseLayout

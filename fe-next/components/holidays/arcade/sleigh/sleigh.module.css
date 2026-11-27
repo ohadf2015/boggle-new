@@ -1,0 +1,135 @@
+.sky {
+  position: relative;
+  flex: 1 0 auto;
+  min-height: 210px;
+  overflow: hidden;
+  background: radial-gradient(circle at 80% 18%, color-mix(in srgb, var(--neo-holiday-snow) 30%, transparent) 0 18px, transparent 19px);
+}
+
+.roofs {
+  position: absolute;
+  inset-inline-start: 0;
+  bottom: 0;
+  width: 200%;
+  height: 56px;
+  background:
+    linear-gradient(135deg, transparent 50%, var(--neo-holiday-red-dark) 50%) 0 0 / 60px 28px repeat-x,
+    linear-gradient(225deg, transparent 50%, var(--neo-holiday-red-dark) 50%) 30px 0 / 60px 28px repeat-x,
+    linear-gradient(var(--neo-navy-light), var(--neo-navy-light)) 0 28px / 100% 28px no-repeat;
+  border-top: 0;
+  animation: scroll 6s linear infinite;
+  will-change: transform;
+}
+
+:global([dir='rtl']) .roofs {
+  animation-name: scrollRtl;
+}
+
+@keyframes scroll {
+  to { transform: translateX(-50%); }
+}
+
+@keyframes scrollRtl {
+  to { transform: translateX(50%); }
+}
+
+.paused .roofs,
+.paused .sleigh {
+  animation-play-state: paused;
+}
+
+.sleigh {
+  position: absolute;
+  top: calc(100% - 188px);
+  inset-inline-start: 6%;
+  width: 92px;
+  animation: bob 1.4s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes bob {
+  50% { transform: translateY(-6px) rotate(-2deg); }
+}
+
+.sleighBody {
+  position: relative;
+  height: 34px;
+  margin-top: -18px;
+  border: 3px solid rgb(var(--neo-black));
+  border-radius: 6px 22px 10px 10px;
+  background: var(--neo-holiday-red);
+}
+
+.runner {
+  height: 6px;
+  margin: 2px 4px 0 10px;
+  border: 3px solid rgb(var(--neo-black));
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+  background: var(--neo-holiday-gold);
+}
+
+.chimney {
+  position: absolute;
+  bottom: 40px;
+  inset-inline-start: 0;
+  width: 46px;
+  height: 58px;
+  border: 3px solid rgb(var(--neo-black));
+  border-radius: 4px 4px 0 0;
+  background: repeating-linear-gradient(0deg, var(--neo-holiday-red-dark) 0 10px, rgb(var(--neo-black)) 10px 12px);
+  will-change: transform;
+}
+
+.chimney::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -6px;
+  right: -6px;
+  height: 10px;
+  border: 3px solid rgb(var(--neo-black));
+  background: var(--neo-holiday-snow);
+}
+
+.gift {
+  position: absolute;
+  top: calc(100% - 164px);
+  inset-inline-start: calc(6% + 30px);
+  width: 34px;
+  animation: drop 520ms cubic-bezier(0.5, 0, 0.9, 0.6) forwards;
+  will-change: transform;
+}
+
+@keyframes drop {
+  from { transform: translate(0, 0) rotate(0deg); }
+  to { transform: translate(var(--gx, 40px), 104px) rotate(200deg); opacity: 0.6; }
+}
+
+.bellLost {
+  opacity: 0.25;
+  filter: grayscale(1);
+  animation: ring 500ms ease-in-out;
+}
+
+@keyframes ring {
+  20% { transform: rotate(-20deg); }
+  40% { transform: rotate(16deg); }
+  60% { transform: rotate(-10deg); }
+}
+
+.timeBar {
+  height: 6px;
+  transform-origin: 0 50%;
+  background: var(--neo-holiday-pine);
+  will-change: transform;
+}
+
+:global([dir='rtl']) .timeBar {
+  transform-origin: 100% 50%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roofs, .sleigh, .bellLost { animation: none; }
+  .gift { animation-duration: 1ms; }
+}

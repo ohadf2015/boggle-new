@@ -1,5 +1,6 @@
 'use client';
 
+import HolidayHideSpot from '@/components/holidays/hunt/HolidayHideSpot';
 import { ResultsSocialSlot } from '@/components/results/ResultsSocialSlot';
 import type { ResultsXp } from '@/components/progression/NextUnlockTeaser';
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
@@ -374,6 +375,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   return (
     <div className="relative min-h-dvh bg-neo-navy text-white">
+      <HolidayHideSpot slot="results" />
       {/* Victory flash on new high score */}
       {results.isNewHighScore && <ScreenFlashOverlay trigger={1} colorClass="bg-neo-lime" />}
       <div className={isDesktop ? 'max-w-5xl mx-auto px-6 xl:px-8 pb-32 pt-4' : 'mx-auto w-full max-w-xl px-3 sm:px-4 pb-28 pt-2'}>

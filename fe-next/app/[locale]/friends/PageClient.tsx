@@ -1,5 +1,6 @@
 'use client';
 
+import HolidayHideSpot from '@/components/holidays/hunt/HolidayHideSpot';
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
@@ -96,6 +97,7 @@ export default function FriendsPageClient(): React.JSX.Element {
       )}
       {...pullToRefreshHandlers}
     >
+      <HolidayHideSpot slot="friends" />
       {/* Pull-to-refresh indicator */}
       <PullToRefreshIndicator
         pullDistance={pullState.pullDistance}

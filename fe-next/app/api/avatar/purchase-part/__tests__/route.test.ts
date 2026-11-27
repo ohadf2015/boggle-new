@@ -48,12 +48,13 @@ vi.mock('@/shared/types/customAvatar', () => ({
   isPremiumPart: vi.fn((category: string, partId: string) => {
     const premiums: Record<string, string[]> = {
       eyes: ['laser', 'cyber'],
-      accessory: ['crown', 'halo'],
+      accessory: ['crown', 'halo', 'santaHat'],
     };
     return premiums[category]?.includes(partId) ?? false;
   }),
   getPartPrice: vi.fn((_category: string, _partId: string) => 75),
   isChestOnlyPart: vi.fn((category: string, partId: string) => `${category}:${partId}` === 'accessory:halo'),
+  isHolidayPart: vi.fn((category: string, partId: string) => `${category}:${partId}` === 'accessory:santaHat'),
 }));
 
 import { NextRequest } from 'next/server';
@@ -210,6 +211,13 @@ describe('POST /api/avatar/purchase-part', () => {
     const res = await POST(makeRequest({ category: 'accessory', partId: 'halo' }));
     expect(res.status).toBe(400);
     expect(res.data.error).toBe('Chest-only part');
+  });
+
+  it('Given a holiday event part, when bought, then it is refused (earned by playing the event only)', async () => {
+    setupDbMocks({ gold: 9999, premiumParts: [] });
+    const res = await POST(makeRequest({ category: 'accessory', partId: 'santaHat' }));
+    expect(res.status).toBe(400);
+    expect(res.data.error).toBe('Holiday event part');
   });
 
   // ===== HAPPY PATH =====

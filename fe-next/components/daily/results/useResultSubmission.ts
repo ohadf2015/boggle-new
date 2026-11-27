@@ -17,6 +17,7 @@ import { getOfflineStore } from '@/lib/offline';
 import { enqueueScore } from '@/lib/offline/scoreQueue';
 import { createClient } from '@/utils/supabase/client';
 import { publishLevelUp } from '@/lib/avatar/revealTrigger';
+import { publishHolidaySettlement, themedHolidayNow } from '@/lib/holidays/dailyClient';
 import type { Language } from '@/types';
 
 interface UseResultSubmissionProps {
@@ -234,6 +235,8 @@ export function useResultSubmission({
             return;
           }
 
+          const holiday = themedHolidayNow();
+          if (holiday) bodyData.holiday = holiday;
           const response = await fetch('/api/daily-challenge/word-hunt/submit', {
             method: 'POST',
             headers: await submitHeaders(isAuthenticated),
@@ -268,6 +271,7 @@ export function useResultSubmission({
           }
 
           if (responseData.levelUp) publishLevelUp(responseData.levelUp, 'dailyWordHunt');
+          publishHolidaySettlement(responseData.holiday);
 
           // Notify parent of successful submission
           onSubmitSuccess();

@@ -59,6 +59,8 @@ export default function UnlockPanel({
     ? t('avatarBuilder.editor.needMoreGold', { amount: safeToLocaleString(info.goldShort, language) })
     : info.path === 'chest'
       ? t('avatarChest.chestOnlyHint')
+      : info.path === 'holiday'
+      ? t('holiday.avatar.eventOnlyHint')
       : levelPath && info.price > 0
       ? t('avatarBuilder.editor.orKeepPlaying')
       // Tried-on parts never save; say so, or Save reads as broken.
@@ -86,7 +88,8 @@ export default function UnlockPanel({
           <p className="mt-1 font-neo-display text-neo-white text-[15px] font-bold leading-tight truncate">
             {levelPath
               ? t('avatarBuilder.editor.unlocksAtLevel', { level: info.unlockLevel as number })
-              : info.path === 'chest' ? t('avatarChest.chestOnly') : t('avatarBuilder.editor.goldOnly')}
+              : info.path === 'chest' ? t('avatarChest.chestOnly')
+              : info.path === 'holiday' ? t('holiday.avatar.eventOnly') : t('avatarBuilder.editor.goldOnly')}
             {levelPath && typeof premium.level === 'number' && (
               <span className="ms-1.5 text-[11px] font-bold text-neo-white/60">{t('avatarBuilder.editor.youAreLevel', { level: premium.level })}</span>
             )}

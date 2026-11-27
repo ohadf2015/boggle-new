@@ -6,6 +6,7 @@ import { WORD_LISTS_GENERATED_AT } from '@/lib/seo/wordLists/catalog';
 import { wordListSitemapRoutes } from '@/lib/seo/wordLists/sitemapRoutes';
 import { isAppScreenUrl } from '@/lib/seo/appScreens';
 import buildInfo from '@/lib/seo/buildInfo.generated.json';
+import { HOLIDAY_LANDINGS, landingAlternates, landingUrl } from '@/lib/holidays/landing';
 
 const BASE_URL = 'https://www.lexiclash.live';
 const LOCALES = ['he', 'en', 'sv', 'ja', 'es', 'ru'] as const;
@@ -322,6 +323,11 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForLocaleOnly(routes, '/erudit-onlayn', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
   addForLocaleOnly(routes, '/sostav-slova-iz-bukv', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
   addForLocaleOnly(routes, '/igra-v-assotsiatsii-onlayn', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
+
+  // Holiday landings: evergreen, one native slug per language, hreflang across the same holiday.
+  for (const p of HOLIDAY_LANDINGS) {
+    routes.push({ url: landingUrl(p), lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85, alternates: { languages: landingAlternates(p) } });
+  }
 
   // ─── Education keyword landings (English-only body) ───
   // Same pattern as comparison pages: robots: { index: locale === 'en' }, non-EN

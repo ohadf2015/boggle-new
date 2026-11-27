@@ -21,7 +21,8 @@ export type AwardCoinsReason = 'duel_win' | 'wotd_complete' | 'grand_slam' | 'da
   | 'adventure_elite' | 'adventure_boss' | 'adventure_world' | 'adventure_purse'
   // A chest rolled an avatar part the player already had: coins instead (lib/avatar/chestDrops).
   | 'avatar_part_duplicate'
-  | 'daily_streak_milestone';
+  | 'daily_streak_milestone'
+  | 'holiday_event';
 
 export interface AwardCoinsResult {
   success: boolean;

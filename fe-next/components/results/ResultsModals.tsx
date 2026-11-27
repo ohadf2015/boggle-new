@@ -15,6 +15,7 @@
 
 'use client';
 
+import HolidayHideSpot from '@/components/holidays/hunt/HolidayHideSpot';
 import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -226,6 +227,7 @@ export function ResultsModals({
 
   return (
     <>
+      <HolidayHideSpot slot="results" />
       {/* Word Feedback Modal - Self-healing dictionary validation */}
       <WordFeedbackModal
         isOpen={activeModalId === 'wordFeedback'}

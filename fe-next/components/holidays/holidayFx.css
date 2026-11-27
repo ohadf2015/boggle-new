@@ -1,0 +1,48 @@
+/* Phase 3 holiday motion: transform/opacity only; every animation sits behind no-preference. */
+
+@media (prefers-reduced-motion: no-preference) {
+  .holiday-gift-idle { animation: hfx-bob 3.2s ease-in-out infinite; }
+  .holiday-gift-shake { animation: hfx-shake 0.62s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+  .holiday-gift-burst { animation: hfx-burst 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.4) both; }
+  .holiday-gift-grow { animation: hfx-grow 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.3) both; }
+  .holiday-pop-in { animation: hfx-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.4) both; }
+  .holiday-peek { animation: hfx-wiggle 8s ease-in-out infinite; transform-origin: 50% 100%; }
+  .holiday-collect { animation: hfx-collect 0.8s cubic-bezier(0.3, 0, 0.2, 1) forwards; }
+  .holiday-sleigh { animation: hfx-sleigh 7s linear 1 both; }
+  .holiday-sweep { animation: hfx-sweep 2.4s ease-out 1 both; }
+  .holiday-mascot-spin { animation: hfx-spin 1.6s cubic-bezier(0.15, 0.6, 0.25, 1) 1; }
+  .holiday-snowball { animation: hfx-snowball 1.1s cubic-bezier(0.3, 0.1, 0.4, 1) both; }
+  .holiday-globe-in { animation: hfx-globe 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.3) both; }
+  .holiday-globe-flake { animation: hfx-flake var(--hfx-dur, 3s) linear var(--hfx-delay, 0s) infinite; }
+  .holiday-bell-ring { animation: hfx-bell 0.4s ease-out 1; transform-origin: 50% 8%; }
+  .holiday-chime { animation: hfx-pulse 1s ease-out infinite; }
+  .holiday-banner-in { animation: hfx-banner 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+  .holiday-card-flip { animation: hfx-flip 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+}
+
+@keyframes hfx-bob { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-4px) rotate(1deg); } }
+@keyframes hfx-shake {
+  10%, 90% { transform: translateX(-2px) rotate(-3deg); }
+  20%, 80% { transform: translateX(4px) rotate(4deg); }
+  30%, 50%, 70% { transform: translateX(-6px) rotate(-6deg); }
+  40%, 60% { transform: translateX(6px) rotate(6deg); }
+}
+@keyframes hfx-burst { 0% { transform: scale(1); } 35% { transform: scale(1.35) rotate(-8deg); } 100% { transform: scale(0) rotate(25deg); opacity: 0; } }
+@keyframes hfx-grow { 0% { transform: scale(0.6); } 70% { transform: scale(1.12); } 100% { transform: scale(1); } }
+@keyframes hfx-pop { 0% { transform: scale(0.4); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes hfx-wiggle { 0%, 88%, 100% { transform: rotate(0); } 91% { transform: rotate(-12deg); } 94% { transform: rotate(10deg); } 97% { transform: rotate(-6deg); } }
+@keyframes hfx-collect { 0% { transform: scale(1); } 40% { transform: scale(1.6) rotate(-10deg); } 100% { transform: translateY(-120px) scale(0.2) rotate(30deg); opacity: 0; } }
+@keyframes hfx-sleigh { from { transform: translate3d(-30vw, 10px, 0) rotate(-4deg); } 50% { transform: translate3d(50vw, -14px, 0) rotate(2deg); } to { transform: translate3d(130vw, 6px, 0) rotate(-3deg); } }
+@keyframes hfx-sweep { from { transform: translateX(-110%); opacity: 0; } 20% { opacity: 1; } to { transform: translateX(110%); opacity: 0; } }
+@keyframes hfx-spin { from { transform: rotate(0); } to { transform: rotate(1800deg); } }
+@keyframes hfx-snowball {
+  0% { transform: translate3d(var(--hfx-x0, -10vw), var(--hfx-y0, 60vh), 0) scale(0.6); }
+  85% { transform: translate3d(var(--hfx-x1, 60vw), var(--hfx-y1, 30vh), 0) scale(1.1); opacity: 1; }
+  100% { transform: translate3d(var(--hfx-x1, 60vw), var(--hfx-y1, 30vh), 0) scale(1.8, 0.4); opacity: 0; }
+}
+@keyframes hfx-globe { 0% { transform: scale(0.2) rotate(-20deg); } 100% { transform: scale(1) rotate(0); } }
+@keyframes hfx-flake { from { transform: translate3d(0, -20px, 0); opacity: 0; } 15% { opacity: 1; } to { transform: translate3d(var(--hfx-drift, 10px), 220px, 0); opacity: 0; } }
+@keyframes hfx-bell { 0% { transform: rotate(0); } 30% { transform: rotate(-16deg); } 65% { transform: rotate(12deg); } 100% { transform: rotate(0); } }
+@keyframes hfx-pulse { 0% { transform: scale(1); } 15% { transform: scale(1.12); } 100% { transform: scale(1); } }
+@keyframes hfx-banner { from { transform: translateY(-120%); } to { transform: translateY(0); } }
+@keyframes hfx-flip { from { transform: perspective(600px) rotateY(90deg); } to { transform: perspective(600px) rotateY(0); } }

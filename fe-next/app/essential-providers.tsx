@@ -94,6 +94,7 @@ const GlobalCoinEarnFx = dynamic(() => import(/* webpackChunkName: "app-root-mou
 const SharedFxMount = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/animations/SharedFxMount'), { ssr: false });
 const NativeSelectionGuard = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/native/NativeSelectionGuard'), { ssr: false });
 const EasterEggListener = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/EasterEggListener'), { ssr: false });
+const HolidayEggsLayer = dynamic(() => import('@/components/holidays/eggs/HolidayEggsLayer'), { ssr: false });
 const HiddenAchievementListener = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/achievements/HiddenAchievementListener'), { ssr: false });
 
 
@@ -311,6 +312,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 {gameSurface && <GlobalCoinEarnFx />}
                                                 {/* Hidden Konami-code easter egg → fireworks + toast (cosmetic only) */}
                                                 <EasterEggListener />
+                                                <HolidayEggsLayer />
                                                 {/* Hidden in-app achievements (easter eggs) → localized reveal card + confetti.
                                                     Gameplay only emits on the bus; this listener owns all UI. */}
                                                 {gameSurface && <HiddenAchievementListener />}

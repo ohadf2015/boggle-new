@@ -1,0 +1,92 @@
+.stage {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  touch-action: manipulation;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
+  overflow: hidden;
+}
+
+.pop {
+  animation: pop 320ms cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+.shake {
+  animation: shake 360ms ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px) rotate(-2deg); }
+  40% { transform: translateX(7px) rotate(2deg); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(3px); }
+}
+
+.good {
+  animation: good 420ms ease-out;
+}
+
+@keyframes good {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.08) translateY(-3px); }
+  100% { transform: scale(1); }
+}
+
+.tile {
+  transition: transform 120ms ease-out;
+}
+
+.tile:active {
+  transform: translate(1px, 1px) scale(0.95);
+}
+
+.picked {
+  transform: translateY(-4px) scale(0.92);
+  opacity: 0.35;
+}
+
+.floatUp {
+  position: absolute;
+  z-index: 31;
+  pointer-events: none;
+  animation: floatUp 900ms ease-out forwards;
+}
+
+@keyframes floatUp {
+  0% { transform: translate(-50%, 0) scale(0.7); opacity: 0; }
+  20% { transform: translate(-50%, -8px) scale(1.15); opacity: 1; }
+  100% { transform: translate(-50%, -56px) scale(1); opacity: 0; }
+}
+
+.frost {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 29;
+  box-shadow: inset 0 0 60px 18px var(--neo-holiday-snow);
+  opacity: 0;
+  transition: opacity 250ms ease-out;
+}
+
+.frostOn {
+  opacity: 0.75;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pop, .shake, .good, .floatUp { animation: none; }
+  .floatUp { opacity: 1; transform: translate(-50%, -24px); }
+  .tile, .frost { transition: none; }
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import HolidayHideSpot from '@/components/holidays/hunt/HolidayHideSpot';
 import { cn } from '@/lib/utils';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { InlineBannerAd } from "@/components/ads";
@@ -122,6 +123,7 @@ export default function HowToPlayPageClient({ locale, children }: HowToPlayPageC
 
     return (
         <div className="min-h-dvh bg-neo-navy">
+            <HolidayHideSpot slot="howToPlay" />
             <BreadcrumbJsonLd items={breadcrumbs} />
             <GameModeJsonLd mode="classic" locale={locale} includeFaq />
             <GameModeJsonLd mode="blast" locale={locale} />

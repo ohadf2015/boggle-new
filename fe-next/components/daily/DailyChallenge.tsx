@@ -53,6 +53,7 @@ import DailyOfflineFallback from '@/components/offline/DailyOfflineFallback';
 import type { LetterGrid, Language } from '@/types';
 import SessionRevealHost from '@/components/avatar/reveal/SessionRevealHost';
 import { useRevealHost } from '@/lib/levelUp/useRevealHost';
+import holidayDailyStyles from './holiday/holidayDaily.module.css';
 
 export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played' | 'offline-miss';
 
@@ -352,7 +353,7 @@ const DailyChallenge: React.FC = () => {
 
   return (
     <div
-      className={`flex-1 flex flex-col min-h-0 h-dvh max-h-dvh w-full max-w-[100vw] bg-neo-navy relative overflow-x-clip overflow-hidden ${seasonSkin}`}
+      className={`flex-1 flex flex-col min-h-0 h-dvh max-h-dvh w-full max-w-[100vw] bg-neo-navy relative overflow-x-clip overflow-hidden ${seasonSkin} ${holidayDailyStyles.root}`}
     >
       {/* Collapse the in-game header spacer so the focused Word Hunt screen has no
           empty band at the top (the header is hidden during play anyway). */}

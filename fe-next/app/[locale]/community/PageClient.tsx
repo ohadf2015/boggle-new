@@ -1,5 +1,6 @@
 'use client';
 
+import HolidayHideSpot from '@/components/holidays/hunt/HolidayHideSpot';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -172,6 +173,7 @@ export default function CommunityPageClient() {
 
   return (
     <div className="min-h-screen bg-neo-navy relative overflow-hidden">
+      <HolidayHideSpot slot="community" />
       <Header />
 
       {/* ── Background texture — diagonal scan lines ── */}

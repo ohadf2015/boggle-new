@@ -1,5 +1,6 @@
 'use client';
 
+import HolidayHideSpot from '@/components/holidays/hunt/HolidayHideSpot';
 import React, { Suspense } from 'react';
 import nextDynamic from 'next/dynamic';
 import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
@@ -31,6 +32,7 @@ export default function AdventurePageClient(): React.JSX.Element {
   useModeBed('ADVENTURE');
   return (
     <Suspense fallback={<LoadingFallback />}>
+      <HolidayHideSpot slot="adventure" />
       <AdventureView />
     </Suspense>
   );

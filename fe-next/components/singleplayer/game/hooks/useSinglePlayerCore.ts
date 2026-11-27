@@ -1,5 +1,6 @@
 'use client';
 
+import { noticeHolidayWord } from '@/lib/holidays/holidayClient';
 import { scheduleSelection, useSelectionReset } from '@/hooks/useSelectionStore';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { selectRandomRevealWord, getRevealableWordCount } from '@/utils/wordPathFinder';
@@ -431,6 +432,7 @@ export function useSinglePlayerCore({
       wordPace.recordWord();
       setScore(prev => prev + wordPts + juice.bonusPts);
       playWordAcceptedSound(); hapticForWordScore(normalizedWord.length);
+      noticeHolidayWord(normalizedWord);
       effects.lastWordFoundTimeRef.current = Date.now(); setShowHintPrompt(false);
       combo.incrementCombo(true);
       trainingAnalysisTrackValidWord(normalizedWord.length);

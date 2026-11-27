@@ -8,7 +8,7 @@
  */
 import { getPartRarity, type VisualTier } from '@/lib/avatar/rarity';
 import { getUnlockLevel } from '@/lib/avatar/unlocks';
-import { isChestOnlyPart } from '@/shared/types/customAvatar';
+import { isChestOnlyPart, isHolidayPart } from '@/shared/types/customAvatar';
 import { getCatalogPart, getPalette, type PaletteId } from '@/lib/avatar/catalog';
 
 export interface LockPremium {
@@ -17,7 +17,7 @@ export interface LockPremium {
   level?: number;
 }
 
-export type UnlockPath = 'free' | 'owned' | 'level' | 'gold' | 'chest';
+export type UnlockPath = 'free' | 'owned' | 'level' | 'gold' | 'chest' | 'holiday';
 
 export interface PartLockInfo {
   locked: boolean;
@@ -60,10 +60,11 @@ export function getPartLockInfo(category: string, id: string, premium: LockPremi
     ? Math.max(0, unlockLevel - premium.level)
     : null;
   if (isChestOnlyPart(category, id)) return { ...base, locked, path: 'chest', levelsToGo: null };
+  if (isHolidayPart(category, id)) return { ...base, locked, path: 'holiday', levelsToGo: null };
   return { ...base, locked, path: unlockLevel != null ? 'level' : 'gold', levelsToGo };
 }
 
-const PATH_RANK: Record<UnlockPath, number> = { free: 0, owned: 0, level: 1, gold: 2, chest: 3 };
+const PATH_RANK: Record<UnlockPath, number> = { free: 0, owned: 0, level: 1, gold: 2, chest: 3, holiday: 4 };
 
 /**
  * Grid order: 'none', then everything usable (catalog order), then level

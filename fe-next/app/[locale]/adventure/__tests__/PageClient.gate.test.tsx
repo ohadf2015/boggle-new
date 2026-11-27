@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 
 const replace = vi.fn();
 
+vi.mock('@/components/holidays/hunt/HolidayHideSpot', () => ({ default: () => null }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace }),
 }));

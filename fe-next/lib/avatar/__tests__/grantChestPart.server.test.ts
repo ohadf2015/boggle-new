@@ -5,7 +5,7 @@ const awardCoins = vi.fn();
 vi.mock('@/backend/services/economy/awardCoins', () => ({ awardCoinsServer: (...a: unknown[]) => awardCoins(...a) }));
 vi.mock('@/utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 
-import { grantChestPart } from '../grantChestPart.server';
+import { grantChestPart, grantPremiumPart } from '../grantChestPart.server';
 import { CHEST_POOL } from '../chestDrops';
 
 type Row = Record<string, unknown>;
@@ -115,5 +115,19 @@ describe('grantChestPart', () => {
     const db = fakeDb({ premium_avatar_parts: [], current_level: 1 }, { ledgerMissing: true });
     await expect(grantChestPart({ supabase: db.client, playerId: 'p1', source: 'day_clear', sourceKey: 'x' })).resolves.toBeNull();
     expect(db.profile.premium_avatar_parts).toEqual([]);
+  });
+});
+
+describe('grantPremiumPart', () => {
+  it('Given a part the player lacks, then it is appended once, and a second grant keeps one copy', async () => {
+    const db = fakeDb({ premium_avatar_parts: ['eyes:laser'], current_level: 1 });
+    expect(await grantPremiumPart(db.client, 'p1', 'accessory:santaHat')).toBe(true);
+    expect(await grantPremiumPart(db.client, 'p1', 'accessory:santaHat')).toBe(true);
+    expect(db.profile.premium_avatar_parts).toEqual(['eyes:laser', 'accessory:santaHat']);
+  });
+
+  it('Given the lock keeps losing, then it reports failure instead of a silent no-op', async () => {
+    const db = fakeDb({ premium_avatar_parts: [], current_level: 1 }, { lockLosses: 10 });
+    expect(await grantPremiumPart(db.client, 'p1', 'accessory:santaHat')).toBe(false);
   });
 });

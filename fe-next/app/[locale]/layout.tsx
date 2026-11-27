@@ -13,6 +13,8 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import { STORAGE_SHIM_SCRIPT } from '@/utils/storageShim';
 import { PRACTICE_SEAT_SCRIPT } from '@/utils/practiceSeatStorage';
 import { CHUNK_BOOT_GUARD_SCRIPT } from '@/utils/chunkBootGuard';
+import { HOLIDAY_PREPAINT_SCRIPT } from '@/lib/holidays/prepaintScript';
+import HolidayClassKeeper from '@/components/holidays/HolidayClassKeeper';
 import { getLocalizedSchemaStrings } from '@/utils/seoLocalizedSchema';
 import { getWebAppDescription } from '@/lib/seo/webAppDescription';
 import { ANDROID_PACKAGE } from '@/utils/androidApp';
@@ -546,6 +548,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         __html: PRACTICE_SEAT_SCRIPT,
                     }}
                 />
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: HOLIDAY_PREPAINT_SCRIPT,
+                    }}
+                />
                 {/* Pre-hydration stale-chunk guard — must run before any app
                     chunk loads (i.e. inline, here in <head>): if the page's own
                     /_next/static chunk 404s at boot (stale cached HTML / mixed
@@ -684,6 +691,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         __html: `document.documentElement.classList.add('dark')`,
                     }}
                 />
+                <HolidayClassKeeper />
                 {/* Skip to main content link for keyboard/screen reader users */}
                 <a
                     href="#main-content"

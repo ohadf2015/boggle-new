@@ -84,6 +84,8 @@ export const CANONICAL_PARTS: Record<LegacyCategory, readonly string[]> = {
     'phoenixCrown', 'crystalCrown', 'microphone', 'earsOut',
     // 2026-11 chest drop (redrawn + new)
     'devilHorns', 'monocle', 'mask', 'sombrero', 'gamerHeadset', 'graduationCap', 'tinfoilHat', 'earrings', 'ninjaScarf', 'cape', 'wings', 'unicornHorn', 'dragonWings', 'flameAura', 'goldNecklace', 'goldChain',
+    'beanieBlue', 'scarfBlue', 'dreidelPin', 'menorahCrown', 'santaHat', 'elfHat', 'antlers', 'earmuffs', 'scarfXmas', 'candyGlasses',
+    'goldDreidelPin', 'goldOrnament', 'goldGeltMedal', 'goldBell',
   ],
   bodyStyle: ['default', 'hoodie', 'suit', 'turtleneck', 'offShoulder', 'cropTop'],
 };
