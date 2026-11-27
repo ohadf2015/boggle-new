@@ -57,4 +57,38 @@ describe('TeacherTrialWelcome', () => {
     expect(screen.queryByTestId('teacher-trial-welcome')).not.toBeInTheDocument();
     expect(window.location.search).not.toContain('checkout');
   });
+
+  it('Given a current activation step, When the teacher takes it, Then the primary action deep-links and does not count as abandonment', () => {
+    const onEngage = vi.fn();
+    const onAbandon = vi.fn();
+    render(
+      <TeacherTrialWelcome
+        trialExpires={new Date(Date.now() + 86400000).toISOString()}
+        nextHref="/en/teacher/classroom/new"
+        nextLabelKey="eduShell.firstSession.steps.create_classroom.cta"
+        onEngage={onEngage}
+        onAbandon={onAbandon}
+      />,
+    );
+    const step = screen.getByTestId('teacher-trial-welcome-step');
+    expect(step).toHaveAttribute('href', '/en/teacher/classroom/new');
+    expect(step).toHaveTextContent('eduShell.firstSession.steps.create_classroom.cta');
+    fireEvent.click(step);
+    expect(onEngage).toHaveBeenCalledOnce();
+    expect(onAbandon).not.toHaveBeenCalled();
+  });
+
+  it('Given a current activation step, When the teacher chooses Not now, Then the welcome closes as an abandonment', () => {
+    const onAbandon = vi.fn();
+    render(
+      <TeacherTrialWelcome
+        trialExpires={new Date(Date.now() + 86400000).toISOString()}
+        nextHref="/en/teacher?classroomId=c1&assign=1"
+        onAbandon={onAbandon}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('teacher-trial-welcome-dismiss'));
+    expect(onAbandon).toHaveBeenCalledOnce();
+    expect(screen.queryByTestId('teacher-trial-welcome')).not.toBeInTheDocument();
+  });
 });

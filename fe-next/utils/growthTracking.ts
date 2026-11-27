@@ -395,6 +395,9 @@ export type GrowthEvent =
   | 'trial_checklist_shown'
   | 'trial_checklist_step_completed'
   | 'trial_checklist_all_completed'
+  // Trial first-session checklist. Same name for completion and abandonment
+  // (outcome prop). NOT in CANONICAL_DUAL_EMIT: captured at the emitter.
+  | 'teacher_activation_step_completed'
   // ESL winner-page depth (t_25b9ddb1). Demo start + CEFR list pick on
   // /education/esl-word-games. Props: { cefr: 'A1'|'A2'|'B1', page }.
   | 'edu_page_play_demo_started'

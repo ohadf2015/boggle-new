@@ -22995,6 +22995,32 @@ const ja = {
         }
       }
     },
+    "firstSession": {
+      "title": "今日からクラスでプレイしよう",
+      "subtitle": "4つのステップ。Teacher Proの無料体験が進行中です。",
+      "progress": "{done} / {total}",
+      "dismiss": "チェックリストを閉じる",
+      "later": "あとで",
+      "schedule": "授業用に予定する",
+      "steps": {
+        "create_classroom": {
+          "title": "クラスを作成する",
+          "cta": "クラスを作成"
+        },
+        "add_students": {
+          "title": "最初の生徒を追加する",
+          "cta": "生徒を追加"
+        },
+        "create_assignment": {
+          "title": "最初の課題を作る",
+          "cta": "課題を作る"
+        },
+        "first_live_game": {
+          "title": "ライブゲームを実施または予定する",
+          "cta": "ライブゲームを始める"
+        }
+      }
+    },
     "setup": {
       "strip": {
         "share": "コードを共有",

@@ -11,6 +11,8 @@ import type { Language } from '@/lib/supabase/education/types';
 import { ContentLanguageChips, contentLanguagesFor } from '@/components/education/pickers/ContentLanguageChips';
 import { SessionTemplatesSection, type SessionRun } from './StarterPacksSection.sessions';
 import { ThemedPacksSection } from './StarterPacksSection.themed';
+import { TrialFirstSessionChecklist } from './home/TrialFirstSessionChecklist';
+import { useTrialFirstSessionAuto, type TrialFirstSessionController } from '@/hooks/useTrialFirstSession';
 import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export type { SessionRun } from './StarterPacksSection.sessions';
@@ -24,6 +26,12 @@ interface StarterPacksSectionProps {
   classroomId?: string;
   /** Inside the lobby the run is applied in place; elsewhere Run this links to the lobby. */
   onRunSession?: (run: SessionRun) => void;
+  /**
+   * Trial first-session checklist. Opt-in so pack grids that are not the
+   * teacher's next step stay unchanged. Not a second onboarding card.
+   */
+  showTrialChecklist?: boolean;
+  activation?: TrialFirstSessionController | null;
 }
 
 const categoryIcons = {
@@ -85,7 +93,7 @@ export function packsForLanguage(language: string | undefined): readonly Starter
   return matching.length > 0 ? matching : STARTER_LESSON_PACKS;
 }
 
-export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPack, language, languages, classroomId, onRunSession }) => {
+export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPack, language, languages, classroomId, onRunSession, showTrialChecklist = false, activation = null }) => {
   const { t, language: uiLanguage } = useLanguage();
   const headingId = useId();
   const [picked, setPicked] = useState<Language | null>(null);
@@ -108,6 +116,19 @@ export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPac
 
   return (
     <div className="@container space-y-8">
+      {activation ? (
+        <TrialFirstSessionChecklist
+          checklist={activation.checklist}
+          hrefs={activation.hrefs}
+          onDismiss={activation.dismiss}
+          onEngage={activation.engage}
+          onOpenAssignment={activation.openAssignment}
+          onSchedule={activation.schedule}
+          t={t}
+        />
+      ) : showTrialChecklist ? (
+        <TrialFirstSessionSlot />
+      ) : null}
       <ContentLanguageChips
         testId="starter-packs-language"
         label={t('eduPickers.content.languageLabel', 'Language')}
@@ -146,4 +167,21 @@ export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPac
 });
 
 StarterPacksSection.displayName = 'StarterPacksSection';
+
+function TrialFirstSessionSlot() {
+  const { t } = useLanguage();
+  const session = useTrialFirstSessionAuto();
+  return (
+    <TrialFirstSessionChecklist
+      checklist={session.checklist}
+      hrefs={session.hrefs}
+      onDismiss={session.dismiss}
+      onEngage={session.engage}
+      onOpenAssignment={session.openAssignment}
+      onSchedule={session.schedule}
+      t={t}
+    />
+  );
+}
+
 export default StarterPacksSection;

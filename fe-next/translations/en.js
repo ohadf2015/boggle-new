@@ -22016,6 +22016,32 @@ const en = {
         }
       }
     },
+    "firstSession": {
+      "title": "Get your class playing today",
+      "subtitle": "Four steps. Your Teacher Pro trial is running.",
+      "progress": "{done} of {total}",
+      "dismiss": "Dismiss checklist",
+      "later": "Not now",
+      "schedule": "Schedule for class",
+      "steps": {
+        "create_classroom": {
+          "title": "Create a classroom",
+          "cta": "Create classroom"
+        },
+        "add_students": {
+          "title": "Add your first students",
+          "cta": "Add students"
+        },
+        "create_assignment": {
+          "title": "Create the first assignment",
+          "cta": "Create assignment"
+        },
+        "first_live_game": {
+          "title": "Run or schedule a live game",
+          "cta": "Run a live game"
+        }
+      }
+    },
     "setup": {
       "strip": {
         "share": "Share the code",
