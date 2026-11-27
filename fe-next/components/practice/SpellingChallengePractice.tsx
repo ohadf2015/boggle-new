@@ -23,6 +23,7 @@ import { StarTrack, STAR_KEYFRAMES } from './spelling/StarTrack';
 import { candyKey } from './spelling/candyKey';
 import { PracticeBuddy, BUDDY_KEYFRAMES, type BuddyReaction } from './spelling/PracticeBuddy';
 import { streakFlameStage } from '@/lib/education/practiceJuice';
+import type { WordResult } from '@/lib/education/wordMemory';
 
 /*
  * The stage behind the drill: two soft brand-colour glows and a faint dot grid
@@ -62,7 +63,7 @@ function burstFrom(el: HTMLElement | null) {
 
 export interface SpellingChallengePracticeProps {
   words: VocabularyWord[];
-  onComplete: (results: { correct: number; total: number; accuracy: number }) => void;
+  onComplete: (results: { correct: number; total: number; accuracy: number; wordResults: WordResult[] }) => void;
   onBack: () => void;
   /** Jump straight into the next ready mode, when the lesson offers one. */
   onNext?: () => void;
@@ -138,6 +139,7 @@ function SpellingRound({
     attempts,
     accuracy,
     isComplete,
+    wordResults,
     advance,
     resetGame,
   } = useSpellingGame(usable, { manualAdvanceOnWrong: true });
@@ -186,10 +188,10 @@ function SpellingRound({
       setTimeSpent(Math.floor((Date.now() - sessionStartRef.current) / 1000));
       setTimeout(() => {
         setShowResults(true);
-        onComplete({ correct: correctCount, total: attempts, accuracy });
+        onComplete({ correct: correctCount, total: attempts, accuracy, wordResults });
       }, 500);
     }
-  }, [isComplete, showResults, onComplete, correctCount, attempts, accuracy]);
+  }, [isComplete, showResults, onComplete, correctCount, attempts, accuracy, wordResults]);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {

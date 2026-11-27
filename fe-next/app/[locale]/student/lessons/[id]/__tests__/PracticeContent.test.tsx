@@ -13,7 +13,11 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import React from 'react';
 
-const { mockPush, mockStartSession, completeSpy, dismissLevelUp } = vi.hoisted(() => ({
+const { mockPush, mockStartSession, completeSpy, dismissLevelUp, STAGE_RESULTS } = vi.hoisted(() => ({
+  STAGE_RESULTS: [
+    { word: 'ox', correct: true, kind: 'spell' },
+    { word: 'harvest', correct: false, kind: 'spell' },
+  ],
   mockPush: vi.fn(),
   mockStartSession: vi.fn().mockResolvedValue({ success: true }),
   completeSpy: vi.fn(),
@@ -61,9 +65,10 @@ vi.mock('@/components/education/practicePicker/PracticePicker', () => ({
 
 vi.mock('@/components/education/practice/PracticeModeStage', () => ({
   __esModule: true,
-  default: ({ mode, variant, onBack, wordCraftReview }: { mode: string; variant: string | null; onBack: () => void; wordCraftReview?: { studentId: string; lessonId: string } }) => (
+  default: ({ mode, variant, onBack, onFinish, wordCraftReview }: { mode: string; variant: string | null; onBack: () => void; onFinish: (type: string, payload: Record<string, unknown>) => unknown; wordCraftReview?: { studentId: string; lessonId: string } }) => (
     <div data-testid="stage" data-mode={mode} data-variant={variant ?? ''} data-review={wordCraftReview ? `${wordCraftReview.studentId}/${wordCraftReview.lessonId}` : ''}>
       <button type="button" data-testid="stage-back" onClick={onBack}>leave</button>
+      <button type="button" data-testid="stage-finish" onClick={() => onFinish(mode, { cardsReviewed: 2, cardsCorrect: 1, wordResults: STAGE_RESULTS })}>finish</button>
     </div>
   ),
 }));
@@ -120,6 +125,22 @@ describe('PracticeContent', () => {
     expect(dismissLevelUp).toHaveBeenCalled();
   });
 
+  it('GIVEN a spelling round with a wrong answer WHEN it finishes THEN its word results reach completePracticeSession', async () => {
+    const user = userEvent.setup();
+    mockStartSession.mockResolvedValueOnce({ success: true, sessionId: 'sess-1' });
+    renderContent();
+
+    await user.click(screen.getByTestId('pick-spelling'));
+    await screen.findByTestId('stage');
+    await user.click(screen.getByTestId('stage-finish'));
+
+    expect(completeSpy).toHaveBeenCalledWith(expect.objectContaining({
+      type: 'spelling',
+      sessionId: 'sess-1',
+      wordResults: STAGE_RESULTS,
+    }));
+  });
+
   it('GIVEN an open round WHEN the student leaves THEN the picker comes back', async () => {
     const user = userEvent.setup();
     renderContent();
@@ -140,12 +161,12 @@ describe('PracticeContent', () => {
     expect(mockStartSession).toHaveBeenCalledWith('solo_board', { variant: 'wordcraft' });
   });
 
-  it('GIVEN a signed-in student WHEN Word Craft opens THEN its missed words are queued for that student on this lesson', async () => {
+  it('GIVEN a signed-in student WHEN Word Craft opens THEN its results link to the review of this lesson for that student', async () => {
     renderContent({ initialMode: 'solo_board', initialVariant: 'wordcraft', reviewStudentId: 'stu-1' });
     expect(await screen.findByTestId('stage')).toHaveAttribute('data-review', 'stu-1/lesson-1');
   });
 
-  it('GIVEN no account WHEN Word Craft opens THEN nothing is queued for review', async () => {
+  it('GIVEN no account WHEN Word Craft opens THEN there is no review to link to', async () => {
     renderContent({ initialMode: 'solo_board', initialVariant: 'wordcraft' });
     expect(await screen.findByTestId('stage')).toHaveAttribute('data-review', '');
   });

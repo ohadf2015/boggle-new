@@ -45,8 +45,8 @@ function WorkshopSession({ lesson, onBack, reviewStudentId }: { lesson: Practice
         sessionIdRef.current = result.sessionId;
         return result.success;
       }}
-      recordResult={({ vocabularyWordsFound, wordsFound }) =>
-        record({ type: 'solo_board', sessionId: sessionIdRef.current, vocabularyWordsFound, wordsFound, newWordsFound: [] })
+      recordResult={({ vocabularyWordsFound, wordsFound, wordResults }) =>
+        record({ type: 'solo_board', sessionId: sessionIdRef.current, vocabularyWordsFound, wordsFound, newWordsFound: [], wordResults })
       }
     />
   );

@@ -6,6 +6,7 @@ import { normalizeWord } from '@/shared/utils/wordNormalization';
 import type { Language } from '@/shared/types/game';
 import logger from '../utils/logger.js';
 import { DbWriteError } from './classroomXpAward';
+import type { WordResult } from '@/lib/education/wordMemory';
 
 interface WordAttempt {
   attempts: number;
@@ -136,9 +137,25 @@ export function splitLessonWords(vocab: LessonVocabulary, foundKeys: Set<string>
 }
 
 /**
- * Read-modify-write of `student_lesson_progress` for one student × lesson.
- * Every lesson word counts as attempted; found words also count as correct
- * and join `words_mastered` (deduped by normalized key).
+ * A live round as word-memory answers. A quiz answer is recognition, right or
+ * wrong (`quizAnswers` is non-null for quiz rounds, even when empty). A board
+ * only proves the words found: an unfound word may never have been on it.
+ */
+export function liveWordResults(
+  vocab: LessonVocabulary,
+  foundKeys: Set<string>,
+  quizAnswers: ReadonlyArray<{ word: string; correct: boolean; ms?: number }> | null
+): WordResult[] {
+  if (quizAnswers) {
+    return quizAnswers.map((a) => ({ word: a.word, correct: a.correct, kind: 'recognise', ...(a.ms !== undefined ? { ms: a.ms } : {}) }));
+  }
+  return [...vocab.words].filter(([key]) => foundKeys.has(key)).map(([, word]) => ({ word, correct: true, kind: 'find' }));
+}
+
+/**
+ * Read-modify-write of `words_attempted` in `student_lesson_progress` for one
+ * student × lesson: every lesson word counts as attempted, found words as
+ * correct. `words_mastered` belongs to the word memory (recordWordReviews).
  */
 export async function upsertLessonProgress(
   supabase: NonNullable<ReturnType<typeof getSupabase>>,
@@ -150,7 +167,7 @@ export async function upsertLessonProgress(
 ): Promise<void> {
   const { data: existing, error: readError } = await supabase
     .from('student_lesson_progress')
-    .select('words_attempted, words_mastered, started_at')
+    .select('words_attempted, started_at')
     .eq('student_id', studentId)
     .eq('lesson_id', lessonId)
     .maybeSingle();
@@ -160,8 +177,6 @@ export async function upsertLessonProgress(
   const wordsAttempted: Record<string, WordAttempt> = {
     ...((existing?.words_attempted as Record<string, WordAttempt> | null) ?? {}),
   };
-  const wordsMastered: string[] = [...((existing?.words_mastered as string[] | null) ?? [])];
-  const masteredKeys = new Set(wordsMastered.map((w) => keyOf(w, vocab.language)));
 
   for (const [key, display] of vocab.words) {
     const found = foundKeys.has(key);
@@ -172,10 +187,6 @@ export async function upsertLessonProgress(
       correct: (prev?.correct ?? 0) + (found ? 1 : 0),
       lastAttemptAt: now,
     };
-    if (found && !masteredKeys.has(key)) {
-      masteredKeys.add(key);
-      wordsMastered.push(display);
-    }
   }
 
   const { error: upsertError } = await supabase
@@ -185,7 +196,6 @@ export async function upsertLessonProgress(
         student_id: studentId,
         lesson_id: lessonId,
         words_attempted: wordsAttempted,
-        words_mastered: wordsMastered,
         started_at: existing?.started_at ?? now,
       },
       { onConflict: 'student_id,lesson_id' }

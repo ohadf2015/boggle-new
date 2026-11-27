@@ -129,7 +129,11 @@ describe('WordWorkshop', () => {
         { hotseat: false },
       );
     });
-    expect(recordResult).toHaveBeenCalledWith({ vocabularyWordsFound: ['TEACHER'], wordsFound: ['TEACHERS', 'AT'] });
+    expect(recordResult).toHaveBeenCalledWith({
+      vocabularyWordsFound: ['TEACHER'],
+      wordsFound: ['TEACHERS', 'AT'],
+      wordResults: expect.arrayContaining([{ word: 'teacher', correct: true, kind: 'find' }]),
+    });
     expect(screen.getByTestId('workshop-results')).toBeTruthy();
     fireEvent.click(screen.getByTestId('academy-chest'));
     expect(screen.getByTestId('academy-xp').textContent).toContain('55');

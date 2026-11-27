@@ -18,7 +18,7 @@
  *
  * XP columns (`total_xp`, `current_level`, streaks, …) are NEVER written
  * here — only through the RPC. The progress upsert touches exactly
- * `words_attempted`, `words_mastered` and `started_at`.
+ * `words_attempted` and `started_at`; `words_mastered` follows the word memory.
  */
 
 import { getSupabase } from '../modules/supabase/client.js';
@@ -42,9 +42,11 @@ import {
   restrictToOffered,
   splitLessonWords,
   upsertLessonProgress,
+  liveWordResults,
   type LessonVocabulary,
 } from './classroomLessonVocabulary';
 import { loadTestAccountIds } from '@/lib/education/eduTestAccount';
+import { recordWordReviews } from '@/lib/education/recordWordReviews';
 
 export { playerScoresFromGameResults, roundHasStudents } from './classroomRoundParticipants.js';
 
@@ -173,6 +175,17 @@ async function dropNonMembers(
   }
 }
 
+/** Longest the round end waits for word memory writes; they keep running after it. */
+const WORD_MEMORY_WAIT_MS = 4_000;
+
+async function settleWithin(work: Promise<unknown>, ms: number, onTimeout: () => void): Promise<void> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const cap = new Promise<'timeout'>((resolve) => { timer = setTimeout(() => resolve('timeout'), ms); });
+  const outcome = await Promise.race([work.then(() => 'done' as const), cap]);
+  clearTimeout(timer);
+  if (outcome === 'timeout') onTimeout();
+}
+
 export async function persistClassroomGameScores(
   game: ClassroomGame | null | undefined,
   playerScores?: PlayerScore[],
@@ -298,6 +311,8 @@ export async function persistClassroomGameScores(
     ? Math.max(0, Math.round((Date.now() - roundStartMs) / 1000))
     : undefined;
 
+  // Started per player, awaited once after the loop: they must not hold the next player's writes.
+  const wordMemoryWrites: Promise<void>[] = [];
   for (const player of participants) {
     let xpEarned = 0;
     // Telemetry-only mirrors of the per-player stats computed inside the try.
@@ -375,6 +390,7 @@ export async function persistClassroomGameScores(
 
       // Lesson progress — the rows the teacher analytics read. One failure
       // must not hide the other lessons (or the XP below).
+      const quizAnswers = options.answersByUser ? (options.answersByUser[player.userId] ?? []) : null;
       for (const lessonId of lessonIds) {
         const lessonVocab = vocabByLesson.get(lessonId);
         if (!lessonVocab || lessonVocab.words.size === 0) continue;
@@ -391,6 +407,24 @@ export async function persistClassroomGameScores(
               `(game ${game.gameCode}): ${(err as Error).message}`
           );
         }
+        const reviews = liveWordResults(vocab, foundKeys, quizAnswers);
+        if (reviews.length === 0) continue;
+        const studentId = player.userId;
+        wordMemoryWrites.push(
+          recordWordReviews(supabase, {
+            studentId,
+            lessonId,
+            lesson: { language: lessonVocab.language, words: [...lessonVocab.words.values()] },
+            reviews,
+            today: now.slice(0, 10),
+          }).then(
+            () => undefined,
+            (err) => logger.error(
+              'CLASSROOM_GAME',
+              `Failed to update word memory for ${studentId} on lesson ${lessonId} (game ${game.gameCode}): ${(err as Error).message}`
+            )
+          )
+        );
       }
 
       xpEarned = await awardLessonXp(supabase, { userId: player.userId, lessonIds, score, gameCode: game.gameCode });
@@ -412,6 +446,10 @@ export async function persistClassroomGameScores(
       isTestAccount: false,
     });
   }
+
+  await settleWithin(Promise.all(wordMemoryWrites), WORD_MEMORY_WAIT_MS, () =>
+    logger.error('CLASSROOM_GAME', `Game ${game.gameCode}: word memory writes still running after ${WORD_MEMORY_WAIT_MS}ms; finishing the round without them`)
+  );
 
   // The only place a real classroom practice completion is observable. The
   // browser-side `edu_practice_complete` cannot see this path at all — it lives

@@ -43,7 +43,7 @@ export function AcademyHub(props: AcademyHubProps) {
   return (
     <>
       {classroomId && <LiveGameBridge classroomId={classroomId} onChange={setLive} />}
-      {base.reviewLessonId && <ReviewCountBridge key={base.reviewLessonId} lessonId={base.reviewLessonId} words={base.reviewWords} onCount={setReviewCount} />}
+      {base.reviewLessonId && <ReviewCountBridge key={base.reviewLessonId} lessonId={base.reviewLessonId} onCount={setReviewCount} />}
       <AcademyHubView
         {...props}
         data={data}

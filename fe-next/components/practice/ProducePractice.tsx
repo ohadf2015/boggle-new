@@ -45,6 +45,7 @@ import {
 } from '@/lib/education/produceAnswer';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import type { Language } from '@/shared/types/game';
+import type { WordResult } from '@/lib/education/wordMemory';
 
 export interface ProduceResults {
   correct: number;
@@ -54,6 +55,7 @@ export interface ProduceResults {
   points: number;
   hintsUsed: number;
   focus: ProduceFocus;
+  wordResults: WordResult[];
 }
 
 export interface ProducePracticeProps {
@@ -125,6 +127,7 @@ export function ProducePractice({
   const [nearMissCount, setNearMissCount] = useState(0);
   const [points, setPoints] = useState(0);
   const [hintsTotal, setHintsTotal] = useState(0);
+  const [wordResults, setWordResults] = useState<WordResult[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [timeSpent, setTimeSpent] = useState(0);
 
@@ -156,6 +159,10 @@ export function ProducePractice({
     setVerdict(result);
     const earned = produceScore(result, hintsTaken);
     setPoints((p) => p + earned);
+    const correct = result === 'correct';
+    // A hinted answer was partly read off the ladder, so it proves recognition, not recall.
+    const kind = correct && hintsTaken > 0 ? 'recognise' : focus === 'context' ? 'context' : 'recall';
+    setWordResults((prev) => [...prev, { word: question.word, correct, kind }]);
     if (result === 'correct') {
       sfx.correct();
       setCorrectCount((c) => c + 1);
@@ -164,7 +171,7 @@ export function ProducePractice({
     } else {
       sfx.wrong();
     }
-  }, [question, verdict, typed, language, otherWords, hintsTaken, sfx]);
+  }, [question, verdict, typed, language, otherWords, hintsTaken, focus, sfx]);
 
   const handleHint = useCallback(() => {
     if (!question || verdict !== null) return;
@@ -187,6 +194,7 @@ export function ProducePractice({
         points,
         hintsUsed: hintsTotal,
         focus,
+        wordResults,
       });
       return;
     }
@@ -196,7 +204,7 @@ export function ProducePractice({
     setVerdict(null);
     setHintsTaken(0);
     setExposureCleared(false);
-  }, [verdict, isLast, correctCount, nearMissCount, total, points, hintsTotal, focus, onComplete, sfx]);
+  }, [verdict, isLast, correctCount, nearMissCount, total, points, hintsTotal, focus, wordResults, onComplete, sfx]);
 
   const handleRestart = useCallback(() => {
     setRound((r) => r + 1);
@@ -209,6 +217,7 @@ export function ProducePractice({
     setNearMissCount(0);
     setPoints(0);
     setHintsTotal(0);
+    setWordResults([]);
     setShowResults(false);
     setTimeSpent(0);
     startedAt.current = Date.now();

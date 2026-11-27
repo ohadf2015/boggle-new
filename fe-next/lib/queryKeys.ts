@@ -52,11 +52,10 @@ export const queryKeys = {
       ['adventure', 'hints-solve-grid', language, gridKey] as const,
   },
 
-  // ─── Spaced Repetition ────────────────────
-  spacedRepetition: {
-    _def: ['spaced-repetition'] as const,
-    byLesson: (lessonId: string, wordsKey: string) =>
-      ['spaced-repetition', lessonId, wordsKey] as const,
+  // ─── Word memory ──────────────────────────
+  wordMemory: {
+    _def: ['word-memory'] as const,
+    byLesson: (lessonId: string) => ['word-memory', lessonId] as const,
   },
 
   // ─── Referral ─────────────────────────────

@@ -110,3 +110,35 @@ describe('SpellingChallengePractice - every answer gets a verdict before moving 
     expect(screen.getByRole('button', { name: 'eduStudent.practice.finish' })).toBeInTheDocument();
   });
 });
+
+describe('SpellingChallengePractice - word results', () => {
+  const words: VocabularyWord[] = [
+    { word: 'cat', definition: 'A small furry pet', canIntegrate: true },
+    { word: 'book', definition: 'For reading stories', canIntegrate: true },
+  ];
+
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  const answer = (value: string) => {
+    const input = screen.getByTestId('spelling-input');
+    fireEvent.change(input, { target: { value } });
+    fireEvent.submit(input.closest('form')!);
+  };
+
+  it('Given a right and a wrong spelling, When the round ends, Then onComplete carries one spell entry per answer', () => {
+    const onComplete = vi.fn();
+    render(<SpellingChallengePractice words={words} onComplete={onComplete} onBack={vi.fn()} />);
+    answer('cat');
+    act(() => { vi.advanceTimersByTime(1100); });
+    answer('bok');
+    fireEvent.click(screen.getByRole('button', { name: 'eduStudent.practice.finish' }));
+    act(() => { vi.advanceTimersByTime(600); });
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({
+      wordResults: [
+        { word: 'cat', correct: true, kind: 'spell' },
+        { word: 'book', correct: false, kind: 'spell' },
+      ],
+    }));
+  });
+});

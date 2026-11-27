@@ -22,6 +22,7 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import PracticeResultsCard from './PracticeResultsCard';
 import { usePracticeSfx } from '@/components/education/practice/usePracticeSfx';
 import { useMatchingGame, type MatchingItem } from './hooks/useMatchingGame';
+import type { WordResult } from '@/lib/education/wordMemory';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import type { EnrichedVocabularyWord } from '@/types/vocabulary';
 import { WordContextRow } from './WordContextRow';
@@ -31,7 +32,7 @@ import { wordsReadyForDrill, DRILL_MIN_USABLE } from '@/lib/education/normalizeP
 
 export interface WordMatchingPracticeProps {
   words: VocabularyWord[];
-  onComplete: (results: { correct: number; total: number; accuracy: number }) => void;
+  onComplete: (results: { correct: number; total: number; accuracy: number; wordResults: WordResult[] }) => void;
   onBack: () => void;
   /** XP session data to display on results screen (optional) */
   /** Jump straight into the next ready mode, when the lesson offers one. */
@@ -156,6 +157,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
       correctCount,
       isComplete,
       accuracy,
+      wordResults,
       checkMatch,
       resetGame,
     } = useMatchingGame(usable);
@@ -231,10 +233,11 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
             correct: correctCount,
             total: attempts,
             accuracy,
+            wordResults,
           });
         }, 500);
       }
-    }, [isComplete, showResults, usable.length, onComplete, correctCount, attempts, accuracy]);
+    }, [isComplete, showResults, usable.length, onComplete, correctCount, attempts, accuracy, wordResults]);
 
     // Handle restart
     const handleRestart = useCallback(() => {

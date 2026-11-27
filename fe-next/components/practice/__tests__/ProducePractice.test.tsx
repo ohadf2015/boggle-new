@@ -219,3 +219,40 @@ describe('ProducePractice — empty state', () => {
     expect(screen.getByTestId('produce-empty')).toBeInTheDocument();
   });
 });
+
+describe('ProducePractice — word results', () => {
+  const finish = (answer: string, opts: { hint?: boolean } = {}) => {
+    passExposure();
+    if (opts.hint) fireEvent.click(screen.getByTestId('produce-hint'));
+    typeAnswer(answer);
+    fireEvent.click(screen.getByTestId('produce-next'));
+  };
+
+  it('Given an unaided correct answer, When the round ends, Then it is a correct recall entry', () => {
+    const onComplete = vi.fn();
+    renderPractice({ onComplete });
+    finish('cell');
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ wordResults: [{ word: 'cell', correct: true, kind: 'recall' }] }));
+  });
+
+  it('Given a correct answer that used a hint, When the round ends, Then it only counts as recognise', () => {
+    const onComplete = vi.fn();
+    renderPractice({ onComplete });
+    finish('cell', { hint: true });
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ wordResults: [{ word: 'cell', correct: true, kind: 'recognise' }] }));
+  });
+
+  it('Given a near miss, When the round ends, Then it is a wrong recall entry', () => {
+    const onComplete = vi.fn();
+    renderPractice({ onComplete });
+    finish('cel');
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ wordResults: [{ word: 'cell', correct: false, kind: 'recall' }] }));
+  });
+
+  it('Given a wrong answer to a context sentence, When the round ends, Then it is a wrong context entry', () => {
+    const onComplete = vi.fn();
+    renderPractice({ onComplete, focus: 'context', words: [{ ...CELL, example: 'The prisoner sat alone in his cell all night.' }] });
+    finish('banana');
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ wordResults: [{ word: 'cell', correct: false, kind: 'context' }] }));
+  });
+});

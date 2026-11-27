@@ -20,10 +20,14 @@ vi.mock('@/components/word-craft/WordCraftGameScreen', () => ({
 
 import WordWorkshop from '../WordWorkshop';
 import { emitWordCraftGameEnd } from '@/components/word-craft/wordCraftTelemetry';
-import { loadLeitnerState } from '@/lib/education/missedWordsLeitnerStore';
-import { reviewKey } from '@/lib/education/missedWordsReview';
+const recordResult = vi.fn();
 
-beforeEach(() => localStorage.clear());
+beforeEach(() => {
+  localStorage.clear();
+  recordResult.mockReset().mockResolvedValue(40);
+});
+
+const sentResults = () => recordResult.mock.calls[0][0].wordResults;
 
 async function playAndEnd(words: string[], review?: { studentId: string; lessonId: string }, score = 80) {
   render(
@@ -33,7 +37,7 @@ async function playAndEnd(words: string[], review?: { studentId: string; lessonI
       lessonLanguage="en"
       onBack={vi.fn()}
       startSession={vi.fn().mockResolvedValue(true)}
-      recordResult={vi.fn().mockResolvedValue(40)}
+      recordResult={recordResult}
       review={review}
     />,
   );
@@ -48,10 +52,13 @@ async function playAndEnd(words: string[], review?: { studentId: string; lessonI
 }
 
 describe('WordWorkshop → Missed Words Review', () => {
-  it('GIVEN lesson words left unbuilt WHEN the match ends THEN they are queued for this student and the results link to review', async () => {
+  it('GIVEN lesson words left unbuilt WHEN the match ends THEN they are sent wrong, built ones correct, and the results link to review', async () => {
     await playAndEnd(['TEACHER', 'SUN'], { studentId: 'stu-1', lessonId: 'L1' });
-    const keys = Object.keys(loadLeitnerState('stu-1')).sort();
-    expect(keys).toEqual([reviewKey('L1', 'cat'), reviewKey('L1', 'puzzle')].sort());
+    expect(sentResults()).toEqual([
+      { word: 'teacher', correct: true, kind: 'find' },
+      { word: 'puzzle', correct: false, kind: 'find' },
+      { word: 'cat', correct: false, kind: 'find' },
+    ]);
     const link = screen.getByTestId('wordcraft-missed-review');
     expect(link.getAttribute('href')).toBe('/en/student/review?lesson=L1');
     expect(link.textContent).toContain('wordcraftReview.cta(2)');
@@ -63,9 +70,13 @@ describe('WordWorkshop → Missed Words Review', () => {
     expect(screen.getByTestId('wordcraft-missed-review').textContent).toContain('wordcraftReview.cta(3)');
   });
 
-  it('GIVEN no signed-in student WHEN the match ends THEN nothing is queued and no link shows', async () => {
+  it('GIVEN no signed-in student WHEN the match ends THEN no link shows but the word results are still recorded', async () => {
     await playAndEnd(['TEACHER'], undefined);
     expect(screen.queryByTestId('wordcraft-missed-review')).toBeNull();
-    expect(loadLeitnerState('stu-1')).toEqual({});
+    expect(sentResults()).toEqual([
+      { word: 'teacher', correct: true, kind: 'find' },
+      { word: 'puzzle', correct: false, kind: 'find' },
+      { word: 'cat', correct: false, kind: 'find' },
+    ]);
   });
 });

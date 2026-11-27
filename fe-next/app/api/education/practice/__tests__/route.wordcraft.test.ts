@@ -112,6 +112,31 @@ describe('POST /api/education/practice — Word Craft', () => {
     });
   });
 
+  it('Given the Missed Words Review variant, When a flashcard session starts, Then its mode says so (its unscramble cards may count as spelling)', async () => {
+    const res = await POST(new NextRequest('http://localhost/api/education/practice', {
+      method: 'POST',
+      body: JSON.stringify({ lessonId: LESSON, practiceType: 'flashcard', variant: 'missed_review' }),
+    }));
+    expect(res.status).toBe(201);
+    expect(insertMock).toHaveBeenCalledWith({ student_id: USER, lesson_id: LESSON, practice_type: 'flashcard', mode: 'missed_review' });
+  });
+
+  it('Given a variant on the wrong practice type, When started, Then no mode is recorded', async () => {
+    await POST(new NextRequest('http://localhost/api/education/practice', {
+      method: 'POST',
+      body: JSON.stringify({ lessonId: LESSON, practiceType: 'spelling', variant: 'missed_review' }),
+    }));
+    expect(insertMock).toHaveBeenCalledWith({ student_id: USER, lesson_id: LESSON, practice_type: 'spelling' });
+  });
+
+  it('Given the daily_quest practice type, When started, Then it is accepted', async () => {
+    const res = await POST(new NextRequest('http://localhost/api/education/practice', {
+      method: 'POST',
+      body: JSON.stringify({ lessonId: LESSON, practiceType: 'daily_quest' }),
+    }));
+    expect(res.status).toBe(201);
+  });
+
   it("Given practiceType 'wordcraft', When started, Then it is rejected before the DB CHECK can 500", async () => {
     const res = await POST(new NextRequest('http://localhost/api/education/practice', {
       method: 'POST',

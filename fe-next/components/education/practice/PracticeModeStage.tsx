@@ -54,6 +54,8 @@ import type { PracticeType } from '@/hooks/usePracticeSession';
 import { asServerOutcome } from '@/lib/education/wordcraftServerOutcome';
 import type { PracticeVariant } from '@/lib/education/practicePicker';
 import type { Language, VocabularyWord } from '@/lib/supabase/education/types';
+import { foundWordResults } from '@/lib/education/lessonWordResults';
+import type { WordResult } from '@/lib/education/wordMemory';
 
 export interface PracticeRoundPayload {
   focus?: VocabFocus;
@@ -63,6 +65,8 @@ export interface PracticeRoundPayload {
   /** Word Craft: every word the player built — the server's "3 valid words" leg of the homework bar. */
   wordsFound?: string[];
   newWordsFound?: string[];
+  /** One entry per answer, for the word memory. */
+  wordResults?: WordResult[];
 }
 
 export interface PracticeModeStageProps {
@@ -79,7 +83,7 @@ export interface PracticeModeStageProps {
   /** Straight into the next ready mode, when the lesson has one left. */
   onNext?: () => void;
   nextLabel?: string;
-  /** Word Craft only: where the round's missed lesson words are queued for review. */
+  /** Word Craft only: the lesson whose Missed Words Review the results link to. */
   wordCraftReview?: { studentId: string; lessonId: string };
   /** Word Craft only: device key a round in progress is saved under, so a reload resumes it. */
   wordCraftRunKey?: string;
@@ -114,6 +118,8 @@ function PracticeModeScreen({
 
   const common = { lessonName, words, language, onBack };
   const forward = { onNext, nextLabel };
+  // Board modes only know which lesson words were found; unfound ones may never have been placed.
+  const found = (vocabularyWordsFound: string[]) => foundWordResults(vocabularyWordsFound, words.map((w) => w.word), language);
 
   switch (mode) {
     case 'flashcard':
@@ -121,7 +127,7 @@ function PracticeModeScreen({
         <FlashcardReview
           words={words}
           onComplete={(results) =>
-            onFinish('flashcard', { cardsReviewed: results.total, cardsCorrect: results.correct })
+            onFinish('flashcard', { cardsReviewed: results.total, cardsCorrect: results.correct, wordResults: results.wordResults })
           }
           onBack={onBack}
           xpSessionData={xpSessionData}
@@ -138,7 +144,7 @@ function PracticeModeScreen({
             words={words.map((entry) => entry.word)}
             language={language}
             onComplete={async (results) =>
-              asServerOutcome(await onFinish('solo_board', { vocabularyWordsFound: results.vocabularyWordsFound, wordsFound: results.wordsFound, newWordsFound: [] }))}
+              asServerOutcome(await onFinish('solo_board', { vocabularyWordsFound: results.vocabularyWordsFound, wordsFound: results.wordsFound, newWordsFound: [], wordResults: results.wordResults }))}
             onBack={onBack}
             review={wordCraftReview}
             runKey={wordCraftRunKey}
@@ -158,6 +164,7 @@ function PracticeModeScreen({
               await onFinish('solo_board', {
                 vocabularyWordsFound: results.vocabularyWordsFound,
                 newWordsFound: [],
+                wordResults: found(results.vocabularyWordsFound),
               });
             }}
             onBack={onBack}
@@ -173,6 +180,7 @@ function PracticeModeScreen({
               vocabularyWordsFound: results.vocabularyWordsFound,
               wordsFound: results.wordsFound,
               newWordsFound: [],
+              wordResults: found(results.vocabularyWordsFound),
             })
           }
           xpSessionData={xpSessionData}
@@ -192,6 +200,7 @@ function PracticeModeScreen({
               vocabularyWordsFound: results.vocabularyWordsFound,
               wordsFound: results.wordsFound,
               newWordsFound: [],
+              wordResults: found(results.vocabularyWordsFound),
             })
           }
           xpSessionData={xpSessionData}
@@ -204,7 +213,7 @@ function PracticeModeScreen({
         <WordMatchingPractice
           words={words}
           onComplete={(results) =>
-            onFinish('matching', { cardsReviewed: results.total, cardsCorrect: results.correct })
+            onFinish('matching', { cardsReviewed: results.total, cardsCorrect: results.correct, wordResults: results.wordResults })
           }
           onBack={onBack}
           xpSessionData={xpSessionData}
@@ -217,7 +226,7 @@ function PracticeModeScreen({
         <SpellingChallengePractice
           words={words}
           onComplete={(results) =>
-            onFinish('spelling', { cardsReviewed: results.total, cardsCorrect: results.correct })
+            onFinish('spelling', { cardsReviewed: results.total, cardsCorrect: results.correct, wordResults: results.wordResults })
           }
           onBack={onBack}
           xpSessionData={xpSessionData}
@@ -233,6 +242,7 @@ function PracticeModeScreen({
             onFinish('blitz', {
               cardsReviewed: results.wordsAttempted,
               cardsCorrect: results.wordsFound,
+              wordResults: results.wordResults,
             })
           }
           onBack={onBack}
@@ -264,6 +274,7 @@ function PracticeModeScreen({
                 // answers. Counting them as correct would inflate the mastery
                 // signal the teacher's report is built on.
                 cardsCorrect: results.correct,
+                wordResults: results.wordResults,
               })
             }
             onBack={onBack}
@@ -281,6 +292,7 @@ function PracticeModeScreen({
               focus: results.focus,
               cardsReviewed: results.total,
               cardsCorrect: results.correct,
+              wordResults: results.wordResults,
             })
           }
           onBack={onBack}

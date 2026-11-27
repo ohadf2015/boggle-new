@@ -36,7 +36,6 @@ function data(lessons: StudentLesson[], reviewCount: number, streakDoneToday: bo
     lessons,
     lessonsLoading: false,
     reviewLessonId: lessons[0]?.lessonId ?? '',
-    reviewWords: [],
     reviewCount,
     streak: fresh ? 0 : 4,
     streakAtRisk: !fresh && !streakDoneToday,

@@ -84,6 +84,11 @@ describe('WordCraftPractice', () => {
     await waitFor(() => expect(onComplete).toHaveBeenCalledTimes(1));
     expect(onComplete.mock.calls[0][0]).toEqual({
       vocabularyWordsFound: ['CAT'], wordsFound: ['CAT', 'SUN'], score: 80, botScore: 60, won: true,
+      wordResults: [
+        { word: 'cat', correct: true, kind: 'find' },
+        { word: 'dog', correct: false, kind: 'find' },
+        { word: 'tree', correct: false, kind: 'find' },
+      ],
     });
     expect(await screen.findByTestId('wordcraft-practice-complete')).toBeTruthy();
   });

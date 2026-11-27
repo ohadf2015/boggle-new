@@ -60,9 +60,8 @@ function toRoom(io: Server, gameCode: string, event: string, payload: unknown): 
  * through the classroom persistence path.
  *
  * `wordsFound` carries the LESSON word for every question the student answered
- * correctly. `upsertLessonProgress` marks every lesson word attempted and only
- * these mastered, which is exactly the required mapping: a wrong answer on W
- * leaves W attempted-not-mastered.
+ * correctly (attempted vs correct for the teacher's report); `answersByUser`
+ * feeds the word memory, each answer a recognition, right or wrong.
  */
 export async function finishQuiz(io: Server, gameCode: string): Promise<void> {
   const session = getQuizSession(gameCode);

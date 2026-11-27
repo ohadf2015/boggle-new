@@ -7,7 +7,6 @@ import {
   getStudentProgress,
   getStudentAssignedLessons,
   getClassProgress,
-  updateProgress as updateProgressAPI,
   type StudentLessonProgress,
   type LessonAssignment,
   type VocabularyLesson,
@@ -37,7 +36,6 @@ interface UseStudentProgressState {
 
 interface UseStudentProgressActions {
   refresh: () => Promise<void>;
-  recordAttempt: (lessonId: string, word: string, correct: boolean) => Promise<{ success: boolean; error?: string }>;
 }
 
 export type UseStudentProgressReturn = UseStudentProgressState & UseStudentProgressActions;
@@ -178,50 +176,6 @@ export function useStudentProgress(lessonId?: string): UseStudentProgressReturn 
     await fetchProgress();
   }, [fetchProgress]);
 
-  // Record word attempt
-  const recordAttempt = useCallback(async (
-    targetLessonId: string,
-    word: string,
-    correct: boolean
-  ): Promise<{ success: boolean; error?: string }> => {
-    if (!user) {
-      return { success: false, error: 'Not authenticated' };
-    }
-
-    try {
-      const { data, error } = await updateProgressAPI(user.id, targetLessonId, { word, correct });
-
-      if (error) {
-        return { success: false, error: error.message };
-      }
-
-      // Optimistically update state
-      if (isMounted.current && data) {
-        setState(prev => {
-          const existingIndex = prev.progress.findIndex(
-            p => p.lesson_id === targetLessonId
-          );
-
-          if (existingIndex >= 0) {
-            // Update existing progress
-            const updated = [...prev.progress];
-            updated[existingIndex] = data;
-            return { ...prev, progress: updated };
-          } else {
-            // Add new progress
-            return { ...prev, progress: [data, ...prev.progress] };
-          }
-        });
-      }
-
-      return { success: true };
-    } catch (err) {
-      const error = err instanceof Error ? err.message : 'Failed to record attempt';
-      logger.error('Exception in recordAttempt:', error);
-      return { success: false, error };
-    }
-  }, [user, isMounted]);
-
   // Initial fetch
   useEffect(() => {
     if (isAuthenticated) {
@@ -239,7 +193,6 @@ export function useStudentProgress(lessonId?: string): UseStudentProgressReturn 
   return {
     ...state,
     refresh,
-    recordAttempt,
   };
 }
 

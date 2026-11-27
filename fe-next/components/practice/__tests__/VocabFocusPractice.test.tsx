@@ -143,7 +143,26 @@ describe('VocabFocusPractice', () => {
     expect(screen.getByTestId('practice-results-card')).toBeInTheDocument();
     expect(screen.getByTestId('results-score')).toHaveTextContent(`2 / ${COUNT}`);
     expect(onComplete).toHaveBeenCalledTimes(1);
-    expect(onComplete).toHaveBeenCalledWith({ correct: 2, total: COUNT, accuracy: 2 / COUNT, focus: 'definition' });
+    expect(onComplete).toHaveBeenCalledWith({
+      correct: 2,
+      total: COUNT,
+      accuracy: 2 / COUNT,
+      focus: 'definition',
+      wordResults: qs.map((q, i) => ({ word: q.word, correct: i < 2, kind: 'recognise' })),
+    });
+  });
+
+  it('Given a context-sentence round with a wrong pick, When it ends, Then each answer is a context entry', () => {
+    renderIt('context');
+    const qs = expected('context');
+    qs.forEach((q, i) => {
+      const choices = within(screen.getByTestId('focus-choices')).getAllByRole('button');
+      fireEvent.click(choices[i === 0 ? (q.answerIndex + 1) % 4 : q.answerIndex]);
+      fireEvent.click(screen.getByRole('button', { name: i === qs.length - 1 ? 'education.vocabFocus.finish' : 'education.vocabFocus.next' }));
+    });
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({
+      wordResults: qs.map((q, i) => ({ word: q.word, correct: i > 0, kind: 'context' })),
+    }));
   });
 
   it('Try Again restarts with a fresh question set', () => {

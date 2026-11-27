@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { normalizeForStorage, type VocabularyWord } from '@/lib/supabase/education/types';
+import type { WordResult } from '@/lib/education/wordMemory';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -35,6 +36,9 @@ export interface UseSpellingGameReturn {
   attempts: number;
   accuracy: number;
   isComplete: boolean;
+
+  /** One spell entry per submitted answer, in answer order. */
+  wordResults: WordResult[];
 
   /** Move to the next word now (the manual path after a wrong answer). */
   advance: () => void;
@@ -82,6 +86,7 @@ export function useSpellingGame(words: VocabularyWord[], options: UseSpellingGam
   const [correctCount, setCorrectCount] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const [wordResults, setWordResults] = useState<WordResult[]>([]);
 
   // Hint state (first letter always shown)
   const [currentHintIndex, setCurrentHintIndex] = useState(1);
@@ -154,6 +159,8 @@ export function useSpellingGame(words: VocabularyWord[], options: UseSpellingGam
       setCurrentStreak(0);
     }
 
+    setWordResults((prev) => [...prev, { word: currentWord.word, correct: isCorrect, kind: 'spell' }]);
+
     // Track word progress
     wordProgress.current[wordIndex] = {
       word: currentWord.word,
@@ -188,6 +195,7 @@ export function useSpellingGame(words: VocabularyWord[], options: UseSpellingGam
     setCorrectCount(0);
     setAttempts(0);
     setIsComplete(false);
+    setWordResults([]);
     setCurrentHintIndex(1);
     setHintsUsed(0);
     wordProgress.current = [];
@@ -221,6 +229,7 @@ export function useSpellingGame(words: VocabularyWord[], options: UseSpellingGam
     attempts,
     accuracy,
     isComplete,
+    wordResults,
     advance,
     resetGame,
   };

@@ -103,7 +103,7 @@ describe('guestPracticeMastery', () => {
       .toBe('not_started');
   });
 
-  // Mirrors calculate_lesson_mastery (058): 60% word coverage + 40% accuracy,
+  // Mirrors calculate_lesson_mastery's shape: 60% word coverage + 40% accuracy,
   // thresholds 0.8 / 0.4 / >0. A guest and a signed-in student must not read
   // the same performance as two different words.
   it('reaches mastered on full coverage and full accuracy', () => {
@@ -137,12 +137,12 @@ describe('guestPracticeMastery', () => {
     expect(guestPracticeMastery(overshoot, 2)).toBe('practicing');
   });
 
-  // Agreement with the server RPC calculate_lesson_mastery (rewritten in
-  // 20261026120000 to read vocabulary_lessons.words). The SQL cannot run in
-  // vitest, so this mirror re-encodes it exactly: distinct lower+trimmed
-  // found words, coverage capped at 1, 60% coverage + 40% accuracy,
-  // thresholds 0.8 / 0.4 / >0. If either side's formula drifts, the fixture
-  // below breaks.
+  // Agreement with the server RPC calculate_lesson_mastery. The SQL cannot run
+  // in vitest, so this mirror re-encodes its shape: distinct lower+trimmed
+  // words, coverage capped at 1, 60% coverage + 40% accuracy, thresholds
+  // 0.8 / 0.4 / >0. The word source differs on purpose: the server counts
+  // words_mastered (word memory, 20261128090000); guests have no word memory,
+  // so their found words stand in.
   function serverMasteryMirror(
     args: { totalWords: number; wordsFound: string[]; cardsReviewed: number; cardsCorrect: number },
   ) {

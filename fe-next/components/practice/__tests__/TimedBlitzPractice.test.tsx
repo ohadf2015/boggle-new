@@ -691,3 +691,33 @@ describe('TimedBlitzPractice hint', () => {
     expect(screen.getByTestId('blitz-hint')).toHaveTextContent('i _ _   _ _ _ _ _', { normalizeWhitespace: false });
   });
 });
+
+describe('TimedBlitzPractice word results', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => { vi.runOnlyPendingTimers(); vi.useRealTimers(); });
+
+  it('Given a right and a wrong answer, When the clock runs out, Then onComplete carries one recall entry per answer', async () => {
+    const user = userEvent.setup({ delay: null });
+    const onComplete = vi.fn();
+    render(<TimedBlitzPractice words={mockWords} onComplete={onComplete} onBack={vi.fn()} />);
+    for (let i = 0; i < 3; i++) act(() => { vi.advanceTimersByTime(1100); });
+    await waitFor(() => expect(screen.getByTestId('playing-phase')).toBeInTheDocument());
+
+    const asked = () => mockWords.find(w => screen.getByTestId('definition-card').textContent?.includes(w.definition!))!.word;
+    const first = asked();
+    await user.type(screen.getByTestId('word-input'), `${first}{Enter}`);
+    const second = asked();
+    await user.type(screen.getByTestId('word-input'), 'wrongword{Enter}');
+
+    act(() => { vi.advanceTimersByTime(61500); });
+    await waitFor(() => expect(screen.getByTestId('times-up')).toBeInTheDocument());
+    act(() => { vi.advanceTimersByTime(1500); });
+
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({
+      wordResults: [
+        { word: first, correct: true, kind: 'recall' },
+        { word: second, correct: false, kind: 'recall' },
+      ],
+    }));
+  });
+});

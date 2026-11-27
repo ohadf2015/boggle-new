@@ -31,6 +31,8 @@ import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchiev
 import type { VocabFocus } from '@/lib/education/vocabFocus';
 import { practiceXpPayload } from '@/lib/education/practiceXpPayload';
 import logger from '@/utils/logger';
+import { completionPatchBody } from '@/lib/education/practiceCompletionRecord';
+import type { WordResult } from '@/lib/education/wordMemory';
 import { publishLevelUp } from '@/lib/avatar/revealTrigger';
 import { trackEduPracticeComplete, trackEduError } from '@/lib/education/telemetry';
 
@@ -56,6 +58,8 @@ export interface CompletePracticeSessionData {
   vocabularyWordsFound?: string[];
   wordsFound?: string[];
   newWordsFound?: string[];
+  /** One entry per answer, for the word memory (server validates each word against the lesson). */
+  wordResults?: WordResult[];
   masteryLevel?: 'not_started' | 'started' | 'practicing' | 'mastered';
 }
 
@@ -204,16 +208,7 @@ export function PracticeSessionProvider({
         if (sessionData.sessionId && !completedSessionIdsRef.current.has(sessionData.sessionId)) {
           completedSessionIdsRef.current.add(sessionData.sessionId);
           try {
-            const patchBody: Record<string, unknown> = {
-              sessionId: sessionData.sessionId,
-              completed: true,
-            };
-            if (sessionData.cardsReviewed !== undefined) patchBody.cardsReviewed = sessionData.cardsReviewed;
-            if (sessionData.cardsCorrect !== undefined) patchBody.cardsCorrect = sessionData.cardsCorrect;
-            if (sessionData.wordsFound !== undefined) patchBody.wordsFound = sessionData.wordsFound;
-            if (sessionData.vocabularyWordsFound !== undefined) {
-              patchBody.vocabularyWordsFound = sessionData.vocabularyWordsFound;
-            }
+            const patchBody = completionPatchBody(sessionData);
 
             const response = await fetch('/api/education/practice', {
               method: 'PATCH',

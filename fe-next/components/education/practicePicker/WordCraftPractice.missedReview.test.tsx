@@ -19,8 +19,6 @@ vi.mock('@/components/word-craft/WordCraftGameScreen', () => ({
 
 import WordCraftPractice from './WordCraftPractice';
 import { emitWordCraftGameEnd } from '@/components/word-craft/wordCraftTelemetry';
-import { loadLeitnerState } from '@/lib/education/missedWordsLeitnerStore';
-import { reviewKey } from '@/lib/education/missedWordsReview';
 
 const LESSON = ['cat', 'dog', 'tree'];
 
@@ -33,22 +31,32 @@ function finish(history: Array<{ who: 'player' | 'bot'; words: string[] }>, play
   });
 }
 
+const onComplete = vi.fn();
+
 async function play(review?: { studentId: string; lessonId: string }) {
-  render(<WordCraftPractice words={LESSON} language="en" onComplete={vi.fn()} onBack={vi.fn()} review={review} />);
+  render(<WordCraftPractice words={LESSON} language="en" onComplete={onComplete} onBack={vi.fn()} review={review} />);
   fireEvent.click(screen.getByTestId('wordcraft-practice-play'));
   await screen.findByTestId('stub-game-view');
 }
 
-beforeEach(() => localStorage.clear());
+beforeEach(() => {
+  localStorage.clear();
+  onComplete.mockReset();
+});
+
+const sentResults = () => onComplete.mock.calls[0][0].wordResults;
 
 describe('WordCraftPractice → Missed Words Review', () => {
-  it('Given a finished round, Then the lesson words the student did not build go to the front of their review', async () => {
+  it('Given a finished round, Then built lesson words are sent correct and unbuilt ones wrong', async () => {
     await play({ studentId: 'stu-1', lessonId: 'L1' });
     finish([{ who: 'player', words: ['CAT', 'SUN'] }, { who: 'bot', words: ['DOG'] }]);
     await screen.findByTestId('wordcraft-practice-complete');
-    const state = loadLeitnerState('stu-1');
-    expect(Object.keys(state).sort()).toEqual([reviewKey('L1', 'dog'), reviewKey('L1', 'tree')].sort());
-    expect(state[reviewKey('L1', 'dog')].box).toBe(1);
+    expect(sentResults()).toEqual([
+      { word: 'cat', correct: true, kind: 'find' },
+      { word: 'dog', correct: false, kind: 'find' },
+      { word: 'tree', correct: false, kind: 'find' },
+    ]);
+    expect(localStorage.length).toBe(0);
   });
 
   it('Given missed words on a finished round, Then reviewing them is the big next step', async () => {
@@ -72,14 +80,18 @@ describe('WordCraftPractice → Missed Words Review', () => {
     finish([{ who: 'player', words: ['CAT', 'DOG', 'TREE'] }]);
     await screen.findByTestId('wordcraft-practice-complete');
     expect(screen.queryByTestId('wordcraft-missed-review')).toBeNull();
-    expect(loadLeitnerState('stu-1')).toEqual({});
+    expect(sentResults().every((r: { correct: boolean }) => r.correct)).toBe(true);
   });
 
-  it('Given a student with no account to review under, Then nothing is saved and no link is shown', async () => {
+  it('Given a student with no account to review under, Then no link is shown but the word results are still sent', async () => {
     await play(undefined);
     finish([{ who: 'player', words: ['CAT', 'SUN'] }]);
     await screen.findByTestId('wordcraft-practice-complete');
     expect(screen.queryByTestId('wordcraft-missed-review')).toBeNull();
-    expect(localStorage.length).toBe(0);
+    expect(sentResults()).toEqual([
+      { word: 'cat', correct: true, kind: 'find' },
+      { word: 'dog', correct: false, kind: 'find' },
+      { word: 'tree', correct: false, kind: 'find' },
+    ]);
   });
 });

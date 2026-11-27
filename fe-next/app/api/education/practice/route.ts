@@ -12,11 +12,12 @@ import { captureStudentReturned } from '@/lib/education/studentReturnTelemetry';
 import { gateWordCraftCompletion } from '@/lib/education/wordcraftCompletionGate';
 import { practiceWordCounts } from '@/lib/education/practiceWordCounts';
 import { allowedPracticeXp, capPracticeXpInput, readPracticeXpLimits } from '@/lib/education/practiceXpLimits';
-import { startSessionSchema, tooManyRequests, updateSessionSchema } from '@/lib/education/practiceSessionSchemas';
+import { MISSED_REVIEW_SESSION_MODE, startSessionSchema, tooManyRequests, updateSessionSchema } from '@/lib/education/practiceSessionSchemas';
 import { grantPlayerXp, levelUpOf } from '@/backend/modules/xpGrant';
 import { readAwardState, type AwardState } from '@/lib/education/grantStudentAwards';
 import { grantPracticeRewards } from '@/lib/education/practiceRewards';
 import { nextPracticeStreak, utcDay, type PracticeStreak } from '@/lib/education/practiceStreak';
+import { recordPracticeWordReviews } from '@/lib/education/practiceWordReviews';
 
 /**
  * GET /api/education/practice
@@ -220,7 +221,9 @@ export async function POST(request: NextRequest) {
       insertData.mode = practiceType;
       insertData.results = { focus };
     }
-    if (practiceType === 'solo_board' && variant) insertData.mode = variant;
+    if ((practiceType === 'solo_board' && variant === WORDCRAFT_SESSION_MODE) || (practiceType === 'flashcard' && variant === MISSED_REVIEW_SESSION_MODE)) {
+      insertData.mode = variant;
+    }
     const { data: session, error } = await supabase
       .from('practice_sessions')
       .insert(insertData)
@@ -275,7 +278,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const { sessionId, completed: completionRequested, ...updateData } = parseResult.data;
+    const { sessionId, completed: completionRequested, wordResults, ...updateData } = parseResult.data;
 
     // Verify user owns the session + idempotency guard.
     // PERF: the extra columns are exactly the ones the completion path needs to
@@ -443,11 +446,18 @@ export async function PATCH(request: NextRequest) {
       lessonId: existing.lesson_id, assignmentId: satisfiedAssignment.id, classroomId: satisfiedAssignment.classroomId }).catch((err) => { logger.error('Assignment stamp failed:', err); return false; })
       : Promise.resolve(null);
 
+    const wordMemory = completed
+      ? recordPracticeWordReviews(createAdminClient, { studentId: existing.student_id, lessonId: existing.lesson_id,
+          practiceType: existing.practice_type, mode: existing.mode, wordResults, nowMs: Date.now() })
+          .catch((err) => logger.error('Word memory update failed:', err))
+      : Promise.resolve();
+
     const [{ data: session, error }, xpResult, profileXp, stamped] = await Promise.all([
       sessionWrite,
       awardEducationXp,
       incrementProfileXp,
       stampAssignment,
+      wordMemory,
     ]);
 
     if (error) {
