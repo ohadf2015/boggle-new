@@ -115,7 +115,7 @@ export async function signInAs(context: BrowserContext, page: Page, baseURL: str
     const path = new URL(req.url()).pathname;
     if (path === '/api/education/practice/lessons') return json(route, { lessons: full ? [0, 1, 2].map(lesson) : [] });
     if (path === '/api/streak') return json(route, full ? { currentStreak: 4, longestStreak: 6, lastWinDate: new Date(Date.now() - 86_400_000).toISOString() } : { currentStreak: 0 });
-    if (path.startsWith('/api/education/spaced-repetition')) return json(route, { words: [], progress: [] });
+    if (path.startsWith('/api/education/word-memory')) return json(route, { today: '2026-01-01', dueCount: 0, words: [], lessons: [] });
     if (path.includes('/hub')) return json(route, { classroom: { id: CLASSROOM_ID, name: 'Class 5B Explorers' }, standings: [], members: [] });
     if (req.method() !== 'GET') return json(route, { ok: true });
     return json(route, {});

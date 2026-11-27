@@ -3,7 +3,7 @@
 /**
  * Everything the student home reads, from the same sources the old hub zones used:
  *  - lessons: `useStudentProgress` + `usePracticeLessons` merged by `mergeStudentLessons`
- *  - review lesson: the first lesson with words (its due count comes from `ReviewCountBridge`)
+ *  - review lesson: the first lesson with words (its due count comes from `ReviewCountBridge`, server word memory)
  *  - streak: `useWinStreak`
  */
 
@@ -25,11 +25,6 @@ export function useAcademyData(level: VocabularyLevel | null | undefined) {
 
   const firstLesson = merged.find((l) => l.lesson?.words?.length);
   const reviewLessonId = firstLesson?.lessonId ?? '';
-  const reviewWords = useMemo(
-    () => (firstLesson?.lesson?.words ?? []).map((w: { word: string }) => w.word),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [reviewLessonId],
-  );
 
   const { currentStreak, isStreakAtRisk, lastWinDate } = useWinStreak();
   const stars = useMemo(() => totalStars(merged, level), [merged, level]);
@@ -38,7 +33,6 @@ export function useAcademyData(level: VocabularyLevel | null | undefined) {
     lessons: merged,
     lessonsLoading: isLoading || practisableLoading,
     reviewLessonId,
-    reviewWords,
     streak: currentStreak,
     streakAtRisk: isStreakAtRisk,
     streakDoneToday: !!lastWinDate && new Date(lastWinDate).toDateString() === new Date().toDateString(),
