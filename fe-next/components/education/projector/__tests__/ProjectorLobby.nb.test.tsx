@@ -104,9 +104,9 @@ describe('ProjectorLobby: neo-brutalist wall', () => {
     screen.getAllByTestId('projector-word-definition').forEach((d) => expect(tokens(d)).toContain(`${SHORT_WALL}hidden`));
   });
 
-  it('on a short wall the Start bar sticks to the bottom edge, so Start never scrolls away', () => {
+  it('on a short wall the Start bar sticks to the bottom edge on the page colour, so Start never scrolls away and no cream band frames it', () => {
     render(<ProjectorLobby {...props} />);
-    expect(tokens(screen.getByTestId('projector-start-bar'))).toEqual(expect.arrayContaining([`${SHORT_WALL}sticky`, `${SHORT_WALL}bottom-0`, `${SHORT_WALL}bg-edu-surface`]));
+    expect(tokens(screen.getByTestId('projector-start-bar'))).toEqual(expect.arrayContaining([`${SHORT_WALL}sticky`, `${SHORT_WALL}bottom-0`, `${SHORT_WALL}bg-edu-page`]));
   });
 
   it('a locked Start reads as not-yet: dashed edge, no shadow', () => {

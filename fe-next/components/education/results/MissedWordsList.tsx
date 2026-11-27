@@ -51,7 +51,7 @@ export function MissedWordsList({ words, maxChips = 8, title, t, children, fill 
             dir="auto"
             className={cn(
               'inline-flex items-center gap-1.5 rounded-neo border-[3px] border-neo-black bg-edu-paper shadow-edu-lip-sm px-2.5 py-0.5 font-neo-display text-base font-black text-neo-black @5xl/results:px-3 @5xl/results:text-xl @[96rem]/results:px-4 @[96rem]/results:py-1 @[96rem]/results:text-3xl',
-              fill && '@5xl/results:px-4 @5xl/results:py-1.5 @5xl/results:text-2xl'
+              fill && '@5xl/results:px-4 @5xl/results:py-1.5 @5xl/results:text-2xl @5xl/results:[@media(max-height:900px)]:py-0.5 @5xl/results:[@media(max-height:900px)]:text-lg'
             )}
           >
             {w.word}

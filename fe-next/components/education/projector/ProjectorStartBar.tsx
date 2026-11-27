@@ -75,7 +75,7 @@ export function ProjectorStartBar({
       data-testid="projector-start-bar"
       style={style}
       className={cn(
-        'flex flex-col gap-2 self-center [@container(max-height:800px)]:sticky [@container(max-height:800px)]:bottom-0 [@container(max-height:800px)]:z-10 [@container(max-height:800px)]:bg-edu-surface [@container(max-height:800px)]:py-2 @max-5xl:sticky @max-5xl:bottom-0 @max-5xl:z-10 @max-5xl:-mx-3 @max-5xl:-mb-3 @max-5xl:border-t-[3px] @max-5xl:border-edu-line @max-5xl:bg-edu-surface @max-5xl:p-3',
+        'flex flex-col gap-2 self-center [@container(max-height:800px)]:sticky [@container(max-height:800px)]:bottom-0 [@container(max-height:800px)]:z-10 [@container(max-height:800px)]:bg-edu-page [@container(max-height:800px)]:py-2 @max-5xl:sticky @max-5xl:bottom-0 @max-5xl:z-10 @max-5xl:-mx-3 @max-5xl:-mb-3 @max-5xl:border-t-[3px] @max-5xl:border-edu-line @max-5xl:bg-edu-surface @max-5xl:p-3',
         RISE,
         className
       )}
