@@ -36,7 +36,7 @@ describe('ArcadeHub', () => {
     expect(replace).toHaveBeenCalledWith('/he');
   });
 
-  it('Given Hanukkah, then only its three games are offered and picking one opens it', () => {
+  it('Given Hanukkah, then only its games are offered and picking one opens it', () => {
     holiday.mockReturnValue({ holiday: 'hanukkah', resolved: true });
     render(<ArcadeHub />);
     expect(screen.getByTestId('arcade-pick-oil')).toBeInTheDocument();
@@ -57,8 +57,23 @@ describe('ArcadeHub', () => {
     expect(screen.getByTestId('host')).toHaveTextContent('oil');
   });
 
+  it('Given Christmas, then the family party games come first with a Pass & Play badge, then the word games', () => {
+    holiday.mockReturnValue({ holiday: 'christmas', resolved: true });
+    render(<ArcadeHub />);
+    const picks = screen.getAllByTestId(/^arcade-pick-/).map((el) => el.dataset.testid);
+    expect(picks).toEqual(['arcade-pick-presents', 'arcade-pick-splat', 'arcade-pick-sleigh', 'arcade-pick-snowball', 'arcade-pick-wrap']);
+    expect(screen.getAllByText('holiday.arcade.family.badge')).toHaveLength(2);
+  });
+
   it('Given the event card tile, then it links to the arcade in the player language', () => {
-    render(<ArcadeTile holiday="christmas" />);
+    holiday.mockReturnValue({ holiday: 'christmas', resolved: true });
+    render(<ArcadeTile />);
     expect(screen.getByTestId('holiday-arcade-tile')).toHaveAttribute('href', '/he/holiday-arcade');
+  });
+
+  it('Given the arcade gate is closed, then the event card shows no arcade tile', () => {
+    holiday.mockReturnValue({ holiday: null, resolved: true });
+    render(<ArcadeTile />);
+    expect(screen.queryByTestId('holiday-arcade-tile')).toBeNull();
   });
 });

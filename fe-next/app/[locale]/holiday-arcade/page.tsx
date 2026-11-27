@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import AutoHideHeader from '@/components/AutoHideHeader';
 import ArcadeHub from '@/components/holidays/arcade/ArcadeHub';
 
 export const metadata: Metadata = {
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 export default function HolidayArcadePage() {
   return (
     <main className="flex flex-[1_0_auto] flex-col bg-neo-navy">
+      <AutoHideHeader collapseSpacerWhenHidden />
       <Suspense fallback={<div className="mx-auto mt-6 h-96 w-full max-w-lg animate-pulse rounded-2xl bg-neo-navy-light/60" />}>
         <ArcadeHub />
       </Suspense>

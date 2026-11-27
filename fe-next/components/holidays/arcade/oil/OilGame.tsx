@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { OilContent } from '@/lib/holidays/arcade/content';
 import { wordPoints } from '@/lib/holidays/arcade/letters';
@@ -26,7 +27,7 @@ const LOW = 25;
 const view = (s: OilState) => ({ night: s.night, miracle: s.miracle, over: s.over, low: s.oil < LOW });
 
 export default function OilGame({ content, lang, onScore, onEnd }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const sfx = useSoundEffects();
   const fx = useArcadeFx();
   const judge = useWordJudge(lang);
@@ -131,7 +132,7 @@ export default function OilGame({ content, lang, onScore, onEnd }: Props) {
           {t('holiday.arcade.oil.nightOf', { night: snap.night, total: 8 })}
         </p>
         <div className="flex flex-[1_0_auto] items-center px-4 pb-1 pt-6">
-          <Hanukkiah ref={menorah} lit={lit} label={t('holiday.arcade.oil.candlesLit', { count: lit })} />
+          <Hanukkiah ref={menorah} lit={lit} label={t(pluralKeyOf('holiday.arcade.oil.candlesLit', lit, language), { count: lit })} />
         </div>
         {snap.miracle === 'active' && (
           <div className={styles.miracle} role="status">

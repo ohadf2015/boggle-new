@@ -59,7 +59,7 @@ export function ArcadeSection({ copy, holiday, locale, live }: ArcadeProps) {
         {!live && <strong className="ms-2 inline-block rounded-neo-pill bg-neo-holiday-snow px-3 py-0.5 text-sm text-neo-navy">{copy.arcadeOff}</strong>}
       </p>
       <div className="grid gap-4 sm:grid-cols-3">
-        {gamesFor(holiday).map((id) =>
+        {gamesFor(holiday).filter((id) => copy.arcade[id]).map((id) =>
           live ? (
             <Link key={id} href={`/${locale}/holiday-arcade?g=${id}&holiday=${holiday}`} className={`${card} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-holiday-gold`}>
               <CoverCard id={id} copy={copy} />

@@ -38,12 +38,12 @@ describe('arcade letters', () => {
 });
 
 describe('arcade games', () => {
-  it('Given a holiday, then it has exactly its three games', () => {
-    expect(gamesFor('hanukkah')).toEqual(['oil', 'dreidel', 'sufganiyah']);
-    expect(gamesFor('christmas')).toEqual(['sleigh', 'snowball', 'wrap']);
+  it('Given a holiday, then it keeps its three word games after the family games', () => {
+    expect(gamesFor('hanukkah').slice(-3)).toEqual(['oil', 'dreidel', 'sufganiyah']);
+    expect(gamesFor('christmas').slice(-3)).toEqual(['sleigh', 'snowball', 'wrap']);
     expect(isArcadeGame('oil')).toBe(true);
     expect(isArcadeGame('nope')).toBe(false);
-    for (const g of Object.values(ARCADE_GAMES)) expect(g.cover).toMatch(/^\/holidays\/arcade-[a-z]+\.webp$/);
+    for (const g of Object.values(ARCADE_GAMES)) expect(g.cover).toMatch(/^\/holidays\/arcade[-/][a-z-]+\.webp$/);
   });
 
   it('Given a score, then round coins scale and stop at the round cap', () => {

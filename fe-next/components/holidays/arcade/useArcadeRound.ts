@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { ArcadeContentMap } from '@/lib/holidays/arcade/content';
 import type { ArcadeGameId, ArcadePlay } from '@/lib/holidays/arcade/games';
@@ -19,6 +20,7 @@ export interface RoundEnd {
   score: number;
   plays: ArcadePlay[];
   won?: boolean;
+  players?: number;
 }
 
 export type Settle =
@@ -46,7 +48,15 @@ export function useArcadeRound<G extends ArcadeGameId>(game: G) {
   const startedAt = useRef(0);
   const trackId = useRef('');
   const roundKey = useRef(0);
-  const setGameActive = sfx.setGameActive;
+  const setSfxActive = sfx.setGameActive;
+  const setInGame = useHideNavigation();
+  const setGameActive = useCallback(
+    (on: boolean) => {
+      setSfxActive(on);
+      setInGame(on);
+    },
+    [setSfxActive, setInGame],
+  );
 
   const start = useCallback(async () => {
     setState({ phase: 'loading' });
@@ -83,7 +93,7 @@ export function useArcadeRound<G extends ArcadeGameId>(game: G) {
       const s = live.current;
       if (s.phase !== 'playing') return;
       const duration = Math.round((Date.now() - startedAt.current) / 1000);
-      trackGameEnd(arcadeMode(game), end.score, end.plays.length, true, duration, { roundId: trackId.current, won: end.won === true });
+      trackGameEnd(arcadeMode(game), end.score, end.players ?? end.plays.length, true, duration, { roundId: trackId.current, won: end.won === true });
       setGameActive(false);
       const round = s.round;
       setState({ phase: 'over', round, key: s.key, end, settle: round.roundId ? { state: 'saving' } : { state: 'guest' } });

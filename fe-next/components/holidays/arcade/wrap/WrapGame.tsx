@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WrapContent } from '@/lib/holidays/arcade/content';
 import { wordLength } from '@/lib/holidays/arcade/letters';
@@ -25,7 +26,7 @@ const BOX_W = 88;
 const art = (i: number, mystery: boolean) => (mystery ? '/holidays/gift-tier-9.webp' : i % 2 ? '/holidays/props-gift-blue.webp' : '/holidays/props-gift-red.webp');
 
 export default function WrapGame({ content, lang, onScore, onEnd }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const sfx = useSoundEffects();
   const fx = useArcadeFx();
   const judge = useWordJudge(lang);
@@ -117,7 +118,7 @@ export default function WrapGame({ content, lang, onScore, onEnd }: Props) {
     <div className={cn('flex flex-[1_0_auto] flex-col', fx.paused && styles.paused)}>
       <div ref={timeBar} className="h-1.5 origin-left bg-neo-holiday-pine will-change-transform rtl:origin-right" aria-hidden="true" />
       <div ref={floor} className={styles.floor}>
-        <div className="absolute start-2 top-2 z-10 flex gap-1" role="img" aria-label={t('holiday.arcade.wrap.misses', { count: snap.lives })}>
+        <div className="absolute start-2 top-2 z-10 flex gap-1" role="img" aria-label={t(pluralKeyOf('holiday.arcade.wrap.misses', snap.lives, language), { count: snap.lives })}>
           {Array.from({ length: WRAP_MISSES }, (_, k) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img key={k} src="/holidays/props-holly.webp" alt="" width={26} height={26} className={cn('size-6', k >= snap.lives && 'opacity-25 grayscale')} />

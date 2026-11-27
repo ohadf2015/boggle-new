@@ -43,6 +43,19 @@ beforeEach(() => {
 });
 
 describe('arcade games render', () => {
+  it('Given Sufganiyah Stack, then the next-letter marker is positioned by an absolute wrapper the letter style cannot override', async () => {
+    await mount('sufganiyah');
+    const marker = screen.getByTestId('stack-next');
+    expect(marker.className).toContain('absolute');
+    expect(marker.firstElementChild?.className).not.toContain('absolute');
+  });
+
+  it('Given Snowball Fight over its painted scene, then no flat snow bar is drawn across the field', async () => {
+    await mount('snowball');
+    const field = screen.getByTestId('arcade-snowball').querySelector('[data-arcade-stage]')!;
+    expect(field.querySelector('[class*="ground"]')).toBeNull();
+  });
+
   it.each(Object.keys(GAMES) as ArcadeGameId[])('Given %s content, then the game mounts inside the shell', async (game) => {
     await mount(game);
     expect(screen.getByTestId(`arcade-${game}`)).toBeInTheDocument();

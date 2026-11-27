@@ -145,4 +145,23 @@ describe('holiday arcade routes', () => {
     expect(body.coinError).toBe(true);
     expect(fx.updates).toContainEqual({ coins: 0 });
   });
+
+  it('Given a family game, when a round starts, then it gets a seed and never loads word content', async () => {
+    const res = await round.POST(post({ ...base, game: 'presents' }));
+    const body = await res.json();
+    expect(res.status).toBe(200);
+    expect(Number.isInteger(body.content.seed)).toBe(true);
+    expect(fx.rows[0]).toMatchObject({ game: 'presents' });
+  });
+
+  it('Given a family game score above its own cap, then the server pays from the capped score with no word checks', async () => {
+    const res = await round.POST(post({ ...base, game: 'splat' }));
+    const { roundId } = await res.json();
+    vi.setSystemTime(new Date('2026-12-15T10:00:40Z'));
+    const body = await (await score.POST(post({ ...base, roundId, plays: [], score: 999_999 }))).json();
+    expect(body.status).toBe('settled');
+    expect(body.score).toBeLessThanOrEqual(40 * 120);
+    expect(body.score).toBeGreaterThan(0);
+    expect(fx.validate).not.toHaveBeenCalled();
+  });
 });

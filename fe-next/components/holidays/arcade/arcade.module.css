@@ -90,3 +90,18 @@
   .floatUp { opacity: 1; transform: translate(-50%, -24px); }
   .tile, .frost { transition: none; }
 }
+
+.floatProp {
+  animation: floatProp 3.2s ease-in-out infinite;
+}
+
+@keyframes floatProp {
+  0%, 100% { transform: translateY(0) rotate(-6deg); }
+  50% { transform: translateY(-10px) rotate(6deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floatProp {
+    animation: none;
+  }
+}

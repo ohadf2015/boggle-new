@@ -10,15 +10,6 @@
     radial-gradient(circle at 70% 60%, color-mix(in srgb, var(--neo-holiday-snow) 16%, transparent) 0 2px, transparent 3px) 0 0 / 60px 60px;
 }
 
-.ground {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  height: 54px;
-  border-top: 3px solid rgb(var(--neo-black));
-  background: var(--neo-holiday-snow);
-}
-
 .ball {
   position: absolute;
   left: 50%;

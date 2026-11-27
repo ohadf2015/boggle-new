@@ -7,7 +7,8 @@ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import HolidayMascotPop from '@/components/daily/holiday/HolidayMascotPop';
 import { spawnBurst, type BurstKind } from '@/components/daily/holiday/holidayBurst';
 import type { HolidayKey } from '@/lib/holidays/calendar';
-import type { ArcadeGameId } from '@/lib/holidays/arcade/games';
+import { ARCADE_GAMES, type ArcadeGameId } from '@/lib/holidays/arcade/games';
+import ArcadeBackdrop from './ArcadeBackdrop';
 import { cn } from '@/lib/utils';
 import styles from './arcade.module.css';
 
@@ -35,6 +36,7 @@ interface Props {
 
 export default function ArcadeShell({ holiday, game, score, onExit, children, overlay }: Props) {
   const { t } = useLanguage();
+  const meta = ARCADE_GAMES[game];
   const reduced = usePrefersReducedMotion();
   const layer = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
@@ -125,7 +127,8 @@ export default function ArcadeShell({ holiday, game, score, onExit, children, ov
           <HolidayMascotPop holiday={holiday} cue={cue} line={line} className="flex-row-reverse items-center gap-2" />
         </div>
         <div data-arcade-stage className={cn(styles.stage, 'flex flex-[1_0_auto] flex-col rounded-2xl border-[3px] border-black bg-neo-navy shadow-hard-lg')}>
-          {children}
+          <div className="relative z-[1] flex flex-[1_0_auto] flex-col">{children}</div>
+          {!meta.family && <ArcadeBackdrop meta={meta} />}
           <div ref={layer} className={styles.layer} aria-hidden="true" />
           {paused && !overlay && (
             <div className="absolute inset-0 z-40 grid place-items-center bg-neo-navy/85">

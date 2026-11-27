@@ -25,6 +25,10 @@ const GAMES: Record<ArcadeGameId, ComponentType<GameProps>> = {
   dreidel: dynamic(() => import('./dreidel/DreidelGame'), { ssr: false, loading }) as ComponentType<GameProps>,
   wrap: dynamic(() => import('./wrap/WrapGame'), { ssr: false, loading }) as ComponentType<GameProps>,
   sufganiyah: dynamic(() => import('./stack/StackGame'), { ssr: false, loading }) as ComponentType<GameProps>,
+  latke: dynamic(() => import('./family/LatkeFlip'), { ssr: false, loading }) as ComponentType<GameProps>,
+  spin: dynamic(() => import('./family/SpinOff'), { ssr: false, loading }) as ComponentType<GameProps>,
+  presents: dynamic(() => import('./family/PresentStack'), { ssr: false, loading }) as ComponentType<GameProps>,
+  splat: dynamic(() => import('./family/SnowballSplat'), { ssr: false, loading }) as ComponentType<GameProps>,
 };
 
 interface Props {
