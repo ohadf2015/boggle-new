@@ -19,7 +19,7 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { shouldMountBlastFxCanvas } from './utils/shouldMountBlastFxCanvas';
 import { createCellsChannel, listSpecialTiles } from './effects/blastFxEvents';
 import { useBlastTileFirstUse } from './hooks/useBlastTileFirstUse';
-import { BlastTileFirstUseCallout } from './BlastTileFirstUseCallout';
+import { BlastBoardFooter } from './board/BlastBoardFooter';
 import { BlastHUD } from './BlastHUD';
 import { BlastMPLeaderboard } from './BlastMPLeaderboard';
 import { selectMyBlastScore } from '@/lib/blast/selectMyBlastScore';
@@ -375,10 +375,12 @@ export const BlastStage = memo(function BlastStage({
       >
         <BlastBoardTray
           footer={(
-            <div className="relative z-40 flex min-h-[44px] w-full max-w-[360px] shrink-0 items-center justify-center gap-2 px-2 md:max-w-[480px]">
-              <WordFormingArea word={liveWord} letterCount={liveWord.length} feedback={currentFeedback} compact morphLayout={false} />
-              {liveWord && <span className="text-[10px] font-bold tabular-nums text-white">{liveWord.length}</span>}
-            </div>
+            <BlastBoardFooter teaching={firstUseTeaching ?? null} busy={Boolean(liveWord || currentFeedback)} onDismissTeaching={dismissFirstUse} isMultiplayer={isMultiplayer}>
+              <div className="relative z-40 flex min-h-[44px] w-full max-w-[360px] shrink-0 items-center justify-center gap-2 px-2 md:max-w-[480px]">
+                <WordFormingArea word={liveWord} letterCount={liveWord.length} feedback={currentFeedback} compact morphLayout={false} />
+                {liveWord && <span className="text-[10px] font-bold tabular-nums text-white">{liveWord.length}</span>}
+              </div>
+            </BlastBoardFooter>
           )}
           chainLevel={sequencerState?.chainLevel ?? 0}
           comboFlashTier={comboFlashTier}
@@ -430,15 +432,6 @@ export const BlastStage = memo(function BlastStage({
               </div>
             )}
           </div>
-          {/* First-use teaching: names a special tile + what it does the
-              first time the player meets it (once per tile, persisted). */}
-          {firstUseTeaching && (
-            <BlastTileFirstUseCallout
-              type={firstUseTeaching}
-              onDismiss={dismissFirstUse}
-              isMultiplayer={isMultiplayer}
-            />
-          )}
         </BlastBoardTray>
         {/* Cascade word discovery banner */}
         <AdaptiveAnimatePresence>
