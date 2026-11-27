@@ -52,7 +52,7 @@ export function LobbyModeGrid({ selected, recommended = null, suggested = null, 
         {CATALOGUE_CATEGORIES.map((category) => (
           <section key={category} data-testid={`mode-group-${category}`} className={cn('grid grid-cols-subgrid content-start gap-y-1.5', GROUP_SPAN[category])}>
             <h2 className="col-span-full flex items-center gap-1.5 px-0.5 font-neo-body text-xs font-bold leading-none text-edu-ink/80 @2xl:text-sm">
-              <span aria-hidden="true" className="h-[3px] w-3 shrink-0 bg-neo-cream" />
+              <span aria-hidden="true" className="h-[3px] w-3 shrink-0 bg-edu-ink" />
               {t(`eg2Modes.category.${category}`)}
             </h2>
             {modes
@@ -151,7 +151,7 @@ function ModeTile({
         'transition-[border-color,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.98] motion-reduce:transition-none',
         'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface disabled:cursor-wait',
         selected
-          ? 'border-neo-lime ring-2 ring-neo-lime ring-offset-2 ring-offset-edu-surface'
+          ? 'border-neo-black ring-[3px] ring-neo-pink ring-offset-2 ring-offset-edu-page'
           : blockedReason
             ? 'border-edu-line'
             : 'border-edu-line [@media(hover:hover)]:hover:border-edu-line',
@@ -183,9 +183,9 @@ function ModeTile({
           <span
             data-testid="mode-selected-check"
             aria-hidden="true"
-            className="absolute end-1 top-1 grid size-6 place-items-center rounded-full border-2 border-neo-lime bg-edu-surface"
+            className="absolute end-1 top-1 grid size-6 place-items-center rounded-full border-2 border-neo-black bg-edu-surface"
           >
-            <Check className="size-3.5 text-edu-lime-ink" strokeWidth={4} />
+            <Check className="size-3.5 text-edu-pink-ink" strokeWidth={4} />
           </span>
         ) : null}
       </span>

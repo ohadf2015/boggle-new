@@ -5,10 +5,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { getPresetValues, type ClassroomPresetId } from '@/lib/education/classroomPresets';
 
-const PRESETS: { id: ClassroomPresetId; key: string; icon: LucideIcon }[] = [
-  { id: 'standard', key: 'standard', icon: Zap },
-  { id: 'friday-battle', key: 'fridayBattle', icon: Swords },
-  { id: 'sped', key: 'sped', icon: HeartHandshake },
+const PRESETS: { id: ClassroomPresetId; key: string; icon: LucideIcon; fill: string }[] = [
+  { id: 'standard', key: 'standard', icon: Zap, fill: 'bg-neo-pink' },
+  { id: 'friday-battle', key: 'fridayBattle', icon: Swords, fill: 'bg-neo-cyan' },
+  { id: 'sped', key: 'sped', icon: HeartHandshake, fill: 'bg-neo-yellow' },
 ];
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
@@ -40,7 +40,7 @@ export function LobbyPresetCards({ active, onApply }: LobbyPresetCardsProps) {
         {t('teacher.classroom.presets.title')}
       </h2>
       <div role="radiogroup" aria-labelledby="lobby-presets-title" className="grid grid-cols-3 gap-2 @2xl/presets:gap-3">
-        {PRESETS.map(({ id, key, icon: Icon }) => {
+        {PRESETS.map(({ id, key, icon: Icon, fill }) => {
           const on = active === id;
           return (
             <button
@@ -52,19 +52,17 @@ export function LobbyPresetCards({ active, onApply }: LobbyPresetCardsProps) {
               title={t(`teacher.classroom.presets.${key}.desc`)}
               onClick={() => onApply(id)}
               className={cn(
-                'relative flex min-h-[6.5rem] min-w-0 flex-col items-start gap-2 rounded-neo-lg border-[3px] bg-edu-surface p-2.5 text-start text-edu-ink shadow-hard',
+                'relative flex min-h-[6.5rem] min-w-0 flex-col items-start gap-2 rounded-neo-lg border-[3px] bg-edu-surface p-2.5 text-start text-edu-ink shadow-edu-lip',
                 'transition-[transform,border-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:translate-y-0.5 motion-reduce:transition-none',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface',
                 '@2xl/presets:min-h-[clamp(11rem,calc(100cqh-22rem),15rem)] @2xl/presets:gap-3 @2xl/presets:p-4',
-                on ? 'border-neo-lime ring-2 ring-neo-lime ring-offset-2 ring-offset-edu-surface' : 'border-edu-line [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:border-edu-line',
+                on ? 'border-neo-black ring-[3px] ring-neo-pink ring-offset-2 ring-offset-edu-page' : 'border-edu-line [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:border-edu-line',
               )}
             >
               <span
                 aria-hidden="true"
-                className={cn(
-                  'grid size-9 shrink-0 place-items-center rounded-neo border-2 @2xl/presets:size-12',
-                  on ? 'border-neo-lime text-edu-lime-ink' : 'border-edu-line text-edu-ink/80',
-                )}
+                data-testid="preset-icon"
+                className={cn('grid size-9 shrink-0 place-items-center rounded-neo border-2 border-neo-black text-neo-black shadow-edu-lip-sm @2xl/presets:size-12', fill)}
               >
                 <Icon className="size-5 @2xl/presets:size-7" strokeWidth={2.5} />
               </span>
@@ -87,9 +85,9 @@ export function LobbyPresetCards({ active, onApply }: LobbyPresetCardsProps) {
                 <span
                   data-testid="preset-check"
                   aria-hidden="true"
-                  className="absolute end-2 top-2 grid size-6 place-items-center rounded-full border-2 border-neo-lime bg-edu-surface motion-safe:animate-[lc-preset-check_240ms_cubic-bezier(0.23,1,0.32,1)]"
+                  className="absolute end-2 top-2 grid size-7 place-items-center rounded-full border-2 border-neo-black bg-edu-surface motion-safe:animate-[lc-preset-check_240ms_cubic-bezier(0.23,1,0.32,1)]"
                 >
-                  <Check className="size-3.5 text-edu-lime-ink" strokeWidth={4} />
+                  <Check className="size-4 text-edu-pink-ink" strokeWidth={4} />
                 </span>
               ) : null}
             </button>

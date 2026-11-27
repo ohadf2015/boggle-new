@@ -173,10 +173,12 @@ describe('<LobbyModeGrid> — the picker is the page', () => {
     expect(grid.innerHTML).not.toMatch(/(?<![@\w-])(sm|md|lg):/);
   });
 
-  it('Then the selected tile is outlined with a lime ring and a check, never a colored fill', () => {
+  it('Then the selected tile is outlined with a pink ring and a check, never a colored fill or a lime ring on the sky page', () => {
     renderGrid();
     const on = screen.getByTestId('mode-tile-classic');
-    expect(on.className).toContain('ring-neo-lime');
+    expect(on.className).toContain('ring-neo-pink');
+    expect(on.className).not.toContain('neo-lime');
+    expect(within(on).getByTestId('mode-selected-check').className).toContain('border-neo-black');
     expect(within(on).getByTestId('mode-selected-check')).toBeInTheDocument();
     expect(withoutDecor(screen.getByTestId('lobby-mode-grid'))).not.toMatch(/bg-neo-(lime|cyan|pink|purple|yellow|orange)(?![\w/-])/);
   });
