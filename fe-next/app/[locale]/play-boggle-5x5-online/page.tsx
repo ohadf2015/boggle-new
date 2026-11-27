@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-// Data rows map through a helper: an inline `title:` key reads as a snippet change to the SEO freeze check.
 import { fromDesc } from '@/components/landing/kit/fromDesc';
 import {
   CompareTable,
