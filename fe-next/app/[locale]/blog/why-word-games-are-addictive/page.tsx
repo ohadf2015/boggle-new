@@ -15,7 +15,7 @@ const DATE_PUBLISHED = '2025-11-12';
 const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
-  en: "Why You Can't Stop Playing Word Games - The Psychology Explained",
+  en: 'Why Word Games Are So Addictive: Dopamine, Flow and More',
   he: 'למה אי אפשר להפסיק לשחק משחקי מילים - הפסיכולוגיה מאחורי ההתמכרות',
   sv: 'Varfor Du Inte Kan Sluta Spela Ordspel - Psykologin Forklarad',
   ja: 'ワードゲームがやめられない理由 - 心理学で解説',
@@ -24,7 +24,7 @@ const metaTitles: Record<string, string> = {
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'Discover why word games are so addictive. Learn about dopamine, flow states, the Zeigarnik effect, and the neuroscience behind why your brain craves "just one more round."',
+  en: "Each word you find pays out a small dopamine hit, flow makes an hour feel like ten minutes, and an unfinished board keeps nagging at you. Here's why.",
   he: 'גלו למה משחקי מילים כל כך ממכרים. למדו על דופמין, מצבי זרימה, אפקט זייגרניק, ומדע המוח מאחורי הדחף ל"עוד סיבוב אחד."',
   sv: 'Upptack varfor ordspel ar sa beroendeframkallande. Lar dig om dopamin, flowtillstand, Zeigarnikeffekten och neurovetenskapen bakom "bara en runda till."',
   ja: 'ワードゲームがなぜこんなに中毒性があるのか発見しよう。ドーパミン、フロー状態、ツァイガルニク効果、「あと1ラウンドだけ」の神経科学を解説。',
