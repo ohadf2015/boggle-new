@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -71,12 +72,12 @@ export function CancelReasonChips({ initialReason }: { initialReason: string | n
       <p data-testid="cancel-reason-prompt" className="text-xs font-black uppercase tracking-wide text-neo-cream/70">
         {t('teacher.subscription.cancelReasonPrompt')}
       </p>
-      <div className="mt-2 flex flex-wrap gap-2">
+      <div className="mt-2 flex flex-wrap gap-2" data-testid="teacher-pro-trial-cancel-reasons">
         {CANCEL_REASON_CHIPS.map(({ reason, labelKey }) => (
           <button
             key={reason}
             type="button"
-            data-testid={`cancel-reason-chip-${reason}`}
+            data-testid={`teacher-pro-trial-cancel-reason-${reason}`}
             disabled={pending !== null}
             aria-busy={pending === reason || undefined}
             onClick={() => void pick(reason)}
@@ -137,6 +138,13 @@ export function TeacherProTrialCanceledBanner({ endsAt, onResumed, cancelReason 
       body={
         <>
           <span>{t('teacher.subscription.canceledTrialBody')}</span>
+          <Link
+            href={`/${language}/teacher/classroom/new`}
+            data-testid="teacher-pro-trial-canceled-lesson"
+            className="mt-1 block font-bold underline underline-offset-2"
+          >
+            {t('teacher.subscription.canceledTrialPlanLesson')}
+          </Link>
           <TrialUsageRecap trialExpires={endsAt} className="mt-1 block" />
           <CancelReasonChips initialReason={cancelReason ?? null} />
         </>

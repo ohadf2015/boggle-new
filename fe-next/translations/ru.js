@@ -14909,6 +14909,12 @@ const ru = {
       "trialLifecycleBody": "Сохраните безлимитные классы и печатные отчёты — 9 $/мес после пробного периода.",
       "canceledTrialTitle": "Teacher Pro работает до {date}",
       "canceledTrialBody": "Вы отменили подписку, поэтому с карты ничего не спишется. Передумали? Оставьте Pro, и он продолжит работать после этой даты за $9/мес.",
+      "canceledTrialPlanLesson": "Pro остаётся до этой даты: подготовьте урок на неделю",
+      "cancelReason_too_expensive": "Слишком дорого",
+      "cancelReason_school_pays": "Платит школа",
+      "cancelReason_just_testing": "Просто проверял",
+      "cancelReason_missing_feature": "Не хватает функции",
+      "cancelReasonThanks": "Спасибо, это помогает.",
       "resumeCta": "Оставить Pro",
       "resumeDone": "Готово. Teacher Pro продолжит работать.",
       "resumeError": "Не удалось вернуть Pro. Попробуйте ещё раз или откройте «Тарифы».",
@@ -22738,6 +22744,32 @@ const ru = {
         "first_assignment": {
           "title": "Дать первое задание",
           "cta": "Создать задание"
+        }
+      }
+    },
+    "firstSession": {
+      "title": "Запустите игру с классом уже сегодня",
+      "subtitle": "Четыре шага. Ваш пробный период Teacher Pro уже идёт.",
+      "progress": "{done} из {total}",
+      "dismiss": "Скрыть чек-лист",
+      "later": "Не сейчас",
+      "schedule": "Запланировать на урок",
+      "steps": {
+        "create_classroom": {
+          "title": "Создать класс",
+          "cta": "Создать класс"
+        },
+        "add_students": {
+          "title": "Добавить первых учеников",
+          "cta": "Добавить учеников"
+        },
+        "create_assignment": {
+          "title": "Создать первое задание",
+          "cta": "Создать задание"
+        },
+        "first_live_game": {
+          "title": "Провести или запланировать живую игру",
+          "cta": "Начать живую игру"
         }
       }
     },

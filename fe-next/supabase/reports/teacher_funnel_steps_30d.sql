@@ -103,5 +103,37 @@ SELECT * FROM (
   UNION ALL
   SELECT 'trial_started', 6, teachers, 'subscription_events teacher_trial_started'
   FROM trials
+  UNION ALL
+  SELECT 'trial_canceled', 7, count(DISTINCT se.user_id), 'subscription_events teacher_trial_canceled or still-trialing cancel'
+  FROM public.subscription_events se
+  JOIN real_teachers t ON t.id = se.user_id
+  WHERE se.created_at >= (SELECT since FROM bounds)
+    AND (
+      se.event_type = 'teacher_trial_canceled'
+      OR (
+        se.event_type = 'subscription.canceled'
+        AND COALESCE(se.payload->>'trial', '') = 'true'
+        AND EXISTS (
+          SELECT 1 FROM public.subscriptions s
+          WHERE s.user_id = se.user_id
+            AND s.tier = 'pro'
+            AND s.status = 'trialing'
+            AND s.current_period_end > now()
+        )
+      )
+    )
+  UNION ALL
+  SELECT 'trial_expired', 8, count(DISTINCT se.user_id), 'subscription_events teacher_trial_expired, excluding a trial that is still on'
+  FROM public.subscription_events se
+  JOIN real_teachers t ON t.id = se.user_id
+  WHERE se.created_at >= (SELECT since FROM bounds)
+    AND se.event_type = 'teacher_trial_expired'
+    AND NOT EXISTS (
+      SELECT 1 FROM public.subscriptions s
+      WHERE s.user_id = se.user_id
+        AND s.tier = 'pro'
+        AND s.status = 'trialing'
+        AND s.current_period_end > now()
+    )
 ) steps
 ORDER BY step_index;

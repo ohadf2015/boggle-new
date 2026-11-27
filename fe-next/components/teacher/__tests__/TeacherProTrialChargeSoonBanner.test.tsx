@@ -19,6 +19,7 @@ describe('TeacherProTrialChargeSoonBanner', () => {
     const cta = screen.getByTestId('teacher-pro-trial-charge-soon-cta');
     expect(cta).toHaveAttribute('href', portal);
     expect(cta).toHaveTextContent('teacher.subscription.trialManageCta');
+    expect(cta.className).not.toContain('animate-edu-shine');
     expect(screen.queryByRole('button')).toBeNull();
   });
 });

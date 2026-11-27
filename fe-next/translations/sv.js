@@ -15535,6 +15535,12 @@ const sv = {
       "trialLifecycleBody": "Behåll obegränsade klasser och utskrivbara rapporter. 9 $/mån efter provperioden.",
       "canceledTrialTitle": "Teacher Pro är kvar till {date}",
       "canceledTrialBody": "Du har avslutat, så ditt kort debiteras inte. Ångrat dig? Behåll Pro så fortsätter det efter det datumet för $9/mån.",
+      "canceledTrialPlanLesson": "Pro ligger kvar tills dess: planera veckans lektion",
+      "cancelReason_too_expensive": "För dyrt",
+      "cancelReason_school_pays": "Skolan betalar",
+      "cancelReason_just_testing": "Testar bara",
+      "cancelReason_missing_feature": "Saknar en funktion",
+      "cancelReasonThanks": "Tack — det hjälper.",
       "resumeCta": "Behåll Pro",
       "resumeDone": "Klart. Teacher Pro fortsätter.",
       "resumeError": "Det gick inte att slå på Pro igen. Försök igen, eller öppna Abonnemang.",
@@ -23012,6 +23018,32 @@ const sv = {
         "first_assignment": {
           "title": "Ge den första uppgiften",
           "cta": "Skapa uppgift"
+        }
+      }
+    },
+    "firstSession": {
+      "title": "Få igång klassen i dag",
+      "subtitle": "Fyra steg. Din provperiod på Teacher Pro är i gång.",
+      "progress": "{done} av {total}",
+      "dismiss": "Stäng checklistan",
+      "later": "Inte nu",
+      "schedule": "Schemalägg till lektionen",
+      "steps": {
+        "create_classroom": {
+          "title": "Skapa ett klassrum",
+          "cta": "Skapa klassrum"
+        },
+        "add_students": {
+          "title": "Lägg till de första eleverna",
+          "cta": "Lägg till elever"
+        },
+        "create_assignment": {
+          "title": "Skapa den första uppgiften",
+          "cta": "Skapa uppgift"
+        },
+        "first_live_game": {
+          "title": "Kör eller schemalägg ett livespel",
+          "cta": "Kör ett livespel"
         }
       }
     },

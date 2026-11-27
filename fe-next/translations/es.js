@@ -15172,6 +15172,12 @@ const es = {
       "trialLifecycleBody": "Conserva clases ilimitadas e informes imprimibles por 9 $/mes al terminar la prueba.",
       "canceledTrialTitle": "Teacher Pro sigue activo hasta el {date}",
       "canceledTrialBody": "Cancelaste, así que no se cobrará nada en tu tarjeta. ¿Cambiaste de idea? Quédate con Pro y seguirá después de esa fecha por $9/mes.",
+      "canceledTrialPlanLesson": "Pro sigue hasta entonces: prepara la clase de esta semana",
+      "cancelReason_too_expensive": "Muy caro",
+      "cancelReason_school_pays": "Lo paga el colegio",
+      "cancelReason_just_testing": "Solo estaba probando",
+      "cancelReason_missing_feature": "Falta una función",
+      "cancelReasonThanks": "Gracias, eso ayuda.",
       "resumeCta": "Quedarme con Pro",
       "resumeDone": "Listo. Teacher Pro sigue activo.",
       "resumeError": "No pudimos reactivar Pro. Inténtalo de nuevo o abre Planes.",
@@ -23024,6 +23030,32 @@ const es = {
         "first_assignment": {
           "title": "Asignar la primera tarea",
           "cta": "Crear tarea"
+        }
+      }
+    },
+    "firstSession": {
+      "title": "Pon a tu clase a jugar hoy",
+      "subtitle": "Cuatro pasos. Tu prueba de Teacher Pro está activa.",
+      "progress": "{done} de {total}",
+      "dismiss": "Cerrar lista de pasos",
+      "later": "Ahora no",
+      "schedule": "Programar para la clase",
+      "steps": {
+        "create_classroom": {
+          "title": "Crear una clase",
+          "cta": "Crear clase"
+        },
+        "add_students": {
+          "title": "Añade a tus primeros alumnos",
+          "cta": "Añadir alumnos"
+        },
+        "create_assignment": {
+          "title": "Crea la primera tarea",
+          "cta": "Crear tarea"
+        },
+        "first_live_game": {
+          "title": "Juega o programa una partida en vivo",
+          "cta": "Empezar partida en vivo"
         }
       }
     },

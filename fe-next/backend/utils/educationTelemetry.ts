@@ -29,6 +29,7 @@
  */
 
 import { getPostHogServer } from '@/lib/posthog';
+import { shouldSkipQaMoneyCapture } from '@/lib/education/qaMoneyCapture';
 // Extensionless relative specifiers on purpose. Anything under `backend/` that
 // becomes reachable from an `app/api/**/route.ts` gets webpack-bundled, and a
 // `.js` relative specifier passes tsx, tsc, vitest and eslint while breaking
@@ -232,7 +233,11 @@ export function captureEduServerEvents(events: EduServerEvent[]): void {
   const client = getPostHogServer();
   if (!client) return;
 
-  for (const ev of events) {
+    for (const ev of events) {
+      if (shouldSkipQaMoneyCapture(ev.event, {
+        email: typeof ev.properties?.email === 'string' ? ev.properties.email : null,
+        isTestAccount: ev.properties?.is_test_account === true,
+      })) continue;
     const names = GROWTH_TWIN_EVENTS.has(ev.event)
       ? [ev.event, `growth:${ev.event}`]
       : [ev.event];

@@ -32,5 +32,8 @@ describe('teacher funnel 30-day readout', () => {
     expect(report).toContain("p.user_role = 'teacher'");
     // Canonical Polar trial key, not only the legacy subscription.active envelope.
     expect(report).toContain("'teacher_trial_started'");
+    expect(report).toContain('trial_canceled');
+    expect(report).toContain('trial_expired');
+    expect(report).toContain("s.status = 'trialing'");
   });
 });

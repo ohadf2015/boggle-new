@@ -14463,6 +14463,12 @@ const en = {
       "trialLifecycleBody": "Keep unlimited classes and printable reports for $9/mo after the trial.",
       "canceledTrialTitle": "Teacher Pro stays on until {date}",
       "canceledTrialBody": "You cancelled, so your card won't be charged. Changed your mind? Keep Pro and it carries on after that date for $9/mo.",
+      "canceledTrialPlanLesson": "Pro stays on until then: plan this week's lesson",
+      "cancelReason_too_expensive": "Too expensive",
+      "cancelReason_school_pays": "School pays",
+      "cancelReason_just_testing": "Just testing",
+      "cancelReason_missing_feature": "Missing a feature",
+      "cancelReasonThanks": "Thanks — that helps.",
       "resumeCta": "Keep Pro",
       "resumeDone": "Done. Teacher Pro will carry on.",
       "resumeError": "Couldn't turn Pro back on. Try again, or open Plans.",
@@ -22033,6 +22039,32 @@ const en = {
         "first_assignment": {
           "title": "Give the first assignment",
           "cta": "Create assignment"
+        }
+      }
+    },
+    "firstSession": {
+      "title": "Get your class playing today",
+      "subtitle": "Four steps. Your Teacher Pro trial is running.",
+      "progress": "{done} of {total}",
+      "dismiss": "Dismiss checklist",
+      "later": "Not now",
+      "schedule": "Schedule for class",
+      "steps": {
+        "create_classroom": {
+          "title": "Create a classroom",
+          "cta": "Create classroom"
+        },
+        "add_students": {
+          "title": "Add your first students",
+          "cta": "Add students"
+        },
+        "create_assignment": {
+          "title": "Create the first assignment",
+          "cta": "Create assignment"
+        },
+        "first_live_game": {
+          "title": "Run or schedule a live game",
+          "cta": "Run a live game"
         }
       }
     },

@@ -15109,6 +15109,12 @@ const he = {
       "trialLifecycleBody": "שמרו על כיתות ללא הגבלה ודוחות להדפסה ב-9$ לחודש אחרי הניסיון.",
       "canceledTrialTitle": "פרו למורים נשאר פעיל עד {date}",
       "canceledTrialBody": "ביטלתם, אז הכרטיס לא יחויב. התחרטתם? השאירו את פרו למורים והוא ימשיך אחרי התאריך הזה ב-$9 לחודש.",
+      "canceledTrialPlanLesson": "פרו נשאר עד אז: תכננו את השיעור של השבוע",
+      "cancelReason_too_expensive": "יקר מדי",
+      "cancelReason_school_pays": "בית הספר משלם",
+      "cancelReason_just_testing": "רק בודקים",
+      "cancelReason_missing_feature": "חסר פיצ'ר",
+      "cancelReasonThanks": "תודה, זה עוזר.",
       "resumeCta": "השאירו את פרו",
       "resumeDone": "בוצע. פרו למורים ממשיך.",
       "resumeError": "לא הצלחנו להפעיל את פרו מחדש. נסו שוב, או פתחו את עמוד המסלולים.",
@@ -22973,6 +22979,32 @@ const he = {
         "first_assignment": {
           "title": "נתינת המטלה הראשונה",
           "cta": "יצירת מטלה"
+        }
+      }
+    },
+    "firstSession": {
+      "title": "מתחילים לשחק עם הכיתה כבר היום",
+      "subtitle": "ארבעה צעדים. תקופת הניסיון שלך בפרו למורים פעילה.",
+      "progress": "{done} מתוך {total}",
+      "dismiss": "סגירת רשימת הצעדים",
+      "later": "לא עכשיו",
+      "schedule": "תזמון לשיעור",
+      "steps": {
+        "create_classroom": {
+          "title": "יצירת כיתה",
+          "cta": "יצירת כיתה"
+        },
+        "add_students": {
+          "title": "הוספת התלמידים הראשונים",
+          "cta": "הוספת תלמידים"
+        },
+        "create_assignment": {
+          "title": "יצירת המטלה הראשונה",
+          "cta": "יצירת מטלה"
+        },
+        "first_live_game": {
+          "title": "הרצה או תזמון של משחק חי",
+          "cta": "הרצת משחק חי"
         }
       }
     },

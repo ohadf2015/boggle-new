@@ -305,6 +305,25 @@ export function buildTrialExpiredEvent(userId: string, subscriptionId: string): 
   };
 }
 
+/** Teacher canceled during a trial. Pro stays until ends_at. Not an expiry. */
+export function buildTrialCanceledEvent(
+  userId: string,
+  subscriptionId: string,
+  extras: { days_left: number | null; ends_at?: string | null; cancel_reason?: string | null },
+): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'trial_canceled',
+    properties: {
+      ...BASE,
+      subscription_id: subscriptionId,
+      ...(extras.days_left !== null ? { days_left: extras.days_left } : {}),
+      ...(extras.ends_at ? { ends_at: extras.ends_at } : {}),
+      ...(extras.cancel_reason ? { cancel_reason: extras.cancel_reason } : {}),
+    },
+  };
+}
+
 /**
  * Dunning step 1 — Polar flagged a Teacher Pro renewal past due. The row flip
  * alone churns in silence; this is the analytics twin of the banner + dunning

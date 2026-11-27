@@ -11,6 +11,7 @@
  *   teacher_trial_active         GET /api/subscription/status while trialing — the
  *                                teacher is back in the product on their trial
  *   teacher_trial_expiring       day-10 / day-before notice sent (cron)
+ *   teacher_trial_canceled       Polar webhook, cancel while the trial is still on
  *   teacher_trial_expired        Polar webhook, trial lapsed without converting
  *   teacher_trial_paywall_viewed /api/education/teacher/upgrade-event (shown)
  *   checkout_started             /api/subscription/checkout (pre-existing event)
@@ -28,6 +29,7 @@ import { CHECKOUT_STARTED_EVENT } from './abandonedCheckout';
 export const TEACHER_TRIAL_STARTED_EVENT = 'teacher_trial_started';
 export const TEACHER_TRIAL_ACTIVE_EVENT = 'teacher_trial_active';
 export const TEACHER_TRIAL_EXPIRING_EVENT = 'teacher_trial_expiring';
+export const TEACHER_TRIAL_CANCELED_EVENT = 'teacher_trial_canceled';
 export const TEACHER_TRIAL_EXPIRED_EVENT = 'teacher_trial_expired';
 export const TEACHER_TRIAL_PAYWALL_VIEWED_EVENT = 'teacher_trial_paywall_viewed';
 export const TEACHER_SUBSCRIPTION_ACTIVE_EVENT = 'teacher_subscription_active';
@@ -39,6 +41,7 @@ export const TEACHER_TRIAL_FUNNEL_STEPS = [
   TEACHER_TRIAL_STARTED_EVENT,
   TEACHER_TRIAL_ACTIVE_EVENT,
   TEACHER_TRIAL_EXPIRING_EVENT,
+  TEACHER_TRIAL_CANCELED_EVENT,
   TEACHER_TRIAL_EXPIRED_EVENT,
   TEACHER_TRIAL_PAYWALL_VIEWED_EVENT,
   CHECKOUT_STARTED_EVENT,

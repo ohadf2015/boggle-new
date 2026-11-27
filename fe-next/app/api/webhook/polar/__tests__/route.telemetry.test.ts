@@ -115,6 +115,34 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
     expect(capture.mock.calls[0][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 
+  it('Given a cancel while Polar still says trialing, even without cancel_at_period_end, Then it is trial_canceled with days_left, never trial_expired', async () => {
+    const res = await POST(polarEvent('subscription.canceled', sub({
+      status: 'trialing',
+      metadata: { user_id: 'u1', trial: true },
+      trial_end: '2026-12-06T19:21:51.009Z',
+      current_period_end: '2026-12-06T19:21:51.009Z',
+      customer_cancellation_reason: 'too_expensive',
+      customer_cancellation_comment: 'school pays',
+      canceled_at: '2026-11-23T07:45:32.000Z',
+    })))
+    expect(res.status).toBe(200)
+    const events = capture.mock.calls.map((c) => c[0].event)
+    expect(events).toContain('trial_canceled')
+    expect(events).not.toContain('trial_expired')
+    const canceled = capture.mock.calls.find((c) => c[0].event === 'trial_canceled')?.[0]
+    expect(canceled.properties.days_left).toBeGreaterThan(0)
+    expect(canceled.properties.cancel_reason).toBe('too_expensive')
+    const logged = vi.mocked(logSubscriptionEvent).mock.calls.map((c) => c[0])
+    expect(logged.map((e) => e.eventType)).toContain('teacher_trial_canceled')
+    expect(logged.map((e) => e.eventType)).not.toContain('teacher_trial_expired')
+    expect(logged.find((e) => e.eventType === 'subscription.canceled')?.payload).toMatchObject({
+      customer_cancellation_reason: 'too_expensive',
+      customer_cancellation_comment: 'school pays',
+      canceled_at: '2026-11-23T07:45:32.000Z',
+      ends_at: '2026-12-06T19:21:51.009Z',
+    })
+  })
+
   it('Given a cancel during a running trial (Pro stays until trial_end), When handled, Then it is not an expiry yet and the reason is kept', async () => {
     const res = await POST(polarEvent('subscription.canceled', sub({
       status: 'trialing',
@@ -126,13 +154,16 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
       customer_cancellation_comment: 'free plan is enough',
     })))
     expect(res.status).toBe(200)
-    expect(capture.mock.calls.map((c) => c[0].event)).toEqual(['polar_subscription_canceled'])
-    expect(capture.mock.calls[0][0].properties).toMatchObject({
+    expect(capture.mock.calls.map((c) => c[0].event)).toEqual(['trial_canceled', 'polar_subscription_canceled'])
+    expect(capture.mock.calls[0][0].properties.cancel_reason).toBe('too_expensive')
+    expect(capture.mock.calls[0][0].properties.days_left).toBeGreaterThan(0)
+    expect(capture.mock.calls[1][0].properties).toMatchObject({
       was_trial: true,
       cancel_reason: 'too_expensive',
       cancel_comment: 'free plan is enough',
     })
     const logged = vi.mocked(logSubscriptionEvent).mock.calls.map((c) => c[0])
+    expect(logged.map((e) => e.eventType)).toContain('teacher_trial_canceled')
     expect(logged.map((e) => e.eventType)).not.toContain('teacher_trial_expired')
     expect(logged.find((e) => e.eventType === 'subscription.canceled')?.payload).toMatchObject({
       cancel_reason: 'too_expensive',
@@ -246,6 +277,14 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
     const durable = vi.mocked(logSubscriptionEvent).mock.calls.map((c) => c[0].eventType)
     expect(durable).toContain('teacher_subscription_active')
     expect(durable).not.toContain('teacher_trial_started')
+  })
+
+  it('Given a @lexiclash.test teacher, When the paid webhook fires, Then money events are not sent to PostHog', async () => {
+    await POST(polarEvent('subscription.active', sub({
+      customer: { email: 'prove@lexiclash.test' },
+    })))
+    expect(capture.mock.calls.map((c) => c[0].event)).not.toContain('teacher_pro_upgraded')
+    expect(capture.mock.calls.map((c) => c[0].event)).not.toContain('checkout_complete')
   })
 
   it('Given PostHog throws, When active, Then the webhook still answers 200 and the upsert ran', async () => {

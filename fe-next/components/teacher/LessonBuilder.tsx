@@ -208,7 +208,7 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
             <h3 className="font-neo-display text-xl text-neo-white text-balance">{t('teacher.lesson.noLessons')}</h3>
             <p className="mx-auto mt-1 max-w-prose text-sm text-neo-white/80 text-pretty">{t('eduLibrary.myLists.emptyHint')}</p>
           </div>
-          <StarterPacksSection onSelectPack={handleSelectStarterPack} />
+          <StarterPacksSection onSelectPack={handleSelectStarterPack} showTrialChecklist />
         </div>
       ) : (
         <>

@@ -15224,6 +15224,12 @@ const ja = {
       "trialLifecycleBody": "無制限クラスと印刷レポートを継続。トライアル後は月額9ドルです。",
       "canceledTrialTitle": "Teacher Proは{date}までご利用いただけます",
       "canceledTrialBody": "解約済みのため、カードへの請求はありません。気が変わったら「Proを続ける」を押すと、その日以降も月$9で続きます。",
+      "canceledTrialPlanLesson": "その日までProは使えます。今週の授業を用意する",
+      "cancelReason_too_expensive": "高すぎる",
+      "cancelReason_school_pays": "学校が払う",
+      "cancelReason_just_testing": "試しだけ",
+      "cancelReason_missing_feature": "欲しい機能がない",
+      "cancelReasonThanks": "ありがとう。助かります。",
       "resumeCta": "Proを続ける",
       "resumeDone": "完了しました。Teacher Proは引き続きご利用いただけます。",
       "resumeError": "Proを再開できませんでした。もう一度お試しいただくか、「プラン」を開いてください。",
@@ -23012,6 +23018,32 @@ const ja = {
         "first_assignment": {
           "title": "最初の課題を出す",
           "cta": "課題を作成"
+        }
+      }
+    },
+    "firstSession": {
+      "title": "今日からクラスでプレイしよう",
+      "subtitle": "4つのステップ。Teacher Proの無料体験が進行中です。",
+      "progress": "{done} / {total}",
+      "dismiss": "チェックリストを閉じる",
+      "later": "あとで",
+      "schedule": "授業用に予定する",
+      "steps": {
+        "create_classroom": {
+          "title": "クラスを作成する",
+          "cta": "クラスを作成"
+        },
+        "add_students": {
+          "title": "最初の生徒を追加する",
+          "cta": "生徒を追加"
+        },
+        "create_assignment": {
+          "title": "最初の課題を作る",
+          "cta": "課題を作る"
+        },
+        "first_live_game": {
+          "title": "ライブゲームを実施または予定する",
+          "cta": "ライブゲームを始める"
         }
       }
     },
