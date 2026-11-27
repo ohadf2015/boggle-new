@@ -1,7 +1,9 @@
 'use client';
 
-/** DEV-ONLY: `?preview=crosswordwall|crosswordphone` a classroom crossword dealt from a sample lesson, on the wall and on a phone. */
+/** DEV-ONLY: `?preview=crosswordwall|crosswordphone[&arcade=1]` a classroom crossword dealt from a sample lesson, on the wall and on a phone. */
 import { useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { ClassroomBoardProvider } from '@/components/education/live/classroomBoard';
 import { ProjectorCrosswordStage } from '@/components/education/live/ProjectorCrosswordStage';
 import { CrosswordVersus } from '@/components/multiplayer/crossword/CrosswordVersus';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -26,6 +28,7 @@ function fakeSocket(payload: unknown) {
 
 export function CrosswordPreview({ surface }: { surface: 'wall' | 'phone' }) {
   const { t, language } = useLanguage();
+  const arcade = useSearchParams()?.get('arcade') === '1';
   const socket = useMemo(() => {
     const locale = (LESSONS[language] ? language : 'en') as PuzzleLocale;
     const built = buildLessonCrossword({ entries: LESSONS[locale]!.map(([word, clue]) => ({ word, clue })), locale, seed: 3, id: `lesson-preview-${locale}` });
@@ -35,7 +38,13 @@ export function CrosswordPreview({ surface }: { surface: 'wall' | 'phone' }) {
     return fakeSocket({ puzzle: built.puzzle, players: roster, standings, startedAt: 1 });
   }, [language]);
 
-  if (surface === 'phone') return <CrosswordVersus socket={socket as never} username="Maya" remainingTime={312} onQuit={() => undefined} />;
+  if (surface === 'phone') {
+    return (
+      <ClassroomBoardProvider value={!arcade}>
+        <CrosswordVersus socket={socket as never} username="Maya" remainingTime={312} onQuit={() => undefined} />
+      </ClassroomBoardProvider>
+    );
+  }
   return (
     <div className="flex h-dvh min-h-0 flex-col bg-edu-page">
       <ProjectorCrosswordStage socket={socket} remainingTime={312} t={t} />

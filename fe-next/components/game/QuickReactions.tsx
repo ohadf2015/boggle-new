@@ -3,6 +3,7 @@
 import React, { memo, useState, useCallback, useRef, useEffect } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 // ==================== Constants ====================
 
@@ -94,6 +95,7 @@ export const QuickReactions = memo<QuickReactionsProps>(({
   layout = 'bar',
 }) => {
   const { t } = useLanguage();
+  const classroom = useClassroomBoard();
   const lastReactionTimeRef = useRef(0);
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -130,10 +132,12 @@ export const QuickReactions = memo<QuickReactionsProps>(({
         onClick={() => setIsOpen((prev) => !prev)}
         aria-label={t('reactions.label')}
         aria-expanded={isOpen}
-        className="w-10 h-10 flex items-center justify-center text-xl
+        className={classroom
+          ? 'w-10 h-10 flex items-center justify-center text-xl bg-edu-surface border-2 border-neo-black rounded-xl shadow-edu-lip-sm hover:bg-neo-yellow hover:scale-110 active:translate-x-px active:translate-y-px transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150'
+          : `w-10 h-10 flex items-center justify-center text-xl
           bg-neo-navy/80 border-2 border-neo-white/15 rounded-xl
           hover:border-neo-yellow hover:bg-neo-navy hover:scale-110
-          active:translate-x-px active:translate-y-px transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150"
+          active:translate-x-px active:translate-y-px transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150`}
       >
         {TRIGGER_EMOJI}
       </AdaptiveMotion.button>
@@ -149,7 +153,7 @@ export const QuickReactions = memo<QuickReactionsProps>(({
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.15 }}
             className={`absolute z-50 flex ${isVertical ? 'flex-col' : 'flex-row'} gap-1.5
-              bg-neo-navy/95 border-2 border-neo-white/15 rounded-xl p-1.5
+              ${classroom ? 'bg-edu-surface border-2 border-neo-black shadow-edu-lip-sm' : 'bg-neo-navy/95 border-2 border-neo-white/15'} rounded-xl p-1.5
               ${isVertical ? 'bottom-full mb-2 left-1/2 -translate-x-1/2' : 'bottom-full mb-2 left-0'}`}
           >
             {REACTIONS.map((reaction) => (
@@ -157,9 +161,11 @@ export const QuickReactions = memo<QuickReactionsProps>(({
                 key={reaction.id}
                 onClick={() => handleClick(reaction.id)}
                 aria-label={t(reaction.labelKey)}
-                className="w-10 h-10 flex items-center justify-center text-xl
+                className={classroom
+                  ? 'w-10 h-10 flex items-center justify-center text-xl rounded-lg hover:bg-edu-ink/10 active:translate-x-px active:translate-y-px transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150'
+                  : `w-10 h-10 flex items-center justify-center text-xl
                   rounded-lg hover:bg-neo-white/10
-                  active:translate-x-px active:translate-y-px transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150"
+                  active:translate-x-px active:translate-y-px transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150`}
               >
                 {reaction.emoji}
               </AdaptiveMotion.button>

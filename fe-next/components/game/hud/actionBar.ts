@@ -7,10 +7,13 @@ const LIP = 'border-3 border-neo-black shadow-[0_4px_0_rgb(var(--neo-black))] ac
 
 export const ACTION_ROUND = cn('grid size-12 shrink-0 place-items-center rounded-neo bg-neo-navy-light text-neo-cream tv:size-20', LIP);
 
-export function actionPrimary(ready: boolean): string {
+/** Classroom rounds stand on the sky page: cream instead of navy. */
+export const ACTION_ROUND_CLASSROOM = cn('grid size-12 shrink-0 place-items-center rounded-neo bg-edu-surface text-edu-ink tv:size-20', LIP);
+
+export function actionPrimary(ready: boolean, { classroom = false } = {}): string {
   return cn(
     'h-12 rounded-neo px-8 font-neo-display text-lg font-black uppercase tracking-wide tv:h-20 tv:px-12 tv:text-3xl',
     LIP,
-    ready ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-cream',
+    ready ? 'bg-neo-lime text-neo-black' : classroom ? 'bg-edu-surface text-edu-ink' : 'bg-neo-navy-light text-neo-cream',
   );
 }

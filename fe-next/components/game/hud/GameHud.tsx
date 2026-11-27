@@ -33,7 +33,7 @@ export const HUD_EXIT_BUTTON = cn(
   'grid h-10 w-10 shrink-0 place-items-center rounded-xl border-2 border-neo-black bg-neo-navy-light text-neo-cream active:translate-y-0.5 active:shadow-none tv:h-16 tv:w-16',
   LIP,
 );
-const HUD_EXIT_BUTTON_CLASSROOM = HUD_EXIT_BUTTON.replace('bg-neo-navy-light text-neo-cream', 'bg-edu-surface text-edu-ink');
+export const HUD_EXIT_BUTTON_CLASSROOM = HUD_EXIT_BUTTON.replace('bg-neo-navy-light text-neo-cream', 'bg-edu-surface text-edu-ink');
 
 export function GameTimerBar({ remaining, total, gentle = false, className }: { remaining: number; total: number; gentle?: boolean; className?: string }) {
   const { t } = useLanguage();

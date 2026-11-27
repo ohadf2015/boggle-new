@@ -10,7 +10,19 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 
 vi.mock('@/components/education/vocabQuiz/VocabQuizView', () => ({ VocabQuizView: () => null }));
-vi.mock('@/components/wordTower/WordTowerVersus', () => ({ WordTowerVersus: () => null }));
+// Each gridless mode reports whether it sits inside the classroom skin provider.
+vi.mock('@/components/wordTower/WordTowerVersus', async () => {
+  const { useClassroomBoard } = await import('@/components/education/live/classroomBoard');
+  return { WordTowerVersus: () => <div data-testid="mode-view" data-classroom={String(useClassroomBoard())} /> };
+});
+vi.mock('@/components/multiplayer/crossword/CrosswordVersus', async () => {
+  const { useClassroomBoard } = await import('@/components/education/live/classroomBoard');
+  return { CrosswordVersus: () => <div data-testid="mode-view" data-classroom={String(useClassroomBoard())} /> };
+});
+vi.mock('@/components/multiplayer/wordcraft/WordcraftLiveView', async () => {
+  const { useClassroomBoard } = await import('@/components/education/live/classroomBoard');
+  return { WordcraftLiveView: () => <div data-testid="mode-view" data-classroom={String(useClassroomBoard())} /> };
+});
 vi.mock('next/dynamic', () => ({
   __esModule: true,
   default: (importFn: () => Promise<any>) => {
@@ -45,7 +57,10 @@ vi.mock('@/components/blast/legacy/BlastGame', () => ({ BlastGame: (p: any) => {
 vi.mock('@/components/blast/legacy/hooks/useBlastMultiplayerBridge', () => ({
   useBlastMultiplayerBridge: () => ({ config: {}, initialTileStates: null, blastSeed: 42 }),
 }));
-vi.mock('@/components/multiplayer/WheelRushView', () => ({ WheelRushView: () => <div data-testid="wheel-rush-view" /> }));
+vi.mock('@/components/multiplayer/WheelRushView', async () => {
+  const { useClassroomBoard } = await import('@/components/education/live/classroomBoard');
+  return { WheelRushView: () => <div data-testid="mode-view" data-classroom={String(useClassroomBoard())} /> };
+});
 vi.mock('@/components/TournamentStandings', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/lib/multiplayer/usePendingWords', () => ({
   usePendingWords: () => {
@@ -237,5 +252,21 @@ describe('PlayerInGameView — round frame', () => {
   it('classroom: the board placeholder before the grid arrives is the sky page, not a navy flash', () => {
     const { container } = render(<PlayerInGameView {...baseProps} classroom letterGrid={null as never} />);
     expect((container.firstElementChild as HTMLElement).className).toContain('bg-edu-page');
+  });
+
+  it.each([
+    ['wheel-rush', false],
+    ['wheel-rush', true],
+    ['word-tower', false],
+    ['crossword', false],
+    ['wordcraft', false],
+  ])('classroom %s (desktop shell %s): the mode view gets the classroom skin, the arcade room does not', async (mode, desktop) => {
+    mockGameMode.value = mode;
+    shell.value = desktop;
+    const classroom = render(<PlayerInGameView {...baseProps} classroom />);
+    expect((await screen.findByTestId('mode-view')).dataset.classroom).toBe('true');
+    classroom.unmount();
+    render(<PlayerInGameView {...baseProps} />);
+    expect((await screen.findByTestId('mode-view')).dataset.classroom).toBe('false');
   });
 });

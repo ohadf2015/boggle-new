@@ -270,7 +270,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     );
     if (shellEnabled) {
       return (
-        <>
+        <ClassroomBoardProvider value={classroom}>
           <div className={getMpInGameContainerClass(gameMode, { classroom })}>
             <RoundClock>{(remainingTime) => (
               <MpDesktopShellFrame
@@ -288,32 +288,36 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             )}</RoundClock>
           </div>
           {roundDialogs}
-        </>
+        </ClassroomBoardProvider>
       );
     }
     return (
-      <>
+      <ClassroomBoardProvider value={classroom}>
         {wheelCanvas}
         {roundDialogs}
-      </>
+      </ClassroomBoardProvider>
     );
   }
 
   // Gridless versus modes — per-player towers / crossword race.
   if (gameMode === 'word-tower' || gameMode === 'crossword') {
     return (
-      <>
+      <ClassroomBoardProvider value={classroom}>
         <RoundClock>{(remainingTime) => (gameMode === 'word-tower'
           ? <WordTowerVersus socket={socket} username={username} onQuit={onExitRoom} remainingTime={remainingTime} />
           : <CrosswordVersus socket={socket} username={username} onQuit={onExitRoom} remainingTime={remainingTime} />)}</RoundClock>
         {roundDialogs}
-      </>
+      </ClassroomBoardProvider>
     );
   }
 
   // Wordcraft — lesson-dealt solo race vs the Baron, no shared grid
   if (gameMode === 'wordcraft') {
-    return <RoundClock>{(remainingTime) => <WordcraftLiveView socket={socket} username={username} t={t} remainingTime={remainingTime} />}</RoundClock>;
+    return (
+      <ClassroomBoardProvider value={classroom}>
+        <RoundClock>{(remainingTime) => <WordcraftLiveView socket={socket} username={username} t={t} remainingTime={remainingTime} />}</RoundClock>
+      </ClassroomBoardProvider>
+    );
   }
 
   // Use letterGrid or shufflingGrid

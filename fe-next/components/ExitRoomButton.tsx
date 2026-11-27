@@ -3,6 +3,9 @@
 import React from 'react';
 import { DoorOpen } from 'lucide-react';
 import { Button } from './ui/button';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
+import { HUD_EXIT_BUTTON_CLASSROOM } from '@/components/game/hud/GameHud';
+import { cn } from '@/lib/utils';
 
 /**
  * ExitRoomButton Props
@@ -18,6 +21,14 @@ interface ExitRoomButtonProps
 }
 
 const ExitRoomButton: React.FC<ExitRoomButtonProps> = ({ onClick, label, className = '', ...rest }) => {
+  const classroom = useClassroomBoard();
+  if (classroom) {
+    return (
+      <button type="button" disabled={rest.disabled} onClick={onClick} aria-label={label} className={cn(HUD_EXIT_BUTTON_CLASSROOM, className)}>
+        <DoorOpen className="w-5 h-5" aria-hidden="true" />
+      </button>
+    );
+  }
   return (
     <Button
       {...rest}

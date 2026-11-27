@@ -26,6 +26,7 @@ import { CrosswordGrid } from '@/components/crossword/CrosswordGrid';
 import { CrosswordInputDock } from '@/components/crossword/CrosswordInputDock';
 import { ClueBar } from '@/components/crossword/ClueBar';
 import { CrosswordClueList } from '@/components/crossword/CrosswordClueList';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 import { useCrosswordMp, type CrosswordMpSocketLike, type CrosswordProgressUpdate, type CrosswordStanding } from './useCrosswordMp';
 
 interface CrosswordVersusProps {
@@ -35,16 +36,56 @@ interface CrosswordVersusProps {
   remainingTime?: number | null;
 }
 
+const SKIN = {
+  arcade: {
+    waiting: 'flex min-h-[100dvh] items-center justify-center bg-neo-navy',
+    waitingText: 'animate-pulse font-neo-display text-xl text-neo-cyan',
+    root: 'fixed inset-0 flex h-[100dvh] flex-col bg-neo-navy p-3',
+    title: 'font-neo-display text-sm font-bold text-neo-cyan',
+    clock: 'text-neo-white',
+    rank: 'rounded-neo border-2 border-neo-cyan px-1.5 font-neo-display text-xs font-bold tabular-nums text-neo-cyan lg:hidden',
+    progress: 'ms-auto font-neo-body text-xs tabular-nums text-neo-cream/70',
+    tool: 'flex min-h-[44px] items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light px-3 py-2 font-neo-body text-xs font-bold text-neo-white shadow-hard',
+    railTitle: 'mb-1.5 font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-cream/50',
+    row: 'bg-neo-navy-light',
+    rowMe: 'bg-neo-cyan/20',
+    name: 'text-neo-white',
+    nameMe: 'text-neo-cyan',
+    percent: 'font-neo-body text-[10px] tabular-nums text-neo-cream/60',
+  },
+  classroom: {
+    waiting: 'flex min-h-[100dvh] items-center justify-center bg-edu-page',
+    waitingText: 'animate-pulse font-neo-display text-xl text-edu-ink',
+    root: 'fixed inset-0 flex h-[100dvh] flex-col bg-edu-page p-3',
+    title: 'font-neo-display text-sm font-bold text-edu-ink',
+    clock: 'text-edu-ink',
+    rank: 'rounded-neo border-2 border-neo-black bg-edu-surface px-1.5 font-neo-display text-xs font-bold tabular-nums text-edu-ink lg:hidden',
+    progress: 'ms-auto font-neo-body text-xs tabular-nums text-edu-ink/70',
+    tool: 'flex min-h-[44px] items-center gap-1 rounded-neo border-neo border-black bg-edu-surface px-3 py-2 font-neo-body text-xs font-bold text-edu-ink shadow-edu-lip-sm',
+    railTitle: 'mb-1.5 font-neo-display text-[11px] font-bold uppercase tracking-wide text-edu-ink/70',
+    row: 'bg-edu-surface',
+    rowMe: 'bg-neo-cyan',
+    name: 'text-edu-ink',
+    nameMe: 'text-neo-black',
+    percent: 'font-neo-body text-[10px] tabular-nums text-edu-ink/70',
+  },
+} as const;
+
+function useSkin() {
+  return SKIN[useClassroomBoard() ? 'classroom' : 'arcade'];
+}
+
 function StandingsRail({ standings, me, t }: { standings: CrosswordStanding[]; me: string; t: (k: string, fallbackOrParams?: string | Record<string, string | number>) => string }) {
+  const skin = useSkin();
   return (
     <ul className="flex flex-col gap-1.5" aria-label={t('crossword.mp.standings')}>
       {standings.map((s) => (
-        <li key={s.username} className={`rounded-neo border-neo border-black px-2.5 py-1.5 shadow-hard ${s.username === me ? 'bg-neo-cyan/20' : 'bg-neo-navy-light'}`}>
+        <li key={s.username} className={`rounded-neo border-neo border-black px-2.5 py-1.5 shadow-hard ${s.username === me ? skin.rowMe : skin.row}`}>
           <div className="flex items-center justify-between gap-2">
-            <span className={`font-neo-display text-xs font-bold ${s.username === me ? 'text-neo-cyan' : 'text-neo-white'}`}>
+            <span className={`font-neo-display text-xs font-bold ${s.username === me ? skin.nameMe : skin.name}`}>
               {s.solved ? <span aria-hidden="true">🏁 </span> : ''}{s.username}
             </span>
-            <span className="font-neo-body text-[10px] tabular-nums text-neo-cream/60">{s.solved ? t('crossword.mp.done') : `${s.percent}%`}</span>
+            <span className={skin.percent}>{s.solved ? t('crossword.mp.done') : `${s.percent}%`}</span>
           </div>
           <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-black/40">
             <div className="h-full rounded-full bg-neo-cyan transition-[width]" style={{ width: `${s.percent}%` }} />
@@ -70,6 +111,7 @@ function CrosswordRace({
   remainingTime?: number | null;
 }) {
   const { t, dir } = useLanguage();
+  const skin = useSkin();
   const game = useCrosswordGame(puzzle, { progressKey: raceKey, telemetry: false });
   const stats = crosswordStats(game.state);
   const solved = game.state.status === 'solved';
@@ -96,23 +138,23 @@ function CrosswordRace({
   }, [stats.wordsSolved, solved]);
 
   return (
-    <div className="fixed inset-0 flex h-[100dvh] flex-col bg-neo-navy p-3" dir={dir}>
+    <div className={skin.root} dir={dir}>
       <GameMascotReactions mode="crossword" comboLevel={0} personality="quiet" />
       {/* Header: exit + progress + timer; pe-14 clears the floating mute button. */}
       <div className="flex items-center gap-3 pe-14">
         {onQuit && <ExitRoomButton onClick={onQuit} label={t('common.backToHome')} />}
-        <span className="font-neo-display text-sm font-bold text-neo-cyan">{t('crossword.mp.title')}</span>
+        <span className={skin.title}>{t('crossword.mp.title')}</span>
         {!clockHidden && remainingTime != null && remainingTime >= 0 && (
-          <span data-testid="crossword-timer" className={`ms-auto font-neo-display text-sm font-bold tabular-nums ${remainingTime <= 30 ? 'text-neo-pink' : 'text-neo-white'}`}>
+          <span data-testid="crossword-timer" className={`ms-auto font-neo-display text-sm font-bold tabular-nums ${remainingTime <= 30 ? 'text-neo-pink' : skin.clock}`}>
             {Math.floor(remainingTime / 60)}:{String(Math.floor(remainingTime % 60)).padStart(2, '0')}
           </span>
         )}
         {!railHidden && myRank && (
-          <span data-testid="crossword-my-rank" dir="ltr" className="rounded-neo border-2 border-neo-cyan px-1.5 font-neo-display text-xs font-bold tabular-nums text-neo-cyan lg:hidden">
+          <span data-testid="crossword-my-rank" dir="ltr" className={skin.rank}>
             #{myRank.rank}{t('crossword.mp.statSeparator', '/')}{standings.length}
           </span>
         )}
-        <span className="ms-auto font-neo-body text-xs tabular-nums text-neo-cream/70">
+        <span className={skin.progress}>
           {stats.wordsSolved}{t('crossword.mp.statSeparator', '/')}{stats.wordsTotal} {t('crossword.mp.statPercent', '{{percent}}%', { percent: stats.percent })}
         </span>
       </div>
@@ -129,13 +171,13 @@ function CrosswordRace({
           </div>
           <ClueBar slot={game.activeSlot} rtl={puzzle.rtl} onPrev={() => game.nextSlot(-1)} onNext={() => game.nextSlot(1)} onToggleDir={game.toggleDir} t={t} />
           <div className="shrink-0 flex items-center justify-center gap-2">
-            <button type="button" onClick={game.checkAll} aria-label={t('crossword.check')} className="flex min-h-[44px] items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light px-3 py-2 font-neo-body text-xs font-bold text-neo-white shadow-hard">
+            <button type="button" onClick={game.checkAll} aria-label={t('crossword.check')} className={skin.tool}>
               <CheckCheck className="h-4 w-4" aria-hidden="true" /> {t('crossword.check')}
             </button>
-            <button type="button" onClick={game.revealCell} aria-label={t('crossword.revealLetter')} className="flex min-h-[44px] items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light px-3 py-2 font-neo-body text-xs font-bold text-neo-white shadow-hard">
+            <button type="button" onClick={game.revealCell} aria-label={t('crossword.revealLetter')} className={skin.tool}>
               <Lightbulb className="h-4 w-4" aria-hidden="true" /> {t('crossword.revealLetter')}
             </button>
-            <button type="button" onClick={game.revealWord} aria-label={t('crossword.revealWord')} className="flex min-h-[44px] items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light px-3 py-2 font-neo-body text-xs font-bold text-neo-white shadow-hard">
+            <button type="button" onClick={game.revealWord} aria-label={t('crossword.revealWord')} className={skin.tool}>
               <Eye className="h-4 w-4" aria-hidden="true" /> {t('crossword.revealWord')}
             </button>
           </div>
@@ -166,7 +208,7 @@ function CrosswordRace({
         {/* Standings rail */}
         {!railHidden && (
           <aside className="hidden shrink-0 overflow-y-auto lg:block">
-            <h3 className="mb-1.5 font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-cream/50">{t('crossword.mp.standings')}</h3>
+            <h3 className={skin.railTitle}>{t('crossword.mp.standings')}</h3>
             <StandingsRail standings={standings} me={username} t={t} />
           </aside>
         )}
@@ -188,13 +230,14 @@ function CrosswordRace({
 
 export function CrosswordVersus({ socket, username, onQuit, remainingTime }: CrosswordVersusProps) {
   const { t, dir } = useLanguage();
+  const skin = useSkin();
   const versusSocket = socket as unknown as CrosswordMpSocketLike | null;
   const mp = useCrosswordMp(versusSocket);
 
   if (!mp.puzzle) {
     return (
-      <div className="flex min-h-[100dvh] items-center justify-center bg-neo-navy" dir={dir}>
-        <p className="animate-pulse font-neo-display text-xl text-neo-cyan">{t('crossword.mp.waiting')}</p>
+      <div className={skin.waiting} dir={dir}>
+        <p className={skin.waitingText}>{t('crossword.mp.waiting')}</p>
       </div>
     );
   }

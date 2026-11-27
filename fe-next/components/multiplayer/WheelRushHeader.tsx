@@ -2,11 +2,12 @@
 
 import React, { useMemo } from 'react';
 import { Crown, X, Zap } from 'lucide-react';
-import { GameTimerBar, HUD_EXIT_BUTTON } from '@/components/game/hud/GameHud';
+import { GameTimerBar, HUD_EXIT_BUTTON, HUD_EXIT_BUTTON_CLASSROOM } from '@/components/game/hud/GameHud';
 import { MpRoundMute } from '@/components/multiplayer/round/MpRoundMute';
 import Avatar from '@/components/Avatar';
 import { cn } from '@/lib/utils';
 import { selectClosestRival } from '@/lib/wheelRush/closestRival';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
 export interface WheelRushPlayer {
@@ -30,6 +31,7 @@ interface Props {
 
 /** Relative progress bar (score / leader's score). Hidden during fog so it can't leak masked scores. */
 export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogActive, remainingTime, totalTime, onQuit, t }) => {
+  const classroom = useClassroomBoard();
   const self = useMemo(() => leaderboard.find(p => p.username === username), [leaderboard, username]);
   // Surface a SINGLE rival — the opponent nearest in score — so the player
   // focuses on one head-to-head instead of scanning a crowded rail.
@@ -51,7 +53,7 @@ export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogAct
   return (
     <div className="flex flex-col gap-2 shrink-0 pt-[env(safe-area-inset-top)] w-full max-w-2xl mx-auto">
       <div data-testid="wheel-hud-row" className="flex h-14 items-center gap-2.5">
-        <button type="button" data-testid="wheel-rush-leave" onClick={onQuit} aria-label={t('common.quit')} className={HUD_EXIT_BUTTON}>
+        <button type="button" data-testid="wheel-rush-leave" onClick={onQuit} aria-label={t('common.quit')} className={classroom ? HUD_EXIT_BUTTON_CLASSROOM : HUD_EXIT_BUTTON}>
           <X className="h-5 w-5" strokeWidth={3} aria-hidden />
         </button>
         {typeof remainingTime === 'number' ? (
@@ -90,19 +92,19 @@ export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogAct
               key={p.username}
               data-testid={`wheel-opp-${p.username}`}
               className={cn(
-                'flex max-w-full items-center gap-2 rounded-full border-2 bg-neo-navy-light py-1 ps-1 pe-3 shadow-[0_3px_0_rgb(var(--neo-black))]',
+                classroom ? 'flex max-w-full items-center gap-2 rounded-full border-2 bg-edu-surface py-1 ps-1 pe-3 shadow-[0_3px_0_rgb(var(--neo-black))]' : 'flex max-w-full items-center gap-2 rounded-full border-2 bg-neo-navy-light py-1 ps-1 pe-3 shadow-[0_3px_0_rgb(var(--neo-black))]',
                 isCloseRace && p.username === rival?.username ? 'border-neo-orange motion-safe:animate-pulse' : 'border-neo-black',
               )}
             >
               <span data-testid={`wheel-opp-avatar-${p.username}`} className="relative shrink-0">
                 <Avatar pixelSize={24} customAvatar={p.avatar?.customAvatar} userId={p.username} disableEffects className="rounded-full" />
-                <span className={cn('absolute -bottom-0.5 -end-0.5 h-2 w-2 rounded-full border border-neo-black', connected ? 'bg-neo-lime' : 'bg-neo-cream/30')} />
+                <span className={cn('absolute -bottom-0.5 -end-0.5 h-2 w-2 rounded-full border border-neo-black', connected ? 'bg-neo-lime' : classroom ? 'bg-edu-ink/30' : 'bg-neo-cream/30')} />
               </span>
-              <span dir="auto" translate="no" className="notranslate min-w-0 truncate font-neo-display text-sm font-bold text-neo-white">{p.username}</span>
+              <span dir="auto" translate="no" className={classroom ? 'notranslate min-w-0 truncate font-neo-display text-sm font-bold text-edu-ink' : 'notranslate min-w-0 truncate font-neo-display text-sm font-bold text-neo-white'}>{p.username}</span>
               {fogActive ? (
-                <span className="font-neo-display text-sm font-black tracking-wider text-neo-cyan">???</span>
+                <span className={classroom ? 'font-neo-display text-sm font-black tracking-wider text-edu-cyan-ink' : 'font-neo-display text-sm font-black tracking-wider text-neo-cyan'}>???</span>
               ) : (
-                <span translate="no" className="notranslate font-neo-display text-sm font-black tabular-nums text-neo-white">{p.score}</span>
+                <span translate="no" className={classroom ? 'notranslate font-neo-display text-sm font-black tabular-nums text-edu-ink' : 'notranslate font-neo-display text-sm font-black tabular-nums text-neo-white'}>{p.score}</span>
               )}
             </div>
           );

@@ -43,6 +43,7 @@ import { LobbyPickerPreview } from './LobbyPickerPreview';
 import { WarmUpPreview } from './WarmUpPreview';
 import { SetupInvitePreview } from './SetupInvitePreview';
 import { CrosswordPreview } from './CrosswordPreview';
+import { VersusPhonePreview } from './VersusPhonePreview';
 import { GamePausedOverlay } from '@/components/education/GamePausedOverlay';
 
 export type { LiveSurfacePreviewKind };
@@ -156,6 +157,8 @@ export default function LiveSurfacePreview({ kind }: { kind: LiveSurfacePreviewK
   if (kind === 'setup') return <SetupInvitePreview />;
   if (kind === 'crosswordwall') return <CrosswordPreview surface="wall" />;
   if (kind === 'crosswordphone') return <CrosswordPreview surface="phone" />;
+  if (kind === 'wheelphone') return <VersusPhonePreview mode="wheel" />;
+  if (kind === 'towerphone') return <VersusPhonePreview mode="tower" />;
   return <ProjectorOrStagePreview />;
 }
 
