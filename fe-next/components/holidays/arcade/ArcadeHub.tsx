@@ -1,6 +1,8 @@
 'use client';
 
 import { useCallback, useEffect } from 'react';
+import Link from 'next/link';
+import { ArrowLeft, Sparkles, Users } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useArcadeGate } from './useArcadeGate';
@@ -8,9 +10,14 @@ import { ARCADE_GAMES, gamesFor, isArcadeGame, type ArcadeGameId } from '@/lib/h
 import { cn } from '@/lib/utils';
 import ArcadeGameHost from './ArcadeGameHost';
 import ArcadeCard from './ArcadeCard';
+import ArcadeMoreFun from './ArcadeMoreFun';
+import { localDateIn, trackIndex, windowFor } from '@/lib/holidays/calendar';
 import styles from './arcade.module.css';
 
-const MASCOT = { hanukkah: '/holidays/m-hanukkah.webp', christmas: '/holidays/m-christmas.webp' } as const;
+const LOOK = {
+  hanukkah: { hero: '/holidays/hero-hanukkah.webp', stripe: 'bg-neo-holiday-blue', bulbs: ['bg-neo-holiday-gold', 'bg-neo-holiday-blue', 'bg-neo-holiday-snow'] },
+  christmas: { hero: '/holidays/hero-christmas.webp', stripe: 'bg-neo-holiday-red', bulbs: ['bg-neo-holiday-red', 'bg-neo-holiday-pine', 'bg-neo-holiday-gold'] },
+} as const;
 
 export default function ArcadeHub() {
   const { t, language } = useLanguage();
@@ -45,34 +52,77 @@ export default function ArcadeHub() {
   const all = gamesFor(holiday);
   const family = all.filter((g) => ARCADE_GAMES[g].family);
   const words = all.filter((g) => !ARCADE_GAMES[g].family);
+  const today = localDateIn(new Date());
+  const win = windowFor(holiday, today, language);
+  const night = win ? trackIndex(win, today) : null;
+  const look = LOOK[holiday];
 
   return (
-    <section aria-labelledby="arcade-title" className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-3 pb-8 pt-4 text-neo-white">
-      <header className="flex items-center gap-3">
+    <section aria-labelledby="arcade-title" className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 pb-10 pt-3 text-neo-white">
+      <nav className="flex items-center justify-between gap-2">
+        <Link
+          href={`/${language}`}
+          data-testid="arcade-home"
+          className="inline-flex min-h-10 items-center gap-1.5 rounded-xl border-[3px] border-black bg-neo-cream px-3 font-neo-display text-sm font-black text-neo-navy shadow-hard-sm active:translate-x-px active:translate-y-px active:shadow-hard-pressed"
+        >
+          <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden="true" />
+          {t('holiday.arcade.lobby.home')}
+        </Link>
+        {night !== null && win && (
+          <span data-testid="arcade-night" className="rounded-full border-[3px] border-black bg-neo-holiday-gold px-3 py-1 font-neo-display text-sm font-black text-neo-navy shadow-hard-sm tabular-nums">
+            {t(`holiday.arcade.lobby.${holiday === 'hanukkah' ? 'night' : 'day'}`, { n: night + 1, total: win.trackDays.length })}
+          </span>
+        )}
+      </nav>
+
+      <header className="relative overflow-hidden rounded-3xl border-[3px] border-black bg-neo-navy-light shadow-hard-lg">
+        <div className={cn('h-2', look.stripe)} aria-hidden="true" />
+        <div className={cn(styles.lights, 'absolute inset-x-3 top-3 z-[1]')} aria-hidden="true">
+          {Array.from({ length: 14 }, (_, i) => (
+            <span key={i} className={cn(styles.bulb, look.bulbs[i % look.bulbs.length])} />
+          ))}
+        </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={MASCOT[holiday]} alt="" width={72} height={72} className={cn('h-16 w-auto drop-shadow-[3px_3px_0_rgb(var(--neo-black))]', styles.floatProp)} />
-        <div className="min-w-0">
-          <h1 id="arcade-title" className="font-neo-display text-3xl font-black leading-tight">{t(`holiday.arcade.${holiday}.title`)}</h1>
-          <p className="mt-1 text-sm text-neo-white/75">{t(`holiday.arcade.${holiday}.subtitle`)}</p>
+        <img src={look.hero} alt="" className="aspect-[21/9] w-full border-b-[3px] border-black object-cover sm:aspect-[3/1]" />
+        <div className="p-4 sm:p-5">
+          <h1 id="arcade-title" className="font-neo-display text-3xl font-black leading-none sm:text-5xl">{t(`holiday.arcade.${holiday}.title`)}</h1>
+          <p className="mt-2 text-sm text-neo-white/80 sm:text-base">{t(`holiday.arcade.${holiday}.subtitle`)}</p>
         </div>
       </header>
-      <h2 className="font-neo-display text-xl font-black text-neo-holiday-gold">{t('holiday.arcade.family.section')}</h2>
-      <ul className="grid grid-cols-2 gap-3">
-        {family.map((g) => (
-          <li key={g}>
-            <ArcadeCard game={g} onPick={() => go(g)} />
-          </li>
-        ))}
-      </ul>
-      <h2 className="font-neo-display text-xl font-black text-neo-holiday-gold">{t('holiday.arcade.wordSection')}</h2>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {words.map((g) => (
-          <li key={g}>
-            <ArcadeCard game={g} onPick={() => go(g)} />
-          </li>
-        ))}
-      </ul>
-      <p className="text-center text-xs text-neo-white/60">{t('holiday.arcade.coinNote')}</p>
+
+      {family.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <h2 className="flex items-center gap-2 font-neo-display text-2xl font-black text-neo-holiday-gold">
+            <Users className="size-6" aria-hidden="true" />
+            {t('holiday.arcade.family.section')}
+          </h2>
+          <ul className="grid grid-cols-2 gap-3 sm:gap-4">
+            {family.map((g) => (
+              <li key={g}>
+                <ArcadeCard game={g} onPick={() => go(g)} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {words.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <h2 className="flex items-center gap-2 font-neo-display text-2xl font-black text-neo-holiday-gold">
+            <Sparkles className="size-6" aria-hidden="true" />
+            {t('holiday.arcade.wordSection')}
+          </h2>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+            {words.map((g) => (
+              <li key={g}>
+                <ArcadeCard game={g} onPick={() => go(g)} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <p className="-mt-2 text-center text-xs text-neo-white/60">{t('holiday.arcade.coinNote')}</p>
+
+      <ArcadeMoreFun holiday={holiday} lang={language} t={t} />
     </section>
   );
 }

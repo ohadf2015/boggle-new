@@ -5,6 +5,25 @@ const sv = {
     // @holiday-arcade:start
     "arcade": {
       "wordSection": "Ordspel",
+      "lobby": {
+        "home": "Hem",
+        "night": "Kväll {n} av {total}",
+        "day": "Paket {n} av {total}",
+        "moreTitle": "Mer högtidskul",
+        "moreLine": "Resten av LexiClash har också klätt upp sig för högtiden.",
+        "daily": {
+          "title": "Dagens högtidsutmaning",
+          "line": "Dagens festbräde, samma för alla"
+        },
+        "friends": {
+          "title": "Spela med vänner",
+          "line": "Dra fram en stol och öppna ett rum för hela familjen"
+        },
+        "track": {
+          "title": "Ditt högtidsspår",
+          "line": "Se kvällens belöning och hur långt alla har kommit"
+        }
+      },
       "family": {
         "badge": "Hela familjen",
         "section": "Festspel för hela familjen",

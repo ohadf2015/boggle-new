@@ -70,6 +70,14 @@ describe('AutoHideFooter - hydration + behavior', () => {
     expect(screen.queryByTestId('full-footer')).toBeNull();
   });
 
+  it('renders no footer at all on the holiday arcade hub, server or client', () => {
+    mockUseIsDesktop.mockReturnValue(true);
+    mockUsePathname.mockReturnValue('/he/holiday-arcade');
+    const { container } = render(<AutoHideFooter />);
+    expect(container.querySelector('footer')).toBeNull();
+    expect(renderToString(<AutoHideFooter />)).toBe('');
+  });
+
   it('renders no full footer on a dev/test route (avatar-test, desktop)', () => {
     mockUseIsDesktop.mockReturnValue(true);
     mockUsePathname.mockReturnValue('/he/avatar-test');

@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { PressSurface } from '@/components/motion/PressSurface';
+import ArcadeCartridge from '@/components/holidays/arcade/ArcadeCartridge';
 
 interface Game {
   id: string;
@@ -141,6 +142,7 @@ export function MoreGames({ lang, t, hideAdventure = false, showCrossword = fals
         </div>
       </div>
       <ul className="grid grid-cols-2 gap-x-3 gap-y-4 lg:grid-cols-4 lg:gap-8">
+        <ArcadeCartridge lang={lang} />
         {games.filter((g) => !TUCKED.has(g.id)).map((g) => (
           <li key={g.id}>
             <PressSurface asChild lip={4}>
