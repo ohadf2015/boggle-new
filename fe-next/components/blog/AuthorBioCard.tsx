@@ -3,8 +3,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useTheme } from '@/utils/ThemeContext';
-import { cn } from '@/lib/utils';
 
 const bioByLocale: Record<string, string> = {
   en: 'Founder and editor-in-chief of LexiClash. 8+ years designing word games and reading cognitive-science research. Every claim in my articles is sourced and fact-checked against peer-reviewed studies — see our editorial policy.',
@@ -31,58 +29,34 @@ const editorialByLocale: Record<string, string> = {
 };
 
 export function AuthorBioCard() {
-  const { theme } = useTheme();
   const params = useParams();
   const locale = (params.locale as string) || 'en';
-  const isDarkMode = theme === 'dark';
 
   const bio = bioByLocale[locale] || bioByLocale.en;
   const title = titleByLocale[locale] || titleByLocale.en;
   const editorialLabel = editorialByLocale[locale] || editorialByLocale.en;
 
   return (
-    <div className={cn(
-      'mt-10 mb-8 p-4 md:p-5 rounded-neo border-3 border-neo-black shadow-hard flex flex-col sm:flex-row items-center sm:items-start gap-4',
-      isDarkMode ? 'bg-neo-navy-light' : 'bg-neo-cream'
-    )}>
+    <div className="flex flex-col items-center gap-4 rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-xl sm:flex-row sm:items-start">
       <Image
         src="/images/author-ohad.png"
         alt="Ohad Fisher, Founder and Editor-in-Chief of LexiClash"
         width={72}
         height={72}
-        className="w-18 h-18 rounded-full border-3 border-neo-black shrink-0 object-cover"
+        className="h-18 w-18 shrink-0 rounded-full border-3 border-neo-black object-cover"
       />
 
-      <div className="text-center sm:text-start flex-1">
-        <Link
-          href={`/${locale}/about/ohad-fisher`}
-          className={cn('font-bold text-base hover:underline', isDarkMode ? 'text-white' : 'text-neo-black')}
-        >
+      <div className="flex-1 text-center sm:text-start">
+        <Link href={`/${locale}/about/ohad-fisher`} className="font-neo-display text-lg font-bold hover:underline">
           Ohad Fisher
         </Link>
-        <p className={cn('text-xs font-semibold mt-0.5', isDarkMode ? 'text-neo-lime' : 'text-gray-600')}>
-          {title}
-        </p>
-        <p className={cn('text-sm mt-2 leading-relaxed', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-          {bio}
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2 justify-center sm:justify-start">
-          <Link
-            href={`/${locale}/editorial-policy`}
-            className={cn(
-              'text-xs font-bold underline',
-              isDarkMode ? 'text-neo-lime' : 'text-neo-black'
-            )}
-          >
+        <p className="mt-0.5 text-xs font-bold text-neo-black/70">{title}</p>
+        <p className="mt-2 text-sm leading-relaxed">{bio}</p>
+        <div className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-2 sm:justify-start">
+          <Link href={`/${locale}/editorial-policy`} className="text-sm font-bold underline decoration-neo-pink decoration-2 underline-offset-2">
             {editorialLabel}
           </Link>
-          <a
-            href="mailto:editor@lexiclash.live"
-            className={cn(
-              'text-xs font-bold underline',
-              isDarkMode ? 'text-neo-cyan' : 'text-neo-black'
-            )}
-          >
+          <a href="mailto:editor@lexiclash.live" className="text-sm font-bold underline decoration-neo-pink decoration-2 underline-offset-2">
             editor@lexiclash.live
           </a>
         </div>

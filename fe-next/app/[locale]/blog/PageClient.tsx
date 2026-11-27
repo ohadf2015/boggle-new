@@ -3,17 +3,15 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import { useTheme } from '@/utils/ThemeContext';
 import { safeToLocaleDateString } from '@/utils/bcp47Locale';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, BookOpen, Clock, Calendar } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ArrowLeft, Clock, Calendar } from 'lucide-react';
+import { LandingHero, LandingPage, Prose } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { InlineBannerAd } from '@/components/ads';
 import { blogPostsContent, getSortedBlogPosts, type BlogPost } from '@/lib/blog/data';
-
-// Blog post metadata (non-localized)
 
 // Contextual link to the education hub — teachers reading vocabulary/word-game
 // posts are a natural audience for the classroom tools, and this page had no
@@ -26,152 +24,105 @@ const educationCta: Record<string, string> = {
   es: '¿Enseñas en un aula? Prueba nuestros juegos de palabras gratuitos para la clase',
 };
 
+const CARD =
+  'group flex flex-col overflow-hidden rounded-neo-lg border-3 border-neo-black bg-neo-cream text-neo-black shadow-hard-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-white motion-safe:transition-transform motion-safe:hover:-translate-y-1';
+
 export default function BlogIndexPageClient(): React.ReactElement {
   const { t, language } = useLanguage();
-  const { theme } = useTheme();
   const params = useParams();
   const locale = params.locale as string;
-  const isDarkMode = theme === 'dark';
 
-  // Get localized content with fallback to English
   const content = blogPostsContent[locale] || blogPostsContent.en;
+  const posts = getSortedBlogPosts().filter((post) => content.posts[post.slug]);
+  const [featured, ...rest] = posts;
+
+  const meta = (post: BlogPost, readTime: string) => (
+    <span className="flex items-center gap-4 text-xs text-neo-black/70">
+      <span className="flex items-center gap-1">
+        <Calendar aria-hidden className="h-3 w-3" />
+        {safeToLocaleDateString(new Date(post.date), language, { month: 'short', day: 'numeric', year: 'numeric' })}
+      </span>
+      <span className="flex items-center gap-1">
+        <Clock aria-hidden className="h-3 w-3" />
+        {readTime}
+      </span>
+    </span>
+  );
+  const badge = (label: string) => (
+    <span className="self-start rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-0.5 text-xs font-bold uppercase">{label}</span>
+  );
 
   return (
-    <div className={cn(
-      'min-h-screen flex flex-col',
-      isDarkMode
-        ? 'bg-neo-navy'
-        : 'bg-linear-to-br from-neo-cream via-white to-neo-cream'
-    )}>
+    <div className="flex min-h-screen flex-col bg-neo-navy">
       <AutoHideHeader />
-
-      <div className="max-w-5xl mx-auto px-4 py-8 page-content-safe">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Link href={`/${locale}`}>
-            <Button
-              variant="outline"
-              size="sm"
-              className={cn(
-                'rounded-neo border-3 border-neo-black shadow-hard',
-                isDarkMode ? 'bg-neo-navy-light text-white hover:bg-neo-navy-elevated' : 'bg-white text-neo-black hover:bg-neo-cream'
-              )}
-            >
-              <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
-              {t('common.back')}
-            </Button>
+      <LandingPage locale={locale} topBar={false}>
+        <div className="flex flex-col gap-6">
+          <Link
+            href={`/${locale}`}
+            className="inline-flex min-h-11 items-center gap-1.5 self-start rounded-full border-2 border-neo-white/25 px-4 text-sm font-bold text-neo-white/85 hover:border-neo-white/60 hover:text-neo-white"
+          >
+            <ArrowLeft aria-hidden className="h-4 w-4 rtl:rotate-180" />
+            {t('common.back')}
           </Link>
-          <div>
-            <h1 className={cn(
-              'text-4xl font-black uppercase flex items-center gap-3',
-              isDarkMode ? 'text-white' : 'text-neo-black'
-            )}>
-              <BookOpen className="w-8 h-8 text-neo-yellow" />
-              {content.pageTitle}
-            </h1>
-            <p className={cn('text-sm mt-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-              {content.pageSubtitle}
-            </p>
-          </div>
+          <LandingHero title={content.pageTitle} lead={content.pageSubtitle} art={LANDING_ART.reading('')} artTone="yellow" />
         </div>
 
-        {/* Ad: Between header and post grid */}
-        <InlineBannerAd webZone="content-page" className="mb-6" />
+        <InlineBannerAd webZone="content-page" />
 
-        {/* Blog Posts Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {getSortedBlogPosts().map((post, index) => {
+        {featured && (
+          <Link href={`/${locale}/blog/${featured.slug}`} className={cn(CARD, 'lg:flex-row')}>
+            <div className="relative aspect-video w-full shrink-0 overflow-hidden border-b-3 border-neo-black lg:aspect-auto lg:w-3/5 lg:border-b-0 lg:border-e-3">
+              <Image
+                src={featured.image}
+                alt={content.posts[featured.slug].title}
+                fill
+                sizes="(max-width: 1024px) 100vw, 60vw"
+                priority
+                className="object-cover"
+              />
+            </div>
+            <div className="flex flex-col justify-center gap-3 p-6 lg:p-8">
+              {badge(content.posts[featured.slug].category)}
+              <h2 className="font-neo-display text-2xl font-bold leading-tight sm:text-3xl">{content.posts[featured.slug].title}</h2>
+              <p className="leading-relaxed">{content.posts[featured.slug].excerpt}</p>
+              {meta(featured, content.posts[featured.slug].readTime)}
+            </div>
+          </Link>
+        )}
+
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {rest.map((post, index) => {
             const postContent = content.posts[post.slug];
-            if (!postContent) return null;
-
             return (
-              <Link
-                key={post.slug}
-                href={`/${locale}/blog/${post.slug}`}
-                className={cn(
-                  'group block rounded-neo border-3 border-neo-black transition-[translate,scale,rotate,transform,background-color,box-shadow] hover:scale-[1.02] overflow-hidden',
-                  isDarkMode
-                    ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
-                    : 'bg-white hover:bg-neo-cream shadow-hard hover:shadow-hard-lg'
-                )}
-              >
-                {/* Preview Image */}
-                <div className="relative w-full aspect-video overflow-hidden">
+              <Link key={post.slug} href={`/${locale}/blog/${post.slug}`} className={CARD}>
+                <div className="relative aspect-video w-full overflow-hidden border-b-3 border-neo-black">
                   <Image
                     src={post.image}
                     alt={postContent.title}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    priority={index < 3}
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    priority={index < 2}
+                    className="object-cover"
                   />
-                  {/* Category Badge overlaid on image */}
-                  <div className="absolute top-3 inset-s-3">
-                    <span className={cn(
-                      'inline-block px-3 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black',
-                      'bg-neo-yellow text-neo-black'
-                    )}>
-                      {postContent.category}
-                    </span>
-                  </div>
                 </div>
-
-                {/* Content */}
-                <div className="p-5">
-                  {/* Title */}
-                  <h2 className={cn(
-                    'text-lg font-bold mb-2 group-hover:text-neo-yellow transition-colors line-clamp-2',
-                    isDarkMode ? 'text-white' : 'text-neo-black'
-                  )}>
-                    {postContent.title}
-                  </h2>
-
-                  {/* Excerpt */}
-                  <p className={cn('text-sm mb-4 line-clamp-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                    {postContent.excerpt}
-                  </p>
-
-                  {/* Meta */}
-                  <div className={cn(
-                    'flex items-center gap-4 text-xs',
-                    isDarkMode ? 'text-gray-500' : 'text-gray-500'
-                  )}>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {safeToLocaleDateString(new Date(post.date), language, { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {postContent.readTime}
-                    </span>
-                  </div>
+                <div className="flex flex-1 flex-col gap-2 p-5">
+                  {badge(postContent.category)}
+                  <h2 className="line-clamp-2 font-neo-display text-lg font-bold leading-snug">{postContent.title}</h2>
+                  <p className="mb-2 line-clamp-2 text-sm leading-relaxed">{postContent.excerpt}</p>
+                  <span className="mt-auto">{meta(post, postContent.readTime)}</span>
                 </div>
               </Link>
             );
           })}
         </div>
 
-        {/* SEO Footer Note */}
-        <div className={cn(
-          'mt-12 pt-6 border-t text-center',
-          isDarkMode ? 'border-slate-700' : 'border-gray-200'
-        )}>
-          <p className={cn('text-sm', isDarkMode ? 'text-gray-500' : 'text-gray-600')}>
-            {content.footerText}
+        <Prose className="mx-auto text-center text-sm">
+          <p>{content.footerText}</p>
+          <p>
+            <Link href={`/${locale}/education`}>{educationCta[locale] || educationCta.en}</Link>
           </p>
-          <p className={cn('text-sm mt-3', isDarkMode ? 'text-gray-500' : 'text-gray-600')}>
-            <Link
-              href={`/${locale}/education`}
-              className={cn(
-                'underline underline-offset-2 font-semibold',
-                isDarkMode ? 'text-neo-yellow hover:text-neo-yellow/80' : 'text-neo-black hover:text-neo-pink'
-              )}
-            >
-              {educationCta[locale] || educationCta.en}
-            </Link>
-          </p>
-        </div>
-      </div>
+        </Prose>
+      </LandingPage>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { defaultOgImages } from '@/lib/seo/defaultOgImage';
 import { APP_SCREEN_ROBOTS } from '@/lib/seo/appScreens';
 import ToolsHubPageClient from './PageClient';
 import { getContent, type Locale } from './word-solver/content';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { SeoKitBlock } from '@/components/landing/SeoKitBlock';
 
 export const revalidate = 86400;
 
@@ -136,13 +136,14 @@ export default async function ToolsHubPage({ params }: { params: Promise<{ local
   const seoData = toolsSeoContent[validLocale] ?? toolsSeoContent.en;
   return (
     <>
-      <ToolsHubPageClient />
-      <GamePageSeoContent
-        title={seoData.title}
-        description={seoData.description}
-        features={seoData.features}
-        faq={seoData.faq}
-      />
+      <ToolsHubPageClient>
+        <SeoKitBlock
+          title={seoData.title}
+          description={seoData.description}
+          features={seoData.features}
+          faq={seoData.faq}
+        />
+      </ToolsHubPageClient>
     </>
   );
 }

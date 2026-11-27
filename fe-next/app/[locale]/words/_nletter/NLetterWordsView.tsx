@@ -139,20 +139,20 @@ export async function NLetterWordsView({ locale, n }: { locale: string; n: WordL
             <span className="text-neo-white" aria-current="page">{n}-Letter Words</span>
           </nav>
 
-          <h1 className="text-4xl sm:text-5xl font-neo-display font-black text-neo-lime mb-3">
+          <h1 className="font-neo-display text-[2rem] font-bold leading-[1.1] text-balance sm:text-5xl mb-3">
             All {n}-Letter Words
           </h1>
-          <p className="flex flex-wrap gap-x-4 gap-y-1 text-neo-cream/70">
-            <span><strong className="text-neo-cyan text-lg">{totalWords}</strong> words</span>
-            <span><strong className="text-neo-lime text-lg">{baseScore}</strong> base pts each</span>
-            <span><strong className="text-neo-pink text-lg">{baseScore * 2}</strong> fire round pts</span>
+          <p className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-neo-white/80">
+            <span><strong className="me-1 rounded-neo border-2 border-neo-black bg-neo-cyan px-2 text-lg text-neo-black">{totalWords}</strong> words</span>
+            <span><strong className="me-1 rounded-neo border-2 border-neo-black bg-neo-lime px-2 text-lg text-neo-black">{baseScore}</strong> base pts each</span>
+            <span><strong className="me-1 rounded-neo border-2 border-neo-black bg-neo-pink px-2 text-lg text-neo-black">{baseScore * 2}</strong> fire round pts</span>
           </p>
 
           <div className="mt-6">
             <Link href={`/${locale}/quick-play`} data-press data-primary-cta className={PRIMARY_CTA}>
               Play Now →
             </Link>
-            <p className="text-neo-cream/60 text-sm mt-3 max-w-md">
+            <p className="mt-3 max-w-md text-sm text-neo-white/70">
               Put your vocabulary to the test — find these words on the grid under time pressure!
             </p>
           </div>
@@ -163,7 +163,7 @@ export async function NLetterWordsView({ locale, n }: { locale: string; n: WordL
           <div className="space-y-8">
             {sortedLetters.map((letter, letterIdx) => (
               <section key={letter}>
-                <h2 className="text-2xl font-neo-display font-black text-neo-cyan mb-3">
+                <h2 className="mb-3 font-neo-display text-2xl font-bold text-neo-white">
                   {letter}
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
@@ -177,7 +177,7 @@ export async function NLetterWordsView({ locale, n }: { locale: string; n: WordL
                       <span className="font-bold text-sm uppercase tracking-wide">
                         {word}
                       </span>
-                      <span className="text-xs font-bold text-neo-cyan ms-1 shrink-0">
+                      <span className="ms-1 shrink-0 rounded bg-neo-black px-1.5 py-0.5 text-xs font-bold text-neo-lime">
                         {getWordScore(word)}pt
                       </span>
                     </Link>
@@ -188,82 +188,82 @@ export async function NLetterWordsView({ locale, n }: { locale: string; n: WordL
             ))}
           </div>
 
-          <p className="mt-12 text-neo-cream/80 text-lg leading-relaxed max-w-2xl">
+          <p className="mt-14 max-w-3xl text-lg leading-relaxed text-neo-white/85">
             Explore all {totalWords} valid {n}-letter words in the LexiClash dictionary.
             Each word shows its base score — longer words earn more points in the game.
             Click any word to see its full scoring breakdown and letter analysis.
           </p>
 
           {WORD_LENGTH_CONTENT[n] && (
-            <section className="mt-10 space-y-4 max-w-2xl">
-              <h2 className="text-xl font-neo-display font-black text-neo-cyan">
+            <section className="mt-10 max-w-3xl space-y-4 rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-xl sm:p-7">
+              <h2 className="font-neo-display text-2xl font-bold">
                 Strategy for {n}-Letter Words
               </h2>
-              <p className="text-neo-cream/85 text-sm leading-relaxed">
+              <p className="leading-relaxed">
                 {WORD_LENGTH_CONTENT[n].strategy}
               </p>
-              <div className="border-s-4 border-neo-lime ps-4">
-                <p className="text-xs font-bold text-neo-lime uppercase tracking-wider mb-1">Fun Fact</p>
-                <p className="text-neo-cream/80 text-sm leading-relaxed">
+              <div className="rounded-neo border-2 border-neo-black bg-neo-lime p-4">
+                <p className="mb-1 text-xs font-bold uppercase tracking-wider">Fun Fact</p>
+                <p className="text-sm leading-relaxed">
                   {WORD_LENGTH_CONTENT[n].funFact}
                 </p>
               </div>
-              <div className="border-s-4 border-neo-pink ps-4">
-                <p className="text-xs font-bold text-neo-pink uppercase tracking-wider mb-1">Difficulty</p>
-                <p className="text-neo-cream/80 text-sm leading-relaxed">
+              <div className="rounded-neo border-2 border-neo-black bg-neo-yellow p-4">
+                <p className="mb-1 text-xs font-bold uppercase tracking-wider">Difficulty</p>
+                <p className="text-sm leading-relaxed">
                   {WORD_LENGTH_CONTENT[n].difficulty}
                 </p>
               </div>
             </section>
           )}
 
-          <section className="mt-10 max-w-2xl">
-            <h2 className="text-xl font-neo-display font-black text-neo-cyan mb-3">
+          <section className="mt-14 max-w-3xl">
+            <h2 className="mb-4 font-neo-display text-2xl font-bold text-neo-black sm:text-3xl">
               Frequently Asked Questions
             </h2>
-            <div className="divide-y divide-neo-cream/15">
+            <div className="divide-y-2 divide-neo-black/15 rounded-neo-lg border-3 border-neo-black bg-neo-cream px-5 text-neo-black shadow-hard-xl">
               <details className="group py-3" open>
-                <summary className="cursor-pointer font-bold text-neo-white text-sm group-open:text-neo-lime transition-colors">
+                <summary className="cursor-pointer font-bold text-neo-black text-sm group-open:underline transition-colors">
                   How many {n}-letter words are in LexiClash?
                 </summary>
-                <p className="mt-2 text-neo-cream/80 text-sm leading-relaxed ps-4">
+                <p className="mt-2 text-neo-black/85 text-sm leading-relaxed ps-4">
                   The LexiClash dictionary contains {totalWords} valid {n}-letter words.
                   You can browse all of them on this page, grouped by starting letter.
                 </p>
               </details>
               <details className="group py-3">
-                <summary className="cursor-pointer font-bold text-neo-white text-sm group-open:text-neo-lime transition-colors">
+                <summary className="cursor-pointer font-bold text-neo-black text-sm group-open:underline transition-colors">
                   How many points is a {n}-letter word worth?
                 </summary>
-                <p className="mt-2 text-neo-cream/80 text-sm leading-relaxed ps-4">
+                <p className="mt-2 text-neo-black/85 text-sm leading-relaxed ps-4">
                   A {n}-letter word earns {baseScore} base points. With combo bonuses,
                   this can multiply significantly — a combo level 5 can more than double your points.
                 </p>
               </details>
               <details className="group py-3">
-                <summary className="cursor-pointer font-bold text-neo-white text-sm group-open:text-neo-lime transition-colors">
+                <summary className="cursor-pointer font-bold text-neo-black text-sm group-open:underline transition-colors">
                   Are {n}-letter words good for scoring?
                 </summary>
-                <p className="mt-2 text-neo-cream/80 text-sm leading-relaxed ps-4">
+                <p className="mt-2 text-neo-black/85 text-sm leading-relaxed ps-4">
                   {n <= 4
                     ? `${n}-letter words are common and quick to find, making them great for building combos. While each word scores less individually, rapid consecutive finds earn combo multipliers that add up fast.`
                     : `${n}-letter words are high-value targets in LexiClash. They score significantly more than shorter words and can swing a multiplayer match in your favor.`}
                 </p>
               </details>
               <details className="group py-3">
-                <summary className="cursor-pointer font-bold text-neo-white text-sm group-open:text-neo-lime transition-colors">
+                <summary className="cursor-pointer font-bold text-neo-black text-sm group-open:underline transition-colors">
                   Where can I practice finding {n}-letter words?
                 </summary>
-                <p className="mt-2 text-neo-cream/80 text-sm leading-relaxed ps-4">
-                  Play a <Link href={`/${locale}/quick-play`} className="text-neo-cyan hover:underline">single-player game</Link> or
-                  try the <Link href={`/${locale}/daily/word-hunt`} className="text-neo-cyan hover:underline">Word Hunt daily challenge</Link>,
+                <p className="mt-2 text-neo-black/85 text-sm leading-relaxed ps-4">
+                  Play a <Link href={`/${locale}/quick-play`} className="underline decoration-neo-pink decoration-2 underline-offset-2">single-player game</Link> or
+                  try the <Link href={`/${locale}/daily/word-hunt`} className="underline decoration-neo-pink decoration-2 underline-offset-2">Word Hunt daily challenge</Link>,
                   which often rewards finding words of specific lengths.
                 </p>
               </details>
             </div>
           </section>
 
-          <div className="mt-12 pt-8 border-t-2 border-neo-cream/15">
+          <div className="mt-14">
             <h2 className={`${SECTION_LABEL} mb-4`}>Explore Other Lengths</h2>
             <div className="flex flex-wrap gap-2">
               {VALID_LENGTHS.filter(l => l !== n).map(l => (
@@ -271,7 +271,7 @@ export async function NLetterWordsView({ locale, n }: { locale: string; n: WordL
                   key={l}
                   href={`/${locale}/words/${l}-letter-words`}
                   data-press
-                  className={`${CHIP} text-sm px-3 py-1.5`}
+                  className={`${CHIP} rounded-full px-4 py-2 text-sm font-bold`}
                 >
                   {l}-letter words
                 </Link>
@@ -287,7 +287,7 @@ export async function NLetterWordsView({ locale, n }: { locale: string; n: WordL
                   key={letter}
                   href={`/${locale}/words/starting-with/${letter}`}
                   data-press
-                  className={`${CHIP} w-9 h-9 flex items-center justify-center text-sm font-bold uppercase`}
+                  className={`${CHIP} flex h-10 w-10 items-center justify-center text-sm font-bold uppercase`}
                 >
                   {letter}
                 </Link>

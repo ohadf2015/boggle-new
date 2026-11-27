@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { defaultOgImages } from '@/lib/seo/defaultOgImage';
 import Link from 'next/link';
+import { CtaBand, FaqList, LandingButton, LandingHero, LandingPage, LinkPills, Mark, Section, StatStrip } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 import { notFound } from 'next/navigation';
 import { InlineBannerAd } from '@/components/ads';
 import { calculateWordScore } from '@/shared/utils/scoring';
@@ -154,211 +156,130 @@ export default async function AnagramPage({ params }: PageParams) {
       {/* JSON-LD is static server data — no user input involved */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schemaJson }} />
 
-      <div className="min-h-screen bg-neo-navy text-neo-white">
-        <div className="max-w-4xl mx-auto px-4 py-8">
+      <LandingPage locale={locale} play={{ href: `/${locale}/quick-play`, label: 'Play Free →' }}>
+        <nav aria-label="Breadcrumb" className="-mb-8 flex items-center gap-2 text-sm text-neo-white/70 sm:-mb-14">
+          <Link href={`/${locale}`} className="hover:text-neo-white">Home</Link>
+          <span aria-hidden="true">/</span>
+          <Link href={`/${locale}/tools`} className="hover:text-neo-white">Tools</Link>
+          <span aria-hidden="true">/</span>
+          <span className="text-neo-white" aria-current="page">Anagrams of {upper}</span>
+        </nav>
 
-          {/* Breadcrumb */}
-          <nav aria-label="Breadcrumb" className="mb-6 text-sm text-slate-400 flex items-center gap-2">
-            <Link href={`/${locale}`} className="hover:text-neo-cyan transition-colors">Home</Link>
-            <span aria-hidden="true">/</span>
-            <Link href={`/${locale}/tools`} className="hover:text-neo-cyan transition-colors">Tools</Link>
-            <span aria-hidden="true">/</span>
-            <span className="text-neo-white" aria-current="page">Anagrams of {upper}</span>
-          </nav>
+        <LandingHero
+          title={<>Anagrams of <Mark>{upper}</Mark></>}
+          lead={totalWords > 0
+            ? `${totalWords} word${totalWords === 1 ? '' : 's'} you can make with these letters`
+            : 'No anagrams found — try different letters'}
+        >
+          {totalWords > 0 && (
+            <div className="w-full">
+              <StatStrip
+                items={[
+                  { value: totalWords, label: 'total words' },
+                  { value: sortedLengths.length, label: 'word lengths' },
+                  { value: `${sortedLengths[0]}–${sortedLengths[sortedLengths.length - 1]}`, label: 'letters' },
+                ]}
+              />
+            </div>
+          )}
+        </LandingHero>
 
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl sm:text-5xl font-neo-display font-black text-neo-lime mb-3">
-              Anagrams of {upper}
-            </h1>
-            <p className="text-slate-300 text-lg leading-relaxed max-w-2xl">
-              {totalWords > 0
-                ? `${totalWords} word${totalWords === 1 ? '' : 's'} you can make with these letters`
-                : 'No anagrams found — try different letters'}
-            </p>
+        {totalWords === 0 && (
+          <div className="rounded-neo-lg border-3 border-neo-black bg-neo-cream p-6 text-neo-black shadow-hard-xl">
+            <p className="mb-4 font-bold">Hmm, no words found from these letters. Try:</p>
+            <ul className="list-disc space-y-2 ps-5">
+              <li>Removing one letter and searching again</li>
+              <li>Adding a vowel if you have mostly consonants</li>
+              <li>Checking your spelling</li>
+            </ul>
+            {dropLetterSuggestions.length > 0 && (
+              <div className="mt-4 border-t-2 border-neo-black/15 pt-4">
+                <p className="mb-2 text-sm">Try these letter combinations:</p>
+                <LinkPills items={dropLetterSuggestions.map((suggestion) => ({ href: `/${locale}/anagram/${suggestion}`, label: suggestion.toUpperCase() }))} />
+              </div>
+            )}
           </div>
+        )}
 
-          {/* Stats bar */}
-          {totalWords > 0 && (
-            <div className="flex flex-wrap gap-4 mb-8">
-              <div className="bg-neo-navy border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
-                <span className="text-neo-cyan font-bold text-lg">{totalWords}</span>
-                <span className="text-slate-400 text-sm">total words</span>
-              </div>
-              <div className="bg-neo-navy border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
-                <span className="text-neo-lime font-bold text-lg">{sortedLengths.length}</span>
-                <span className="text-slate-400 text-sm">word lengths</span>
-              </div>
-              <div className="bg-neo-navy border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
-                <span className="text-neo-cyan font-bold text-lg">{sortedLengths[0]}–{sortedLengths[sortedLengths.length - 1]}</span>
-                <span className="text-slate-400 text-sm">letters</span>
-              </div>
-            </div>
-          )}
-
-          {/* Empty state */}
-          {totalWords === 0 && (
-            <div className="bg-neo-navy border-2 border-neo-cyan rounded-neo p-6 shadow-hard mb-8">
-              <p className="text-neo-white font-bold mb-4">
-                Hmm, no words found from these letters. Try:
-              </p>
-              <ul className="space-y-2 text-slate-300">
-                <li>Removing one letter and searching again</li>
-                <li>Adding a vowel if you have mostly consonants</li>
-                <li>Checking your spelling</li>
-              </ul>
-              {dropLetterSuggestions.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-slate-700">
-                  <p className="text-sm text-slate-400 mb-2">Try these letter combinations:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {dropLetterSuggestions.map(suggestion => (
-                      <Link
-                        key={suggestion}
-                        href={`/${locale}/anagram/${suggestion}`}
-                        className="bg-neo-cyan/10 border border-neo-cyan rounded-neo px-3 py-1 text-sm font-bold text-neo-cyan hover:bg-neo-cyan/20 transition-colors"
-                      >
-                        {suggestion.toUpperCase()}
-                      </Link>
-                    ))}
-                  </div>
+        {totalWords > 0 && (
+          <div className="flex flex-col gap-10">
+            {sortedLengths.map((len) => (
+              <Section key={len} title={`${len}-Letter Words`}>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                  {(grouped[len] ?? []).map((word) => (
+                    <Link
+                      key={word}
+                      href={`/${locale}/words/${word}`}
+                      className="flex items-center justify-between rounded-neo border-2 border-neo-black bg-neo-cream px-3 py-2 text-neo-black shadow-hard-sm hover:bg-neo-yellow"
+                    >
+                      <span className="text-sm font-bold uppercase tracking-wide">{word}</span>
+                      <span className="ms-1 shrink-0 rounded bg-neo-black px-1.5 py-0.5 text-xs font-bold text-neo-lime">
+                        {calculateWordScore(word)}pt
+                      </span>
+                    </Link>
+                  ))}
                 </div>
-              )}
-            </div>
-          )}
-
-          {/* Hero CTA */}
-          {totalWords > 0 && (
-            <div className="bg-linear-to-r from-neo-lime/10 to-neo-cyan/10 border-3 border-neo-lime rounded-neo p-5 shadow-hard mb-8">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <div className="flex-1">
-                  <p className="font-neo-display font-black text-xl text-neo-white mb-1">
-                    Try these words in LexiClash
-                  </p>
-                  <p className="text-slate-300 text-sm">
-                    Find them on the grid to earn points. Longer words score more!
-                  </p>
-                </div>
-                <Link
-                  href={`/${locale}/quick-play`}
-                  className="shrink-0 bg-neo-lime text-neo-black font-neo-display font-black px-5 py-2.5 rounded-neo border-3 border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition-[box-shadow,translate,scale,rotate,transform]"
-                >
-                  Play Free →
-                </Link>
-              </div>
-            </div>
-          )}
-
-          {/* Words grouped by length */}
-          {totalWords > 0 && (
-            <div className="space-y-8">
-              {sortedLengths.map((len) => (
-                <section key={len}>
-                  <h2 className="text-2xl font-neo-display font-black text-neo-cyan mb-3 border-b-2 border-slate-700 pb-2">
-                    {len}-Letter Words
-                  </h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                    {(grouped[len] ?? []).map((word) => (
-                      <Link
-                        key={word}
-                        href={`/${locale}/words/${word}`}
-                        className="group flex items-center justify-between bg-neo-navy border border-slate-700 hover:border-neo-cyan hover:shadow-[0_0_12px_rgba(0,255,255,0.15)] rounded-neo px-3 py-2 transition-[border-color,box-shadow] duration-200"
-                      >
-                        <span className="font-bold text-sm text-neo-white group-hover:text-neo-lime transition-colors uppercase tracking-wide">
-                          {word}
-                        </span>
-                        <span className="text-xs font-bold text-neo-cyan bg-neo-navy-light rounded px-1.5 py-0.5 ms-1 shrink-0">
-                          {calculateWordScore(word)}pt
-                        </span>
-                      </Link>
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          )}
-
-          <InlineBannerAd webZone="content-page" className="my-8" />
-
-          {/* FAQ section */}
-          <section className="mt-12 pt-8 border-t-2 border-slate-700">
-            <h2 className="text-2xl font-neo-display font-black text-neo-lime mb-6">
-              Frequently Asked Questions
-            </h2>
-            <div className="space-y-4">
-              <details className="bg-neo-navy border-2 border-slate-700 rounded-neo p-4 group" open>
-                <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
-                  What words can I make from {upper}?
-                  <span className="text-slate-500 group-open:rotate-180 transition-transform">▾</span>
-                </summary>
-                <div className="mt-3 text-slate-300 text-sm leading-relaxed">
-                  <p>
-                    {totalWords > 0
-                      ? `There are ${totalWords} valid words you can form from the letters ${upper}, ranging from ${sortedLengths[0]} to ${sortedLengths[sortedLengths.length - 1]} letters long. Click any word to see its definition and scoring breakdown.`
-                      : `No words were found from the letters ${upper}. Try removing or swapping letters to find anagrams.`}
-                  </p>
-                </div>
-              </details>
-              <details className="bg-neo-navy border-2 border-slate-700 rounded-neo p-4 group">
-                <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
-                  Is this a Scrabble word finder?
-                  <span className="text-slate-500 group-open:rotate-180 transition-transform">▾</span>
-                </summary>
-                <div className="mt-3 text-slate-300 text-sm leading-relaxed">
-                  <p>
-                    Yes! This anagram solver uses the same dictionary as competitive Scrabble and Boggle word games. All words shown are valid in standard English dictionaries, making it perfect for word game players.
-                  </p>
-                </div>
-              </details>
-              <details className="bg-neo-navy border-2 border-slate-700 rounded-neo p-4 group">
-                <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
-                  How is the score calculated?
-                  <span className="text-slate-500 group-open:rotate-180 transition-transform">▾</span>
-                </summary>
-                <div className="mt-3 text-slate-300 text-sm leading-relaxed space-y-2">
-                  <p>
-                    In LexiClash, longer words score exponentially more points:
-                  </p>
-                  <ul className="space-y-1 list-disc list-inside">
-                    <li>3-letter words: 10 points</li>
-                    <li>4-letter words: 20 points</li>
-                    <li>5-letter words: 50 points</li>
-                    <li>6-letter words: 100 points</li>
-                    <li>7-letter words: 200 points</li>
-                    <li>8+ letter words: 500 points</li>
-                  </ul>
-                  <p>Combo bonuses can multiply your score further when you find words consecutively.</p>
-                </div>
-              </details>
-            </div>
-          </section>
-
-          {/* Related tools */}
-          <div className="mt-12 pt-8 border-t-2 border-slate-700">
-            <h2 className="text-sm font-bold text-neo-cyan uppercase tracking-wider mb-4">Related Tools & Games</h2>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                href={`/${locale}/tools/word-solver`}
-                className="flex-1 bg-neo-navy-light border border-slate-700 rounded-neo px-4 py-3 hover:border-neo-cyan transition-colors text-sm font-bold"
-              >
-                Word Solver →
-              </Link>
-              <Link
-                href={`/${locale}/quick-play`}
-                className="flex-1 bg-neo-navy-light border border-slate-700 rounded-neo px-4 py-3 hover:border-neo-cyan transition-colors text-sm font-bold"
-              >
-                Play Solo →
-              </Link>
-              <Link
-                href={`/${locale}/multiplayer`}
-                className="flex-1 bg-neo-navy-light border border-slate-700 rounded-neo px-4 py-3 hover:border-neo-cyan transition-colors text-sm font-bold"
-              >
-                Multiplayer →
-              </Link>
-            </div>
+              </Section>
+            ))}
           </div>
+        )}
 
-        </div>
-      </div>
+        {totalWords > 0 && (
+          <CtaBand
+            tone="lime"
+            title="Try these words in LexiClash"
+            body="Find them on the grid to earn points. Longer words score more!"
+            actions={<LandingButton href={`/${locale}/quick-play`} variant="dark">Play Free →</LandingButton>}
+            art={LANDING_ART.trophy('')}
+          />
+        )}
+
+        <InlineBannerAd webZone="content-page" />
+
+        <Section title="Frequently Asked Questions">
+          <FaqList
+            items={[
+              {
+                q: `What words can I make from ${upper}?`,
+                a: totalWords > 0
+                  ? `There are ${totalWords} valid words you can form from the letters ${upper}, ranging from ${sortedLengths[0]} to ${sortedLengths[sortedLengths.length - 1]} letters long. Click any word to see its definition and scoring breakdown.`
+                  : `No words were found from the letters ${upper}. Try removing or swapping letters to find anagrams.`,
+              },
+              {
+                q: 'Is this a Scrabble word finder?',
+                a: 'Yes! This anagram solver uses the same dictionary as competitive Scrabble and Boggle word games. All words shown are valid in standard English dictionaries, making it perfect for word game players.',
+              },
+              {
+                q: 'How is the score calculated?',
+                a: (
+                  <div className="space-y-2">
+                    <p>In LexiClash, longer words score exponentially more points:</p>
+                    <ul className="list-disc space-y-1 ps-5">
+                      <li>3-letter words: 10 points</li>
+                      <li>4-letter words: 20 points</li>
+                      <li>5-letter words: 50 points</li>
+                      <li>6-letter words: 100 points</li>
+                      <li>7-letter words: 200 points</li>
+                      <li>8+ letter words: 500 points</li>
+                    </ul>
+                    <p>Combo bonuses can multiply your score further when you find words consecutively.</p>
+                  </div>
+                ),
+              },
+            ]}
+          />
+        </Section>
+
+        <Section title="Related Tools & Games">
+          <LinkPills
+            items={[
+              { href: `/${locale}/tools/word-solver`, label: 'Word Solver →' },
+              { href: `/${locale}/quick-play`, label: 'Play Solo →' },
+              { href: `/${locale}/multiplayer`, label: 'Multiplayer →' },
+            ]}
+          />
+        </Section>
+      </LandingPage>
     </>
   );
 }

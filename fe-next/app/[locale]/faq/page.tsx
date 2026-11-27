@@ -4,7 +4,7 @@ import { contentByLocale } from './content';
 
 export const revalidate = 86400;
 import type { Metadata } from 'next';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { SeoKitBlock } from '@/components/landing/SeoKitBlock';
 import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
 import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
@@ -250,16 +250,19 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
     <>
       <script type="application/ld+json">{faqJsonLd}</script>
       <BreadcrumbJsonLd items={breadcrumbItems} />
-      <FAQPageClient />
-      <GuidesCalloutLink locale={locale} />
-      <EducationCalloutLink locale={locale} />
-      <EsScrabbleCrossLink locale={locale} anchorVariant="query" />
-      <GamePageSeoContent
-        title={content.title}
-        description={content.description}
-        features={content.features}
-        faq={content.faq}
-      />
+      <FAQPageClient>
+        <div className="flex flex-col gap-4 empty:hidden">
+          <GuidesCalloutLink locale={locale} />
+          <EducationCalloutLink locale={locale} />
+          <EsScrabbleCrossLink locale={locale} anchorVariant="query" />
+        </div>
+        <SeoKitBlock
+          title={content.title}
+          description={content.description}
+          features={content.features}
+          faq={content.faq}
+        />
+      </FAQPageClient>
     </>
   );
 }

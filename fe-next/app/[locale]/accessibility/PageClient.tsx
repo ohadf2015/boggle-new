@@ -6,6 +6,7 @@ import { Eye, EyeOff, Volume2, VolumeX, Sparkles, Zap, Type, Contrast, Waves } f
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import Header from '@/components/Header';
+import { LandingPage } from '@/components/landing/kit';
 
 /**
  * Accessibility Settings Page
@@ -95,7 +96,7 @@ export default function AccessibilitySettingsPageClient() {
       description:
         t('accessibility.fireRoundLights.description', 'Turn off the rainbow glowing cells during fire rounds to reduce visual distractions.'),
       enabled: settings.disableFireRoundLights,
-      iconColor: 'text-neo-purple',
+      iconColor: 'text-neo-pink',
     },
     {
       id: 'earthquakeEffects',
@@ -145,90 +146,63 @@ export default function AccessibilitySettingsPageClient() {
   ];
 
   return (
-    <div className="flex-1 flex flex-col bg-neo-navy">
+    <div className="flex flex-1 flex-col bg-neo-navy">
       <Header />
-      <div className="max-w-3xl mx-auto px-4 py-8 md:py-12 page-content-safe">
-        {/* Page Title */}
-        <m.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="text-center mb-8"
-        >
-          <h1 className="text-4xl md:text-5xl font-black text-neo-white mb-3 uppercase">
+      <LandingPage locale={language} topBar={false} className="max-w-4xl gap-10 sm:gap-12">
+        <header className="flex flex-col gap-4 lg:pt-6">
+          <h1 className="font-neo-display text-[2rem] font-bold leading-[1.1] sm:text-5xl">
             {language === 'he' && '♿'}
             <span className="mx-2">{t('accessibility.title')}</span>
             {language !== 'he' && '♿'}
           </h1>
-          <p className="text-neo-white text-lg opacity-90 max-w-2xl mx-auto">
+          <p className="max-w-2xl text-lg leading-relaxed text-neo-white/85">
             {t('accessibility.subtitle', 'Customize your experience to meet your needs. These settings are saved locally.')}
           </p>
-        </m.div>
+        </header>
 
-        {/* Settings Cards */}
-        <div className="space-y-4">
-          {settingsConfig.map((setting, index) => (
-            <m.div
+        <div className="grid gap-4 md:grid-cols-2">
+          {settingsConfig.map((setting) => (
+            <div
               key={setting.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="bg-neo-gray border-3 border-neo-black rounded-neo shadow-hard-lg p-5 md:p-6"
+              className="flex items-start gap-4 rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-xl"
             >
-              <div className="flex items-start gap-4">
-                {/* Icon */}
-                <div className="p-3 bg-neo-cream text-neo-black border-2 border-neo-black rounded-neo">
-                  <setting.icon size={28} className={setting.iconColor} />
-                </div>
-
-                {/* Content */}
-                <div className="flex-1">
-                  <h3 className="font-black text-neo-white text-xl mb-2">{setting.title}</h3>
-                  <p className="text-neo-white opacity-80 text-sm md:text-base mb-4">
-                    {setting.description}
-                  </p>
-                </div>
-
-                {/* Toggle Switch */}
-                <button
-                  type="button"
-                  onClick={() => handleToggle(setting.id as never, !setting.enabled)}
-                  className={`relative w-16 h-8 shrink-0 rounded-full border-3 border-neo-black transition-colors duration-200 ${
-                    setting.enabled ? 'bg-neo-lime' : 'bg-neo-red'
-                  }`}
-                  aria-label={`${setting.enabled ? 'Disable' : 'Enable'} ${setting.title}`}
-                  aria-pressed={setting.enabled}
-                >
-                  <m.div
-                    initial={false}
-                    animate={{ x: setting.enabled ? 32 : 0 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    className="absolute top-0.5 left-0.5 w-6 h-6 bg-neo-black rounded-full border-2 border-neo-white"
-                  >
-                    {setting.enabled ? (
-                      <Eye size={14} className="text-neo-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                    ) : (
-                      <EyeOff size={14} className="text-neo-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                    )}
-                  </m.div>
-                </button>
+              <span className="rounded-neo border-2 border-neo-black bg-neo-navy p-2.5">
+                <setting.icon size={26} className={setting.iconColor} />
+              </span>
+              <div className="flex-1">
+                <h3 className="mb-1 font-neo-display text-xl font-bold">{setting.title}</h3>
+                <p className="text-[15px] leading-relaxed">{setting.description}</p>
               </div>
-            </m.div>
+              <button
+                type="button"
+                onClick={() => handleToggle(setting.id as never, !setting.enabled)}
+                className={`relative h-8 w-16 shrink-0 rounded-full border-3 border-neo-black transition-colors duration-200 ${
+                  setting.enabled ? 'bg-neo-lime' : 'bg-neo-navy/20'
+                }`}
+                aria-label={`${setting.enabled ? 'Disable' : 'Enable'} ${setting.title}`}
+                aria-pressed={setting.enabled}
+              >
+                <m.div
+                  initial={false}
+                  animate={{ x: setting.enabled ? 32 : 0 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  className="absolute left-0.5 top-0.5 h-6 w-6 rounded-full border-2 border-neo-white bg-neo-black"
+                >
+                  {setting.enabled ? (
+                    <Eye size={14} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-neo-white" />
+                  ) : (
+                    <EyeOff size={14} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-neo-white" />
+                  )}
+                </m.div>
+              </button>
+            </div>
           ))}
         </div>
 
-        {/* Info Footer */}
-        <m.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.6 }}
-          className="mt-8 p-4 bg-neo-purple bg-opacity-20 border-2 border-neo-purple rounded-neo"
-        >
-          <p className="text-neo-white text-sm text-center">
-            {t('accessibility.footer', 'These settings are stored locally on your device. For additional system-level accessibility features, check your device settings.')}
-          </p>
-        </m.div>
-      </div>
+        <p className="max-w-2xl text-sm leading-relaxed text-neo-white/75">
+          {t('accessibility.footer', 'These settings are stored locally on your device. For additional system-level accessibility features, check your device settings.')}
+        </p>
+      </LandingPage>
     </div>
   );
 }

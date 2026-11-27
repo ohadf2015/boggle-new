@@ -7,7 +7,9 @@ import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
 import { HeScrabbleCrossLink } from '@/components/seo/HeScrabbleCrossLink';
 import { EnBoggleCrossLink } from '@/components/seo/EnBoggleCrossLink';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { SeoKitBlock } from '@/components/landing/SeoKitBlock';
+import { LandingButton, LandingHero, LandingPage, LinkPills, Prose, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
 
 /** Growth Radar rec 6487 — H2 + FAQPage Question must match this query verbatim. */
@@ -302,7 +304,7 @@ export default async function AnagramHubPage({ params }: PageParams) {
       : seoData.faq.map((item) => ({ q: item.question, a: item.answer }));
 
   return (
-    <div className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/multiplayer`, label: locale === 'sv' ? 'Spela live' : 'Play LexiClash' }}>
       <BreadcrumbJsonLd
         items={[
           { name: 'LexiClash', url: `${BASE_URL}/${locale}` },
@@ -313,120 +315,78 @@ export default async function AnagramHubPage({ params }: PageParams) {
         ]}
       />
       <FaqPageJsonLd faqs={faqItems} />
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <nav className="mb-6 text-sm text-slate-400">
-          <Link href={`/${locale}`} className="hover:text-neo-cyan transition-colors">
-            Home
-          </Link>
-          <span className="mx-2">/</span>
-          <span className="text-neo-white">{locale === 'sv' ? 'Anagram svenska' : 'Anagram Solver'}</span>
-        </nav>
+      <nav className="mb-2 text-sm text-neo-white/70">
+        <Link href={`/${locale}`} className="hover:text-neo-white">
+          Home
+        </Link>
+        <span className="mx-2">/</span>
+        <span className="text-neo-white">{locale === 'sv' ? 'Anagram svenska' : 'Anagram Solver'}</span>
+      </nav>
 
-        <h1 className="text-4xl font-neo-display font-black text-neo-pink tracking-wider mb-4">
-          {locale === 'sv' ? 'Anagramlösare på svenska' : 'Anagram Solver'}
-        </h1>
-        {locale === 'sv' ? (
-          <section className="mb-8">
-            <h2 className="text-xl font-neo-display font-bold text-neo-cyan tracking-wider mb-3">
-              {ANAGRAM_SVENSKA_QUESTION}
-            </h2>
-            <p className="text-slate-300 text-lg leading-relaxed">{ANAGRAM_SVENSKA_ANSWER}</p>
-            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href={`/${locale}/anagram/listen`}
-                className="rounded-neo border-2 border-neo-black bg-neo-lime px-4 py-2 text-center font-neo-display font-black uppercase text-neo-navy shadow-hard-sm"
-              >
-                Prova med listen →
-              </Link>
-              <Link
-                href={`/${locale}/multiplayer`}
-                className="rounded-neo border-2 border-neo-black bg-neo-navy px-4 py-2 text-center font-neo-display font-black uppercase text-neo-cyan shadow-hard-sm"
-              >
-                Spela live →
-              </Link>
-            </div>
-          </section>
-        ) : (
-          <p className="text-slate-300 text-lg mb-8 leading-relaxed">
-            Enter any letters in the URL and instantly see every valid English word you can make.
-            Free, no signup, no download. Powered by the same dictionary that runs the LexiClash
-            multiplayer word game.
-          </p>
-        )}
-
-        <section className="mb-10">
-          <h2 className="text-xl font-neo-display font-bold text-neo-cyan uppercase tracking-wider mb-4">
-            Popular Anagram Lookups
-          </h2>
-          <p className="text-slate-400 text-sm mb-4">
-            Tap any seed to see every word you can make from those letters.
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-            {POPULAR_SEEDS.map((letters) => (
-              <Link
-                key={letters}
-                href={`/${locale}/anagram/${letters}`}
-                className="bg-neo-navy border-2 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm hover:shadow-hard hover:border-neo-pink transition-[box-shadow,border-color] text-center"
-              >
-                <span className="text-sm font-neo-display font-bold text-neo-white uppercase">
-                  {letters}
-                </span>
-              </Link>
-            ))}
+      {locale === 'sv' ? (
+        <LandingHero
+          title="Anagramlösare på svenska"
+          art={LANDING_ART.solver('')}
+          artTone="cyan"
+        >
+          <h2 className="font-neo-display text-xl font-bold">{ANAGRAM_SVENSKA_QUESTION}</h2>
+          <p className="max-w-xl text-lg leading-relaxed text-neo-white/85">{ANAGRAM_SVENSKA_ANSWER}</p>
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <LandingButton href={`/${locale}/anagram/listen`}>Prova med listen →</LandingButton>
+            <LandingButton href={`/${locale}/multiplayer`} variant="secondary">Spela live →</LandingButton>
           </div>
-        </section>
+        </LandingHero>
+      ) : (
+        <LandingHero
+          title="Anagram Solver"
+          lead="Enter any letters in the URL and instantly see every valid English word you can make. Free, no signup, no download. Powered by the same dictionary that runs the LexiClash multiplayer word game."
+          art={LANDING_ART.solver('')}
+          artTone="cyan"
+        />
+      )}
 
-        <section className="mb-10">
-          <h2 className="text-xl font-neo-display font-bold text-neo-cyan uppercase tracking-wider mb-4">
-            How It Works
-          </h2>
-          <ol className="text-slate-300 space-y-2 list-decimal list-inside">
-            <li>Visit <code className="text-neo-lime">/anagram/yourletters</code> — replace yourletters with 2-10 a-z characters.</li>
+      <Section title="Popular Anagram Lookups" intro="Tap any seed to see every word you can make from those letters.">
+        <LinkPills
+          items={POPULAR_SEEDS.map((letters) => ({
+            href: `/${locale}/anagram/${letters}`,
+            label: <span className="uppercase">{letters}</span>,
+          }))}
+        />
+      </Section>
+
+      <Section title="How It Works">
+        <Prose paper>
+          <ol>
+            <li>Visit <code className="rounded bg-neo-black/10 px-1">/anagram/yourletters</code> — replace yourletters with 2-10 a-z characters.</li>
             <li>Every valid word that fits within your letter pool appears, grouped by length.</li>
             <li>Tap any word to see its score and definition page.</li>
           </ol>
-        </section>
+        </Prose>
+      </Section>
 
+      <div className="flex flex-col gap-2 empty:hidden">
         <EsScrabbleCrossLink locale={locale} anchorVariant="anagram" queryAnchor />
         <SvScrabbleCrossLink locale={locale} anchorVariant="anagram" />
         <EnBoggleCrossLink locale={locale} anchorVariant="anagram" />
         <HeScrabbleCrossLink locale={locale} anchorVariant="anagram" />
-
-        <section className="mb-10">
-          <h2 className="text-xl font-neo-display font-bold text-neo-cyan uppercase tracking-wider mb-4">
-            Related Tools
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Link
-              href={`/${locale}/tools/word-solver`}
-              className="bg-neo-navy border-2 border-neo-black rounded-neo p-4 shadow-hard hover:border-neo-cyan transition-[border-color]"
-            >
-              <div className="font-neo-display font-bold text-neo-white">Word Solver</div>
-              <div className="text-xs text-slate-400 mt-1">Interactive UI version</div>
-            </Link>
-            <Link
-              href={`/${locale}/words`}
-              className="bg-neo-navy border-2 border-neo-black rounded-neo p-4 shadow-hard hover:border-neo-cyan transition-[border-color]"
-            >
-              <div className="font-neo-display font-bold text-neo-white">Words Dictionary</div>
-              <div className="text-xs text-slate-400 mt-1">Browse by length or letter</div>
-            </Link>
-            <Link
-              href={`/${locale}/multiplayer`}
-              className="bg-neo-navy border-2 border-neo-black rounded-neo p-4 shadow-hard hover:border-neo-lime transition-[border-color]"
-            >
-              <div className="font-neo-display font-bold text-neo-white">Play LexiClash</div>
-              <div className="text-xs text-slate-400 mt-1">Real-time word game</div>
-            </Link>
-          </div>
-        </section>
       </div>
-      <GamePageSeoContent
+
+      <Section title="Related Tools">
+        <TileGrid
+          items={[
+            { href: `/${locale}/tools/word-solver`, title: 'Word Solver', body: 'Interactive UI version', tone: 'cyan' },
+            { href: `/${locale}/words`, title: 'Words Dictionary', body: 'Browse by length or letter', tone: 'yellow' },
+            { href: `/${locale}/multiplayer`, title: 'Play LexiClash', body: 'Real-time word game', tone: 'lime' },
+          ]}
+        />
+      </Section>
+
+      <SeoKitBlock
         title={seoData.title}
         description={seoData.description}
         features={seoData.features}
         faq={seoData.faq}
       />
-    </div>
+    </LandingPage>
   );
 }

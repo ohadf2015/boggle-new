@@ -1,26 +1,18 @@
 'use client';
 
-import Link from 'next/link';
-import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import { useTheme } from '@/utils/ThemeContext';
-import { safeToLocaleDateString } from '@/utils/bcp47Locale';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
-import { ArrowLeft, Calendar, Clock, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import AutoHideHeader from '@/components/AutoHideHeader';
 import { InlineBannerAd } from '@/components/ads';
 import { RelatedArticles } from '@/components/blog/RelatedArticles';
 import { contentByLocale } from './content';
 import { AuthorBioCard } from '@/components/blog/AuthorBioCard';
+import { BlogPostLayout } from '@/components/blog/BlogPostLayout';
+import { Section, TileGrid } from '@/components/landing/kit';
 
 export default function WordGamesEducationPageClient(): React.ReactElement {
   const { language } = useLanguage();
-  const { theme } = useTheme();
   const params = useParams();
   const locale = (params.locale as string) || language;
-  const isDarkMode = theme === 'dark';
 
   const content = contentByLocale[locale] || contentByLocale.en;
 
@@ -54,166 +46,62 @@ export default function WordGamesEducationPageClient(): React.ReactElement {
   }));
 
   return (
-    <div className={cn(
-      'min-h-screen flex flex-col',
-      isDarkMode
-        ? 'bg-neo-navy'
-        : 'bg-linear-to-br from-neo-cream via-white to-neo-cream'
-    )}>
-      <AutoHideHeader />
-
-      <article className="max-w-3xl mx-auto px-4 py-8 page-content-safe">
-        <Link href={`/${locale}/blog`}>
-          <Button
-            variant="outline"
-            size="sm"
-            className={cn(
-              'mb-6 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-neo-navy-light text-white hover:bg-neo-navy-elevated' : 'bg-white text-neo-black hover:bg-neo-cream'
-            )}
-          >
-            <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
-            {content.backToBlog}
-          </Button>
-        </Link>
-
-        <header className="mb-8">
-          <div className="mb-4">
-            <span className={cn(
-              'inline-block px-3 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black',
-              'bg-neo-lime text-neo-black'
-            )}>
-              {content.category}
-            </span>
-          </div>
-
-          <h1 className={cn(
-            'text-3xl md:text-4xl font-black mb-3 leading-tight',
-            isDarkMode ? 'text-white' : 'text-neo-black'
-          )}>
-            {content.title}
-          </h1>
-
-          <p className={cn(
-            'text-lg mb-4 leading-relaxed',
-            isDarkMode ? 'text-gray-300' : 'text-gray-600'
-          )}>
-            {content.subtitle}
-          </p>
-
-          <div className={cn(
-            'flex flex-wrap items-center gap-4 text-sm mb-6',
-            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-          )}>
-            <span className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              {safeToLocaleDateString(new Date('2026-01-27'), language, { month: 'long', day: 'numeric', year: 'numeric' })}
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              {content.readTime}
-            </span>
-          </div>
-
-          {/* Hero Image */}
-          <div className="relative w-full h-64 md:h-80 rounded-neo border-3 border-neo-black overflow-hidden shadow-hard mb-6">
-            <Image
-              src="/images/blog/kids-education.jpg"
-              alt="Children playing word games in a classroom setting"
-              fill
-              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
-              className="object-cover"
-              priority
-            />
-          </div>
-        </header>
-
-        {/* Ad: After header */}
-        <InlineBannerAd webZone="content-page" className="my-6" />
-
-        <div className={cn(
-          'prose prose-lg max-w-none',
-          isDarkMode ? 'prose-invert' : ''
-        )}>
-          {content.sections.map((section, index) => (
-            <div key={`section-${index}`} className="mb-6">
-              {section.title && (
-                <h2 className={cn(
-                  'text-xl font-bold mb-3 mt-8',
-                  isDarkMode ? 'text-white' : 'text-neo-black'
-                )}>
-                  {section.title}
-                </h2>
-              )}
-              {section.content.split('\n\n').map((paragraph, pIndex) => (
-                <p
-                  key={`section-${index}-p-${pIndex}`}
-                  className={cn(
-                    'mb-4 leading-relaxed',
-                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                  )}
-                >
-                  {paragraph}
-                </p>
-              ))}
-              {/* Ad: After 4th section */}
-              {index === 3 && <InlineBannerAd webZone="content-page" className="my-6" />}
-            </div>
-          ))}
-
-
-          {/* Ad: Before CTAs */}
-          <InlineBannerAd webZone="content-page" className="my-6" />
-
-          <div className={cn('mt-12 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>
-            <div className="flex flex-wrap gap-4">
-              <Link href={`/${locale}/daily`}>
-                <Button className="rounded-neo border-3 border-neo-black bg-neo-yellow text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
-                  {content.tryDaily}
-                </Button>
-              </Link>
-              <Link href={`/${locale}/quick-play`}>
-                <Button className="rounded-neo border-3 border-neo-black bg-neo-orange text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
-                  {content.practice}
-                </Button>
-              </Link>
-            </div>
-          </div>
-
-          {/* Education-specific CTAs — surface the dedicated teacher/classroom landings.
-              Locale-gated to en because the linked landings are EN-only target. */}
+    <BlogPostLayout
+      locale={locale}
+      backLabel={content.backToBlog}
+      category={content.category}
+      categoryTone="lime"
+      title={content.title}
+      subtitle={content.subtitle}
+      date="2026-01-27"
+      readTime={content.readTime}
+      image={{ src: "/images/blog/kids-education.jpg", alt: "Children playing word games in a classroom setting" }}
+      ctas={[
+        { href: `/${locale}/daily`, label: content.tryDaily },
+        { href: `/${locale}/quick-play`, label: content.practice },
+      ]}
+      after={
+        <>
           {locale === 'en' && (
-            <div className={cn('mt-8 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>
-              <h3 className={cn('mb-4 font-neo-display text-lg font-bold uppercase', isDarkMode ? 'text-neo-white' : 'text-neo-navy')}>
-                For teachers running classroom vocabulary
-              </h3>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <Link href={`/${locale}/education/vocabulary-games-classroom`} className="group rounded-neo border-3 border-neo-black bg-neo-cyan p-4 shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
-                  <span className="block font-neo-display text-sm font-black uppercase tracking-widest text-neo-navy">Vocabulary Games for Classroom</span>
-                  <span className="mt-2 block text-xs text-neo-navy/80">No signup, 6 languages, free to start.</span>
-                </Link>
-                <Link href={`/${locale}/education/esl-word-games`} className="group rounded-neo border-3 border-neo-black bg-neo-pink p-4 shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
-                  <span className="block font-neo-display text-sm font-black uppercase tracking-widest text-neo-white">ESL Vocabulary Games Online</span>
-                  <span className="mt-2 block text-xs text-neo-white">Three levels, 6 dictionaries, no student accounts.</span>
-                </Link>
-                <Link href={`/${locale}/education/games-for-teachers`} className="group rounded-neo border-3 border-neo-black bg-neo-purple p-4 shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
-                  <span className="block font-neo-display text-sm font-black uppercase tracking-widest text-neo-white">Word Games for Teachers</span>
-                  <span className="mt-2 block text-xs text-neo-white">Sub-day, brain-break, warm-up — zero prep.</span>
-                </Link>
-              </div>
-            </div>
+            <Section title="For teachers running classroom vocabulary">
+              <TileGrid
+                items={[
+                  { href: `/${locale}/education/vocabulary-games-classroom`, title: 'Vocabulary Games for Classroom', body: 'No signup, 6 languages, free to start.', tone: 'cyan' },
+                  { href: `/${locale}/education/esl-word-games`, title: 'ESL Vocabulary Games Online', body: 'Three levels, 6 dictionaries, no student accounts.', tone: 'pink' },
+                  { href: `/${locale}/education/games-for-teachers`, title: 'Word Games for Teachers', body: 'Sub-day, brain-break, warm-up — zero prep.', tone: 'yellow' },
+                ]}
+              />
+            </Section>
           )}
-
           <AuthorBioCard />
-
           <RelatedArticles
             currentSlug="word-games-for-kids-education"
             locale={locale}
             heading={relatedHeading}
             articles={relatedArticlesData}
           />
+        </>
+      }
+    >
+      {content.sections.map((section, index) => (
+        <div key={`section-${index}`} className="mb-6">
+          {section.title && (
+            <h2 className="text-xl font-bold mb-3 mt-8 text-neo-black">
+              {section.title}
+            </h2>
+          )}
+          {section.content.split('\n\n').map((paragraph, pIndex) => (
+            <p
+              key={`section-${index}-p-${pIndex}`}
+              className="mb-4 leading-relaxed"
+            >
+              {paragraph}
+            </p>
+          ))}
+          {/* Ad: After 4th section */}
+          {index === 3 && <InlineBannerAd webZone="content-page" className="my-6" />}
         </div>
-      </article>
-    </div>
+      ))}
+    </BlogPostLayout>
   );
 }

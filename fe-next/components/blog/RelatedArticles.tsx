@@ -3,8 +3,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Clock } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
 
 interface RelatedArticle {
   slug: string;
@@ -49,9 +47,6 @@ interface RelatedArticlesProps {
 }
 
 export function RelatedArticles({ currentSlug, locale, heading, articles }: RelatedArticlesProps) {
-  const { theme } = useTheme();
-  const isDarkMode = theme === 'dark';
-
   const relatedSlugs = RELATED_MAP[currentSlug] || [];
   const related = relatedSlugs
     .map((slug) => {
@@ -65,49 +60,25 @@ export function RelatedArticles({ currentSlug, locale, heading, articles }: Rela
   if (related.length === 0) return null;
 
   return (
-    <section className={cn('mt-12 pt-8 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>
-      <h2 className={cn(
-        'text-xl font-black uppercase mb-6',
-        isDarkMode ? 'text-white' : 'text-neo-black'
-      )}>
-        {heading}
-      </h2>
+    <section className="flex flex-col gap-5">
+      <h2 className="font-neo-display text-2xl font-bold leading-tight sm:text-3xl">{heading}</h2>
       <div className="grid gap-4 sm:grid-cols-3">
         {related.map((article) => (
           <Link
             key={article.slug}
             href={`/${locale}/blog/${article.slug}`}
-            className={cn(
-              'group block rounded-neo border-3 border-neo-black overflow-hidden transition hover:scale-[1.02]',
-              isDarkMode
-                ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
-                : 'bg-white hover:bg-neo-cream shadow-hard-sm hover:shadow-hard'
-            )}
+            className="group flex flex-col overflow-hidden rounded-neo-lg border-3 border-neo-black bg-neo-cream text-neo-black shadow-hard-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-white motion-safe:transition-transform motion-safe:hover:-translate-y-1"
           >
-            <div className="relative w-full aspect-16/10 overflow-hidden">
-              <Image
-                src={article.image}
-                alt={article.title}
-                fill
-                sizes="(max-width: 640px) 100vw, 33vw"
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
-              />
+            <div className="relative aspect-16/10 w-full overflow-hidden border-b-3 border-neo-black">
+              <Image src={article.image} alt={article.title} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover" />
             </div>
-            <div className="p-3">
-              <span className={cn(
-                'inline-block px-2 py-0.5 text-[10px] font-bold uppercase rounded-neo border border-neo-black mb-2',
-                'bg-neo-yellow text-neo-black'
-              )}>
+            <div className="flex flex-col gap-2 p-4">
+              <span className="self-start rounded-full border-2 border-neo-black bg-neo-yellow px-2 py-0.5 text-[11px] font-bold uppercase">
                 {article.category}
               </span>
-              <h3 className={cn(
-                'text-sm font-bold line-clamp-2 group-hover:text-neo-yellow transition-colors',
-                isDarkMode ? 'text-white' : 'text-neo-black'
-              )}>
-                {article.title}
-              </h3>
-              <span className={cn('flex items-center gap-1 text-xs mt-2', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
-                <Clock className="w-3 h-3" />
+              <h3 className="line-clamp-2 font-neo-display text-base font-bold leading-snug">{article.title}</h3>
+              <span className="flex items-center gap-1 text-xs text-neo-black/70">
+                <Clock aria-hidden className="h-3 w-3" />
                 {article.readTime}
               </span>
             </div>

@@ -1,27 +1,23 @@
 'use client';
 
 import React, { useState } from 'react';
-import { m } from 'framer-motion';
 import { ArrowLeft, Send, Mail, MessageSquare, User, CheckCircle, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { useRouter } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import { Button } from '@/components/ui/button';
+import { LandingPage, landingButtonClass } from '@/components/landing/kit';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { InstagramIcon } from '@/components/icons/SocialIcons';
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
 
-export default function ContactPageClient(): React.JSX.Element {
-  const { theme } = useTheme();
+export default function ContactPageClient({ children }: { children?: React.ReactNode }): React.JSX.Element {
   const { t, language } = useLanguage();
   const router = useRouter();
-  const isDarkMode = theme === 'dark';
 
   const [formData, setFormData] = useState({
     name: '',
@@ -63,280 +59,161 @@ export default function ContactPageClient(): React.JSX.Element {
 
   const isValid = formData.name.trim() && formData.email.trim() && formData.message.trim();
 
+  const field = 'min-h-12 rounded-neo-lg border-3 border-neo-black bg-neo-white text-base text-neo-black dark:border-neo-black dark:bg-neo-white dark:text-neo-black placeholder:text-neo-black/45 focus-visible:ring-3 focus-visible:ring-neo-cyan';
+  const label = 'flex items-center gap-2 text-sm font-bold';
+  const contactCard = 'flex items-center gap-4 rounded-neo-lg border-3 border-neo-black p-4 text-neo-black shadow-hard-xl motion-safe:transition-transform motion-safe:hover:-translate-y-1';
+
   return (
-    <div className={cn(
-      'flex-1 flex flex-col',
-      isDarkMode
-        ? 'bg-neo-navy'
-        : 'bg-linear-to-br from-neo-cream via-white to-neo-cream'
-    )}>
+    <div className="flex flex-1 flex-col bg-neo-navy">
       <AutoHideHeader />
 
-      <div className={cn(
-        "max-w-2xl mx-auto px-4 page-content-safe",
-        // Reduced padding: mobile 12px, desktop 16px (was 24px)
-        "py-3 sm:py-4"
-      )}>
-        {/* Header */}
-        <m.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          // Reduced margin: mobile 12px, sm 16px (was 24px)
-          className="flex items-center gap-4 mb-3 sm:mb-4"
-        >
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => router.push(`/${language}`)}
-            className={cn(
-              'rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-neo-navy-light text-white hover:bg-neo-navy-elevated hover:text-white' : 'bg-white text-neo-black hover:bg-neo-cream'
-            )}
-          >
-            <DirectionalIcon icon={ArrowLeft} className="w-4 h-4 me-1" />
-            {t('common.back')}
-          </Button>
-          <h1 className={cn(
-            'text-2xl font-black uppercase',
-            isDarkMode ? 'text-white' : 'text-neo-black'
-          )}>
-            {t('contact.title')}
-          </h1>
-        </m.div>
-
-        {/* Social Links */}
-        <m.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          // Reduced margin: mobile 16px, sm 20px (was 32px)
-          className="mb-4 sm:mb-5"
-        >
-          <h2 className={cn(
-            'text-sm font-black uppercase mb-3 flex items-center gap-2',
-            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-          )}>
-            <MessageSquare className="w-4 h-4" />
-            {t('contact.connectWithUs')}
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {/* Instagram */}
-            <a
-              href="https://www.instagram.com/lexi.clash"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={cn(
-                'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-[translate,scale,rotate,transform,background-color,box-shadow] hover:scale-[1.02]',
-                isDarkMode
-                  ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
-                  : 'bg-white hover:bg-neo-cream shadow-hard hover:shadow-hard-lg'
-              )}
+      <LandingPage locale={language} topBar={false} className="max-w-5xl">
+        <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-12 lg:pt-6">
+          <div className="flex flex-col gap-6">
+            <button
+              type="button"
+              onClick={() => router.push(`/${language}`)}
+              className="inline-flex min-h-11 items-center gap-1.5 self-start rounded-full border-2 border-neo-white/25 px-4 text-sm font-bold text-neo-white/85 hover:border-neo-white/60 hover:text-neo-white"
             >
-              <div className={cn(
-                'w-12 h-12 rounded-lg flex items-center justify-center border-2 border-neo-black',
-                'bg-linear-to-br from-purple-500 via-pink-500 to-orange-400'
-              )}>
-                <InstagramIcon className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className={cn('font-bold', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                  Instagram
-                </p>
-                <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                  @lexi.clash
-                </p>
-              </div>
-            </a>
+              <DirectionalIcon icon={ArrowLeft} className="h-4 w-4" />
+              {t('common.back')}
+            </button>
+            <h1 className="font-neo-display text-[2rem] font-bold leading-[1.1] sm:text-5xl">{t('contact.title')}</h1>
 
-            {/* Email */}
-            <a
-              href="mailto:lexiclash.game@gmail.com"
-              className={cn(
-                'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-[translate,scale,rotate,transform,background-color,box-shadow] hover:scale-[1.02]',
-                isDarkMode
-                  ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
-                  : 'bg-white hover:bg-neo-cream shadow-hard hover:shadow-hard-lg'
-              )}
-            >
-              <div className={cn(
-                'w-12 h-12 rounded-lg flex items-center justify-center border-2 border-neo-black bg-neo-cyan'
-              )}>
-                <Mail className="w-6 h-6 text-neo-black" />
-              </div>
-              <div>
-                <p className={cn('font-bold', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                  {t('contact.emailLabel')}
-                </p>
-                <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                  lexiclash.game@gmail.com
-                </p>
-              </div>
-            </a>
+            <section className="flex flex-col gap-3">
+              <h2 className="flex items-center gap-2 font-neo-display text-xl font-bold">
+                <MessageSquare aria-hidden className="h-5 w-5" />
+                {t('contact.connectWithUs')}
+              </h2>
+              <a href="https://www.instagram.com/lexi.clash" target="_blank" rel="noopener noreferrer" className={cn(contactCard, 'bg-neo-pink')}>
+                <span className="flex h-12 w-12 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cream">
+                  <InstagramIcon className="h-6 w-6 text-neo-black" />
+                </span>
+                <span>
+                  <span className="block font-bold">Instagram</span>
+                  <span className="block text-sm">@lexi.clash</span>
+                </span>
+              </a>
+              <a href="mailto:lexiclash.game@gmail.com" className={cn(contactCard, 'bg-neo-cyan')}>
+                <span className="flex h-12 w-12 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cream">
+                  <Mail aria-hidden className="h-6 w-6" />
+                </span>
+                <span>
+                  <span className="block font-bold">{t('contact.emailLabel')}</span>
+                  <span className="block text-sm">lexiclash.game@gmail.com</span>
+                </span>
+              </a>
+            </section>
           </div>
-        </m.section>
 
-        {/* Contact Form */}
-        <m.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <h2 className={cn(
-            'text-sm font-black uppercase mb-3 flex items-center gap-2',
-            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-          )}>
-            <Send className="w-4 h-4" />
-            {t('contact.sendMessage')}
-          </h2>
+          <section className="rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-xl sm:p-7">
+            <h2 className="mb-4 flex items-center gap-2 font-neo-display text-xl font-bold">
+              <Send aria-hidden className="h-5 w-5" />
+              {t('contact.sendMessage')}
+            </h2>
 
-          {status === 'success' ? (
-            <m.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className={cn(
-                'p-6 rounded-neo border-3 border-neo-black text-center',
-                isDarkMode ? 'bg-neo-navy-light' : 'bg-white shadow-hard'
-              )}
-            >
-              <CheckCircle className="w-12 h-12 mx-auto mb-3 text-neo-lime" />
-              <h3 className={cn('text-lg font-bold mb-2', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                {t('contact.successTitle')}
-              </h3>
-              <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                {t('contact.successMessage')}
-              </p>
-              <Button
-                onClick={() => setStatus('idle')}
-                className="mt-4 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black font-bold shadow-hard hover:shadow-hard-lg"
-              >
-                {t('contact.sendAnother')}
-              </Button>
-            </m.div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Name Field */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="name"
-                  className={cn('text-sm font-bold flex items-center gap-2', isDarkMode ? 'text-white' : 'text-neo-black')}
-                >
-                  <User className="w-4 h-4" />
-                  {t('contact.nameLabel')}
-                  <span className="text-neo-red">*</span>
-                </label>
-                <Input
-                  id="name"
-                  name="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder={t('contact.namePlaceholder')}
-                  required
-                  disabled={status === 'submitting'}
-                />
+            {status === 'success' ? (
+              <div className="py-4 text-center">
+                <CheckCircle aria-hidden className="mx-auto mb-3 h-12 w-12" />
+                <h3 className="mb-2 text-lg font-bold">{t('contact.successTitle')}</h3>
+                <p className="text-sm">{t('contact.successMessage')}</p>
+                <button type="button" onClick={() => setStatus('idle')} className={cn(landingButtonClass('primary'), 'mt-4')}>
+                  {t('contact.sendAnother')}
+                </button>
               </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label htmlFor="name" className={label}>
+                    <User aria-hidden className="h-4 w-4" />
+                    {t('contact.nameLabel')}
+                    <span className="text-neo-red">*</span>
+                  </label>
+                  <Input
+                    id="name"
+                    name="name"
+                    type="text"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder={t('contact.namePlaceholder')}
+                    required
+                    disabled={status === 'submitting'}
+                    className={field}
+                  />
+                </div>
 
-              {/* Email Field */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="email"
-                  className={cn('text-sm font-bold flex items-center gap-2', isDarkMode ? 'text-white' : 'text-neo-black')}
-                >
-                  <Mail className="w-4 h-4" />
-                  {t('contact.emailLabel')}
-                  <span className="text-neo-red">*</span>
-                </label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder={t('contact.emailPlaceholder')}
-                  required
-                  disabled={status === 'submitting'}
-                />
-              </div>
+                <div className="space-y-1.5">
+                  <label htmlFor="email" className={label}>
+                    <Mail aria-hidden className="h-4 w-4" />
+                    {t('contact.emailLabel')}
+                    <span className="text-neo-red">*</span>
+                  </label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder={t('contact.emailPlaceholder')}
+                    required
+                    disabled={status === 'submitting'}
+                    className={field}
+                  />
+                </div>
 
-              {/* Message Field */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="message"
-                  className={cn('text-sm font-bold flex items-center gap-2', isDarkMode ? 'text-white' : 'text-neo-black')}
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  {t('contact.messageLabel')}
-                  <span className="text-neo-red">*</span>
-                </label>
-                <Textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder={t('contact.messagePlaceholder')}
-                  required
-                  disabled={status === 'submitting'}
-                  rows={5}
-                  className="resize-none"
-                />
-              </div>
+                <div className="space-y-1.5">
+                  <label htmlFor="message" className={label}>
+                    <MessageSquare aria-hidden className="h-4 w-4" />
+                    {t('contact.messageLabel')}
+                    <span className="text-neo-red">*</span>
+                  </label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    placeholder={t('contact.messagePlaceholder')}
+                    required
+                    disabled={status === 'submitting'}
+                    rows={5}
+                    className={cn(field, 'resize-none')}
+                  />
+                </div>
 
-              {/* Error Message */}
-              {status === 'error' && (
-                <m.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-2 p-3 rounded-neo border-2 border-neo-red bg-neo-red/10 text-neo-red"
-                >
-                  <AlertCircle className="w-5 h-5 shrink-0" />
-                  <p className="text-sm font-medium">{errorMessage || t('contact.errorMessage')}</p>
-                </m.div>
-              )}
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                disabled={!isValid || status === 'submitting'}
-                className={cn(
-                  'w-full rounded-neo border-3 border-neo-black font-bold text-lg py-6',
-                  'bg-neo-lime text-neo-black shadow-hard',
-                  'hover:bg-neo-orange hover:shadow-hard-lg',
-                  'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-hard',
-                  'transition-[background-color,box-shadow,opacity] duration-150'
+                {status === 'error' && (
+                  <div className="flex items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-pink p-3">
+                    <AlertCircle aria-hidden className="h-5 w-5 shrink-0" />
+                    <p className="text-sm font-bold">{errorMessage || t('contact.errorMessage')}</p>
+                  </div>
                 )}
-              >
-                {status === 'submitting' ? (
-                  <>
-                    <Loader size="sm" />
-                    <span className="ms-2">{t('contact.sending')}</span>
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-5 h-5 me-2" />
-                    {t('contact.submit')}
-                  </>
-                )}
-              </Button>
-            </form>
-          )}
-        </m.section>
 
-        {/* Footer Note */}
-        <m.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className={cn(
-            // Reduced margin: 16px top, 8px padding (was 32px/16px)
-            'mt-4 pt-2 border-t text-center',
-            isDarkMode ? 'border-slate-700' : 'border-gray-200'
-          )}
-        >
-          <p className={cn('text-xs', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
-            {t('contact.responseTime')}
-          </p>
-        </m.div>
-      </div>
+                <button
+                  type="submit"
+                  disabled={!isValid || status === 'submitting'}
+                  className={cn(
+                    landingButtonClass('primary'),
+                    'w-full disabled:cursor-not-allowed disabled:border-dashed disabled:bg-neo-navy/10 disabled:text-neo-black/65 disabled:shadow-none disabled:hover:translate-y-0',
+                  )}
+                >
+                  {status === 'submitting' ? (
+                    <>
+                      <Loader size="sm" />
+                      <span className="ms-2">{t('contact.sending')}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send aria-hidden className="h-5 w-5" />
+                      {t('contact.submit')}
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
+            <p className="mt-4 border-t-2 border-neo-black/15 pt-3 text-center text-xs text-neo-black/70">{t('contact.responseTime')}</p>
+          </section>
+        </div>
+        {children}
+      </LandingPage>
     </div>
   );
 }

@@ -175,21 +175,21 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
             <PopIn className="w-16 h-16 shrink-0 bg-neo-lime text-neo-black font-neo-display font-black text-4xl flex items-center justify-center rounded-neo border-3 border-neo-black shadow-[0_4px_0_0] shadow-neo-lime-dark">
               {upper}
             </PopIn>
-            <h1 className="text-3xl sm:text-4xl font-neo-display font-black text-neo-lime">
+            <h1 className="font-neo-display text-[2rem] font-bold leading-[1.1] text-balance sm:text-5xl">
               {totalWords} Words That Start With {upper}
             </h1>
           </div>
-          <p className="flex flex-wrap gap-x-4 gap-y-1 text-neo-cream/70">
-            <span><strong className="text-neo-cyan text-lg">{totalWords}</strong> total words</span>
-            <span><strong className="text-neo-lime text-lg">{sortedLengths.length}</strong> length groups</span>
-            <span><strong className="text-neo-cyan text-lg">{sortedLengths[0]}–{sortedLengths[sortedLengths.length - 1]}</strong> letters</span>
+          <p className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-neo-white/80">
+            <span><strong className="me-1 rounded-neo border-2 border-neo-black bg-neo-cyan px-2 text-lg text-neo-black">{totalWords}</strong> total words</span>
+            <span><strong className="me-1 rounded-neo border-2 border-neo-black bg-neo-lime px-2 text-lg text-neo-black">{sortedLengths.length}</strong> length groups</span>
+            <span><strong className="me-1 rounded-neo border-2 border-neo-black bg-neo-cyan px-2 text-lg text-neo-black">{sortedLengths[0]}–{sortedLengths[sortedLengths.length - 1]}</strong> letters</span>
           </p>
 
           <div className="mt-6">
             <Link href={`/${locale}/quick-play`} data-press data-primary-cta className={PRIMARY_CTA}>
               Play Free Now →
             </Link>
-            <p className="text-neo-cream/60 text-sm mt-3">
+            <p className="mt-3 text-sm text-neo-white/70">
               Free, no signup required — play instantly.
             </p>
           </div>
@@ -221,10 +221,10 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
               <div key={len}>
                 <section>
                   <div className="flex flex-wrap items-baseline gap-x-3 mb-3">
-                    <h2 className="text-xl sm:text-2xl font-neo-display font-black text-neo-cyan">
+                    <h2 className="font-neo-display text-2xl font-bold text-neo-white">
                       {len}-Letter Words Starting With {upper}
                     </h2>
-                    <Link href={`/${locale}/words/${len}-letter-words`} className="text-xs text-neo-cream/60 hover:text-neo-cyan transition-colors">
+                    <Link href={`/${locale}/words/${len}-letter-words`} className="text-sm font-bold text-neo-white/70 underline underline-offset-2 hover:text-neo-white">
                       see all {len}-letter words →
                     </Link>
                   </div>
@@ -237,7 +237,7 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
                         className={`${CHIP} flex items-center justify-between px-3 py-2`}
                       >
                         <span className="font-bold text-sm uppercase tracking-wide">{word}</span>
-                        <span className="text-xs font-bold text-neo-cyan ms-1 shrink-0">{getWordScore(word)}pt</span>
+                        <span className="ms-1 shrink-0 rounded bg-neo-black px-1.5 py-0.5 text-xs font-bold text-neo-lime">{getWordScore(word)}pt</span>
                       </Link>
                     ))}
                   </div>
@@ -281,11 +281,11 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
 
           <InlineBannerAd webZone="content-page" className="mt-10" />
 
-          <div className="mt-12 max-w-2xl space-y-3">
+          <div className="mt-14 max-w-3xl space-y-3">
             {letterInfo && (
-              <p className="text-neo-cream/85 text-lg leading-relaxed">{letterInfo.intro}</p>
+              <p className="text-lg leading-relaxed text-neo-white/85">{letterInfo.intro}</p>
             )}
-            <p className="text-neo-cream/70 leading-relaxed">
+            <p className="leading-relaxed text-neo-white/75">
               Complete list of words starting with {upper}, from {sortedLengths[0]}-letter
               to {sortedLengths[sortedLengths.length - 1]}-letter words. Each word shows its
               game score — tap any word for its definition.
@@ -293,75 +293,75 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
           </div>
 
           {/* FAQ section — renders as FAQ rich snippet in Google */}
-          <section className="mt-10 max-w-2xl">
-            <h2 className="text-2xl font-neo-display font-black text-neo-lime mb-3">
+          <section className="mt-14 max-w-3xl">
+            <h2 className="mb-4 font-neo-display text-2xl font-bold text-neo-black sm:text-3xl">
               Frequently Asked Questions
             </h2>
-            <div className="divide-y divide-neo-cream/15">
+            <div className="divide-y-2 divide-neo-black/15 rounded-neo-lg border-3 border-neo-black bg-neo-cream px-5 text-neo-black shadow-hard-xl">
               <details className="group py-4" open>
-                <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
+                <summary className="font-bold text-neo-black cursor-pointer list-none flex items-center justify-between">
                   How many words start with {upper}?
-                  <span className="text-neo-cream/50 group-open:rotate-180 transition-transform">▾</span>
+                  <span className="text-neo-black/50 group-open:rotate-180 transition-transform">▾</span>
                 </summary>
-                <div className="mt-3 text-neo-cream/80 text-sm leading-relaxed space-y-2">
+                <div className="mt-3 text-neo-black/85 text-sm leading-relaxed space-y-2">
                   <p>
-                    There are <strong className="text-neo-lime">{totalWords} words</strong> that start with the letter {upper} in the
+                    There are <strong className="font-bold">{totalWords} words</strong> that start with the letter {upper} in the
                     LexiClash dictionary, ranging from {sortedLengths[0]} to {sortedLengths[sortedLengths.length - 1]} letters long.
                     The most common lengths are {sortedLengths.filter(l => (grouped[l]?.length ?? 0) > 5).slice(0, 3).join(', ')} letters.
                   </p>
-                  {letterInfo && <p className="text-neo-cream/70">{letterInfo.funFact}</p>}
+                  {letterInfo && <p className="text-neo-black/75">{letterInfo.funFact}</p>}
                 </div>
               </details>
               <details className="group py-4">
-                <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
+                <summary className="font-bold text-neo-black cursor-pointer list-none flex items-center justify-between">
                   What are common words that start with {upper}?
-                  <span className="text-neo-cream/50 group-open:rotate-180 transition-transform">▾</span>
+                  <span className="text-neo-black/50 group-open:rotate-180 transition-transform">▾</span>
                 </summary>
-                <div className="mt-3 text-neo-cream/80 text-sm leading-relaxed space-y-2">
+                <div className="mt-3 text-neo-black/85 text-sm leading-relaxed space-y-2">
                   <p>
                     Some popular {upper}-words include{' '}
                     <strong>{words.slice(0, 8).map(w => w.toUpperCase()).join(', ')}</strong>.
                     Browse the full list above organized by word length, with game scores for each word.
                   </p>
-                  {letterInfo && <p className="text-neo-cream/70">{letterInfo.intro}</p>}
+                  {letterInfo && <p className="text-neo-black/75">{letterInfo.intro}</p>}
                 </div>
               </details>
               <details className="group py-4">
-                <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
+                <summary className="font-bold text-neo-black cursor-pointer list-none flex items-center justify-between">
                   How can I practice words starting with {upper}?
-                  <span className="text-neo-cream/50 group-open:rotate-180 transition-transform">▾</span>
+                  <span className="text-neo-black/50 group-open:rotate-180 transition-transform">▾</span>
                 </summary>
-                <div className="mt-3 text-neo-cream/80 text-sm leading-relaxed space-y-2">
+                <div className="mt-3 text-neo-black/85 text-sm leading-relaxed space-y-2">
                   <p>
                     LexiClash is a free word game where you find words on a letter grid under time pressure.
                     It&apos;s the best way to practice vocabulary and improve your word skills.
                   </p>
-                  {letterInfo && <p className="text-neo-cream/70">{letterInfo.strategy}</p>}
-                  <Link href={`/${locale}/quick-play`} className="inline-block font-bold text-neo-cyan hover:underline">
+                  {letterInfo && <p className="text-neo-black/75">{letterInfo.strategy}</p>}
+                  <Link href={`/${locale}/quick-play`} className="inline-block font-bold underline decoration-neo-pink decoration-2 underline-offset-2">
                     Start Practicing →
                   </Link>
                 </div>
               </details>
               <details className="group py-4">
-                <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
+                <summary className="font-bold text-neo-black cursor-pointer list-none flex items-center justify-between">
                   What is the highest-scoring {upper}-word?
-                  <span className="text-neo-cream/50 group-open:rotate-180 transition-transform">▾</span>
+                  <span className="text-neo-black/50 group-open:rotate-180 transition-transform">▾</span>
                 </summary>
-                <p className="mt-3 text-neo-cream/80 text-sm leading-relaxed">
+                <p className="mt-3 text-neo-black/85 text-sm leading-relaxed">
                   The highest-scoring word starting with {upper} is{' '}
-                  <strong className="text-neo-lime">{words[words.length - 1]?.toUpperCase()}</strong> worth{' '}
-                  <strong className="text-neo-cyan">{getWordScore(words[words.length - 1])} points</strong>.
+                  <strong className="font-bold">{words[words.length - 1]?.toUpperCase()}</strong> worth{' '}
+                  <strong className="font-bold">{getWordScore(words[words.length - 1])} points</strong>.
                   Longer words earn more points — find them on the grid to boost your score.
                 </p>
               </details>
             </div>
           </section>
 
-          <div className="mt-10 border-2 border-neo-black rounded-neo bg-neo-navy-light/50 p-6 text-center">
-            <p className="font-neo-display font-black text-2xl text-neo-white mb-2">
+          <div className="mt-14 rounded-neo-lg border-3 border-neo-black bg-neo-pink p-6 text-center text-neo-black shadow-hard-xl sm:p-10">
+            <p className="mb-2 font-neo-display text-2xl font-bold sm:text-3xl">
               Ready to test your {upper}-word skills?
             </p>
-            <p className="text-neo-cream/70 mb-5 max-w-md mx-auto">
+            <p className="mx-auto mb-5 max-w-md font-medium">
               Free word game — no download, no signup. Find words on a grid against the clock.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -374,7 +374,7 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
             </div>
           </div>
 
-          <div className="mt-12 pt-8 border-t-2 border-neo-cream/15">
+          <div className="mt-14">
             <h2 className={`${SECTION_LABEL} mb-4`}>Browse All Letters</h2>
             <div className="flex flex-wrap gap-1.5">
               {VALID_LETTERS.map((l: string) => (
@@ -399,7 +399,7 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
             <h2 className={`${SECTION_LABEL} mb-4`}>Browse by Word Length</h2>
             <div className="flex flex-wrap gap-2">
               {VALID_LENGTHS.map(l => (
-                <Link key={l} href={`/${locale}/words/${l}-letter-words`} data-press className={`${CHIP} text-sm px-3 py-1.5`}>
+                <Link key={l} href={`/${locale}/words/${l}-letter-words`} data-press className={`${CHIP} rounded-full px-4 py-2 text-sm font-bold`}>
                   {l}-letter words
                 </Link>
               ))}

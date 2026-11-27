@@ -88,28 +88,20 @@ export default function LegalIndexPageClient(): React.ReactElement {
         </ul>
       </section>
 
-      <div className="grid gap-6 md:grid-cols-2 mb-8">
+      <div className="not-prose mb-8 grid gap-4 md:grid-cols-2">
         {legalPages.map((page) => (
           <Link
             key={page.href}
             href={page.href}
-            className={cn(
-              'block p-6 rounded-lg border transition-[translate,scale,rotate,transform,border-color,box-shadow] hover:scale-[1.02]',
-              isDarkMode
-                ? 'bg-neo-navy-light border-gray-700 hover:border-purple-500'
-                : 'bg-white border-gray-200 hover:border-purple-500 shadow-xs hover:shadow-md'
-            )}
+            className="block rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black no-underline shadow-hard-xl motion-safe:transition-transform motion-safe:hover:-translate-y-1"
           >
             <div className="flex items-start gap-4">
               <span className="text-3xl">{page.icon}</span>
               <div>
-                <h2 className={cn(
-                  'text-xl font-bold mb-2',
-                  heading
-                )}>
+                <h2 className="mb-1 font-neo-display text-xl font-bold text-neo-black">
                   {t(page.titleKey)}
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-neo-black/75">
                   {t(page.descriptionKey)}
                 </p>
               </div>

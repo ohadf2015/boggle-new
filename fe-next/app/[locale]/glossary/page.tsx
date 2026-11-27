@@ -93,9 +93,12 @@ export default async function GlossaryPage({ params }: PageProps) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermSetSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
-      <GlossaryPageClient />
-      <GuidesCalloutLink locale={locale} />
-      <EducationCalloutLink locale={locale} />
+      <GlossaryPageClient>
+        <div className="flex flex-col gap-4">
+          <GuidesCalloutLink locale={locale} />
+          <EducationCalloutLink locale={locale} />
+        </div>
+      </GlossaryPageClient>
 
       {/* Server-rendered glossary terms for crawlers — visually hidden, not aria-hidden */}
       <section className="sr-only">
