@@ -27,6 +27,7 @@ interface MyListCardProps {
 }
 
 const CHIPS = 6;
+const WORD_TILE = 'edu-tile px-2.5 py-1 text-base leading-tight';
 
 /** One of the teacher's word lists: a color band with its count and name, its first words, Start a game, and a menu with everything else. */
 export default function MyListCard({
@@ -104,21 +105,18 @@ export default function MyListCard({
         </button>
       }
     >
-      <ul className="flex flex-wrap gap-1.5" dir="auto">
+      <ul className="flex flex-wrap gap-2" dir="auto">
         {lesson.words.slice(0, CHIPS).map((w, i) => (
           <li
             key={`${w.word}-${i}`}
             data-testid="word-tile"
-            className={cn(
-              'rounded-neo border-2 border-neo-black bg-neo-cream px-2 py-0.5 font-neo-display text-sm font-black text-neo-black shadow-hard',
-              i % 2 ? 'rotate-1' : '-rotate-1',
-            )}
+            className={WORD_TILE}
           >
             {w.word}
           </li>
         ))}
         {total > CHIPS ? (
-          <li className="rounded-neo border-2 border-dashed border-edu-line px-2 py-0.5 font-neo-display text-sm font-black text-edu-ink/70">
+          <li data-testid="word-tile-more" className={WORD_TILE}>
             +{total - CHIPS}
           </li>
         ) : null}

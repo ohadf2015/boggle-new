@@ -51,7 +51,7 @@ export function TeacherLibrary({ onImportSuccess }: TeacherLibraryProps) {
     <div data-testid="teacher-library" className="space-y-6">
       <section id={SECTION_ID.mine} aria-labelledby="library-title" className="scroll-mt-4">
         <LessonBuilder
-          heading={<h1 id="library-title" className="font-neo-display text-2xl font-bold text-edu-ink sm:text-3xl">{t('eduLibrary.title')}</h1>}
+          heading={<h1 id="library-title" className="font-neo-display text-4xl font-black leading-none text-edu-ink sm:text-5xl">{t('eduLibrary.title')}</h1>}
           onBrowseDiscover={() => goTo('discover')}
           onListCount={setListCount}
           hideDiscoverLink

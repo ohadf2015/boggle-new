@@ -8,7 +8,6 @@ import { TeacherLibrary } from '@/components/teacher/lesson-creation/library/Tea
 import { NB_PRIMARY } from '@/components/teacher/nb/nbStyles';
 import type { LibraryLesson } from '@/lib/education/libraryTypes';
 import type { Language } from '@/lib/supabase/education/types';
-import { cn } from '@/lib/utils';
 import { fixtureFor } from './fixtures';
 import { PreviewTeacherAuth, usePreviewT } from './SetupBatchPreviews';
 
@@ -81,10 +80,10 @@ export function LibraryPreview({ v }: { v?: string }) {
             <TeacherLibrary />
           ) : (
             <section className="space-y-3">
-              <h1 className="font-neo-display text-2xl font-bold text-edu-ink sm:text-3xl">{t('eduLibrary.title')}</h1>
+              <h1 className="font-neo-display text-4xl font-black leading-none text-edu-ink sm:text-5xl">{t('eduLibrary.title')}</h1>
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="max-w-prose text-sm text-edu-ink/80 max-sm:hidden">{t('teacher.lesson.sectionHint')}</p>
-                <button type="button" className={cn(NB_PRIMARY, 'min-h-11 px-4 text-sm')}>
+                <p className="max-w-prose font-neo-body text-base font-semibold text-edu-ink/85 max-sm:hidden">{t('teacher.lesson.sectionHint')}</p>
+                <button type="button" className={NB_PRIMARY}>
                   <Plus className="size-5" strokeWidth={3} aria-hidden="true" />
                   {t('eduLibrary.editor.newList')}
                 </button>

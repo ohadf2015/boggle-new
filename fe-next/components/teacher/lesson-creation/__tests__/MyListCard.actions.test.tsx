@@ -133,3 +133,18 @@ describe('MyListCard menu', () => {
     expect(screen.getByTestId('lesson-share-L1')).toHaveAttribute('aria-disabled', 'true');
   });
 });
+
+describe('MyListCard on the sky page', () => {
+  it('Given a list, Then its words are straight cream letter tiles with a lip, and the overflow count is a solid tile too', () => {
+    const many = { ...(lesson as object), words: Array.from({ length: 12 }, (_, i) => ({ word: `w${i}` })) } as never;
+    render(<MyListCard lesson={many} index={0} sharing={false} {...handlers} />);
+    const tiles = screen.getAllByTestId('word-tile');
+    for (const tile of tiles) {
+      expect(tile.className).toContain('edu-tile');
+      expect(tile.className).not.toMatch(/(^|\s)-?rotate-1(\s|$)/);
+    }
+    const more = screen.getByTestId('word-tile-more');
+    expect(more.className).toContain('edu-tile');
+    expect(more.className).not.toContain('border-dashed');
+  });
+});

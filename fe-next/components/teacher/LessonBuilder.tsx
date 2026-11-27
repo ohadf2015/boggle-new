@@ -19,6 +19,7 @@ import type { LibraryLesson } from '@/lib/education/libraryTypes';
 import LessonBuilderDraftPrompt from './LessonBuilderDraftPrompt';
 import ListEditorSheet, { emptyListDraft, type ListDraft } from './lesson-creation/ListEditorSheet';
 import MyListCard from './lesson-creation/MyListCard';
+import { NB_PRIMARY } from './nb/nbStyles';
 import { lessonToDraft, remixedFromOf, saveExistingList, shareResultToast } from './lesson-creation/listEditorSave';
 import { StarterPacksSection } from './StarterPacksSection';
 import { convertPackWordsToLessonWords } from '@/lib/education/createLessonFromPack';
@@ -190,21 +191,18 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
             type="button"
             data-testid="lessons-create"
             onClick={() => openCreate()}
-            className={cn(
-              'inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 font-neo-display text-sm font-bold text-neo-black',
-              'shadow-hard transition hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none',
-            )}
+            className={NB_PRIMARY}
           >
             <Plus className="size-5" strokeWidth={3} aria-hidden="true" />
             {t('eduLibrary.editor.newList')}
           </button>
         </div>
       </div>
-      <p className="max-w-prose text-sm text-edu-ink/80 text-pretty max-sm:hidden">{t('teacher.lesson.sectionHint')}</p>
+      <p data-testid="lessons-hint" className="max-w-prose font-neo-body text-base font-semibold text-edu-ink/85 text-pretty max-sm:hidden">{t('teacher.lesson.sectionHint')}</p>
 
       {lessons.length === 0 ? (
         <div className={cn('space-y-4', isCreatingFromPack && 'pointer-events-none opacity-60')}>
-          <div className="rounded-neo border-3 border-dashed border-edu-line bg-edu-surface/60 px-4 py-6 text-center">
+          <div data-testid="lessons-empty" className="edu-card px-4 py-6 text-center">
             <h3 className="font-neo-display text-xl text-edu-ink text-balance">{t('teacher.lesson.noLessons')}</h3>
             <p className="mx-auto mt-1 max-w-prose text-sm text-edu-ink/80 text-pretty">{t('eduLibrary.myLists.emptyHint')}</p>
           </div>
