@@ -59,7 +59,7 @@ export function ClassStrip({ classroomId, reducedMotion }: Props) {
   };
 
   return (
-    <section className="mb-3 flex flex-col gap-2 rounded-neo border-3 border-neo-black bg-neo-white p-3 text-neo-black shadow-hard-sm">
+    <section className="mb-3 flex flex-col gap-2 rounded-neo border-3 border-neo-black bg-edu-paper p-3 text-neo-black shadow-edu-lip-sm">
       <div className="flex items-center gap-3">
         <StreakMark streak={hub.streak} still={!!reducedMotion} size={36} t={t} />
         <div className="min-w-0">
@@ -82,7 +82,7 @@ export function ClassStrip({ classroomId, reducedMotion }: Props) {
           type="button"
           onClick={ask}
           disabled={asking}
-          className="min-h-[44px] rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-2 font-neo-display text-sm font-black text-neo-black shadow-hard-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-60"
+          className="min-h-[44px] rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-2 font-neo-display text-sm font-black text-neo-black shadow-edu-lip-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-60"
         >
           {t('student.classStrip.askRematch')}
         </button>

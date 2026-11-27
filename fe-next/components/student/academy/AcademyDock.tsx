@@ -9,7 +9,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { BookOpen, Sparkles, Trophy, User, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { InkPanel, Medallion, INK_TEXT, type Tone } from './chrome';
+import { InkPanel, Medallion, type Tone } from './chrome';
 
 interface Props {
   locale: string;
@@ -47,7 +47,7 @@ function Item({ tone, icon, label, badge, big, iconOnly }: { tone: Tone; icon: R
         className={
           iconOnly
             ? 'sr-only'
-            : `max-w-full text-center ${big ? 'whitespace-nowrap text-sm' : `line-clamp-2 break-words ${label.length > 9 ? 'tracking-tight [hyphens:auto]' : ''}`} ${INK_TEXT}`
+            : `max-w-full text-center ${big ? 'whitespace-nowrap text-sm' : `line-clamp-2 break-words ${label.length > 9 ? 'tracking-tight [hyphens:auto]' : ''}`}`
         }
       >
         {label}
@@ -76,7 +76,7 @@ export function AcademyDock({ locale, reviewCount, onOpenClass, onSolo, big = fa
             reviewCount > 0 ? (
               <span className="absolute -top-2 end-1" aria-label={t('academy.student.reviewDueAria', '{count} words to review', { count: reviewCount })}>
                 <Medallion tone="pink" size={20} shadow={1}>
-                  <span className="font-neo-display text-xs font-black leading-none text-edu-ink">{reviewCount}</span>
+                  <span className="font-neo-display text-xs font-black leading-none text-neo-black">{reviewCount}</span>
                 </Medallion>
               </span>
             ) : undefined

@@ -15,7 +15,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCountUp } from '@/hooks/useCountUp';
 import { getXpProgress } from '@/backend/modules/xpManager';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { InkPanel, Medallion, INK_TEXT, toneStyle } from './chrome';
+import { InkPanel, Medallion, toneStyle } from './chrome';
 import { StreakMark } from './StreakMark';
 
 interface Props {
@@ -35,12 +35,6 @@ interface Props {
   /** Wide screens get a taller plaque; a phone on its side a slim one. */
   size?: 'compact' | 'normal' | 'wide';
 }
-
-/** Recessed "coin tray" the totals sit in — one object, not two floating pills. */
-const TRAY_STYLE = {
-  background: 'linear-gradient(180deg,var(--neo-abyss-light) 0%,color-mix(in srgb,var(--neo-purple-dark) 25%,var(--neo-abyss-light)) 100%)',
-  boxShadow: 'inset 0 0 0 1.5px color-mix(in srgb,var(--neo-yellow) 80%,var(--neo-orange)), inset 0 3px 5px rgba(0,0,0,0.6)',
-} as const;
 
 export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streakAtRisk = false, stars, isGuest, onSignOut, reducedMotion, title, size = 'normal' }: Props) {
   const wide = size === 'wide';
@@ -87,14 +81,14 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
 
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-          <p dir="auto" className={`min-w-0 shrink truncate font-neo-display font-black leading-tight text-edu-ink ${wide ? 'text-xl' : compact ? 'text-sm' : 'text-base sm:text-lg'} ${INK_TEXT}`}>
+          <p dir="auto" className={`min-w-0 shrink truncate font-neo-display font-black leading-tight text-edu-ink ${wide ? 'text-2xl' : compact ? 'text-sm' : 'text-xl sm:text-2xl'}`}>
             {name}
           </p>
           {title && (
             <span
               dir="auto"
               data-testid="academy-class-tag"
-              className={`min-w-0 max-w-full truncate rounded-full border-2 border-neo-black px-2 font-neo-display font-black uppercase leading-[18px] tracking-wide text-edu-ink ${wide ? 'text-xs leading-[22px]' : 'text-xs'} ${INK_TEXT}`}
+              className={`min-w-0 max-w-full truncate rounded-full border-2 border-neo-black px-2 font-neo-display font-black uppercase leading-[18px] tracking-wide text-edu-ink ${wide ? 'text-xs leading-[22px]' : 'text-xs'}`}
               style={toneStyle('pink', { shadow: 0, trim: 1 })}
             >
               {title}
@@ -107,49 +101,46 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={xp.progressPercent}
-          className={`relative mt-1 w-full overflow-hidden rounded-full border-2 border-neo-black ${wide ? 'h-5' : compact ? 'h-3' : 'h-4'}`}
-          style={{ background: 'linear-gradient(180deg,var(--neo-abyss-light),color-mix(in srgb,var(--neo-purple-dark) 35%,var(--neo-abyss-light)))', boxShadow: 'inset 0 0 0 1.5px color-mix(in srgb,var(--neo-yellow) 80%,var(--neo-orange)), inset 0 3px 4px rgba(0,0,0,0.55)' }}
+          className={`relative mt-1 w-full overflow-hidden rounded-full border-2 border-edu-line bg-edu-surface ${wide ? 'h-5' : compact ? 'h-3' : 'h-4'}`}
         >
           <div
             className="absolute inset-y-[2px] start-[2px] rounded-full"
             style={{
               width: `calc(${pct}% - 4px)`,
               minWidth: pct > 0 ? 8 : 0,
-              backgroundImage: 'linear-gradient(180deg,color-mix(in srgb,var(--neo-lime) 40%,var(--neo-cream)) 0%,var(--neo-lime) 45%,var(--neo-lime-dark) 100%)',
-              boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.55), 1px 0 0 rgb(var(--neo-black))',
+              backgroundColor: 'var(--neo-lime)',
             }}
           >
             {!still && (
               <span
                 ref={shine}
                 aria-hidden="true"
-                className="absolute inset-y-0 left-0 w-6 -skew-x-12 bg-neo-white/60"
+                className="absolute inset-y-0 left-0 w-6 -skew-x-12 bg-edu-paper/60"
               />
             )}
           </div>
         </div>
-        <p dir="ltr" className={`mt-0.5 text-start ${compact ? 'sr-only' : ''} font-neo-display text-xs font-black uppercase tracking-wider text-edu-yellow-ink tabular-nums rtl:text-end`}>
+        <p dir="ltr" className={`mt-0.5 text-start ${compact ? 'sr-only' : ''} font-neo-display text-xs font-black uppercase tracking-wider text-edu-ink tabular-nums rtl:text-end`}>
           {t('academy.student.xpLine', '{xp} / {need} XP', { xp: shownXp, need: xp.xpNeededForNextLevel })}
         </p>
       </div>
 
       <span
         data-testid="academy-hud-tray"
-        className={`flex shrink-0 items-center gap-1.5 rounded-[14px] border-2 border-neo-black py-1 ps-1 pe-2 ${wide ? 'gap-3 ps-1.5 pe-3' : ''}`}
-        style={TRAY_STYLE}
+        className={`flex shrink-0 items-center gap-1.5 rounded-[14px] border-2 border-edu-line bg-edu-surface py-1 ps-1 pe-2 ${wide ? 'gap-3 ps-1.5 pe-3' : ''}`}
       >
       <span className="flex items-center gap-1" title={t('education.xp.streak', 'Day Streak')}>
         <StreakMark streak={streak} atRisk={streakAtRisk} still={still} size={wide ? 36 : compact ? 22 : 28} t={t} />
         <span className="sr-only">{t('education.xp.streak', 'Day Streak')}</span>
-        <span className={`min-w-[1ch] font-neo-display ${compact ? 'text-base' : 'text-lg'} font-black tabular-nums text-edu-ink ${INK_TEXT}`}>{streak}</span>
+        <span className={`min-w-[1ch] font-neo-display ${compact ? 'text-base' : 'text-lg'} font-black tabular-nums text-edu-ink`}>{streak}</span>
       </span>
-      <span aria-hidden="true" className="h-5 w-[2px] rounded-full bg-neo-yellow/40" />
+      <span aria-hidden="true" className="h-5 w-[2px] rounded-full bg-edu-ink/20" />
       <span className="flex items-center gap-1" title={t('academy.student.stars', 'Stars')}>
-        <span className={`relative drop-shadow-[2px_2px_0_#000] ${wide ? 'h-9 w-9' : compact ? 'h-[22px] w-[22px]' : 'h-7 w-7'}`}>
+        <span className={`relative drop-shadow-[0_2px_0_#101114] ${wide ? 'h-9 w-9' : compact ? 'h-[22px] w-[22px]' : 'h-7 w-7'}`}>
           <Image src="/images/adventure/loot/gold-coin.webp" alt="" aria-hidden="true" fill unoptimized sizes="32px" className="object-contain" />
         </span>
         <span className="sr-only">{t('academy.student.stars', 'Stars')}</span>
-        <span className={`min-w-[1ch] font-neo-display ${compact ? 'text-base' : 'text-lg'} font-black tabular-nums text-edu-ink ${INK_TEXT}`}>{shownStars}</span>
+        <span className={`min-w-[1ch] font-neo-display ${compact ? 'text-base' : 'text-lg'} font-black tabular-nums text-edu-ink`}>{shownStars}</span>
       </span>
       </span>
 

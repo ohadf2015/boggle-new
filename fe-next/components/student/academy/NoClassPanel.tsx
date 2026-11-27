@@ -27,10 +27,10 @@ export function NoClassPanel({ className }: { className?: string }) {
     <form
       data-testid="academy-no-class"
       onSubmit={(e) => { e.preventDefault(); go(code); }}
-      className={cn('pointer-events-auto mx-auto flex w-full max-w-md flex-col gap-4 rounded-neo border-3 border-edu-line bg-edu-surface p-5 text-edu-ink shadow-hard-lg', className)}
+      className={cn('pointer-events-auto mx-auto flex w-full max-w-md flex-col gap-4 rounded-neo border-3 border-edu-line bg-edu-surface p-5 text-edu-ink shadow-edu-lip', className)}
     >
       <div className="flex items-center gap-3">
-        <span aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm">
+        <span aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black shadow-edu-lip-sm">
           <KeyRound className="size-6" strokeWidth={2.75} />
         </span>
         <div className="min-w-0">

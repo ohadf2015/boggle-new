@@ -39,7 +39,7 @@ export function AcademyMascot({ mood, reducedMotion }: Props) {
       <span aria-hidden="true" className="-m-[18px] shrink-0">
         <Mascot variant={mood.variant} size="xs" animated={!still} clipBorder="none" />
       </span>
-      <span className="relative mb-3 ms-1 max-w-[16rem] rounded-neo border-2 border-neo-black bg-neo-cream px-2.5 py-1 font-neo-display text-xs font-bold leading-snug text-neo-black shadow-hard-sm sm:text-sm">
+      <span className="relative mb-3 ms-1 max-w-[16rem] rounded-neo border-2 border-neo-black bg-neo-cream px-2.5 py-1 font-neo-display text-xs font-bold leading-snug text-neo-black shadow-edu-lip-sm sm:text-sm">
         <span
           aria-hidden="true"
           className="absolute -bottom-[7px] start-4 h-3 w-3 rotate-45 border-b-2 border-e-2 border-neo-black bg-neo-cream"

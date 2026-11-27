@@ -29,7 +29,7 @@ export function FirstDayCard({ goals, hasClass, chestArt = true }: Props) {
     <section
       data-testid="academy-first-day"
       aria-label={t('student.firstDay.title', 'First-day goals')}
-      className="pointer-events-auto flex flex-col gap-1 rounded-[14px] border-2 border-edu-line bg-edu-surface/90 p-1.5 text-edu-ink shadow-hard-sm"
+      className="pointer-events-auto flex flex-col gap-1 rounded-[14px] border-2 border-edu-line bg-edu-surface p-1.5 text-edu-ink shadow-edu-lip-sm"
     >
       <div className="flex items-center gap-2">
         {chestArt && (

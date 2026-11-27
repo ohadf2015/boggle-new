@@ -10,7 +10,7 @@
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { InkPanel, Medallion, Ribbon, INK_TEXT } from './chrome';
+import { InkPanel, Medallion, Ribbon } from './chrome';
 import type { AcademyIsland } from './academyIslands';
 import { StreakFlame } from '@/components/streak/StreakFlame';
 
@@ -31,7 +31,7 @@ export function AcademySidePanel({ title, streak, boss, chest }: Props) {
   return (
     <InkPanel tone="night" data-testid="academy-side-panel" className="w-full max-w-[26rem] p-4 pt-6">
       <Ribbon tone="pink" className="absolute -top-4 start-3 max-w-[80%]">
-        <p dir="auto" className={`line-clamp-2 font-neo-display text-sm font-black uppercase tracking-wide text-edu-ink ${INK_TEXT}`}>{title}</p>
+        <p dir="auto" className={`line-clamp-2 font-neo-display text-sm font-black uppercase tracking-wide text-edu-ink`}>{title}</p>
       </Ribbon>
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1 space-y-2.5">
@@ -41,7 +41,7 @@ export function AcademySidePanel({ title, streak, boss, chest }: Props) {
               <StreakFlame days={streak} size={20} />
             </Medallion>
             <div className="min-w-0">
-              <p dir="auto" className={`font-neo-display text-base font-black leading-tight text-edu-ink ${INK_TEXT}`}>
+              <p dir="auto" className={`font-neo-display text-base font-black leading-tight text-edu-ink`}>
                 <span className="tabular-nums">{streak}</span> {t('education.xp.streak', 'Day Streak')}
               </p>
               <div className="mt-0.5 flex gap-1" aria-hidden="true">
@@ -49,7 +49,7 @@ export function AcademySidePanel({ title, streak, boss, chest }: Props) {
                   <span
                     key={i}
                     className="h-3 w-5 rounded-full border-2 border-neo-black"
-                    style={{ background: i < lit ? 'linear-gradient(180deg,color-mix(in srgb, var(--neo-red) 10%, var(--neo-yellow)),var(--neo-orange))' : 'color-mix(in srgb, var(--neo-purple) 40%, rgb(var(--neo-black)))' }}
+                    style={{ background: i < lit ? 'var(--neo-orange)' : 'var(--edu-surface)' }}
                   />
                 ))}
               </div>
@@ -70,19 +70,18 @@ export function AcademySidePanel({ title, streak, boss, chest }: Props) {
                 />
               </span>
               <div className="min-w-0 flex-1">
-                <p dir="auto" className={`line-clamp-2 font-neo-display text-base font-black leading-tight text-edu-ink ${INK_TEXT}`}>
+                <p dir="auto" className={`line-clamp-2 font-neo-display text-base font-black leading-tight text-edu-ink`}>
                   {boss.state === 'locked'
                     ? t('academy.student.bossNeed', 'Master {have}/{need} words', { have, need })
                     : t('academy.student.bossReady', 'Unlocked')}
                 </p>
                 <div
                   aria-hidden="true"
-                  className="relative mt-1 h-3 overflow-hidden rounded-full border-2 border-neo-black"
-                  style={{ background: 'color-mix(in srgb, var(--neo-purple-dark) 25%, rgb(var(--neo-black)))', boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--neo-cozy) 40%, var(--neo-yellow))' }}
+                  className="relative mt-1 h-3 overflow-hidden rounded-full border-2 border-neo-black bg-edu-surface"
                 >
                   <span
                     className="absolute inset-y-0 start-0 rounded-full"
-                    style={{ width: `${pct}%`, backgroundImage: 'linear-gradient(180deg,color-mix(in srgb, var(--neo-yellow) 70%, rgb(var(--neo-white))),color-mix(in srgb, var(--neo-red) 30%, var(--neo-yellow-hover)))' }}
+                    style={{ width: `${pct}%`, backgroundColor: 'var(--neo-yellow)' }}
                   />
                 </div>
               </div>

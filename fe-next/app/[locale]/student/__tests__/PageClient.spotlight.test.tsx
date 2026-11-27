@@ -19,8 +19,8 @@ describe('Academy spotlight ↔ hero button', () => {
     render(<StudentPageClient />);
     const pointer = await screen.findByTestId('academy-spotlight-pointer');
     const cta = screen.getByTestId('academy-cta');
-    expect(pointer.getAttribute('data-tone')).toBe('gold');
-    expect(cta.getAttribute('data-tone')).toBe('gold');
+    expect(pointer.getAttribute('data-tone')).toBe('lime');
+    expect(cta.getAttribute('data-tone')).toBe('lime');
     expect(pointer.textContent).toBe('academy.student.ctaPlay');
     expect(cta.textContent).toContain('academy.student.ctaPlay');
   });

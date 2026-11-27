@@ -80,7 +80,6 @@ export function AcademyPageFrame({ title, art, badge, toolbar, regionLabel, pend
     <div
       dir={dir ?? (language === 'he' ? 'rtl' : 'ltr')}
       data-testid={pending ? 'academy-page-pending' : 'academy-page'}
-      data-edu-theme="dark"
       data-chrome={layout.chrome}
       className="fixed inset-0 isolate overflow-hidden bg-edu-page text-edu-ink"
     >
@@ -107,7 +106,7 @@ export function AcademyPageFrame({ title, art, badge, toolbar, regionLabel, pend
           aria-busy={pending || busy || undefined}
           className={cn('mx-auto flex min-h-0 w-full flex-1 flex-col', wide ? 'max-w-6xl' : 'max-w-3xl', rail && 'max-w-none')}
         >
-          {toolbar && <div className={cn('shrink-0 border-b-2 border-neo-yellow/40', rail ? 'px-2.5 py-1.5' : 'px-3 py-2.5 sm:px-4')}>{toolbar}</div>}
+          {toolbar && <div className={cn('shrink-0 border-b-3 border-edu-line', rail ? 'px-2.5 py-1.5' : 'px-3 py-2.5 sm:px-4')}>{toolbar}</div>}
           {/* The ONE scroller. Rounded clip so cards never paint over the ink edge. */}
           <div
             data-testid="academy-page-scroll"

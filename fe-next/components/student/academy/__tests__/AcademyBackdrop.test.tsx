@@ -14,6 +14,12 @@ describe('<AcademyBackdrop>', () => {
     expect(container.querySelector('img')).toHaveAttribute('src', '/images/education/academy-map-landscape.webp');
   });
 
+  it('Given the daytime map behind a sky page, Then a light sky wash softens it, never a navy scrim', () => {
+    const { container } = render(<AcademyBackdrop art="map" />);
+    expect(container.innerHTML).not.toMatch(/rgba\(18,13,51/);
+    expect(container.querySelector('[data-testid="academy-backdrop-wash"]')?.className).toContain('bg-edu-page/');
+  });
+
   it.each([
     ['arena', '/images/education/arena-lobby-bg.webp'],
     ['podium', '/images/education/podium-bg.webp'],

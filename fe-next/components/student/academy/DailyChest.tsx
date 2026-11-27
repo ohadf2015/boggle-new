@@ -237,7 +237,7 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm', onRe
               type="button"
               tabIndex={isOpen ? undefined : -1}
               onClick={() => setPhase('idle')}
-              className="min-h-[48px] rounded-neo border-3 border-neo-black bg-neo-yellow px-8 font-neo-display text-lg font-black uppercase text-neo-black shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+              className="min-h-[48px] rounded-neo border-3 border-neo-black bg-neo-yellow px-8 font-neo-display text-lg font-black uppercase text-neo-black shadow-edu-lip active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
             >
               {t('academy.student.chestCollect', 'Collect')}
             </button>

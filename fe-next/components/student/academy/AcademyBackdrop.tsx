@@ -14,9 +14,9 @@ const SCENE: Record<Exclude<AcademyArt, 'map'>, string> = {
   podium: '/images/education/podium-bg.webp',
 };
 
-// The map is busy and bright, so it goes out of focus; the scenes keep their edges lit around a dark middle.
+// The daytime map is busy, so it sits out of focus under the page sky; the scenes keep their edges lit around a dark middle.
 const SCRIM: Record<AcademyArt, string> = {
-  map: 'bg-[linear-gradient(180deg,rgba(18,13,51,0.55)_0%,rgba(18,13,51,0.72)_45%,rgba(18,13,51,0.88)_100%)] backdrop-blur-[6px]',
+  map: 'bg-edu-page/75 backdrop-blur-[6px]',
   arena: 'bg-[radial-gradient(ellipse_at_center,rgba(15,17,40,0.82)_0%,rgba(15,17,40,0.55)_45%,rgba(15,17,40,0.25)_100%)]',
   podium: 'bg-[radial-gradient(ellipse_at_center,rgba(15,17,40,0.78)_0%,rgba(15,17,40,0.5)_50%,rgba(15,17,40,0.3)_100%)]',
 };
@@ -40,7 +40,7 @@ export function AcademyBackdrop({ art }: { art: AcademyArt }) {
         // eslint-disable-next-line @next/next/no-img-element -- plain decorative scene, already a sized webp
         <img src={SCENE[art]} alt="" decoding="async" className={IMG} />
       )}
-      <div className={`absolute inset-0 ${SCRIM[art]}`} />
+      <div data-testid="academy-backdrop-wash" className={`absolute inset-0 ${SCRIM[art]}`} />
       {art !== 'map' && <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-neo-navy/90 to-transparent" />}
     </div>
   );

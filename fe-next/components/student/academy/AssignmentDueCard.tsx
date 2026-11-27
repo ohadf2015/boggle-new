@@ -82,9 +82,7 @@ export function AssignmentDueCard({
 
   const time = dueCardTimeText(kind, dueDate);
   const Icon = kind === 'overdue' ? AlarmClock : CalendarClock;
-  const tone = kind === 'overdue'
-    ? 'border-neo-red bg-neo-red/15'
-    : 'border-neo-yellow bg-neo-yellow/10';
+  const late = kind === 'overdue';
 
   return (
     <Link
@@ -92,18 +90,18 @@ export function AssignmentDueCard({
       data-testid="assignment-due-card"
       data-kind={kind}
       aria-label={`${title}: ${t(time.key, time.fallback, time.params)}`}
-      className={`pointer-events-auto flex min-h-11 items-center gap-2 rounded-neo border-2 p-1.5 text-edu-ink shadow-hard-sm ${tone} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan`}
+      className={`pointer-events-auto flex min-h-11 items-center gap-2 rounded-neo border-3 border-edu-line bg-edu-surface p-1.5 text-edu-ink shadow-edu-lip-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan`}
     >
-      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black ${kind === 'overdue' ? 'bg-neo-red text-neo-white' : 'bg-neo-yellow text-neo-black'}`}>
+      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black ${late ? 'bg-neo-red' : 'bg-neo-yellow'} text-neo-black`}>
         <Icon className="h-5 w-5" aria-hidden="true" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate font-neo-body text-xs font-bold leading-tight">{title}</span>
-        <span className={`block font-neo-body text-xs font-bold uppercase tracking-wide ${kind === 'overdue' ? 'text-neo-red' : 'text-edu-yellow-ink'}`}>
+        <span className="block truncate font-neo-display text-sm font-black leading-tight">{title}</span>
+        <span className={`block font-neo-body text-xs font-bold uppercase tracking-wide ${late ? 'text-edu-pink-ink' : 'text-edu-ink/75'}`}>
           {t(time.key, time.fallback, time.params)}
         </span>
       </span>
-      <span data-testid="assignment-due-go" aria-hidden="true" className={`shrink-0 ${kind === 'overdue' ? 'text-neo-red' : 'text-edu-yellow-ink'}`}>
+      <span data-testid="assignment-due-go" aria-hidden="true" className="shrink-0 text-edu-ink">
         <DirectionalIcon icon={ChevronRight} className="size-6" />
       </span>
     </Link>

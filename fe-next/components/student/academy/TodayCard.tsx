@@ -23,7 +23,7 @@ export function TodayCard({ items, warmup }: { items: TodayItem[]; warmup: Stude
     <section
       data-testid="academy-today"
       aria-label={t('student.today.title', 'Today')}
-      className="pointer-events-auto flex flex-col gap-1.5 rounded-neo border-2 border-edu-line bg-edu-surface/90 p-1.5 text-edu-ink shadow-hard-sm"
+      className="pointer-events-auto flex flex-col gap-1.5 rounded-neo border-2 border-edu-line bg-edu-surface p-1.5 text-edu-ink shadow-edu-lip-sm"
     >
       {warmup && <WarmupCta warmup={warmup} />}
       <ul className="grid grid-cols-3 gap-1">
@@ -56,7 +56,7 @@ export function WarmupCta({ warmup }: { warmup: StudentWarmup }) {
     <Link
       href={warmup.href}
       data-testid="academy-warmup-cta"
-      className="flex min-h-12 items-center gap-2 rounded-neo border-2 border-neo-black bg-neo-lime px-2 py-1.5 text-neo-black shadow-hard-sm transition-transform duration-150 active:translate-y-0.5 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+      className="flex min-h-12 items-center gap-2 rounded-neo border-2 border-neo-black bg-neo-lime px-2 py-1.5 text-neo-black shadow-edu-lip-sm transition-transform duration-150 active:translate-y-0.5 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
     >
       <Zap aria-hidden="true" className="size-5 shrink-0" strokeWidth={3} />
       <span className="min-w-0 flex-1">
@@ -71,7 +71,7 @@ export function WarmupCta({ warmup }: { warmup: StudentWarmup }) {
           ))}
         </span>
       </span>
-      <span className="shrink-0 rounded-neo border-2 border-neo-black bg-neo-white px-2 py-1 font-neo-body text-xs font-black uppercase">
+      <span className="shrink-0 rounded-neo border-2 border-neo-black bg-edu-paper px-2 py-1 font-neo-body text-xs font-black uppercase">
         {t('student.today.play', 'Play')}
       </span>
     </Link>

@@ -58,9 +58,9 @@ describe('classroom sky skin', () => {
     }
   });
 
-  it('keeps the dark academy art a dark island until it is redrawn', () => {
+  it('keeps the academy on the sky theme now its map art is drawn for daylight', () => {
     for (const rel of ['components/student/academy/AcademyHubView.tsx', 'components/student/pages/AcademyPageFrame.tsx']) {
-      expect(read(rel), rel).toMatch(/data-edu-theme="dark"/);
+      expect(read(rel), rel).not.toMatch(/data-edu-theme="dark"/);
     }
   });
 
