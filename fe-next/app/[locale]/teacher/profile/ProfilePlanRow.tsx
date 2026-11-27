@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { NB_BLOCK, NB_LINK, NB_SMALL, NB_STICKER } from '@/components/teacher/nb/nbStyles';
 import { proPlanStatusLine } from '@/components/teacher/pro/proPlanStatus';
 
-const ROW = 'flex flex-col gap-3 border-t-2 border-neo-cream/15 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6';
+const ROW = 'flex flex-col gap-3 border-t-2 border-edu-line/15 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6';
 
 /** `usage` is the free plan's one line, like "2 of 3 free classes used". */
 export function ProfilePlanRow({ usage }: { usage?: string }) {
@@ -20,7 +20,7 @@ export function ProfilePlanRow({ usage }: { usage?: string }) {
   if (pro.loading) {
     return (
       <div data-testid="subscription-card" className={ROW}>
-        <span aria-hidden="true" className="h-7 w-40 animate-pulse rounded bg-neo-cream/15 motion-reduce:animate-none" />
+        <span aria-hidden="true" className="h-7 w-40 animate-pulse rounded bg-edu-ink/15 motion-reduce:animate-none" />
       </div>
     );
   }
@@ -49,7 +49,7 @@ export function ProfilePlanRow({ usage }: { usage?: string }) {
     >
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-          <h2 className={cn('font-neo-display text-xl font-black leading-tight', onCyan ? 'text-neo-black' : 'text-neo-cream')}>{title}</h2>
+          <h2 className={cn('font-neo-display text-xl font-black leading-tight', onCyan ? 'text-neo-black' : 'text-edu-ink')}>{title}</h2>
           {gifted ? (
             <span className={cn(NB_STICKER, NB_BLOCK.lime)}>
               <Gift className="size-3.5" aria-hidden="true" />
@@ -59,7 +59,7 @@ export function ProfilePlanRow({ usage }: { usage?: string }) {
         </div>
         <p
           data-testid={!pro.hasPro && usage ? 'subscription-usage' : undefined}
-          className={cn('mt-1 font-neo-body text-sm font-semibold leading-snug', onCyan ? 'text-neo-black/80' : 'text-neo-cream/80')}
+          className={cn('mt-1 font-neo-body text-sm font-semibold leading-snug', onCyan ? 'text-neo-black/80' : 'text-edu-ink/80')}
         >
           {detail}
         </p>

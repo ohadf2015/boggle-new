@@ -76,7 +76,7 @@ describe('EduHostResults: boss round on the teacher wall', () => {
     renderBossWall('defeated');
     const label = screen.getByTestId('class-chest-label');
     expect(tokens(label).filter((c) => LOUD_FILL.test(c))).toEqual([]);
-    expect(tokens(label)).toContain('bg-neo-navy-light');
+    expect(tokens(label)).toContain('bg-edu-surface');
   });
 
   it('given the boss got away, then the wall card is compact and still says the outcome, damage, health left, blocks and top hitters', () => {

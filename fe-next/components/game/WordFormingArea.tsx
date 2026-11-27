@@ -7,6 +7,7 @@ import { SPRING_PRESETS } from '@/lib/animation/presets';
 import Avatar from '@/components/Avatar';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useCosyMode } from '@/contexts/AccessibilityContext';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 // How long the ✓/✗ note stays on screen after it arrives (ms).
@@ -112,6 +113,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
   morphLayout = true,
 }) => {
   const { t } = useLanguageSafe();
+  const classroom = useClassroomBoard();
   // Cozy / Calm Mode swaps the energetic accept burst for one soft warm settle.
   const cosyMode = useCosyMode();
   const [visibleFeedback, setVisibleFeedback] = useState<WordFeedback | null>(null);
@@ -260,7 +262,9 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className={cn(
-              'flex items-center justify-center rounded-full border-2 border-neo-cream/15 bg-neo-cream/5 font-neo-display font-bold text-neo-cream/55',
+              classroom
+                ? 'flex items-center justify-center rounded-full border-2 border-edu-line/30 bg-edu-surface font-neo-display font-bold text-edu-ink/70'
+                : 'flex items-center justify-center rounded-full border-2 border-neo-cream/15 bg-neo-cream/5 font-neo-display font-bold text-neo-cream/55',
               compact ? 'h-8 px-3 text-xs' : 'h-10 px-5 text-sm'
             )}
           >

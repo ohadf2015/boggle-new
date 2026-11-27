@@ -9,10 +9,10 @@ import { useCountUp } from './useCountUp';
 import type { ClassInsights } from './classInsights';
 
 const TONES = {
-  lime: 'text-neo-lime border-neo-lime',
-  cyan: 'text-neo-cyan border-neo-cyan',
-  pink: 'text-neo-pink border-neo-pink',
-  purple: 'text-neo-purple-light border-neo-purple-light',
+  lime: 'text-edu-lime-ink border-neo-lime',
+  cyan: 'text-edu-cyan-ink border-neo-cyan',
+  pink: 'text-edu-pink-ink border-neo-pink',
+  purple: 'text-edu-purple-ink border-neo-purple-light',
 } as const;
 
 function StatCard({
@@ -40,13 +40,13 @@ function StatCard({
       initial={reduceMotion ? false : { y: 8, scale: 0.96 }}
       animate={{ y: 0, scale: 1 }}
       transition={{ type: 'spring', stiffness: 420, damping: 26, delay: index * 0.06 }}
-      className="flex min-w-0 flex-col gap-1 rounded-neo border-2 border-neo-cream/50 bg-neo-navy p-2.5 shadow-hard-sm sm:p-3"
+      className="flex min-w-0 flex-col gap-1 rounded-neo border-2 border-edu-line bg-edu-surface p-2.5 shadow-hard-sm sm:p-3"
     >
       <span className="flex items-center gap-1.5">
-        <span className={cn('grid size-6 shrink-0 place-items-center rounded-neo border-2 bg-neo-navy-light', TONES[tone])}>
+        <span className={cn('grid size-6 shrink-0 place-items-center rounded-neo border-2 bg-edu-surface', TONES[tone])}>
           <Icon className="size-3.5" aria-hidden="true" />
         </span>
-        <span className="min-w-0 text-xs font-bold leading-tight text-neo-cream/80">{label}</span>
+        <span className="min-w-0 text-xs font-bold leading-tight text-edu-ink/80">{label}</span>
       </span>
       <span className={cn('font-neo-display text-2xl font-black leading-none tabular-nums sm:text-3xl', TONES[tone].split(' ')[0])}>
         {shown}

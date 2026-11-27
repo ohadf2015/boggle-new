@@ -165,7 +165,7 @@ export function TeacherLiveControls({
           'pointer-events-auto mx-auto flex w-full max-w-6xl tv:max-w-[100rem] flex-wrap lg:flex-nowrap items-stretch justify-center',
           'gap-2 sm:gap-3 tv:gap-5 rounded-neo border-3 tv:border-4 shadow-hard-lg',
           compact ? 'p-1.5' : 'p-2 tv:p-4',
-          isPaused ? 'border-neo-black bg-neo-lime' : 'border-neo-cream/60 bg-neo-navy-light',
+          isPaused ? 'border-neo-black edu-sky:border-neo-black bg-neo-lime edu-sky:bg-neo-lime' : 'border-neo-cream/60 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface',
         )}
       >
         {isPaused && (
@@ -191,8 +191,8 @@ export function TeacherLiveControls({
             onClick={() => setRosterOpen((open) => !open)}
             className={cn(
               'inline-flex shrink-0 items-center gap-2 lg:gap-3 tv:gap-4 leading-none',
-              'rounded-neo border-3 lg:border-4 border-neo-cream bg-neo-navy shadow-hard lg:shadow-hard-lg',
-              'font-neo-display font-black uppercase tracking-wide text-neo-cream',
+              'rounded-neo border-3 lg:border-4 border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface shadow-hard lg:shadow-hard-lg',
+              'font-neo-display font-black uppercase tracking-wide text-neo-cream edu-sky:text-edu-ink',
               sizeClasses,
               'transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
               'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
@@ -212,7 +212,7 @@ export function TeacherLiveControls({
                 aria-label={t('education.liveControls.idleCount', { count: summary.idle })}
                 className={cn(
                   'inline-flex items-center gap-1 rounded-neo border-2 tv:border-3 border-neo-black bg-neo-pink',
-                  'px-2 lg:px-3 py-1 text-xs sm:text-sm lg:text-lg xl:text-xl tv:text-2xl font-black text-neo-white',
+                  'px-2 lg:px-3 py-1 text-xs sm:text-sm lg:text-lg xl:text-xl tv:text-2xl font-black text-neo-white edu-sky:text-edu-ink',
                 )}
               >
                 <Zap className="h-3 w-3 lg:h-5 lg:w-5 tv:h-6 tv:w-6" aria-hidden="true" />

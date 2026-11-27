@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
+import { HIDE_ON_SKY } from '@/components/education/shell/ArcadeBackdrop';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import { ClassSetupInvite } from '@/components/education/ClassSetupInvite';
 import { ClassSetupCreate } from '@/components/teacher/setup/ClassSetupCreate';
@@ -19,7 +20,7 @@ export default function NewClassPageClient() {
   if (ClassReadyPreview && searchParams?.get('preview') === 'ready') return <ClassReadyPreview />;
   return (
     <EducationShell scrollRegionLabel={t('eduShell.setup.title')} tabs={!searchParams?.get('classroomId')} contentClassName="relative isolate">
-      <AmbientBackdrop theme="teacher" density="calm" />
+      <AmbientBackdrop theme="teacher" density="calm" className={HIDE_ON_SKY} />
       <TeacherGate>
         <SetupMain />
       </TeacherGate>

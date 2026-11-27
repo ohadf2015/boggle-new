@@ -19,15 +19,15 @@ export function chipAccent(name: string, index: number): string {
   return CHIP_ACCENTS[seed % CHIP_ACCENTS.length];
 }
 
-export const STUDENT_CHIP = 'bg-neo-navy text-neo-cream border-neo-cream/50';
+export const STUDENT_CHIP = 'bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink border-neo-cream/50 edu-sky:border-edu-line';
 
 /** Container width (rem) from which the lobby splits into join hero | roster columns; matches `@5xl`. */
 export const WIDE_MIN_REM = 64;
 
 /** Back-row code: at least a tenth of the wall's height on every 4:3, 16:9 and 21:9 wall. */
-export const HERO_CODE_TEXT = 'text-[min(14cqw,12cqh)] @5xl:text-[min(7.6cqw,14cqh)]';
+export const HERO_CODE_TEXT = 'text-[min(14cqw,12cqh)] @5xl:text-[min(7.6cqw,11cqh)]';
 
-export const HERO_QR_SIZE = 'size-[min(32cqw,19cqh)] @5xl:size-[min(14cqw,30cqh)]';
+export const HERO_QR_SIZE = 'size-[min(32cqw,19cqh)] @5xl:size-[min(14cqw,20cqh)]';
 
 /** With the lesson words on the wall too, code and QR sit side by side so Start never drops below the fold. */
 export const HERO_CODE_TEXT_COMPACT = 'text-[min(14cqw,12cqh)] @5xl:text-[min(5.4cqw,12cqh)]';

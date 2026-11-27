@@ -42,16 +42,16 @@ function ClassReadyInner() {
 
   if (!failed) {
     return (
-      <div className="flex h-dvh flex-1 items-center justify-center bg-neo-navy text-neo-white">
+      <div className="flex h-dvh flex-1 items-center justify-center bg-edu-page text-edu-ink">
         <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-lg px-4 py-10 text-center text-neo-white">
+    <div className="mx-auto max-w-lg px-4 py-10 text-center text-edu-ink">
       <p>{t('education.access.class_ready_error', 'Could not open a class. Try again, or go to teacher home.')}</p>
-      <Link href={`/${language}/teacher`} className="mt-4 inline-flex min-h-11 items-center font-bold text-neo-lime underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
+      <Link href={`/${language}/teacher`} className="mt-4 inline-flex min-h-11 items-center font-bold text-edu-lime-ink underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
         {t('education.access.class_ready_hq', 'Teacher home')}
       </Link>
     </div>

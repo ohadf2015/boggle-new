@@ -197,4 +197,11 @@ describe('InGameAudioButton obstruction guard', () => {
     expect(muteButton()).toBeInTheDocument();
     expect(muteButton().style.marginTop).toBe('');
   });
+
+  it('keeps the dark disc on game pages and turns cream only under the classroom sky scope', () => {
+    navState.isInGame = true;
+    render(<InGameAudioButton />);
+    expect(muteButton()).toHaveClass('border-neo-cream', 'bg-neo-black/55', 'text-neo-white', 'backdrop-blur-sm');
+    expect(muteButton()).toHaveClass('edu-sky:bg-edu-surface', 'edu-sky:text-edu-ink', 'edu-sky:border-neo-black', 'edu-sky:backdrop-blur-none');
+  });
 });

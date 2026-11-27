@@ -49,15 +49,15 @@ export default function ListPreviewSheet({ item, onClose, busy, copied, onHost, 
                 </span>
               }
             >
-              {item.description && <p dir="auto" className="mt-2 font-neo-body text-sm text-neo-cream/85 text-pretty">{item.description}</p>}
+              {item.description && <p dir="auto" className="mt-2 font-neo-body text-sm text-edu-ink/85 text-pretty">{item.description}</p>}
             </NbDialogHeader>
 
             <NbDialogBody>
               <ul data-testid="preview-words" className="[columns:1] sm:[columns:2] sm:gap-3">
                 {item.words.map((w, i) => (
-                  <li key={`${i}:${w.word}`} className="mb-2 flex break-inside-avoid items-baseline gap-3 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light px-3 py-2">
-                    <span dir="auto" className="shrink-0 font-neo-display font-black text-neo-cream">{w.word}</span>
-                    {w.definition && <span dir="auto" className="min-w-0 flex-1 text-end font-neo-body text-xs text-neo-cream/75">{w.definition}</span>}
+                  <li key={`${i}:${w.word}`} className="mb-2 flex break-inside-avoid items-baseline gap-3 rounded-neo border-2 border-edu-line bg-edu-surface px-3 py-2">
+                    <span dir="auto" className="shrink-0 font-neo-display font-black text-edu-ink">{w.word}</span>
+                    {w.definition && <span dir="auto" className="min-w-0 flex-1 text-end font-neo-body text-xs text-edu-ink/75">{w.definition}</span>}
                   </li>
                 ))}
               </ul>
@@ -76,7 +76,7 @@ export default function ListPreviewSheet({ item, onClose, busy, copied, onHost, 
                 {!item.isMine &&
                   (copied ? (
                     <button type="button" data-testid="preview-copied" onClick={onOpenMyLists} className={cn(SECOND, 'border-neo-lime motion-safe:animate-neo-pop')}>
-                      <Check className="size-5 text-neo-lime" strokeWidth={3} aria-hidden="true" />
+                      <Check className="size-5 text-edu-lime-ink" strokeWidth={3} aria-hidden="true" />
                       {t('eduLibrary.preview.copied')}
                     </button>
                   ) : (
@@ -86,7 +86,7 @@ export default function ListPreviewSheet({ item, onClose, busy, copied, onHost, 
                     </button>
                   ))}
               </div>
-              {copied && <p className="text-center font-neo-body text-xs font-bold text-neo-cream/85">{t('eduLibrary.preview.copiedHint')}</p>}
+              {copied && <p className="text-center font-neo-body text-xs font-bold text-edu-ink/85">{t('eduLibrary.preview.copiedHint')}</p>}
               {item.source === 'teacher' && !item.isMine && (
                 <button type="button" data-testid="preview-report" onClick={onReport} className={cn(NB_LINK, 'mx-auto text-xs')}>
                   <Flag className="size-3.5" aria-hidden="true" />

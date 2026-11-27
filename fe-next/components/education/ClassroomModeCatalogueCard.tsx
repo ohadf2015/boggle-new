@@ -22,7 +22,7 @@ export interface ClassroomModeCatalogueCardProps {
 }
 
 const TAG =
-  'absolute start-1 top-1 z-10 inline-flex max-w-[90%] items-center gap-0.5 truncate rounded-full border border-neo-cream/40 bg-neo-navy px-1.5 py-0.5 font-neo-body text-xs font-bold leading-none text-neo-cream';
+  'absolute start-1 top-1 z-10 inline-flex max-w-[90%] items-center gap-0.5 truncate rounded-full border border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface px-1.5 py-0.5 font-neo-body text-xs font-bold leading-none text-neo-cream edu-sky:text-edu-ink';
 
 export function ClassroomModeCatalogueCard({
   mode,
@@ -50,12 +50,12 @@ export function ClassroomModeCatalogueCard({
         onPick(mode.id);
       }}
       className={cn(
-        'group relative flex w-[6.6rem] shrink-0 snap-center flex-col items-stretch gap-1 rounded-neo-lg border-2 bg-neo-navy-light p-1.5 text-center text-neo-cream lg:w-auto lg:p-2',
+        'group relative flex w-[6.6rem] shrink-0 snap-center flex-col items-stretch gap-1 rounded-neo-lg border-2 bg-neo-navy-light edu-sky:bg-edu-surface p-1.5 text-center text-neo-cream edu-sky:text-edu-ink lg:w-auto lg:p-2',
         'transition-[border-color] duration-150 motion-reduce:transition-none',
-        'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy disabled:cursor-wait',
+        'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream edu-sky:focus-visible:ring-edu-line focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy edu-sky:focus-visible:ring-offset-edu-surface disabled:cursor-wait',
         selected
-          ? 'z-10 border-neo-lime ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy-light'
-          : 'border-neo-cream/35 [@media(hover:hover)]:hover:border-neo-cream/60'
+          ? 'z-10 border-neo-lime edu-sky:border-neo-lime ring-2 ring-neo-lime edu-sky:ring-neo-lime ring-offset-2 ring-offset-neo-navy-light edu-sky:ring-offset-edu-surface'
+          : 'border-neo-cream/35 edu-sky:border-edu-line [@media(hover:hover)]:hover:border-neo-cream/60 edu-sky:[@media(hover:hover)]:hover:border-edu-line'
       )}
     >
       {recommendedLabel ? (
@@ -64,12 +64,12 @@ export function ClassroomModeCatalogueCard({
           {recommendedLabel}
         </span>
       ) : favoriteLabel ? (
-        <span data-testid="mode-favorite" className={cn(TAG, 'border-neo-black bg-neo-orange text-neo-black')}>
+        <span data-testid="mode-favorite" className={cn(TAG, 'border-neo-black edu-sky:border-neo-black bg-neo-orange edu-sky:bg-neo-orange text-neo-black edu-sky:text-neo-black')}>
           <Flame className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
           {favoriteLabel}
         </span>
       ) : null}
-      <span className="relative block aspect-square w-full overflow-hidden rounded-neo bg-neo-navy lg:aspect-[5/4] lg:[@media(max-height:1099px)]:aspect-[2/1]">
+      <span className="relative block aspect-square w-full overflow-hidden rounded-neo bg-neo-navy edu-sky:bg-edu-surface lg:aspect-[5/4] lg:[@media(max-height:1099px)]:aspect-[2/1]">
         {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover, same file as the catalog */}
         <img
           data-testid="mode-card-cover"
@@ -86,16 +86,16 @@ export function ClassroomModeCatalogueCard({
           <span
             data-testid="mode-selected-check"
             aria-hidden="true"
-            className="absolute end-1 top-1 grid size-6 place-items-center rounded-full border-2 border-neo-lime bg-neo-navy"
+            className="absolute end-1 top-1 grid size-6 place-items-center rounded-full border-2 border-neo-lime bg-neo-navy edu-sky:bg-edu-surface"
           >
-            <Check className="size-3.5 text-neo-lime" strokeWidth={4} />
+            <Check className="size-3.5 text-neo-lime edu-sky:text-edu-lime-ink" strokeWidth={4} />
           </span>
         ) : null}
       </span>
-      <span className={cn('line-clamp-3 min-h-[2.2em] font-neo-display text-[0.8rem] font-bold leading-[1.1] lg:text-sm', selected && 'text-neo-lime')}>
+      <span className={cn('line-clamp-3 min-h-[2.2em] font-neo-display text-[0.8rem] font-bold leading-[1.1] lg:text-sm', selected && 'text-neo-lime edu-sky:text-edu-lime-ink')}>
         {name}
       </span>
-      <span className="mx-auto inline-flex items-center gap-1 whitespace-nowrap font-neo-body text-xs font-bold leading-none text-neo-cream/80">
+      <span className="mx-auto inline-flex items-center gap-1 whitespace-nowrap font-neo-body text-xs font-bold leading-none text-neo-cream/80 edu-sky:text-edu-ink/80">
         <Clock className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
         {minutesLabel}
       </span>

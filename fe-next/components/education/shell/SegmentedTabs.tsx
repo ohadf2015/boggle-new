@@ -40,7 +40,7 @@ export function SegmentedTabs<K extends string>({ items, value, onChange, ariaLa
       aria-label={ariaLabel}
       onKeyDown={onKeyDown}
       style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
-      className={cn('relative grid rounded-neo border-[3px] border-neo-cream bg-neo-navy-light p-1', className)}
+      className={cn('relative grid rounded-neo border-[3px] border-edu-line bg-edu-surface p-1', className)}
     >
       <span
         aria-hidden="true"
@@ -69,13 +69,13 @@ export function SegmentedTabs<K extends string>({ items, value, onChange, ariaLa
               'relative z-10 inline-flex min-h-11 min-w-0 items-center justify-center gap-1.5 rounded-neo px-3',
               'font-neo-display text-sm font-bold transition-[color,transform] duration-150 ease-out active:scale-[0.97]',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
-              active ? 'text-neo-black' : 'text-neo-cream/75 [@media(hover:hover)]:hover:text-neo-cream',
+              active ? 'text-neo-black' : 'text-edu-ink/75 [@media(hover:hover)]:hover:text-edu-ink',
             )}
           >
             {Icon ? <Icon className="size-4 shrink-0" aria-hidden="true" /> : null}
             <span className="truncate">{label}</span>
             {count !== undefined ? (
-              <span className={cn('rounded-full px-1.5 text-xs tabular-nums', active ? 'bg-neo-black/10' : 'bg-neo-cream/15')}>{count}</span>
+              <span className={cn('rounded-full px-1.5 text-xs tabular-nums', active ? 'bg-neo-black/10' : 'bg-edu-ink/15')}>{count}</span>
             ) : null}
           </button>
         );

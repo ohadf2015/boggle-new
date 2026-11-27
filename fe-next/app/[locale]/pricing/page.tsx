@@ -9,8 +9,11 @@ import {
 } from '@/lib/seo/teacherUpgradeJsonLd';
 import { buildUpgradeFaqEntries } from '@/lib/education/pro/upgradeFaq';
 import UpgradePricingPageClient from '../teacher/upgrade/PageClient';
+import { EduSkyScope } from '@/components/education/EduSkyScope';
+import { EDU_SKY_VIEWPORT } from '@/lib/education/eduSkyViewport';
 
 export const dynamic = 'force-dynamic';
+export const viewport = EDU_SKY_VIEWPORT;
 
 const SUPPORTED_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
@@ -48,12 +51,12 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
   const faqSchema = buildTeacherUpgradeFaqJsonLd(validLocale, faq);
 
   return (
-    <>
+    <EduSkyScope>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
       {faqSchema && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       )}
       <UpgradePricingPageClient hasSession={hasSession} />
-    </>
+    </EduSkyScope>
   );
 }

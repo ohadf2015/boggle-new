@@ -24,6 +24,7 @@ import { WheelRushCelebration, type WheelCelebration } from './WheelRushCelebrat
 import { classifyLetterCoverage, missingWheelLetter } from '@/lib/wheelRush/letterCoverage';
 import { selectClosestRival } from '@/lib/wheelRush/closestRival';
 import { selectWheelRadius } from '@/lib/wordWheel/wheelGeometry';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
@@ -79,6 +80,35 @@ const MIN_LEN = WHEEL_RUSH_MIN_WORD_LEN;
 /** Over my (still empty) words slot, below the wheel and its action bar. */
 const RUSH_COACH_ANCHOR = { selector: '[data-testid="my-words-slot"]', edge: 'over' } as const;
 
+const SKIN = {
+  arcade: {
+    loading: 'flex-1 flex flex-col items-center justify-center gap-4 bg-neo-navy text-neo-white p-4',
+    loadFailedQuit: 'px-4 py-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light font-neo-display text-sm',
+    root: 'relative flex-1 flex flex-col items-center min-h-0 bg-neo-navy p-3 md:p-4 gap-2 overflow-hidden',
+    fog: 'text-center text-xs sm:text-sm text-neo-cyan font-neo-display font-bold tracking-wide flex items-center justify-center gap-2 shrink-0',
+    placeholder: 'absolute inset-0 flex items-center justify-center text-neo-white font-neo-display text-base sm:text-lg pointer-events-none',
+    rivalPill: 'px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-white font-semibold flex items-center gap-1.5',
+    rivalArrow: 'w-3 h-3 text-neo-lime',
+    tapHint: 'text-neo-white text-[10px] sm:text-xs text-center',
+    innerRing: 'absolute inset-4 sm:inset-5 rounded-full border border-neo-cyan/10',
+    outerRing: 'absolute inset-8 sm:inset-10 rounded-full border border-neo-cream/5',
+    rule: 'text-neo-white text-xs text-center px-2',
+  },
+  classroom: {
+    loading: 'flex-1 flex flex-col items-center justify-center gap-4 bg-edu-page text-edu-ink p-4',
+    loadFailedQuit: 'px-4 py-2 rounded-neo border-neo border-neo-black bg-edu-surface text-edu-ink shadow-edu-lip-sm font-neo-display text-sm',
+    root: 'relative flex-1 flex flex-col items-center min-h-0 bg-edu-page p-3 md:p-4 gap-2 overflow-hidden',
+    fog: 'text-center text-xs sm:text-sm text-edu-cyan-ink font-neo-display font-bold tracking-wide flex items-center justify-center gap-2 shrink-0',
+    placeholder: 'absolute inset-0 flex items-center justify-center text-edu-ink font-neo-display text-base sm:text-lg pointer-events-none',
+    rivalPill: 'px-2.5 py-1 rounded-neo border-2 border-neo-black bg-edu-surface text-[11px] sm:text-xs text-edu-ink font-semibold flex items-center gap-1.5',
+    rivalArrow: 'w-3 h-3 text-edu-lime-ink',
+    tapHint: 'text-edu-ink text-[10px] sm:text-xs text-center',
+    innerRing: 'absolute inset-4 sm:inset-5 rounded-full border border-edu-line/10',
+    outerRing: 'absolute inset-8 sm:inset-10 rounded-full border border-edu-line/10',
+    rule: 'text-edu-ink text-xs text-center px-2',
+  },
+} as const;
+
 
 
 export const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {
@@ -106,6 +136,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   } = useSoundEffects();
 
   const prefersReduced = useReducedMotion();
+  const skin = SKIN[useClassroomBoard() ? 'classroom' : 'arcade'];
 
   const [puzzle, setPuzzle] = useState<WheelPuzzle | null>(null);
   const verdicts = useWordVerdict({ t, playRejectedSound: playWordRejectedSound, resetKey: puzzle });
@@ -487,14 +518,14 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const fogEndsAt = (startedAt ?? 0) + WHEEL_RUSH_FOG_MS;
   if (!puzzle) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-4 bg-neo-navy text-neo-white p-4">
+      <div className={skin.loading}>
         {loadTimedOut ? (
           <>
             <div className="font-neo-display text-center">{t('wheel.rush.loadFailed')}</div>
             <button
               type="button"
               onClick={onQuit}
-              className="px-4 py-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light font-neo-display text-sm"
+              className={skin.loadFailedQuit}
             >
               {t('wheel.rush.loadFailedQuit')}
             </button>
@@ -507,7 +538,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   }
 
   return (
-    <div className="relative flex-1 flex flex-col items-center min-h-0 bg-neo-navy p-3 md:p-4 gap-2 overflow-hidden">
+    <div className={skin.root}>
       {/* Inner column caps width to match the daily-challenge wheel (max-w-lg)
           so the play area has the same proportions on desktop instead of
           stretching edge-to-edge. bg stays full-bleed on outer. */}
@@ -527,7 +558,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       )}
 
       {fogActive && (
-        <div className="text-center text-xs sm:text-sm text-neo-cyan font-neo-display font-bold tracking-wide flex items-center justify-center gap-2 shrink-0">
+        <div className={skin.fog}>
           <span className={cn('inline-block w-1.5 h-1.5 rounded-full bg-neo-cyan', !prefersReduced && 'animate-pulse')} />
           {t('wheel.rush.fogActive')}
           <FogCountdown endsAt={fogEndsAt} />
@@ -560,7 +591,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
               (prevents post-reset horizontal shift). */}
           <m.span
             aria-hidden={builtLetters.length > 0}
-            className="absolute inset-0 flex items-center justify-center text-neo-white font-neo-display text-base sm:text-lg pointer-events-none"
+            className={skin.placeholder}
             animate={{ opacity: builtLetters.length === 0 ? 1 : 0 }}
             transition={{ duration: 0.18 }}
           >
@@ -607,12 +638,12 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           {nextRival && (
             <m.div
               data-testid="mp-next-rival-pill"
-              className="px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-white font-semibold flex items-center gap-1.5"
+              className={skin.rivalPill}
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
             >
-              <ChevronUp className="w-3 h-3 text-neo-lime" />
+              <ChevronUp className={skin.rivalArrow} />
               <Avatar
                 pixelSize={20}
                 customAvatar={nextRival.avatar?.customAvatar}
@@ -636,7 +667,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             hint text mounts/unmounts. */}
         <div data-testid="tap-hint-slot" className="h-[14px] sm:h-[16px] flex items-center justify-center">
           {builtLetters.length > 0 && (
-            <p className="text-neo-white text-[10px] sm:text-xs text-center">
+            <p className={skin.tapHint}>
               {t('wordWheel.tapToRemove')} &middot; {t('wordWheel.doubleTapToSubmit')}
             </p>
           )}
@@ -680,8 +711,8 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             animate={prefersReduced ? { opacity: 0.85 } : { opacity: [0.6, 1, 0.6] }}
             transition={prefersReduced ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           />
-          <div className="absolute inset-4 sm:inset-5 rounded-full border border-neo-cyan/10" />
-          <div className="absolute inset-8 sm:inset-10 rounded-full border border-neo-cream/5" />
+          <div className={skin.innerRing} />
+          <div className={skin.outerRing} />
 
           <WheelLetter
             letter={puzzle.centerLetter}
@@ -709,7 +740,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             />
           ))}
         </div>
-        <p className="text-neo-white text-xs text-center px-2">
+        <p className={skin.rule}>
           {t('wordWheel.centerLetterRule')} &middot; {t('wordWheel.minLetters', { min: MIN_LEN })}
         </p>
 

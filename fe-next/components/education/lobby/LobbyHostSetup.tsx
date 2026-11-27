@@ -39,7 +39,7 @@ export function LobbyHostSetup({ flowStrip, lessonStep, activePreset, onApplyPre
   }, [gamesOpen]);
 
   return (
-    <div data-testid="lobby-host-setup" data-lobby-expanded={gamesOpen || undefined} className="@container/setup flex flex-col gap-3 @4xl/setup:gap-4">
+    <div data-testid="lobby-host-setup" data-lobby-expanded={gamesOpen || undefined} className="@container/setup flex flex-col gap-3 @4xl/setup:gap-4 @4xl/setup:[@media(max-height:860px)]:gap-3">
       {flowStrip}
       <div className="flex flex-col gap-2 @2xl/setup:flex-row @2xl/setup:items-start">
         <div className="min-w-0 flex-1">{lessonStep}</div>
@@ -50,9 +50,9 @@ export function LobbyHostSetup({ flowStrip, lessonStep, activePreset, onApplyPre
           aria-controls="lobby-more-games-panel"
           onClick={() => onGamesOpenChange(!gamesOpen)}
           className={cn(
-            'flex min-h-12 shrink-0 items-center justify-between gap-3 rounded-neo-lg border-[3px] border-dashed border-neo-cream/45 px-3 py-1.5 text-start',
-            'font-neo-body text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream/80 motion-reduce:transition-none',
-            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+            'flex min-h-12 shrink-0 items-center justify-between gap-3 rounded-neo-lg border-[3px] border-dashed border-edu-line px-3 py-1.5 text-start',
+            'font-neo-body text-sm font-bold text-edu-ink transition-colors hover:border-edu-line motion-reduce:transition-none',
+            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface',
           )}
         >
           <span className="inline-flex items-center gap-3">
@@ -76,7 +76,7 @@ export function LobbyHostSetup({ flowStrip, lessonStep, activePreset, onApplyPre
         </button>
       </div>
       {gamesOpen ? (
-        <div ref={panelRef} id="lobby-more-games-panel" data-testid="lobby-more-games-panel" className="flex scroll-mt-2 flex-col gap-3 @4xl/setup:gap-4">
+        <div ref={panelRef} id="lobby-more-games-panel" data-testid="lobby-more-games-panel" className="flex scroll-mt-2 flex-col gap-3 @4xl/setup:gap-4 @4xl/setup:[@media(max-height:860px)]:gap-3">
           <LobbyPresetCards active={activePreset} onApply={onApplyPreset} />
           {options}
           {modeGrid}

@@ -148,7 +148,7 @@ export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, lay
             {/* Name cap — sits on the plinth like a placard. */}
             <div
               className={cn(
-                'relative z-10 w-full rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated',
+                'relative z-10 w-full rounded-neo border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface',
                 row ? 'px-2 py-1 text-center shadow-hard-sm' : 'px-3 py-2 text-center shadow-hard-sm',
                 TILT[rank],
                 REVEAL_MOTION,
@@ -159,7 +159,7 @@ export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, lay
                 <Crown
                   data-testid="podium-crown"
                   className={cn(
-                    'absolute start-1/2 -translate-x-1/2 rtl:translate-x-1/2 text-neo-yellow',
+                    'absolute start-1/2 -translate-x-1/2 rtl:translate-x-1/2 text-neo-yellow edu-sky:text-edu-yellow-ink',
                     // Clear of the placard, not on it. Caught on the projector:
                     // a 40px crown at -top-4 dropped two-thirds of itself into a
                     // text-3xl name and struck it through. The offset tracks the
@@ -176,7 +176,7 @@ export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, lay
               )}
               <p
                 className={cn(
-                  'font-neo-display font-bold text-neo-white truncate',
+                  'font-neo-display font-bold text-neo-white edu-sky:text-edu-ink truncate',
                   projector ? 'text-2xl [@media(min-height:1000px)]:text-3xl' : row ? 'text-sm' : 'text-base'
                 )}
               >

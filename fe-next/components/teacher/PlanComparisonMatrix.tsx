@@ -33,7 +33,7 @@ export function PlanComparisonMatrix({ compact = false }: { compact?: boolean } 
     }
     if (value === null) {
       return (
-        <span className="font-neo-display font-black text-neo-lime">
+        <span className="font-neo-display font-black text-edu-lime-ink">
           {t('teacher.subscription.matrix.unlimited')}
         </span>
       );
@@ -43,7 +43,7 @@ export function PlanComparisonMatrix({ compact = false }: { compact?: boolean } 
         <span
           data-plan-mark
           aria-hidden="true"
-          className={value ? 'text-neo-lime font-black' : 'text-neo-white/40 font-black'}
+          className={value ? 'text-edu-lime-ink font-black' : 'text-edu-ink/40 font-black'}
         >
           {value ? '✓' : '✗'}
         </span>
@@ -63,8 +63,8 @@ export function PlanComparisonMatrix({ compact = false }: { compact?: boolean } 
       <h2
         className={
           compact
-            ? 'text-base font-neo-display font-black text-neo-white text-start mb-2'
-            : 'text-2xl sm:text-3xl font-neo-display font-black text-neo-white text-center mb-6'
+            ? 'text-base font-neo-display font-black text-edu-ink text-start mb-2'
+            : 'text-2xl sm:text-3xl font-neo-display font-black text-edu-ink text-center mb-6'
         }
       >
         {t('teacher.subscription.matrix.title')}
@@ -73,19 +73,19 @@ export function PlanComparisonMatrix({ compact = false }: { compact?: boolean } 
       {/* Horizontal scroll container, not a squeeze: at 390px three columns of short values
           fit, but a long row label in German-length Swedish or Russian would otherwise force
           the whole page body to scroll sideways. Keep the overflow on the wrapper. */}
-      <div className="overflow-x-auto rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light shadow-hard">
-        <table className="w-full border-collapse bg-neo-navy-light text-start">
+      <div className="overflow-x-auto rounded-neo border-2 border-edu-line bg-edu-surface shadow-hard">
+        <table className="w-full border-collapse bg-edu-surface text-start">
           <thead>
-            <tr className="border-b-2 border-neo-cream/40 bg-neo-navy">
+            <tr className="border-b-2 border-edu-line bg-edu-surface">
               <th
                 scope="col"
-                className={`${pad} text-start font-neo-display font-black text-neo-white/80 text-sm sm:text-base`}
+                className={`${pad} text-start font-neo-display font-black text-edu-ink/80 text-sm sm:text-base`}
               >
                 {t('teacher.subscription.matrix.featureColumn')}
               </th>
               <th
                 scope="col"
-                className={`${pad} text-center font-neo-display font-black text-neo-white text-sm sm:text-base`}
+                className={`${pad} text-center font-neo-display font-black text-edu-ink text-sm sm:text-base`}
               >
                 {t('teacher.subscription.freePlanName')}
               </th>
@@ -101,17 +101,17 @@ export function PlanComparisonMatrix({ compact = false }: { compact?: boolean } 
           </thead>
           <tbody>
             {PLAN_MATRIX_ROWS.map((row) => (
-              <tr key={row.key} className="border-b border-neo-white/15 last:border-b-0">
+              <tr key={row.key} className="border-b border-edu-line/15 last:border-b-0">
                 <th
                   scope="row"
-                  className={`${pad} text-start font-bold text-neo-white text-sm sm:text-base`}
+                  className={`${pad} text-start font-bold text-edu-ink text-sm sm:text-base`}
                 >
                   {t(`teacher.subscription.matrix.${row.key}`)}
                 </th>
-                <td className={`${pad} text-center text-neo-white`}>
+                <td className={`${pad} text-center text-edu-ink`}>
                   <Cell value={row.free} />
                 </td>
-                <td className={`${pad} text-center text-neo-white bg-neo-yellow/10`}>
+                <td className={`${pad} text-center text-edu-ink bg-neo-yellow/10`}>
                   <Cell value={row.pro} />
                 </td>
               </tr>

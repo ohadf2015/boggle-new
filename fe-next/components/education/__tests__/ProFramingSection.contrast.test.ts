@@ -24,7 +24,7 @@ import { describe, expect, it } from 'vitest';
  */
 const SECTION = path.resolve(__dirname, '../ProFramingSection.tsx');
 
-/** Shipped values, `app/globals.css` :root (the dark theme — this app is dark-only). */
+/** Shipped values: neo-* from `app/globals.css` :root, edu-* from the sky scope in `app/edu-sky.css`. */
 const TOKENS: Record<string, string> = {
   'neo-navy': '#1a1a2e',
   'neo-navy-light': '#16213e',
@@ -35,6 +35,15 @@ const TOKENS: Record<string, string> = {
   'neo-lime': '#bfff00',
   'neo-cyan': '#00ffff',
   'neo-pink': '#ff1493',
+  'neo-yellow': '#ffe135',
+  'edu-page': '#9ed8ff',
+  'edu-surface': '#fff8ea',
+  'edu-tile': '#ffefd2',
+  'edu-ink': '#101114',
+  'edu-line': '#101114',
+  'edu-yellow-ink': '#6b4a00',
+  'edu-lime-ink': '#3d5c00',
+  'edu-pink-ink': '#b0105f',
 };
 
 function luminance(hex: string): number {
@@ -75,8 +84,8 @@ function cardBlock(src: string, label: string, endsAt: string): string {
 
 /** Background token of the first element in the block that declares one. */
 function backgroundOf(block: string): string {
-  const match = /\bbg-(neo-[a-z-]+?)(?:\/\d+)?[\s"]/.exec(block);
-  expect(match, 'card block declares no bg-neo-* background').toBeTruthy();
+  const match = /\bbg-((?:neo|edu)-[a-z-]+?)(?:\/\d+)?[\s"]/.exec(block);
+  expect(match, 'card block declares no bg token').toBeTruthy();
   return match![1];
 }
 
@@ -104,12 +113,12 @@ describe('ProFramingSection contrast', () => {
       let sawText = false;
 
       for (const [, className] of block.matchAll(/className="([^"]*)"/g)) {
-        const ownBg = /\bbg-(neo-[a-z-]+?)(?:\/\d+)?(?:\s|$)/.exec(className)?.[1];
+        const ownBg = /\bbg-((?:neo|edu)-[a-z-]+?)(?:\/\d+)?(?:\s|$)/.exec(className)?.[1];
         const groundToken = ownBg ?? bgToken;
         const ground = TOKENS[groundToken];
         if (!ground) continue;
 
-        for (const [, fgToken] of className.matchAll(/\btext-(neo-[a-z-]+?)(?:\/\d+)?(?:\s|$)/g)) {
+        for (const [, fgToken] of className.matchAll(/\btext-((?:neo|edu)-[a-z-]+?)(?:\/\d+)?(?:\s|$)/g)) {
           const fg = TOKENS[fgToken];
           if (!fg) continue;
           sawText = true;
@@ -123,7 +132,7 @@ describe('ProFramingSection contrast', () => {
         // price was `border-neo-black/20` over navy — 1.07:1 even at full opacity — so the
         // divider was simply absent. WCAG 1.4.11 puts non-text UI at 3:1.
         // `border-neo-thick` and friends fall out here: they resolve to no hex in TOKENS.
-        for (const [, edgeToken] of className.matchAll(/\bborder-(neo-[a-z-]+?)(?:\/\d+)?(?:\s|$)/g)) {
+        for (const [, edgeToken] of className.matchAll(/\bborder-((?:neo|edu)-[a-z-]+?)(?:\/\d+)?(?:\s|$)/g)) {
           const edge = TOKENS[edgeToken];
           if (!edge) continue;
           const ratio = contrast(edge, ground);
@@ -133,7 +142,7 @@ describe('ProFramingSection contrast', () => {
         }
       }
 
-      expect(sawText, `no text-neo-* tokens found in the ${label} card`).toBe(true);
+      expect(sawText, `no text tokens found in the ${label} card`).toBe(true);
       expect(
         [...new Set(failures)],
         'WCAG AA: 4.5:1 for body copy, 3:1 for borders and other non-text UI',

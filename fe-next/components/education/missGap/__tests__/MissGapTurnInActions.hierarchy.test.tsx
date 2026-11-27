@@ -65,8 +65,8 @@ describe('MissGapTurnInActions — one dominant action', () => {
     // the navy surface (written as `border-[2px]` so a cn() merge cannot drop
     // the width next to the colour class).
     expect(share.className).toContain('border-[2px]');
-    expect(share.className).toContain('border-neo-cream');
-    expect(share.className).toContain('text-neo-cream');
+    expect(share.className).toContain('border-edu-line');
+    expect(share.className).toContain('text-edu-ink');
   });
 
   it('still opens WhatsApp with the practice card', () => {

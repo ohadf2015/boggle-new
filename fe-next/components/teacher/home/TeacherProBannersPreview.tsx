@@ -26,7 +26,7 @@ const DAY = 86_400_000;
 function Slot({ name, children }: { name: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-2">
-      <p className="font-mono text-xs text-neo-cream/60">{name}</p>
+      <p className="font-mono text-xs text-edu-ink/60">{name}</p>
       {children}
     </section>
   );
@@ -39,7 +39,7 @@ export function TeacherProBannersPreview() {
   const iso = (days: number) => new Date(nowMs + days * DAY).toISOString();
   const noop = () => undefined;
   return (
-    <main className="min-h-dvh bg-neo-navy p-4 sm:p-8">
+    <main className="min-h-dvh bg-edu-page p-4 sm:p-8">
       <div className="mx-auto flex max-w-4xl flex-col gap-8">
         <Slot name="TeacherTrialReminderBanner (2d)">
           <TeacherTrialReminderBanner trial={teacherTrialStatus(iso(2), nowMs)} onDismiss={noop} />

@@ -85,6 +85,12 @@ describe('Student quiz top row: X, one bar, one score-and-clock cluster', () => 
     expect(within(screen.getByTestId('vocab-quiz-column')).getByRole('img')).toBeInTheDocument();
   });
 
+  it('Given a question, Then Lexi stands beside the word unframed, as in the approved mockup', () => {
+    mount();
+    const lexi = within(screen.getByTestId('vocab-quiz-question-mascot')).getByRole('img');
+    expect(lexi.className).not.toMatch(/border-\[3px\]|rounded-full|bg-edu-surface/);
+  });
+
   it('Given the reveal on a wide screen, Then the verdict sheet owns Lexi and the framed panel drops her slot instead of leaving a hole', () => {
     const s = mount();
     s.server(VOCAB_QUIZ_EVENTS.reveal, REVEAL);
@@ -102,7 +108,7 @@ describe('The topic is a label above the question, not a chip', () => {
     expect(block.contains(focus)).toBe(true);
     expect(focus.compareDocumentPosition(screen.getByTestId('vocab-quiz-prompt')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(focus.className).not.toContain('rounded-full');
-    expect(focus.className).toContain('text-neo-purple');
+    expect(focus).toHaveClass('bg-neo-pink', 'text-neo-black', 'border-neo-black');
   });
 });
 
@@ -118,7 +124,7 @@ describe('One neutral clock that only turns urgent at the end', () => {
     mount({ remainingMs: 3_000 });
     const timer = screen.getByRole('timer');
     expect(timer.dataset.urgent).toBe('true');
-    expect(timer.className).toContain('text-neo-orange');
+    expect(timer.className).toContain('text-edu-orange-ink');
   });
 
   it('Given the clock has run out before the reveal, Then it stays urgent, the clock says time is up and the band says the answer is coming', () => {

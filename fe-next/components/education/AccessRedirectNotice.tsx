@@ -56,7 +56,7 @@ export function AccessRedirectNotice({ from }: { from?: string | null }) {
     <div className="mb-3 flex justify-center">
       <p
         role="status"
-        className="inline-flex max-w-full items-center gap-1.5 rounded-full border-2 border-neo-cyan/60 bg-neo-cyan/10 px-3 py-1 text-sm font-bold text-neo-cyan"
+        className="inline-flex max-w-full items-center gap-1.5 rounded-full border-2 border-neo-cyan/60 bg-neo-cyan/10 px-3 py-1 text-sm font-bold text-edu-cyan-ink edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:text-edu-ink edu-sky:shadow-edu-lip-sm"
       >
         <Info aria-hidden="true" className="h-4 w-4 shrink-0" />
         <span className="min-w-0">{t('education.access.redirect_chip', { dest })}</span>

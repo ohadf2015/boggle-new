@@ -11,9 +11,9 @@ import type { DiscoverFilters as Filters } from './useDiscoverLibrary';
 import { NB_BLOCK, NB_SMALL } from '@/components/teacher/nb/nbStyles';
 
 const PILL =
-  'inline-flex h-10 shrink-0 items-center gap-1 rounded-full border-2 px-2.5 font-neo-display sm:px-3.5 text-sm font-bold transition-[translate,box-shadow,border-color] duration-150 hover:-translate-y-0.5 active:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cream';
+  'inline-flex h-10 shrink-0 items-center gap-1 rounded-full border-2 px-2.5 font-neo-display sm:px-3.5 text-sm font-bold transition-[translate,box-shadow,border-color] duration-150 hover:-translate-y-0.5 active:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-edu-line';
 const SELECT =
-  'h-10 min-w-0 rounded-full border-2 border-neo-cream/40 bg-neo-navy-light px-2 text-sm font-bold text-neo-white focus:outline-hidden focus:ring-2 focus:ring-neo-cream';
+  'h-10 min-w-0 rounded-full border-2 border-edu-line bg-edu-surface px-2 text-sm font-bold text-edu-ink focus:outline-hidden focus:ring-2 focus:ring-edu-line';
 
 interface DiscoverFiltersProps {
   filters: Filters;
@@ -27,18 +27,18 @@ export default function DiscoverFilters({ filters, onChange, total }: DiscoverFi
   const activeExtra = (filters.source !== 'all' ? 1 : 0) + (filters.grade ? 1 : 0) + (filters.topic ? 1 : 0) + (filters.sort !== 'popular' ? 1 : 0);
 
   return (
-    <div data-testid="discover-filters" className="sticky top-0 z-10 -mx-1 space-y-2 bg-neo-navy px-1 pb-2 pt-1">
+    <div data-testid="discover-filters" className="sticky top-0 z-10 -mx-1 space-y-2 bg-edu-surface px-1 pb-2 pt-1">
       <div className="flex gap-2">
         <label className="relative min-w-0 flex-1">
           <span className="sr-only">{t('eduLibrary.discover.searchLabel')}</span>
-          <Search className="pointer-events-none absolute z-10 start-3 top-1/2 size-4 -translate-y-1/2 text-neo-cream/60" aria-hidden="true" />
+          <Search className="pointer-events-none absolute z-10 start-3 top-1/2 size-4 -translate-y-1/2 text-edu-ink/60" aria-hidden="true" />
           <input
             type="search"
             data-testid="discover-search"
             value={filters.query}
             onChange={(e) => onChange({ query: e.target.value })}
             placeholder={t('eduLibrary.discover.searchPlaceholder')}
-            className="h-11 w-full min-w-0 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light shadow-hard-sm ps-9 pe-9 font-neo-body text-base text-neo-white placeholder:text-neo-cream/55 focus:border-neo-cream focus:outline-hidden"
+            className="h-11 w-full min-w-0 rounded-neo border-2 border-edu-line bg-edu-surface shadow-hard-sm ps-9 pe-9 font-neo-body text-base text-edu-ink placeholder:text-edu-ink/55 focus:border-edu-line focus:outline-hidden"
           />
           {filters.query && (
             <button
@@ -46,7 +46,7 @@ export default function DiscoverFilters({ filters, onChange, total }: DiscoverFi
               onClick={() => onChange({ query: '' })}
               aria-label={t('eduLibrary.discover.clearSearch')}
               title={t('eduLibrary.discover.clearSearch')}
-              className="absolute end-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-neo-cream/70 hover:text-neo-cream"
+              className="absolute end-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-edu-ink/70 hover:text-edu-ink"
             >
               <X className="size-4" aria-hidden="true" />
             </button>
@@ -59,12 +59,12 @@ export default function DiscoverFilters({ filters, onChange, total }: DiscoverFi
           aria-controls="discover-more-filters"
           aria-label={t('eduLibrary.discover.filters')}
           title={t('eduLibrary.discover.filters')}
-          className={cn(NB_SMALL, NB_BLOCK.navy, 'relative h-11 shrink-0 px-3', showMore && 'border-neo-cream')}
+          className={cn(NB_SMALL, NB_BLOCK.navy, 'relative h-11 shrink-0 px-3', showMore && 'border-edu-line')}
         >
           <SlidersHorizontal className="size-4" aria-hidden="true" />
           <span className="hidden sm:inline">{t('eduLibrary.discover.filters')}</span>
           {activeExtra > 0 && (
-            <span className="absolute -end-2 -top-2 flex size-5 items-center justify-center rounded-full border-2 border-neo-cream bg-neo-navy text-[10px] font-black text-neo-white">
+            <span className="absolute -end-2 -top-2 flex size-5 items-center justify-center rounded-full border-2 border-edu-line bg-edu-surface text-[10px] font-black text-edu-ink">
               {activeExtra}
             </span>
           )}
@@ -73,7 +73,7 @@ export default function DiscoverFilters({ filters, onChange, total }: DiscoverFi
 
       <div className="flex flex-wrap items-center gap-1.5">
         <label className="relative shrink-0">
-          <Globe2 className="pointer-events-none absolute start-2 top-1/2 size-4 -translate-y-1/2 text-neo-cream/70" aria-hidden="true" />
+          <Globe2 className="pointer-events-none absolute start-2 top-1/2 size-4 -translate-y-1/2 text-edu-ink/70" aria-hidden="true" />
           <select
             aria-label={t('eduLibrary.meta.language')}
             data-testid="discover-language"
@@ -87,7 +87,7 @@ export default function DiscoverFilters({ filters, onChange, total }: DiscoverFi
             ))}
           </select>
         </label>
-        <span className="ms-auto shrink-0 text-xs font-bold tabular-nums text-neo-cream/70 max-sm:hidden" aria-live="polite">
+        <span className="ms-auto shrink-0 text-xs font-bold tabular-nums text-edu-ink/70 max-sm:hidden" aria-live="polite">
           {t('eduLibrary.discover.count', { count: total })}
         </span>
       </div>
@@ -103,9 +103,9 @@ export default function DiscoverFilters({ filters, onChange, total }: DiscoverFi
                   type="button"
                   aria-pressed={active}
                   onClick={() => onChange({ source: s })}
-                  className={cn(PILL, active ? 'border-neo-lime text-neo-white shadow-hard-sm ring-1 ring-neo-lime' : 'border-neo-cream/50 text-neo-cream/85 hover:border-neo-cream')}
+                  className={cn(PILL, active ? 'border-neo-lime text-edu-ink shadow-hard-sm ring-1 ring-neo-lime' : 'border-edu-line text-edu-ink/85 hover:border-edu-line')}
                 >
-                  {active && <Check className="size-3.5 text-neo-lime" strokeWidth={3} aria-hidden="true" />}
+                  {active && <Check className="size-3.5 text-edu-lime-ink" strokeWidth={3} aria-hidden="true" />}
                   {s === 'all' ? t('eduLibrary.discover.source.all') : t(`eduLibrary.badge.${s}`)}
                 </button>
               );

@@ -230,7 +230,7 @@ export function GetStudentsInCard({
         ) : empty ? (
           <div data-testid="hq-first-student-panel" className="flex min-w-0 flex-1 items-center gap-2">
             {joinUrl ? (
-              <span data-testid="hq-first-student-qr" className="hidden size-9 shrink-0 rounded-sm bg-neo-white p-0.5 lg:block">
+              <span data-testid="hq-first-student-qr" className="hidden size-9 shrink-0 rounded-sm bg-edu-paper p-0.5 lg:block">
                 <QRCodeSVG value={joinUrl} size={96} level="L" style={{ width: "100%", height: "100%" }} aria-hidden="true" />
               </span>
             ) : null}

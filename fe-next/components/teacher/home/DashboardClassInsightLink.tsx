@@ -16,7 +16,7 @@ export function DashboardClassInsightLink({ classroomId, language, label }: { cl
       href={teacherResultsHref(language, classroomId)}
       data-testid="dashboard-class-insight-link"
       onClick={onClick}
-      className="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-1 rounded-neo font-neo-body text-sm font-bold text-neo-cream/85 underline decoration-2 underline-offset-4 transition-colors hover:text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+      className="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-1 rounded-neo font-neo-body text-sm font-bold text-edu-ink/85 underline decoration-2 underline-offset-4 transition-colors hover:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
     >
       <span className="min-w-0">{label}</span>
       <ChevronRight className="size-4 shrink-0 rtl:-scale-x-100" aria-hidden="true" />

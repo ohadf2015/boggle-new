@@ -45,7 +45,7 @@ export function LobbyPickerPreview() {
   }, [list]);
 
   return (
-    <div className={cn('fixed inset-0 z-[80] flex flex-col overflow-hidden bg-neo-navy', language === 'he' && 'rtl')}>
+    <div className={cn('fixed inset-0 z-[80] flex flex-col overflow-hidden bg-edu-page', language === 'he' && 'rtl')}>
       <EducationHeader compact showBackButton title={t('education.classroomGame.title')} />
       <main className={cn('relative mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col overflow-hidden px-3 py-2 sm:px-6 sm:py-3', TV_STAGE_ZOOM_CLASS)}>
         <ClassroomLobbyShell

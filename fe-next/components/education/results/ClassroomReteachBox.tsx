@@ -24,7 +24,7 @@ export function ClassroomReteachBox({ summary, neverPlaced, links, onReteach, re
 
   if (verdict.kind !== 'replay' && !sendHome) {
     return (
-      <p className="p-3 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light text-neo-white shadow-hard font-neo-body text-sm">
+      <p className="p-3 rounded-neo-lg border-[3px] border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink shadow-hard font-neo-body text-sm">
         {t('education.results.allFound')}
       </p>
     );
@@ -33,10 +33,10 @@ export function ClassroomReteachBox({ summary, neverPlaced, links, onReteach, re
   const missedOnBoard = summary.missedWords.filter((w) => !neverPlaced.has(w.toLowerCase()));
 
   return (
-    <div data-testid="reteach-list" className="p-3 rounded-neo-lg border-[3px] border-neo-pink bg-neo-navy-light shadow-hard">
+    <div data-testid="reteach-list" className="p-3 rounded-neo-lg border-[3px] border-neo-pink bg-neo-navy-light edu-sky:bg-edu-surface shadow-hard">
       {verdict.kind === 'replay' ? (
         <>
-          <p className="text-neo-white font-bold text-sm mb-2">{t('eduLiveRoom.hostResults.mostMissed')}</p>
+          <p className="text-neo-white edu-sky:text-edu-ink font-bold text-sm mb-2">{t('eduLiveRoom.hostResults.mostMissed')}</p>
           <ul className="flex flex-wrap gap-1.5">
             {verdict.words.map((w) => (
               <li
@@ -55,30 +55,30 @@ export function ClassroomReteachBox({ summary, neverPlaced, links, onReteach, re
           </ul>
         </>
       ) : verdict.kind === 'wholeLesson' ? (
-        <p data-testid="reteach-whole-lesson" className="text-neo-white font-bold text-sm">
+        <p data-testid="reteach-whole-lesson" className="text-neo-white edu-sky:text-edu-ink font-bold text-sm">
           {t('education.results.wholeLessonAgain')}
         </p>
       ) : missedOnBoard.length > 0 ? (
         <>
-          <p className="text-neo-white font-bold text-sm mb-1">{t('education.results.reteach')}</p>
-          <p data-testid="missed-on-board-words" className="text-neo-white/80 font-neo-body text-sm">
+          <p className="text-neo-white edu-sky:text-edu-ink font-bold text-sm mb-1">{t('education.results.reteach')}</p>
+          <p data-testid="missed-on-board-words" className="text-neo-white/80 edu-sky:text-edu-ink/80 font-neo-body text-sm">
             {missedOnBoard.join(', ')}
           </p>
         </>
       ) : (
-        <p data-testid="all-board-words-found" className="text-neo-white font-bold text-sm">
+        <p data-testid="all-board-words-found" className="text-neo-white edu-sky:text-edu-ink font-bold text-sm">
           {t('education.results.allBoardWordsFound')}
         </p>
       )}
 
       {neverPlaced.size > 0 && (
-        <div data-testid="never-placed-words" className="mt-3 p-3 rounded-neo border border-dashed border-neo-white/50 bg-neo-navy/60">
-          <p className="flex items-center gap-2 text-neo-white/80 font-bold text-sm mb-1">
+        <div data-testid="never-placed-words" className="mt-3 p-3 rounded-neo border border-dashed border-neo-white/50 edu-sky:border-edu-line bg-neo-navy/60 edu-sky:bg-edu-surface/60">
+          <p className="flex items-center gap-2 text-neo-white/80 edu-sky:text-edu-ink/80 font-bold text-sm mb-1">
             <EyeOff className="w-4 h-4 shrink-0" aria-hidden />
             {t('education.results.neverPlaced')}
           </p>
-          <p className="text-neo-white/70 font-neo-body text-sm">{summary.neverPlacedWords?.join(', ')}</p>
-          <p className="mt-1 text-neo-white/50 font-neo-body text-xs">{t('education.results.neverPlacedHint')}</p>
+          <p className="text-neo-white/70 edu-sky:text-edu-ink/70 font-neo-body text-sm">{summary.neverPlacedWords?.join(', ')}</p>
+          <p className="mt-1 text-neo-white/50 edu-sky:text-edu-ink/50 font-neo-body text-xs">{t('education.results.neverPlacedHint')}</p>
         </div>
       )}
 

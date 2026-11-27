@@ -30,7 +30,7 @@ export function SourceBadge({ item, className, sticker = false }: { item: Pick<L
         'inline-flex min-w-0 items-center gap-1 rounded-neo border-2 px-1.5 py-px text-[11px] font-black',
         sticker && item.source === 'verified' && !item.isMine
           ? '-rotate-2 border-neo-black bg-neo-cream text-neo-black shadow-hard-sm'
-          : sticker ? 'border-neo-cream/70 text-neo-cream' : 'border border-neo-cream/50 text-neo-cream/90',
+          : sticker ? 'border-edu-line text-edu-ink' : 'border border-edu-line text-edu-ink/90',
         className,
       )}
     >
@@ -44,14 +44,14 @@ export function ItemStats({ item, className, verbose = false }: { item: LibraryI
   const { t, language } = useLanguage();
   if (item.source !== 'teacher' || item.playCount === null || item.copyCount === null) return null;
   if (item.playCount === 0 && item.copyCount === 0) {
-    return <span className={cn('text-[11px] font-bold text-neo-cream/80', className)}>{t('eduLibrary.card.new')}</span>;
+    return <span className={cn('text-[11px] font-bold text-edu-ink/80', className)}>{t('eduLibrary.card.new')}</span>;
   }
   const stats = [
     { count: item.playCount, label: t(countKey('plays', item.playCount, language), { count: item.playCount }), icon: <Play className="size-3 fill-current" aria-hidden="true" /> },
     { count: item.copyCount, label: t(countKey('copies', item.copyCount, language), { count: item.copyCount }), icon: <Copy className="size-3" aria-hidden="true" /> },
   ].filter((s) => s.count > 0);
   return (
-    <span className={cn('inline-flex items-center gap-2 text-[11px] font-bold tabular-nums text-neo-white/80', className)}>
+    <span className={cn('inline-flex items-center gap-2 text-[11px] font-bold tabular-nums text-edu-ink/80', className)}>
       {stats.map((s) => (
         <span key={s.label} className="inline-flex items-center gap-0.5" aria-label={s.label} title={s.label}>
           {s.icon}
@@ -92,15 +92,15 @@ export default function LibraryCard({ item, index, onOpen }: LibraryCardProps) {
         'group relative flex min-h-[116px] min-w-0 flex-col gap-1 overflow-hidden py-3 pe-3 ps-6 text-start',
         GAME_CARD,
         GAME_CARD_HOVER,
-        'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cream',
+        'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-edu-line',
         'motion-safe:animate-pop-in [animation-fill-mode:both]',
       )}
     >
       <span aria-hidden="true" data-testid="list-card-accent" className={cn(LIST_CARD_ACCENT, ARCADE_BLOCK[accent])} />
-      <span title={item.name} className="line-clamp-2 font-neo-display text-lg font-bold leading-tight text-neo-white">
+      <span title={item.name} className="line-clamp-2 font-neo-display text-lg font-bold leading-tight text-edu-ink">
         <BidiText>{item.name}</BidiText>
       </span>
-      <span data-testid="library-card-fact" className="truncate text-sm font-semibold text-neo-cream/80" dir="auto">
+      <span data-testid="library-card-fact" className="truncate text-sm font-semibold text-edu-ink/80" dir="auto">
         {t(pluralKeyOf('eduLibrary.card.words', item.wordCount, language), { count: item.wordCount })}
         {' · '}
         <span lang={item.language}>{nativeLanguageName(item.language)}</span>
@@ -109,7 +109,7 @@ export default function LibraryCard({ item, index, onOpen }: LibraryCardProps) {
       </span>
       <span className="mt-auto flex items-center justify-between gap-2 pt-1">
         <SourceBadge item={item} />
-        <span className="inline-flex items-center gap-0.5 font-neo-display text-sm font-black text-neo-cream">
+        <span className="inline-flex items-center gap-0.5 font-neo-display text-sm font-black text-edu-ink">
           {t('eduLibrary.card.use')}
           <DirectionalIcon icon={ChevronRight} className="size-4" />
         </span>

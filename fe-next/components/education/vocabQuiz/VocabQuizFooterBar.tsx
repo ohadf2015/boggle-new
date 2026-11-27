@@ -24,8 +24,8 @@ export interface VocabQuizFooterBarProps {
   t: TranslateFn;
 }
 
-const HEADLINE = 'flex min-w-0 items-center gap-2 text-balance break-words font-neo-display text-base font-black leading-tight text-neo-white sm:text-xl';
-const HINT = 'flex min-w-0 items-center gap-2 text-balance break-words font-neo-body text-sm font-bold leading-tight text-neo-white/70 sm:text-lg';
+const HEADLINE = 'flex min-w-0 items-center gap-2 text-balance break-words font-neo-display text-base font-black leading-tight text-neo-white edu-sky:text-edu-ink sm:text-xl';
+const HINT = 'flex min-w-0 items-center gap-2 text-balance break-words font-neo-body text-sm font-bold leading-tight text-neo-white/70 edu-sky:text-edu-ink/70 sm:text-lg';
 const HEAD_ICON = 'size-5 shrink-0 sm:size-6';
 
 const MAX_ROOM_DOTS = 12;
@@ -35,7 +35,7 @@ function RoomChip({ room, t }: { room: { locked: number; total: number }; t: Tra
   return (
     <span
       data-testid="vocab-quiz-footer-room"
-      className="ms-auto flex shrink-0 items-center gap-2 whitespace-nowrap font-neo-display font-black tabular-nums text-neo-white"
+      className="ms-auto flex shrink-0 items-center gap-2 whitespace-nowrap font-neo-display font-black tabular-nums text-neo-white edu-sky:text-edu-ink"
     >
       <span className="sr-only">{t('vocabQuiz.footer.roomCount', { locked: room.locked, total: room.total })}</span>
       {dots.length > 0 ? (
@@ -46,7 +46,7 @@ function RoomChip({ room, t }: { room: { locked: number; total: number }; t: Tra
               data-dot={on ? 'on' : 'off'}
               className={cn(
                 'size-3.5 rounded-full border-2 transition-[transform,background-color] duration-200 motion-reduce:transition-none sm:size-4',
-                on ? 'scale-100 border-neo-black bg-neo-lime' : 'scale-90 border-neo-white/40 bg-transparent'
+                on ? 'scale-100 border-neo-black edu-sky:border-neo-black bg-neo-lime' : 'scale-90 border-neo-white/40 edu-sky:border-edu-line bg-transparent'
               )}
             />
           ))}
@@ -76,19 +76,19 @@ export function VocabQuizFooterBar({
     <>
       <Pop className="min-w-0 max-w-full">
         <span role="status" data-testid="vocab-quiz-footer-status" className={HEADLINE}>
-          <Check className={`${HEAD_ICON} text-neo-lime`} strokeWidth={3.5} aria-hidden />
+          <Check className={`${HEAD_ICON} text-neo-lime edu-sky:text-edu-lime-ink`} strokeWidth={3.5} aria-hidden />
           <span>{t('vocabQuiz.footer.locked')}</span>
         </span>
       </Pop>
       {picked && (
-        <span data-testid="vocab-quiz-footer-picked" className="break-words font-neo-body text-sm font-bold leading-snug text-neo-white/70 sm:text-base">
+        <span data-testid="vocab-quiz-footer-picked" className="break-words font-neo-body text-sm font-bold leading-snug text-neo-white/70 edu-sky:text-edu-ink/70 sm:text-base">
           {t('vocabQuiz.footer.youPicked', { word: picked })}
         </span>
       )}
     </>
   ) : timeUp ? (
     <p role="status" data-testid="vocab-quiz-footer-timeup" className={HEADLINE}>
-      <Hourglass className={`${HEAD_ICON} text-neo-orange`} strokeWidth={3} aria-hidden />
+      <Hourglass className={`${HEAD_ICON} text-neo-orange edu-sky:text-edu-orange-ink`} strokeWidth={3} aria-hidden />
       <span>{t('vocabQuiz.footer.timeUp')}</span>
     </p>
   ) : null;
@@ -100,7 +100,7 @@ export function VocabQuizFooterBar({
       className={cn('-mx-3 -mb-3 shrink-0', verdict && 'h-[calc(12rem+env(safe-area-inset-bottom))] overflow-hidden sm:h-40 sm:[@media(max-height:560px)]:h-28')}
     >
       {verdict ?? (
-        <div data-testid="vocab-quiz-footer-gutters" className="flex px-4 pt-1 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:border-t-2 sm:border-neo-white/10 sm:pt-4 [@media(max-height:560px)]:pt-1 sm:pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div data-testid="vocab-quiz-footer-gutters" className="flex px-4 pt-1 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:border-t-2 sm:border-neo-white/10 edu-sky:sm:border-edu-line/10 sm:pt-4 [@media(max-height:560px)]:pt-1 sm:pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div
             data-testid="vocab-quiz-footer-row"
             // Physical left on phones: the corner a floating launcher or dev badge takes, in either direction.
@@ -111,13 +111,13 @@ export function VocabQuizFooterBar({
                 // Keyed on the count so each new right answer re-pops the run.
                 <Pop key={streak} className="min-w-0 max-w-full">
                   <p data-testid="vocab-quiz-footer-hint" data-live="true" className={HINT}>
-                    <Flame className={`${HEAD_ICON} fill-neo-orange text-neo-orange`} strokeWidth={3} aria-hidden />
+                    <Flame className={`${HEAD_ICON} fill-neo-orange text-neo-orange edu-sky:text-edu-orange-ink`} strokeWidth={3} aria-hidden />
                     <span>{t('vocabQuiz.footer.streakRun', { count: streak })}</span>
                   </p>
                 </Pop>
               ) : (
                 <p data-testid="vocab-quiz-footer-hint" data-live="false" className={HINT}>
-                  <Zap className={`${HEAD_ICON} fill-neo-lime text-neo-lime`} strokeWidth={3} aria-hidden />
+                  <Zap className={`${HEAD_ICON} fill-neo-lime text-neo-lime edu-sky:text-edu-lime-ink`} strokeWidth={3} aria-hidden />
                   <span>{t('vocabQuiz.footer.speedTip')}</span>
                 </p>
               ))}

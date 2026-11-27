@@ -87,8 +87,8 @@ export function SettingsPreview() {
   const [accessibility, setAccessibility] = useState({});
   const [rivalry, setRivalry] = useState(true);
   return (
-    <div className="min-h-dvh bg-neo-navy px-3 py-4">
-      <div className="mx-auto w-full max-w-xl rounded-neo-lg border-[3px] border-neo-cream/40 bg-neo-navy-light p-4 shadow-hard-lg">
+    <div className="min-h-dvh bg-edu-page px-3 py-4">
+      <div className="mx-auto w-full max-w-xl rounded-neo-lg border-[3px] border-edu-line bg-edu-surface p-4 shadow-hard-lg">
         <LobbySetupPanel
           playStyle={playStyle}
           teamCount={teamCount}

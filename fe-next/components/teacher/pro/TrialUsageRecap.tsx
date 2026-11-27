@@ -41,7 +41,7 @@ export function TrialUsageRecap({ trialExpires, className }: { trialExpires: str
   if (parts.length === 0) return null;
 
   return (
-    <span data-testid="trial-usage-recap" className={cn('mt-1 block font-bold text-neo-cream', className)}>
+    <span data-testid="trial-usage-recap" className={cn('mt-1 block font-bold text-edu-ink', className)}>
       {t('teacher.trialUsage.lead')} {parts.join(' · ')}
     </span>
   );

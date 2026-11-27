@@ -23,7 +23,7 @@ export default function TvWordcraftBroadcast({ joinBar, socket, players, teams, 
   return (
     <div
       data-testid="tv-wordcraft-broadcast"
-      className="flex-1 flex flex-col min-h-0 bg-neo-navy overflow-hidden"
+      className="flex-1 flex flex-col min-h-0 bg-neo-navy edu-sky:bg-edu-page overflow-hidden"
       style={TEACHER_CONTROLS_INSET}
     >
       {joinBar}

@@ -107,10 +107,10 @@ export function EducationLandingDemo() {
       data-testid="education-landing-demo"
       role="group"
       aria-label={t('eg6Land.demo.label')}
-      className="overflow-hidden rounded-neo border-3 border-neo-cream/60 bg-neo-navy-light shadow-hard-lg"
+      className="overflow-hidden rounded-neo border-3 border-edu-line bg-edu-surface shadow-hard-lg"
     >
       <EducationLandingProjector youScore={found.length}>
-        <p aria-live="polite" className="mb-2 min-h-[2lh] text-balance font-neo-display text-xs font-black uppercase leading-tight tracking-wide text-neo-lime">
+        <p aria-live="polite" className="mb-2 min-h-[2lh] text-balance font-neo-display text-xs font-black uppercase leading-tight tracking-wide text-edu-lime-ink">
           {watching ? t('eg6Land.demo.watching') : t('eg6Land.demo.yourTurn')}
         </p>
         <div data-testid="education-landing-demo-board" className="relative mx-auto max-w-[15rem] sm:max-w-[17rem] lg:max-w-[20rem]">
@@ -147,7 +147,7 @@ export function EducationLandingDemo() {
       </EducationLandingProjector>
       <div className="flex flex-wrap items-center justify-between gap-2 border-t-2 border-neo-black/60 px-3 py-2.5 sm:px-4">
         <div className="flex min-h-7 min-w-0 flex-1 flex-wrap items-center gap-1.5" aria-live="polite">
-          <span className="me-1 text-xs font-bold text-neo-cream/75">
+          <span className="me-1 text-xs font-bold text-edu-ink/75">
             {t(wordsFoundKey(found.length, language), undefined, {
               count: String(found.length),
               total: String(targets.length),

@@ -66,9 +66,9 @@ export function PracticeRunPanel({ gameCode, language, joined, started, ended, o
 
   return (
     <>
-      <div data-testid="practice-run-panel" className={cn('fixed inset-0 z-[65] flex-col bg-neo-navy', open ? 'flex' : 'hidden')}>
-        <header className="flex shrink-0 items-center gap-2 border-b-[3px] border-neo-cream bg-neo-navy-light px-2 pb-1.5 pt-[max(0.375rem,env(safe-area-inset-top))]">
-          <h2 className="min-w-0 truncate font-neo-display text-base font-black text-neo-cream max-sm:sr-only">{t('eduLiveRoom.practice.title')}</h2>
+      <div data-testid="practice-run-panel" className={cn('fixed inset-0 z-[65] flex-col bg-edu-page', open ? 'flex' : 'hidden')}>
+        <header className="flex shrink-0 items-center gap-2 border-b-[3px] border-edu-line bg-edu-surface px-2 pb-1.5 pt-[max(0.375rem,env(safe-area-inset-top))]">
+          <h2 className="min-w-0 truncate font-neo-display text-base font-black text-edu-ink max-sm:sr-only">{t('eduLiveRoom.practice.title')}</h2>
           <div className="ms-auto flex items-center gap-2">
             {joined && !hasStarted && (
               <button type="button" data-testid="practice-run-skip" onClick={() => window.dispatchEvent(new Event(PRACTICE_SKIP_TO_GAME_EVENT))} className={cn(NB_SMALL, NB_BLOCK.cyan)}>
@@ -103,8 +103,8 @@ export function PracticeRunPanel({ gameCode, language, joined, started, ended, o
             className="absolute inset-0 size-full border-0"
           />
           {timedOut && !joined && (
-            <div role="alert" className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-neo-navy p-6 text-center">
-              <p className="max-w-sm font-neo-display text-lg font-black text-neo-cream">{t('eduLiveRoom.practice.seatRetry')}</p>
+            <div role="alert" className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-edu-surface p-6 text-center">
+              <p className="max-w-sm font-neo-display text-lg font-black text-edu-ink">{t('eduLiveRoom.practice.seatRetry')}</p>
               <button type="button" data-testid="practice-run-retry" onClick={() => window.dispatchEvent(new Event(PRACTICE_SEAT_RETRY_EVENT))} className={cn(NB_SMALL, NB_BLOCK.lime)}>
                 <RotateCw className="size-4" aria-hidden="true" />
                 {t('eduLiveRoom.practice.retry')}

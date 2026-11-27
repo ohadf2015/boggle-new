@@ -3,6 +3,7 @@
 import { Bomb, Crown } from 'lucide-react';
 import type { VersusStanding } from '@/lib/wordTower/versusMatch';
 import { WORD_TOWER_BOMB_LEAD_GATE_M } from '@/shared/constants/wordTowerConstants';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 export interface WordTowerVersusRailProps {
   standings: VersusStanding[];
@@ -17,6 +18,7 @@ export interface WordTowerVersusRailProps {
 
 /** Live rival rail: heights + biome + a bomb button when you lead far enough. */
 export function WordTowerVersusRail({ standings, selfId, banked, yourHeightM, onBomb, t }: WordTowerVersusRailProps) {
+  const classroom = useClassroomBoard();
   return (
     <ul className="pointer-events-auto flex flex-col gap-1.5">
       {standings.map((s) => {
@@ -26,11 +28,11 @@ export function WordTowerVersusRail({ standings, selfId, banked, yourHeightM, on
           <li
             key={s.playerId}
             className={`flex items-center justify-between gap-2 rounded-neo border-neo border-black px-2 py-1.5 shadow-hard-sm ${
-              isYou ? 'bg-neo-lime text-black' : 'bg-neo-navy-light/90 text-neo-white'
+              isYou ? 'bg-neo-lime text-black' : classroom ? 'bg-edu-surface text-edu-ink' : 'bg-neo-navy-light/90 text-neo-white'
             }`}
           >
             <span className="flex items-center gap-1.5 truncate">
-              {s.rank === 1 && <Crown className="h-3.5 w-3.5 text-neo-yellow" />}
+              {s.rank === 1 && <Crown className={classroom ? 'h-3.5 w-3.5 text-edu-yellow-ink' : 'h-3.5 w-3.5 text-neo-yellow'} />}
               <span className="truncate font-neo-body text-xs font-bold">{s.username}</span>
             </span>
             <span className="flex items-center gap-2">
@@ -41,7 +43,7 @@ export function WordTowerVersusRail({ standings, selfId, banked, yourHeightM, on
                   disabled={!canBomb}
                   onClick={() => onBomb(s.playerId)}
                   aria-label={t('wordTower.versus.bomb', { name: s.username })}
-                  className="rounded border-neo border-black bg-neo-pink p-1 text-neo-white shadow-hard-sm disabled:opacity-30"
+                  className={classroom ? 'rounded border-neo border-black bg-neo-pink p-1 text-neo-black shadow-hard-sm disabled:opacity-30' : 'rounded border-neo border-black bg-neo-pink p-1 text-neo-white shadow-hard-sm disabled:opacity-30'}
                 >
                   <Bomb className="h-3.5 w-3.5" />
                 </button>

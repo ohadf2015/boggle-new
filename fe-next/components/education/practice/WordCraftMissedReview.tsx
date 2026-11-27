@@ -24,7 +24,7 @@ export default function WordCraftMissedReview({ lessonId, missed, className }: W
       href={missedReviewHref(language, lessonId)}
       data-testid="wordcraft-missed-review"
       className={cn(
-        'flex min-h-11 w-full shrink-0 flex-col items-center justify-center gap-1 rounded-neo border-2 border-neo-cyan bg-neo-navy px-3 py-1.5 text-center text-neo-cyan transition-colors hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+        'flex min-h-11 w-full shrink-0 flex-col items-center justify-center gap-1 rounded-neo border-2 border-neo-cyan bg-edu-page px-3 py-1.5 text-center text-edu-cyan-ink transition-colors hover:bg-edu-surface focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
         className,
       )}
     >
@@ -39,7 +39,7 @@ export default function WordCraftMissedReview({ lessonId, missed, className }: W
           </span>
         ))}
         {rest > 0 && (
-          <span data-testid="wordcraft-missed-more" className="shrink-0 font-neo-display text-xs font-bold text-neo-cream">
+          <span data-testid="wordcraft-missed-more" className="shrink-0 font-neo-display text-xs font-bold text-edu-ink">
             {`+${rest}`}
           </span>
         )}

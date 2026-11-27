@@ -91,14 +91,14 @@ describe('VocabQuizView — pressure dials', () => {
     const bar = screen.getByRole('timer');
     expect(bar.className).not.toContain('animate-pulse');
     expect(bar.dataset.urgent).toBe('false');
-    expect(container.querySelector('[role="timer"].text-neo-orange')).toBeNull();
+    expect(container.querySelector('[role="timer"].text-edu-orange-ink')).toBeNull();
   });
 
   it('default (loud): the last seconds turn orange', () => {
     const { socket, server } = makeSocket();
     const { container } = render(<VocabQuizView socket={socket} username="ana" t={t} />);
     server(VOCAB_QUIZ_EVENTS.question, QUESTION);
-    expect(container.querySelector('[role="timer"].text-neo-orange')).not.toBeNull();
+    expect(container.querySelector('[role="timer"][class~="edu-sky:text-edu-orange-ink"]')).not.toBeNull();
   });
 
   it('leaderboard=hidden: the reveal shows no rank in the header', () => {

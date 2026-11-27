@@ -30,7 +30,7 @@ export function ProjectorStageFallback({ mode, players, t }: { mode?: string; pl
   return (
     <div
       data-testid="projector-phone-mode"
-      className="hidden h-full max-h-full w-[min(40%,28rem)] shrink-0 rounded-neo-lg border-4 border-neo-cream bg-neo-navy-light text-center [container-type:inline-size] text-neo-cream shadow-hard-lg md:block"
+      className="hidden h-full max-h-full w-[min(40%,28rem)] shrink-0 rounded-neo-lg border-4 border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface text-center [container-type:inline-size] text-neo-cream edu-sky:text-edu-ink shadow-hard-lg md:block"
     >
       {/* cq units resolve against the nearest ancestor container, so the content sits one level inside the sized card. */}
       <div className="flex h-full flex-col items-center justify-center gap-[4cqw] overflow-hidden p-[6cqw]">
@@ -41,20 +41,20 @@ export function ProjectorStageFallback({ mode, players, t }: { mode?: string; pl
       {known && (
         <>
           <p className="font-neo-display text-[clamp(1.5rem,13cqw,5rem)] font-black uppercase leading-none">{t(known.nameKey)}</p>
-          <p className="max-w-[24ch] font-neo-body text-[clamp(1rem,6cqw,2.25rem)] font-bold leading-snug text-neo-cream">{t(known.howKey)}</p>
+          <p className="max-w-[24ch] font-neo-body text-[clamp(1rem,6cqw,2.25rem)] font-bold leading-snug text-neo-cream edu-sky:text-edu-ink">{t(known.howKey)}</p>
         </>
       )}
       {leaders.length > 0 && (
         <div className="flex w-full flex-col gap-[2cqw]">
           <p className="inline-flex items-center justify-center gap-2 font-neo-display text-[clamp(0.875rem,5cqw,1.75rem)] font-black uppercase">
-            <Trophy className="size-[1.1em] text-neo-yellow" aria-hidden="true" />
+            <Trophy className="size-[1.1em] text-neo-yellow edu-sky:text-edu-yellow-ink" aria-hidden="true" />
             {t('partyScreen.liveLeaderboard')}
           </p>
           <ol data-testid="projector-stage-leaders" className="flex flex-col gap-[2cqw]">
             {leaders.map((p, i) => (
               <li
                 key={p.username}
-                className="flex items-center gap-[3cqw] rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy px-[3cqw] py-[1.5cqw] shadow-hard"
+                className="flex items-center gap-[3cqw] rounded-neo border-[3px] border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface px-[3cqw] py-[1.5cqw] shadow-hard"
               >
                 <span className={`grid size-[clamp(1.75rem,9cqw,3.5rem)] shrink-0 place-items-center rounded-full border-[3px] border-neo-black font-neo-display text-[clamp(1rem,5.5cqw,2rem)] font-black text-neo-black ${RANK_FILL[i]}`}>
                   {i + 1}
@@ -63,7 +63,7 @@ export function ProjectorStageFallback({ mode, players, t }: { mode?: string; pl
                 <span
                   key={`${p.username}:${p.score}`}
                   data-testid={`projector-stage-score-${p.username}`}
-                  className="inline-block shrink-0 font-neo-display text-[clamp(1rem,6cqw,2.25rem)] font-black tabular-nums text-neo-lime motion-safe:animate-score-pop"
+                  className="inline-block shrink-0 font-neo-display text-[clamp(1rem,6cqw,2.25rem)] font-black tabular-nums text-neo-lime edu-sky:text-edu-lime-ink motion-safe:animate-score-pop"
                 >
                   {p.score}
                 </span>

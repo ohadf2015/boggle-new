@@ -13,13 +13,13 @@ import { School } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 
-const CARD = 'rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy p-8 shadow-hard';
+const CARD = 'rounded-neo border-[3px] border-edu-line bg-edu-surface p-8 shadow-hard';
 /* Cream edge, not black: a black border on a navy card is invisible, and a
    secondary button nobody can find is a dead end on an onboarding screen. The
    width is `border-[3px]`, never `border-neo` — tailwind-merge folds that
    width utility into the colour class and the control ships borderless. */
 const GHOST_BTN =
-  'rounded-neo border-[3px] border-neo-cream bg-neo-navy px-6 py-3 font-bold text-neo-cream shadow-hard-sm transition hover:bg-neo-navy-light hover:shadow-hard';
+  'rounded-neo border-[3px] border-edu-line bg-edu-surface px-6 py-3 font-bold text-edu-ink shadow-hard-sm transition hover:bg-edu-surface hover:shadow-hard';
 
 export interface LobbyNoClassroomsProps {
   onBack: () => void;
@@ -30,8 +30,8 @@ export function LobbyNoClassrooms({ onBack, onCreateClassroom }: LobbyNoClassroo
   const { t } = useLanguage();
   return (
     <div className={`${CARD} text-center`}>
-      <School className="mx-auto mb-4 h-12 w-12 text-neo-white" aria-hidden="true" />
-      <p className="mb-4 font-neo-body text-neo-white">{t('education.classroomGame.noClassrooms')}</p>
+      <School className="mx-auto mb-4 h-12 w-12 text-edu-ink" aria-hidden="true" />
+      <p className="mb-4 font-neo-body text-edu-ink">{t('education.classroomGame.noClassrooms')}</p>
       <div className="flex items-center justify-center gap-3">
         <button type="button" onClick={onBack} className={GHOST_BTN}>
           {t('common.back')}
@@ -58,9 +58,9 @@ export interface LobbyNoLessonsProps {
 export function LobbyNoLessons({ starterPacks, isCreating, onCreateLesson }: LobbyNoLessonsProps) {
   const { t } = useLanguage();
   return (
-    <div data-testid="lobby-no-lessons" className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy p-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-hard sm:p-6">
+    <div data-testid="lobby-no-lessons" className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-neo border-[3px] border-edu-line bg-edu-page p-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-hard sm:p-6">
       <div className="mb-3 flex flex-wrap items-center justify-end gap-2">
-        <p className="font-neo-body text-sm text-neo-white">{t('education.lesson.preferCustom')}</p>
+        <p className="font-neo-body text-sm text-edu-ink">{t('education.lesson.preferCustom')}</p>
         <button type="button" data-testid="lobby-no-lessons-library" onClick={onCreateLesson} className={`${GHOST_BTN} min-h-11 px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan`}>
           {t('education.classroomGame.createLesson')}
         </button>

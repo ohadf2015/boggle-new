@@ -87,12 +87,14 @@ function MultiplayerPageFrame(): React.JSX.Element {
   const [hostExitOpen, setHostExitOpen] = React.useState(false);
   const hostGuardsBack = isActive && (isHost || isClassroomHost);
   const inClassroom = classroomContext === 'classroom';
+  // An attribute, not a wrapper: swapping wrappers when the record resolves would remount the round.
+  const eduTheme = inClassroom || classroomEnded !== null ? 'sky' : undefined;
 
   return (
     <SocketContext.Provider value={socketContextValue}>
       <MpExitProvider value={exitMp}>
       <ErrorBoundary>
-        <div tabIndex={-1} className="flex-1 flex flex-col min-h-0 w-full overflow-x-clip">
+        <div tabIndex={-1} data-edu-theme={eduTheme} className="flex-1 flex flex-col min-h-0 w-full overflow-x-clip">
           {/* Root fills the flex-fit locked body (which reserves banner height via padding-bottom),
               so the banner never overlaps bottom CTAs / ready indicators. Lobby, results, and
               in-game states all use this single root — MP-root wraps all MP views. */}

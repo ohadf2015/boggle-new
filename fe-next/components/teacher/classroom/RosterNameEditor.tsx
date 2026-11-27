@@ -96,7 +96,7 @@ export function RosterNameEditor({ rosterName, ownName, onSave }: RosterNameEdit
             onKeyDown={onKeyDown}
             onBlur={commit}
             className={cn(
-              'h-11 w-full min-w-0 rounded-neo border-2 border-black bg-neo-white px-2 text-base font-neo-display font-black text-black',
+              'h-11 w-full min-w-0 rounded-neo border-2 border-black bg-edu-paper px-2 text-base font-neo-display font-black text-black',
               'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
               tooLong && 'border-neo-red',
             )}

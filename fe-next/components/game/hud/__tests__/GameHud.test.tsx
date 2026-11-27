@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { GameHud, timerTone } from '../GameHud';
+import { ClassroomBoardProvider } from '@/components/education/live/classroomBoard';
 import { HUD_FIRE_SLOT } from '@/components/earthquake/FireRoundIndicator';
 
 vi.mock('@/contexts/AccessibilityContext', () => ({ useShouldReduceMotion: () => true }));
@@ -62,5 +63,23 @@ describe('GameHud: exit, one timer bar, score pill', () => {
     expect(screen.queryByRole('progressbar')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'common.exit' }));
     expect(onExit).toHaveBeenCalled();
+  });
+});
+
+describe('GameHud classroom skin', () => {
+  const base = { onExit: vi.fn(), remaining: 45, total: 60, score: 12 };
+
+  it('given the arcade board, then exit and timer keep their navy and cream look', () => {
+    render(<GameHud {...base} />);
+    expect(screen.getByRole('button', { name: 'common.exit' }).className).toContain('bg-neo-navy-light text-neo-cream');
+    expect(screen.getByText('0:45').className).toContain('text-neo-cream');
+  });
+
+  it('given a classroom board, then exit is a cream outlined button and the time reads in page ink', () => {
+    render(<ClassroomBoardProvider value><GameHud {...base} /></ClassroomBoardProvider>);
+    const exit = screen.getByRole('button', { name: 'common.exit' });
+    expect(exit).toHaveClass('bg-edu-surface', 'text-edu-ink', 'border-neo-black');
+    expect(exit.className).not.toContain('bg-neo-navy');
+    expect(screen.getByText('0:45')).toHaveClass('text-edu-ink');
   });
 });

@@ -74,7 +74,7 @@ export function ClassicUnpluggedStage({
             className={cn(
               'min-w-[4.5rem] px-3 py-1.5 rounded-neo border-[3px] border-neo-black shadow-hard-sm text-center',
               TEAM_CHIP[i % TEAM_CHIP.length],
-              i === state.activeTeam && !revealed && 'ring-4 ring-neo-cream',
+              i === state.activeTeam && !revealed && 'ring-4 ring-neo-cream edu-sky:ring-edu-line',
             )}
           >
             <span className="block font-neo-body font-bold uppercase tracking-wider text-[clamp(0.5rem,0.9vw,0.75rem)]">
@@ -92,7 +92,7 @@ export function ClassicUnpluggedStage({
           data-testid="classic-unplugged-mode-picker"
           className="shrink-0 flex flex-wrap items-center justify-center gap-2"
         >
-          <span className="flex items-center gap-1 font-neo-body font-bold text-neo-cream text-[clamp(0.65rem,1.2vw,0.95rem)]">
+          <span className="flex items-center gap-1 font-neo-body font-bold text-neo-cream edu-sky:text-edu-ink text-[clamp(0.65rem,1.2vw,0.95rem)]">
             <Users className="w-4 h-4" aria-hidden />
             {labels.chooseMode}
           </span>
@@ -108,8 +108,8 @@ export function ClassicUnpluggedStage({
                 BTN_SOLID,
                 'px-3 py-1.5 text-sm',
                 state.teamCount === n
-                  ? 'bg-neo-lime text-neo-black'
-                  : 'bg-neo-navy-light text-neo-cream border-neo-cream',
+                  ? 'bg-neo-lime edu-sky:bg-neo-lime text-neo-black edu-sky:text-neo-black'
+                  : 'bg-neo-navy-light edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink border-neo-cream edu-sky:border-edu-line',
               )}
             >
               {n === 1 ? labels.classMode : n}
@@ -119,7 +119,7 @@ export function ClassicUnpluggedStage({
       ) : (
         <p
           data-testid="classic-unplugged-active-hint"
-          className="shrink-0 text-center font-neo-body font-bold text-neo-cyan text-[clamp(0.7rem,1.3vw,1.1rem)]"
+          className="shrink-0 text-center font-neo-body font-bold text-neo-cyan edu-sky:text-edu-cyan-ink text-[clamp(0.7rem,1.3vw,1.1rem)]"
         >
           {revealed
             ? labels.letters
@@ -134,14 +134,14 @@ export function ClassicUnpluggedStage({
         data-revealed={String(revealed)}
         className={cn(
           'flex-1 min-h-0 flex flex-col items-center justify-center gap-3 sm:gap-4',
-          'rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard px-3 py-4',
+          'rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface shadow-hard px-3 py-4',
           !reducedMotion && revealed && 'animate-in fade-in zoom-in-95 duration-200',
         )}
       >
         {revealed ? (
           <p
             data-testid="classic-unplugged-word-text"
-            className="font-neo-display font-bold text-neo-lime text-center leading-none max-w-full break-words"
+            className="font-neo-display font-bold text-neo-lime edu-sky:text-edu-lime-ink text-center leading-none max-w-full break-words"
             style={{ fontSize }}
           >
             {word}
@@ -157,7 +157,7 @@ export function ClassicUnpluggedStage({
             {Array.from({ length: Math.max(1, word.length) }, (_, i) => (
               <span
                 key={i}
-                className="w-[0.55em] h-[0.1em] min-h-[3px] rounded-full bg-neo-white/30 shrink-0"
+                className="w-[0.55em] h-[0.1em] min-h-[3px] rounded-full bg-neo-white/30 edu-sky:bg-edu-ink/30 shrink-0"
               />
             ))}
           </span>
@@ -184,7 +184,7 @@ export function ClassicUnpluggedStage({
               onClick={() => onSubmit(false)}
               className={cn(
                 BTN,
-                'flex-1 py-3 sm:py-4 border-[3px] border-neo-cream bg-neo-navy text-neo-cream text-[clamp(0.95rem,1.8vw,1.4rem)]',
+                'flex-1 py-3 sm:py-4 border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-page text-neo-cream edu-sky:text-edu-ink text-[clamp(0.95rem,1.8vw,1.4rem)]',
               )}
             >
               <X className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden />

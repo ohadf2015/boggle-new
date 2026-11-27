@@ -12,7 +12,7 @@ describe('ClassroomBossOutcome tone', () => {
     render(<ClassroomBossOutcome boss={won} tone="calm" t={t} />);
     const card = screen.getByTestId('boss-outcome');
     expect(card.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
-    expect(card.className).toMatch(/(^|\s)bg-neo-navy-light(\s|$)/);
+    expect(card.className).toMatch(/(^|\s)edu-sky:bg-edu-surface(\s|$)/);
     expect(card.innerHTML).not.toMatch(/\buppercase\b/);
   });
 

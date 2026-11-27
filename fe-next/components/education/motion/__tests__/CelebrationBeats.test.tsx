@@ -82,7 +82,7 @@ describe('CelebrationBeats', () => {
   it('is a dark-only fullscreen layer with no opacity entrance', () => {
     renderBeats();
     const root = screen.getByTestId('edu-celebration');
-    expect(root.className).toContain('bg-neo-navy');
+    expect(root.className).toContain('bg-edu-page');
     expect(root.className).not.toMatch(/dark:|bg-neo-cream|opacity-0/);
   });
 });

@@ -26,11 +26,11 @@ export interface TreasureChestRevealProps {
 }
 
 const OUTCOME_TEXT: Record<TreasureChestOutcome, string> = {
-  gain: 'text-neo-lime',
-  double: 'text-neo-yellow',
-  steal: 'text-neo-pink',
-  swap: 'text-neo-cyan',
-  'small-loss': 'text-neo-orange',
+  gain: 'text-neo-lime edu-sky:text-edu-lime-ink',
+  double: 'text-neo-yellow edu-sky:text-edu-yellow-ink',
+  steal: 'text-neo-pink edu-sky:text-edu-pink-ink',
+  swap: 'text-neo-cyan edu-sky:text-edu-cyan-ink',
+  'small-loss': 'text-neo-orange edu-sky:text-edu-orange-ink',
 };
 
 const OUTCOME_BORDER: Record<TreasureChestOutcome, string> = {
@@ -68,7 +68,7 @@ export function TreasureChestReveal({ state, t, onDismiss }: TreasureChestReveal
       aria-modal="true"
       aria-live="assertive"
       onClick={onDismiss}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy edu-sky:bg-edu-page px-4"
     >
       <BoundedConfettiBurst trigger={celebrate && !reduceMotion} size="lg">
         <m.div
@@ -77,7 +77,7 @@ export function TreasureChestReveal({ state, t, onDismiss }: TreasureChestReveal
           transition={{ type: 'spring', stiffness: 420, damping: 16 }}
           className={cn(
             'flex flex-col items-center gap-3 w-full max-w-sm p-6 text-center',
-            'rounded-neo border-[3px] bg-neo-navy-elevated shadow-hard',
+            'rounded-neo border-[3px] bg-neo-navy-elevated edu-sky:bg-edu-surface shadow-hard',
             OUTCOME_BORDER[state.outcome]
           )}
         >
@@ -86,12 +86,12 @@ export function TreasureChestReveal({ state, t, onDismiss }: TreasureChestReveal
             {outcomeLabel(state, t)}
           </p>
           {typeof state.myScore === 'number' && (
-            <p className="font-neo-body text-lg text-neo-white">
+            <p className="font-neo-body text-lg text-neo-white edu-sky:text-edu-ink">
               {t('vocabQuiz.treasure.newTotal', { score: state.myScore })}
             </p>
           )}
           {onDismiss && (
-            <p className="font-neo-body text-sm text-neo-white/70">{t('vocabQuiz.treasure.tapToContinue')}</p>
+            <p className="font-neo-body text-sm text-neo-white/70 edu-sky:text-edu-ink/70">{t('vocabQuiz.treasure.tapToContinue')}</p>
           )}
         </m.div>
       </BoundedConfettiBurst>

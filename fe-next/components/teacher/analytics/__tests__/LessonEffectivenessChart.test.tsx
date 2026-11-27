@@ -166,3 +166,12 @@ describe('LessonEffectivenessChart', () => {
     expect(screen.getByTestId('tooltip')).toBeInTheDocument();
   });
 });
+
+describe('LessonEffectivenessChart colours', () => {
+  it('draws axes, grid, legend and tooltip from the classroom tokens so they read on sky and dark', async () => {
+    const { CHART_COLORS } = await import('../LessonEffectivenessChartInner');
+    for (const key of ['text', 'grid', 'tooltip', 'tooltipBorder', 'avgXpGainInk', 'completionRateInk'] as const) {
+      expect(CHART_COLORS[key], key).toMatch(/^var\(--edu-[a-z-]+\)$/);
+    }
+  });
+});

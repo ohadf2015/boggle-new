@@ -39,12 +39,12 @@ export function ClassroomGuestDemoNextSteps({ t, ready }: ClassroomGuestDemoNext
                   'flex size-11 items-center justify-center rounded-full border-[3px] transition-[background-color,color,border-color] duration-200 motion-reduce:transition-none sm:size-12',
                   current && 'border-neo-black bg-neo-lime text-neo-black shadow-[0_3px_0_0] shadow-neo-lime-dark',
                   !current && lit && 'border-neo-black bg-neo-cyan text-neo-black shadow-[0_3px_0_0] shadow-neo-cyan-dark',
-                  !lit && 'border-neo-black bg-neo-navy text-neo-cream/70 shadow-[0_3px_0_0] shadow-neo-black',
+                  !lit && 'border-neo-black bg-edu-surface text-edu-ink/70 shadow-[0_3px_0_0] shadow-neo-black',
                 )}
               >
                 <step.Icon className="size-5" strokeWidth={3} />
               </span>
-              <span className={cn('font-neo-display text-sm font-black uppercase tracking-[0.06em] sm:text-base', lit ? 'text-neo-cream' : 'text-neo-cream/70')}>{t(step.key)}</span>
+              <span className={cn('font-neo-display text-sm font-black uppercase tracking-[0.06em] sm:text-base', lit ? 'text-edu-ink' : 'text-edu-ink/70')}>{t(step.key)}</span>
             </li>
           );
         })}

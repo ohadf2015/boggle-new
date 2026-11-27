@@ -12,7 +12,7 @@ import { claimHudFlame, flameTier, useEconomyStreakStore } from './streakFlame';
 const ICON_SIZE = ['', 'size-4', 'size-5', 'size-6'] as const;
 const TONE = [
   '',
-  'border-neo-cream/50 bg-neo-navy-light text-neo-cream',
+  'border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink',
   'border-neo-black bg-neo-orange text-neo-black',
   'border-neo-black bg-neo-pink text-neo-black shadow-hard-sm',
 ] as const;

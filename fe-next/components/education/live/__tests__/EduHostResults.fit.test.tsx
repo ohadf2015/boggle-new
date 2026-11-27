@@ -88,7 +88,7 @@ describe('EduHostResults: fits the wall with the Teacher Pro card', () => {
     renderZeroRound();
     const bar = screen.getByTestId('winner-spotlight');
     expect(bar).toHaveAttribute('data-outcome', 'zero');
-    expect(bar.className).toMatch(/\bbg-neo-navy-light\b/);
+    expect(bar.className).toMatch(/\bbg-edu-surface\b/);
     expect(bar.innerHTML).not.toMatch(/text-neo-yellow|\buppercase\b/);
   });
 
@@ -99,7 +99,7 @@ describe('EduHostResults: fits the wall with the Teacher Pro card', () => {
 
   it('given the student card (no calm tone), when a round scores zero, then the student look keeps its yellow banner', () => {
     render(<WinnerSpotlight winner={{ username: 'Noa', score: 0 }} active t={t} />);
-    expect(screen.getByTestId('winner-spotlight').innerHTML).toMatch(/text-neo-yellow/);
+    expect(screen.getByTestId('winner-spotlight').innerHTML).toMatch(/text-edu-yellow-ink/);
   });
 
   it('given a podium on the wall, when results show, then the class numbers sit under the winner, leaving the side column to coverage, actions and the Pro card', () => {

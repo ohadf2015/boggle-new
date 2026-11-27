@@ -147,13 +147,13 @@ export function ResultsTeacherProTrialCard({
       data-offer={proOffer.offer}
       dir={dir}
       className={cn(
-        'shrink-0 rounded-neo-lg border-[3px] border-s-[6px] border-neo-cream/50 border-s-neo-pink bg-neo-navy-light text-neo-white shadow-hard-lg',
+        'shrink-0 rounded-neo-lg border-[3px] border-s-[6px] border-edu-line border-s-neo-pink bg-edu-surface text-edu-ink shadow-edu-lip-sm',
         dismissible ? 'p-4' : 'px-3 py-2.5 @[96rem]/results:px-4 @[96rem]/results:py-3.5',
         className,
       )}
     >
       <div className="flex items-start gap-2">
-        <p className={cn('flex flex-1 items-center gap-2 font-neo-display font-black text-neo-pink-light', dismissible ? 'text-base leading-snug' : 'text-sm leading-tight @[96rem]/results:text-lg')}>
+        <p className={cn('flex flex-1 items-center gap-2 font-neo-display font-black text-edu-pink-ink', dismissible ? 'text-base leading-snug' : 'text-sm leading-tight @[96rem]/results:text-lg')}>
           <Sparkles className="size-4 shrink-0" aria-hidden="true" />
           {copy.title}
         </p>
@@ -176,13 +176,13 @@ export function ResultsTeacherProTrialCard({
               }
               setDismissed(true);
             }}
-            className="-me-1 -mt-1 inline-flex size-11 shrink-0 items-center justify-center rounded-neo text-neo-white/70 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="-me-1 -mt-1 inline-flex size-11 shrink-0 items-center justify-center rounded-neo text-edu-ink/70 hover:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             <X className="size-4" aria-hidden="true" />
           </button>
         ) : null}
       </div>
-      <p className={cn('mt-1 text-neo-white/80', dismissible ? 'text-sm leading-relaxed' : 'text-xs leading-snug @[96rem]/results:text-base')}>{copy.body}</p>
+      <p className={cn('mt-1 text-edu-ink/80', dismissible ? 'text-sm leading-relaxed' : 'text-xs leading-snug @[96rem]/results:text-base')}>{copy.body}</p>
       <div className={dismissible ? undefined : 'mt-2 flex flex-wrap items-center gap-x-3 gap-y-1'}>
       <Link
         href={`/${language}/teacher/upgrade?source=${placement}`}
@@ -198,17 +198,17 @@ export function ResultsTeacherProTrialCard({
           }
         }}
         className={cn(
-          'inline-flex items-center justify-center rounded-neo border-[3px] border-neo-pink bg-neo-navy px-4 text-center font-neo-display text-sm font-black text-neo-pink-light transition-transform hover:-translate-y-px focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:translate-y-px',
+          'inline-flex items-center justify-center rounded-neo border-[3px] border-neo-pink bg-edu-surface px-4 text-center font-neo-display text-sm font-black text-edu-pink-ink transition-transform hover:-translate-y-px focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:translate-y-px',
           dismissible ? 'mt-3 min-h-11 w-full' : 'min-h-10 shrink-0 px-3 text-[0.8125rem] @[96rem]/results:min-h-12 @[96rem]/results:px-4 @[96rem]/results:text-base',
         )}
       >
         {proOffer.label}
       </Link>
-      <p className={cn('text-xs font-semibold text-neo-white/65', dismissible ? 'mt-1.5 text-center' : 'min-w-0 flex-1 basis-32 @[96rem]/results:text-sm')}>
+      <p className={cn('text-xs font-semibold text-edu-ink/65', dismissible ? 'mt-1.5 text-center' : 'min-w-0 flex-1 basis-32 @[96rem]/results:text-sm')}>
         {proOffer.note}
       </p>
       </div>
-      <div className={dismissible ? 'mt-3 border-t-2 border-dashed border-neo-cream/50 pt-3 text-center' : 'mt-2 flex flex-wrap items-baseline gap-x-2 border-t-2 border-dashed border-neo-cream/50 pt-1.5'}>
+      <div className={dismissible ? 'mt-3 border-t-2 border-dashed border-edu-line pt-3 text-center' : 'mt-2 flex flex-wrap items-baseline gap-x-2 border-t-2 border-dashed border-edu-line pt-1.5'}>
         <Link
           href={`/${language}/education/for-schools?source=${placement}`}
           data-testid="results-school-quote-link"
@@ -219,11 +219,11 @@ export function ResultsTeacherProTrialCard({
               /* analytics must never block */
             }
           }}
-          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', 'font-bold text-neo-cream underline underline-offset-2 hover:text-neo-white', dismissible ? 'text-sm' : 'text-xs @[96rem]/results:text-sm')}
+          className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', 'font-bold text-edu-ink underline underline-offset-2 hover:text-edu-ink', dismissible ? 'text-sm' : 'text-xs @[96rem]/results:text-sm')}
         >
           {copy.quoteCta}
         </Link>
-        <p className={cn('text-xs text-neo-white/60', dismissible ? 'mt-0.5' : '@[96rem]/results:text-sm')}>{copy.quoteNote}</p>
+        <p className={cn('text-xs text-edu-ink/60', dismissible ? 'mt-0.5' : '@[96rem]/results:text-sm')}>{copy.quoteNote}</p>
       </div>
     </aside>
   );

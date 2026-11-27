@@ -38,7 +38,7 @@ export const TimeScopeTabs = memo<TimeScopeTabsProps>(({ timeScope, onScopeChang
             'px-4 py-2 rounded-neo border-neo font-neo-body font-bold text-sm transition',
             timeScope === tab.key
               ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard-sm'
-              : 'bg-neo-navy-light text-neo-white border-neo-cream/40 hover:bg-neo-navy'
+              : 'bg-edu-surface text-edu-ink border-edu-line hover:bg-edu-surface'
           )}
         >
           {tab.label}
@@ -78,7 +78,7 @@ export const RankDeltaIndicator = memo<RankDeltaProps>(({ rankDelta, isNew }) =>
 
   if (rankDelta === null || rankDelta === 0) {
     return (
-      <span data-testid="rank-delta-none" className="text-neo-white text-sm">
+      <span data-testid="rank-delta-none" className="text-edu-ink text-sm">
         −
       </span>
     );
@@ -89,7 +89,7 @@ export const RankDeltaIndicator = memo<RankDeltaProps>(({ rankDelta, isNew }) =>
     return (
       <AdaptiveMotion.span
         data-testid="rank-delta-up"
-        className="flex items-center gap-1 text-neo-lime text-sm font-neo-body font-bold"
+        className="flex items-center gap-1 text-edu-lime-ink text-sm font-neo-body font-bold"
         initial={{ y: 8, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 400, damping: 18 }}
@@ -104,7 +104,7 @@ export const RankDeltaIndicator = memo<RankDeltaProps>(({ rankDelta, isNew }) =>
   return (
     <AdaptiveMotion.span
       data-testid="rank-delta-down"
-      className="flex items-center gap-1 text-neo-pink text-sm font-neo-body font-bold"
+      className="flex items-center gap-1 text-edu-pink-ink text-sm font-neo-body font-bold"
       initial={{ y: -8, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 400, damping: 18 }}

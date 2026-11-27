@@ -60,7 +60,7 @@ export function ReportsClassView({ classroomId, classroom, section, onSectionCha
           link={classIsEmpty ? undefined : { href: teacherHostHref(language, { classroomId }), label: t('teacher.weekInsight.startGame'), testId: 'reports-start-game' }}
         >
           {showLive ? (
-            <div data-testid="reports-live" className="rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 py-2 shadow-hard">
+            <div data-testid="reports-live" className="rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 py-2 shadow-hard">
               <LiveActivityIndicator
                 isConnected={live.isConnected}
                 activeStudentsCount={live.activeStudentsCount}
@@ -85,7 +85,7 @@ export function ReportsClassView({ classroomId, classroom, section, onSectionCha
             }}
           />
           <Tabs value={section} onValueChange={(v) => onSectionChange(v as ReportTab)} className="space-y-3">
-            <TabsList aria-label={t('teacher.reports.tabs.label')} className="grid h-auto w-full grid-cols-5 gap-1.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-1.5">
+            <TabsList aria-label={t('teacher.reports.tabs.label')} className="grid h-auto w-full grid-cols-5 gap-1.5 rounded-neo border-2 border-edu-line bg-edu-surface p-1.5">
               {REPORT_TABS.map((id) => (
                 <TabsTrigger key={id} value={id} className={REPORT_TAB}>
                   {t(`teacher.reports.tabs.${id}`)}
@@ -161,11 +161,11 @@ export function ReportsClassView({ classroomId, classroom, section, onSectionCha
   );
 }
 
-const PANEL = 'rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-3 shadow-hard-lg sm:p-4';
+const PANEL = 'rounded-neo-xl border-[3px] border-edu-line bg-edu-surface p-3 shadow-hard-lg sm:p-4';
 
 // Selected = lime ring on navy-light; unselected keeps a cream edge so it reads as tappable.
 const REPORT_TAB =
-  'min-h-11 h-auto min-w-0 whitespace-normal rounded-neo border-[2px] px-1 py-1.5 font-neo-body text-xs font-bold leading-tight sm:text-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan data-[state=inactive]:border-neo-cream/40 data-[state=inactive]:text-neo-cream data-[state=active]:border-neo-lime data-[state=active]:bg-neo-navy-light data-[state=active]:text-neo-cream data-[state=active]:ring-2 data-[state=active]:ring-neo-lime';
+  'min-h-11 h-auto min-w-0 whitespace-normal rounded-neo border-[2px] px-1 py-1.5 font-neo-body text-xs font-bold leading-tight sm:text-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan data-[state=inactive]:border-edu-line data-[state=inactive]:text-edu-ink data-[state=active]:border-neo-lime data-[state=active]:bg-edu-surface data-[state=active]:text-edu-ink data-[state=active]:ring-2 data-[state=active]:ring-neo-lime';
 
 // Dev-only fixture so the round report can be judged without a played round.
 function roundPreviewProps(value: string | null | undefined) {

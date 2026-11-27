@@ -103,12 +103,11 @@ describe('WinnerSpotlight', () => {
     expect(playRoundEndCue).not.toHaveBeenCalled();
   });
 
-  it('plays the mascot trophy loop with its poster already painted', () => {
-    render(<WinnerSpotlight winner={winner} active t={t} />);
-    const video = screen.getByTestId('winner-mascot-video') as HTMLVideoElement;
-    expect(video.getAttribute('poster')).toBe('/mascot/teacher/badge-trophy.webp');
-    expect(video).toHaveAttribute('loop');
-    expect(video).toHaveAttribute('playsinline');
+  it('shows the transparent trophy still, pulsing, never the navy-backed video', () => {
+    render(<WinnerSpotlight winner={winner} active tone="calm" t={t} />);
+    expect(screen.queryByTestId('winner-mascot-video')).not.toBeInTheDocument();
+    expect(screen.getByTestId('winner-mascot-still')).toHaveAttribute('src', '/mascot/teacher/badge-trophy.webp');
+    expect(screen.getByTestId('winner-mascot-frame')).toHaveAttribute('data-trophy-pulse', 'on');
   });
 
   it('swaps the loop for a still under prefers-reduced-motion', () => {

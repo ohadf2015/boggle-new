@@ -135,14 +135,14 @@ export default function EducationBadgeGrid({
     <div className={cn('space-y-8', className)}>
       {/* Header Section */}
       <div className="space-y-4">
-        <h2 className="font-neo-display text-3xl font-bold text-neo-white flex items-center gap-3">
+        <h2 className="font-neo-display text-3xl font-bold text-edu-ink flex items-center gap-3">
           <Trophy className="w-5 h-5" />
           {t('education.achievements.title')}
         </h2>
 
         {/* Overall Completion */}
         <div className="space-y-2">
-          <p className="text-neo-white font-neo-body">
+          <p className="text-edu-ink font-neo-body">
             {t('education.achievements.completion', {
               percent: completionPercent,
               earned: earnedCount,
@@ -152,7 +152,7 @@ export default function EducationBadgeGrid({
 
           {/* Overall Progress Bar */}
           <div
-            className="h-4 bg-neo-navy-light border-neo border-neo-cream/40 rounded-neo overflow-hidden"
+            className="h-4 bg-edu-surface border-neo border-edu-line rounded-neo overflow-hidden"
             role="progressbar"
             aria-label={t('education.achievements.ariaOverallProgress')}
             aria-valuenow={completionPercent}
@@ -169,7 +169,7 @@ export default function EducationBadgeGrid({
       {/* Featured Badges Section */}
       {pinnedCount > 0 && (
         <div data-testid="featured-badges" className="space-y-4">
-          <h3 className="font-neo-display text-xl font-bold text-neo-white flex items-center gap-2">
+          <h3 className="font-neo-display text-xl font-bold text-edu-ink flex items-center gap-2">
             <Star className="w-5 h-5" />
             {t('education.achievements.featured')}
           </h3>
@@ -223,21 +223,21 @@ export default function EducationBadgeGrid({
               onClick={() => toggleCategory(category)}
               aria-expanded={!isCollapsed}
               aria-controls={`category-${category}`}
-              className="w-full flex items-center justify-between text-start group p-3 -m-3 rounded-neo hover:bg-neo-white/5 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+              className="w-full flex items-center justify-between text-start group p-3 -m-3 rounded-neo hover:bg-edu-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
-              <h3 className="font-neo-display text-xl font-bold text-neo-white group-hover:text-neo-cyan transition-colors">
+              <h3 className="font-neo-display text-xl font-bold text-edu-ink group-hover:text-edu-cyan-ink transition-colors">
                 {t(`education.achievements.categories.${category}`)}
               </h3>
 
               <div className="flex items-center gap-4">
-                <span className="text-sm text-neo-white group-hover:text-neo-white transition-colors">
+                <span className="text-sm text-edu-ink group-hover:text-edu-ink transition-colors">
                   {t('education.achievements.earned', {
                     count: categoryEarnedCount,
                     total: categoryAchievements.length,
                   })}
                 </span>
                 <ChevronDown
-                  className={`w-5 h-5 text-neo-white group-hover:text-neo-cyan transition-transform duration-200 ${
+                  className={`w-5 h-5 text-edu-ink group-hover:text-edu-cyan-ink transition-transform duration-200 ${
                     isCollapsed ? '-rotate-90' : 'rotate-0'
                   }`}
                 />
@@ -314,7 +314,7 @@ export default function EducationBadgeGrid({
       <div className="text-center">
         <p className={cn(
           'text-sm font-neo-body',
-          canPinMore ? 'text-neo-white' : 'text-neo-lime'
+          canPinMore ? 'text-edu-ink' : 'text-edu-lime-ink'
         )}>
           {pinCount === 0
             ? t('education.achievements.pinInvite', { max: maxPins })
@@ -328,7 +328,7 @@ export default function EducationBadgeGrid({
       {/* Footer: Secret Badges Hint */}
       {lockedSecretsCount > 0 && (
         <div className="text-center">
-          <p className="text-neo-white italic font-neo-body">
+          <p className="text-edu-ink italic font-neo-body">
             {t('education.achievements.secretRemaining', { count: lockedSecretsCount })}
           </p>
         </div>

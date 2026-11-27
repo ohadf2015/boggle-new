@@ -71,23 +71,25 @@ describe('ClassCard face', () => {
     expect(controls).toEqual(['classroom-card-open', 'join-code-plate', 'classroom-card-start-game', 'classroom-card-menu']);
   });
 
-  it('is a compact row with a colour edge, not a colour band over a big body', () => {
+  it('is a white outlined card with a thin colour band across its top', () => {
     render(<ClassCard {...baseProps} color="cyan" />);
     const card = screen.getByTestId('classroom-card');
-    expect(screen.queryByTestId('list-card-band')).toBeNull();
-    expect(card.className).toContain('border-s-neo-cyan');
+    expect(card.className).toContain('edu-card');
     expect(card.className).not.toMatch(/(^|\s)bg-neo-cyan(\s|$)/);
+    expect(card.className).not.toMatch(/border-s-/);
+    expect(within(card).getByTestId('classroom-card-band').className).toMatch(/(^|\s)bg-neo-cyan(\s|$)/);
     expect(within(card).getByRole('heading', { name: 'Period 3' })).toBeInTheDocument();
     expect(within(card).getByTestId('classroom-card-language')).toHaveTextContent('languages.english');
   });
 
-  it('shows the join code as a small chip that copies when tapped, never a big plate', async () => {
+  it('shows the join code as small letter tiles that copy when tapped, never a big plate', async () => {
     const onCopy = vi.fn().mockResolvedValue(true);
     render(<ClassCard {...baseProps} onCopy={onCopy} />);
     const chip = screen.getByTestId('join-code-plate');
     expect(chip.tagName).toBe('BUTTON');
     expect(within(chip).getByTestId('classroom-join-code')).toHaveTextContent('ABC123');
     expect(within(chip).getByTestId('classroom-join-code').className).not.toMatch(/text-3xl/);
+    expect(within(chip).getAllByTestId('classroom-join-code-tile').map((el) => el.textContent).join('')).toBe('ABC123');
     expect(screen.getByTestId('join-code-plate-caption')).toHaveTextContent('teacher.classroom.tapToCopy');
     await userEvent.click(chip);
     expect(onCopy).toHaveBeenCalledTimes(1);
@@ -129,12 +131,12 @@ describe('ClassCard face', () => {
     expect(fact).not.toHaveTextContent('played');
   });
 
-  it('keeps long class names recoverable: full name in title, one-line clamp in the row', () => {
+  it('keeps long class names recoverable: full name in title, two-line clamp on the card', () => {
     const longName = 'Advanced Placement English Literature and Composition';
     render(<ClassCard {...baseProps} classroom={{ ...CLASSROOM, name: longName }} />);
     const title = screen.getByRole('heading', { name: longName });
     expect(title).toHaveAttribute('title', longName);
-    expect(title.className).toContain('line-clamp-1');
+    expect(title.className).toContain('line-clamp-2');
     expect(title.className).not.toMatch(/(^|\s)(truncate|uppercase)(\s|$)/);
   });
 

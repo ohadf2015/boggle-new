@@ -11,13 +11,13 @@ import { cn } from '@/lib/utils';
 type T = (key: string, params?: Record<string, string | number>) => string;
 
 const BIG = 'font-neo-display font-black leading-none tabular-nums';
-const HEADLINE = 'max-w-sm font-neo-display text-3xl font-black leading-tight text-neo-yellow drop-shadow-[2px_2px_0_rgb(var(--neo-black))] sm:text-4xl';
+const HEADLINE = 'max-w-sm font-neo-display text-3xl font-black leading-tight text-edu-yellow-ink drop-shadow-[2px_2px_0_rgb(var(--neo-black))] sm:text-4xl';
 
 type Stat = 'points' | 'rank' | 'words';
 const TONE: Record<Stat, { band: string; value: string }> = {
-  points: { band: 'bg-neo-yellow', value: 'text-neo-yellow' },
-  rank: { band: 'bg-neo-cyan', value: 'text-neo-cyan' },
-  words: { band: 'bg-neo-lime', value: 'text-neo-lime' },
+  points: { band: 'bg-neo-yellow', value: 'text-edu-yellow-ink' },
+  rank: { band: 'bg-neo-cyan', value: 'text-edu-cyan-ink' },
+  words: { band: 'bg-neo-lime', value: 'text-edu-lime-ink' },
 };
 
 function StatTile({ stat, label, wide, beat = 0, children }: { stat: Stat; label: string; wide?: boolean; beat?: number; children: ReactNode }) {
@@ -29,7 +29,7 @@ function StatTile({ stat, label, wide, beat = 0, children }: { stat: Stat; label
         className={cn('flex w-full min-w-0 flex-col rounded-neo border-3 border-neo-black p-[3px] pt-0 shadow-hard', TONE[stat].band)}
       >
         <p dir="auto" className="truncate px-2 py-1 text-center font-neo-display text-xs font-black uppercase tracking-[0.14em] text-neo-black">{label}</p>
-        <div className={cn('flex min-h-[4.5rem] flex-1 flex-col items-center justify-center gap-2 rounded-neo-sm bg-neo-navy px-2 py-2', TONE[stat].value)}>
+        <div className={cn('flex min-h-[4.5rem] flex-1 flex-col items-center justify-center gap-2 rounded-neo-sm bg-edu-page px-2 py-2', TONE[stat].value)}>
           {children}
         </div>
       </div>
@@ -117,14 +117,14 @@ function MissedPreview({ words, wordLang, t }: { words: string[]; wordLang: stri
   const more = words.length - shown.length;
   return (
     <section data-testid="results-missed-preview" className="flex w-full flex-col gap-2 text-start">
-      <h3 dir="auto" className="font-neo-display text-sm font-black uppercase tracking-[0.14em] text-neo-white">
+      <h3 dir="auto" className="font-neo-display text-sm font-black uppercase tracking-[0.14em] text-edu-ink">
         {t('education.results.steps.missedTitle', { count: words.length })}
       </h3>
       <Stagger className="grid gap-2" itemClassName="min-w-0">
         {shown.map((word) => <MissedRow key={word} word={word} wordLang={wordLang} canSpeak={canSpeak} t={t} />)}
       </Stagger>
       {more > 0 && (
-        <p dir="auto" className="font-neo-body text-sm font-bold text-neo-white/80">{t('education.results.steps.moreWords', { count: more })}</p>
+        <p dir="auto" className="font-neo-body text-sm font-bold text-edu-ink/80">{t('education.results.steps.moreWords', { count: more })}</p>
       )}
     </section>
   );
@@ -140,7 +140,7 @@ function TallyBar({ pct, label }: { pct: number; label: string }) {
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={Math.round(pct * 100)}
-      className="relative block h-5 w-full max-w-xs overflow-hidden rounded-full border-3 border-neo-cream/50 bg-neo-black/50"
+      className="relative block h-5 w-full max-w-xs overflow-hidden rounded-full border-3 border-edu-line bg-neo-black/50"
     >
       <m.span
         className="absolute inset-0 block origin-left rounded-full bg-neo-lime rtl:origin-right"
@@ -162,7 +162,7 @@ export function ScoreStep({ score, rank, players, showRank, lessonName, missed =
       <CheerMascot src={winner ? EDU_MASCOT.podium : EDU_MASCOT.success} cheer />
       <Reveal delay={staggerDelay(1)} className="flex flex-col items-center gap-1">
         <h2 dir="auto" className={HEADLINE}>{t('education.results.steps.roundDone')}</h2>
-        {lessonName && <p dir="auto" className="font-neo-body text-sm font-bold text-neo-white/70">{lessonName}</p>}
+        {lessonName && <p dir="auto" className="font-neo-body text-sm font-bold text-edu-ink/70">{lessonName}</p>}
       </Reveal>
       <div className="flex w-full justify-center gap-3">
         <StatTile stat="points" beat={2} label={t('education.results.steps.tilePoints')}>
@@ -174,7 +174,7 @@ export function ScoreStep({ score, rank, players, showRank, lessonName, missed =
           <StatTile stat="rank" beat={3} label={t('education.results.steps.tileRank')}>
             <span data-testid="results-step-rank" className={cn(BIG, 'text-4xl')}>
               <span className="sr-only">{t('education.results.steps.place', { rank, players })}</span>
-              <bdi aria-hidden="true">#{rank}<span className="text-2xl text-neo-white/60"> / {players}</span></bdi>
+              <bdi aria-hidden="true">#{rank}<span className="text-2xl text-edu-ink/60"> / {players}</span></bdi>
             </span>
           </StatTile>
         )}
@@ -204,7 +204,7 @@ export function LessonStep({ found, total, t }: { found: number; total: number; 
           <p className={cn(BIG, 'text-4xl')} aria-label={t('education.results.steps.lessonCount', { found, total })}>
             <bdi>
               <AnimatedNumber to={found} from={0} onDone={() => setLanded(true)} />
-              <span className="text-neo-white/60"> / {total}</span>
+              <span className="text-edu-ink/60"> / {total}</span>
             </bdi>
           </p>
           <span className="sr-only">{t('education.results.steps.lessonCount', { found, total })}</span>

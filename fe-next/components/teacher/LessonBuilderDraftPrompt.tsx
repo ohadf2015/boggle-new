@@ -29,7 +29,7 @@ export default function LessonBuilderDraftPrompt({
         data-testid="lesson-draft-prompt"
         className={cn(
           'flex w-[calc(100%-2rem)] max-w-md flex-col gap-0 overflow-hidden p-0 sm:max-w-md',
-          'border-[3px] border-neo-cream/50 bg-neo-navy text-neo-cream shadow-hard-xl rounded-neo-xl! sm:rounded-neo-xl!',
+          'border-[3px] border-edu-line bg-edu-surface text-edu-ink shadow-hard-xl rounded-neo-xl! sm:rounded-neo-xl!',
           NB_DIALOG_PHONE.sheet,
         )}
       >

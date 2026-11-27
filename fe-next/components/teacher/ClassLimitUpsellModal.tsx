@@ -122,7 +122,7 @@ export default function ClassLimitUpsellModal({
     } finally {
       setPending(false);
     }
-  }, [pending, reason, isStudentLimit, language, t, source]);
+  }, [pending, reason, isStudentLimit, isTrialExpired, currentCount, limit, language, t, source]);
 
   const titleKey = isTrialExpired
     ? 'teacher.subscription.trialExpiredTitle'
@@ -156,13 +156,13 @@ export default function ClassLimitUpsellModal({
         <NbDialogBody className="space-y-4">
           <div className={cn(NB_PANEL, 'p-4')}>
             <p className="font-neo-display text-lg font-black leading-snug">{message}</p>
-            <p className="mt-1 font-neo-body text-sm font-semibold leading-relaxed text-neo-cream/80">
+            <p className="mt-1 font-neo-body text-sm font-semibold leading-relaxed text-edu-ink/80">
               {t('teacher.subscription.upgradeProDescription')}
             </p>
           </div>
 
           <div className="space-y-2">
-            <h3 className="font-neo-display text-lg font-black text-neo-cream">
+            <h3 className="font-neo-display text-lg font-black text-edu-ink">
               {t('teacher.subscription.proFeatures')}
             </h3>
             <div aria-hidden="true" className="pointer-events-none select-none">
@@ -177,14 +177,14 @@ export default function ClassLimitUpsellModal({
             </ul>
           </div>
 
-          <p className="flex flex-wrap items-baseline gap-x-2 font-neo-body text-sm font-bold text-neo-cream/80">
+          <p className="flex flex-wrap items-baseline gap-x-2 font-neo-body text-sm font-bold text-edu-ink/80">
             <span>{t('teacher.subscription.priceUSD')}</span>
-            <span className="font-neo-display text-3xl font-black text-neo-cyan">${TEACHER_PRO_PRICE_USD}</span>
+            <span className="font-neo-display text-3xl font-black text-edu-cyan-ink">${TEACHER_PRO_PRICE_USD}</span>
             <span>{t('teacher.subscription.perMonth')}</span>
-            <span className="basis-full text-xs text-neo-cream/65">{t('teacher.subscription.autoRenew')}</span>
+            <span className="basis-full text-xs text-edu-ink/65">{t('teacher.subscription.autoRenew')}</span>
           </p>
 
-          <p className="border-t-2 border-neo-cream/20 pt-3 text-center font-neo-body text-xs font-bold text-neo-cream/70">
+          <p className="border-t-2 border-edu-line/20 pt-3 text-center font-neo-body text-xs font-bold text-edu-ink/70">
             {t('education.landing.districtCta.title')} {t('education.landing.districtCta.body')}{' '}
             <Link
               href={`/${language}/education/for-schools`}

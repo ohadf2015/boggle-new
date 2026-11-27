@@ -93,7 +93,7 @@ export function InviteStudentsCta({
       <p className="mb-4 text-sm font-bold text-black/60">
         {t('teacher.classrooms.students.emptyHint', { code: joinCode })}
       </p>
-      <div className="mx-auto mb-4 flex max-w-xs flex-col items-center rounded-neo border-3 border-neo-black bg-neo-white px-3 py-2 shadow-hard-sm">
+      <div className="mx-auto mb-4 flex max-w-xs flex-col items-center rounded-neo border-3 border-neo-black bg-edu-paper px-3 py-2 shadow-hard-sm">
         <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-black/60">
           {t('teacher.classroom.joinCode')}
         </span>
@@ -123,7 +123,7 @@ export function InviteStudentsCta({
           type="button"
           data-testid="invite-students-copy-link"
           onClick={() => void copyLink()}
-          className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream bg-neo-navy px-2 font-neo-display text-xs font-black uppercase tracking-wide text-neo-cream shadow-hard-sm hover:-translate-y-0.5 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-edu-line bg-edu-page px-2 font-neo-display text-xs font-black uppercase tracking-wide text-edu-ink shadow-hard-sm hover:-translate-y-0.5 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           <Link2 className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
           {t('teacher.classroom.copyLink', 'Copy invite link')}
@@ -132,7 +132,7 @@ export function InviteStudentsCta({
           type="button"
           data-testid="invite-students-share"
           onClick={() => void shareLink()}
-          className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-white px-2 font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm hover:-translate-y-0.5 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black bg-edu-paper px-2 font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm hover:-translate-y-0.5 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           <Share2 className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
           {t('teacher.classroom.share', 'Share')}

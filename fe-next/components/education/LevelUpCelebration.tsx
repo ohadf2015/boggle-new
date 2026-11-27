@@ -92,7 +92,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
             ref={modalRef}
             className={cn(
               'relative w-full max-w-md mx-4',
-              'bg-neo-navy border-4 border-neo-cream',
+              'bg-neo-navy edu-sky:bg-edu-surface border-4 border-neo-cream edu-sky:border-edu-line',
               'rounded-neo shadow-hard-lg',
               'p-6 md:p-8',
               'text-center',
@@ -117,7 +117,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               id={titleId}
               className={cn(
                 'text-3xl md:text-4xl font-black',
-                'text-neo-lime',
+                'text-neo-lime edu-sky:text-edu-lime-ink',
                 'mb-4'
               )}
             >
@@ -126,7 +126,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
 
             {/* Level Display */}
             <div className="mb-6">
-              <p className="text-neo-white font-bold text-lg mb-2">
+              <p className="text-neo-white edu-sky:text-edu-ink font-bold text-lg mb-2">
                 {t('education.xp.newLevel')}
               </p>
               <div
@@ -141,7 +141,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                 <span
                   className={cn(
                     'text-4xl md:text-5xl font-black tabular-nums',
-                    'text-neo-pink'
+                    'text-neo-pink edu-sky:text-edu-pink-ink'
                   )}
                 >
                   {levelUpData.newLevel}
@@ -157,14 +157,14 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                   'bg-neo-pink/20 border-[3px] border-neo-pink'
                 )}
               >
-                <p className="text-neo-pink font-bold text-sm uppercase tracking-wide mb-2">
+                <p className="text-neo-pink edu-sky:text-edu-pink-ink font-bold text-sm uppercase tracking-wide mb-2">
                   {t('education.xp.newTitleUnlocked')}
                 </p>
                 <div className="space-y-1">
                   {newTitles.map((title) => (
                     <p
                       key={title}
-                      className="text-lg md:text-xl font-black text-neo-white"
+                      className="text-lg md:text-xl font-black text-neo-white edu-sky:text-edu-ink"
                     >
                       {title}
                     </p>

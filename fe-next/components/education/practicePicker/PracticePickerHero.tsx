@@ -99,11 +99,11 @@ export default function PracticePickerHero({ tile, onSelect }: PracticePickerHer
 
       {/* Name, one meta line, and the single primary action, on a hard band so
           they stay legible over any art. */}
-      <span className="relative mt-auto w-full border-t-[3px] border-neo-cream/40 bg-neo-navy px-3 pb-3 pt-2">
-        <span className="block font-neo-display text-xl font-black uppercase leading-none text-neo-white text-balance">
+      <span className="relative mt-auto w-full border-t-[3px] border-edu-line bg-edu-surface px-3 pb-3 pt-2">
+        <span className="block font-neo-display text-xl font-black uppercase leading-none text-edu-ink text-balance">
           {t(tile.titleKey)}
         </span>
-        <span className="mt-1.5 flex flex-wrap items-center gap-1.5 font-neo-body text-xs font-bold leading-none text-neo-cream">
+        <span className="mt-1.5 flex flex-wrap items-center gap-1.5 font-neo-body text-xs font-bold leading-none text-edu-ink">
           {xp > 0 && (
             <span
               data-testid={`practice-hero-xp-${tile.id}`}

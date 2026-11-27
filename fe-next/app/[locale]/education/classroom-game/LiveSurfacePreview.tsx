@@ -9,6 +9,7 @@
  *   /en/education/classroom-game?preview=waiting    — a student's /education/live lobby
  *   (&count=N sets the projector roster size, default 12; &ready=all readies everyone so Start unlocks)
  *   &stage=wheel|fallback|wordcraft — an in-game projector stage instead of the lobby
+ *   ?preview=paused — the live phone board under the teacher's pause
  *   ?preview=hostresults|phone|quiz|duel|ended — the round-end surfaces, see LiveResultsPreviews
  *   ?preview=ingame — the teacher's in-game projector mid-round
  *   ?preview=lobby — the game picker; ?preview=setup — the new-class invite step, students landing
@@ -30,6 +31,7 @@ import { ProjectorStageFallback } from '@/components/education/live/ProjectorSta
 import { useGameStore } from '@/hooks/gameState/store';
 import Avatar from '@/components/Avatar';
 import { EduStudentLobby } from '@/components/education/live/EduStudentLobby';
+import { ReadyButton } from '@/components/multiplayer/lobby/ReadyButton';
 import { sampleProjectorStudents } from '@/components/education/results/previewFixtures';
 import { DuelPreview, EndedPreview, HostResultsPreview, PhoneResultsPreview, QuizPreview } from './LiveResultsPreviews';
 
@@ -41,6 +43,8 @@ import { LobbyPickerPreview } from './LobbyPickerPreview';
 import { WarmUpPreview } from './WarmUpPreview';
 import { SetupInvitePreview } from './SetupInvitePreview';
 import { CrosswordPreview } from './CrosswordPreview';
+import { VersusPhonePreview } from './VersusPhonePreview';
+import { GamePausedOverlay } from '@/components/education/GamePausedOverlay';
 
 export type { LiveSurfacePreviewKind };
 
@@ -59,7 +63,7 @@ function StagePreview({ stage }: { stage: string }) {
 
   if (stage === 'wordcraft') return modeSet ? <InGamePreview /> : null;
   return (
-    <div className="fixed inset-0 z-[80] flex items-stretch justify-center gap-6 bg-neo-navy p-8">
+    <div className="fixed inset-0 z-[80] flex items-stretch justify-center gap-6 bg-edu-page p-8">
       {stage === 'wheel' && (
         <ProjectorWheel puzzle={{ centerLetter: 'r', outerLetters: ['s', 't', 'o', 'm', 'a', 'i'], allLetters: ['r', 's', 't', 'o', 'm', 'a', 'i'] }} label={t('eduLiveRoom.round.wheelLabel')} />
       )}
@@ -113,23 +117,13 @@ function WaitingPreview() {
   }, [arrived, roster.length]);
   const classmates = roster.slice(0, arrived);
   return (
-    <div className="fixed inset-0 z-[80] flex flex-col bg-neo-navy">
+    <div className="fixed inset-0 z-[80] flex flex-col bg-edu-page">
       <EduStudentLobby
         username="Maya"
         avatar={<Avatar userId="Maya" size="2xl" className="!h-full !w-full" />}
         onEditAvatar={() => toast('Preview: avatar builder')}
-        nameSlot={<h2 className="truncate text-xl font-black text-neo-cream">Maya</h2>}
-        readySlot={
-          <button
-            type="button"
-            onClick={() => setReady((v) => !v)}
-            className={`focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan ${ready
-              ? 'w-full rounded-neo border-3 border-neo-black bg-neo-lime py-3 font-black uppercase text-neo-black shadow-hard'
-              : 'w-full rounded-neo border-3 border-neo-lime bg-neo-navy py-3 font-black uppercase text-neo-lime shadow-hard'}`}
-          >
-            {ready ? t('playerView.readyConfirmed') : t('playerView.readyUp')}
-          </button>
-        }
+        nameSlot={<h2 className="truncate text-xl font-black text-edu-ink">Maya</h2>}
+        readySlot={<ReadyButton isReady={ready} onToggle={() => setReady((v) => !v)} inFlight={false} t={t} />}
         classmates={classmates}
         onExit={() => toast('Preview: exit')}
         isReady={ready}
@@ -157,11 +151,17 @@ export default function LiveSurfacePreview({ kind }: { kind: LiveSurfacePreviewK
   if (kind === 'quizphone') return <StudentQuizPreview />;
   if (kind === 'ingame') return <InGamePreview />;
   if (kind === 'phonegame') return <PhoneGamePreview />;
+  if (kind === 'paused') return <><PhoneGamePreview /><GamePausedOverlay /></>;
   if (kind === 'lobby') return <LobbyPickerPreview />;
   if (kind === 'warmup') return <WarmUpPreview />;
   if (kind === 'setup') return <SetupInvitePreview />;
   if (kind === 'crosswordwall') return <CrosswordPreview surface="wall" />;
   if (kind === 'crosswordphone') return <CrosswordPreview surface="phone" />;
+  if (kind === 'wheelphone') return <VersusPhonePreview mode="wheel" />;
+  if (kind === 'towerphone') return <VersusPhonePreview mode="tower" />;
+  if (kind === 'wordcraftphone') return <VersusPhonePreview mode="wordcraft" />;
+  if (kind === 'blastphone') return <VersusPhonePreview mode="blast" />;
+  if (kind === 'huntphone') return <VersusPhonePreview mode="hunt" />;
   return <ProjectorOrStagePreview />;
 }
 

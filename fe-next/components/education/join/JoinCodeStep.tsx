@@ -5,6 +5,7 @@ import { ChevronDown, HelpCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
+import { EduMascot } from '@/components/education/EduMascot';
 import { JoinCodeField } from './JoinCodeField';
 import { JoinAlert } from './JoinAlert';
 import { JoinPrimaryButton } from './JoinPrimaryButton';
@@ -70,13 +71,16 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
       }}
       className="flex flex-col gap-5 short:gap-3 [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:grid [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:grid-cols-2 [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:items-center [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:gap-x-8"
     >
-      <div>
-        <h1 className="font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-neo-white short:text-3xl sm:text-5xl lg:text-6xl">
+      <div className="relative">
+        <h1 className="font-neo-display text-4xl font-black leading-[0.95] tracking-tight text-edu-ink short:text-3xl sm:text-6xl lg:text-7xl">
           {t(`${K}.flow.codeHeadline`)}
         </h1>
-        <p className="mt-2 font-neo-body text-base font-bold text-neo-cyan short:mt-1 short:text-sm phone-short:hidden lg:text-lg">
-          {t(`${K}.flow.codeSub`)}
-        </p>
+        <div className="mt-3 flex items-end justify-between gap-2 short:mt-1">
+          <p className="max-w-[15rem] font-neo-body text-lg font-bold leading-snug text-edu-ink short:text-sm phone-short:hidden lg:max-w-none lg:text-xl">
+            {t(`${K}.flow.codeSub`)}
+          </p>
+          <EduMascot moment="welcome" size={96} className="-mb-6 size-24 shrink-0 short:hidden lg:size-28" />
+        </div>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -104,7 +108,7 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
             // The sub line already says where the code comes from; this region only speaks up when something happened.
             <p
               role="status"
-              className={cn('font-neo-body text-sm font-bold lg:text-base', stripped ? 'text-neo-yellow' : 'text-neo-lime')}
+              className={cn('font-neo-body text-sm font-bold lg:text-base', stripped ? 'text-edu-yellow-ink' : 'text-edu-lime-ink')}
             >
               {stripped ? t(`${K}.codeStripped`) : pasteNoteKey ? t(pasteNoteKey) : null}
             </p>
@@ -121,16 +125,18 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
           </JoinPrimaryButton>
         )}
 
-        <details className="group/where rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light/80">
-          <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-neo px-3 py-2 font-neo-body text-sm font-bold text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-neo-cyan lg:text-base [&::-webkit-details-marker]:hidden">
-            <HelpCircle aria-hidden="true" className="size-5 shrink-0" />
+        <details className="group/where edu-card">
+          <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 rounded-[inherit] px-3 py-2 font-neo-display text-lg font-bold text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-neo-cyan lg:text-xl [&::-webkit-details-marker]:hidden">
+            <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-pink text-neo-black">
+              <HelpCircle className="size-5" strokeWidth={2.5} />
+            </span>
             <span>{t(`${K}.flow.whereCode`)}</span>
             <ChevronDown
               aria-hidden="true"
               className="ms-auto size-5 shrink-0 group-open/where:rotate-180 motion-safe:transition-transform"
             />
           </summary>
-          <p className="px-3 pb-3 font-neo-body text-sm leading-snug text-neo-white/85 lg:text-base">
+          <p className="px-4 pb-3 font-neo-body text-base leading-snug text-edu-ink/85 lg:text-lg">
             {t(`${K}.flow.whereCodeAnswer`)}
           </p>
         </details>

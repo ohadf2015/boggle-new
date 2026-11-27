@@ -74,7 +74,7 @@ export function AccessRequestGate({ onApproved }: { onApproved?: (approval: Acce
     return (
       <div
         aria-hidden="true"
-        className="min-h-[220px] animate-pulse rounded-neo bg-neo-navy/40 sm:min-h-[260px]"
+        className="min-h-[220px] animate-pulse rounded-neo bg-edu-surface/40 sm:min-h-[260px]"
       />
     );
   }
@@ -92,7 +92,7 @@ export function AccessRequestGate({ onApproved }: { onApproved?: (approval: Acce
     };
     // The page h1 already says what this is: here it is only the two ways in, stacked.
     return (
-      <div className="flex flex-col gap-3 text-neo-white">
+      <div className="flex flex-col gap-3 text-edu-ink">
         <AccessRequestGoogleButton onTap={() => tapped('google')} />
         <PressSurface
           lip={4}
@@ -102,17 +102,19 @@ export function AccessRequestGate({ onApproved }: { onApproved?: (approval: Acce
           }}
           className={EMAIL_CTA_CLASS}
         >
-          <Mail className="size-5 shrink-0" aria-hidden="true" />
+          <span data-testid="access-email-icon" aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-yellow text-neo-black">
+            <Mail className="size-5" strokeWidth={2.5} />
+          </span>
           <span className="text-balance">{t('education.access.auth_required_cta')}</span>
         </PressSurface>
-        <p className="text-center text-sm font-semibold text-neo-white/60">{t('education.access.cta_micro')}</p>
+        <p className="text-center text-sm font-semibold text-edu-ink/60">{t('education.access.cta_micro')}</p>
         <button
           type="button"
           onClick={() => {
             tapped('signin');
             setAuthMode('signin');
           }}
-          className="flex min-h-11 w-full items-center justify-center rounded-neo px-4 font-neo-display text-sm font-bold text-neo-white/85 underline decoration-neo-cream/40 underline-offset-4 hover:text-neo-white focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="flex min-h-11 w-full items-center justify-center rounded-neo px-4 font-neo-display text-sm font-bold text-edu-ink/85 underline decoration-neo-cream/40 underline-offset-4 hover:text-edu-ink focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           {t('education.access.auth_signin_cta')}
         </button>
@@ -143,12 +145,12 @@ export function AccessRequestGate({ onApproved }: { onApproved?: (approval: Acce
       }
     };
     return (
-      <div className="text-neo-white">
-        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-neo border-neo bg-neo-pink text-neo-white shadow-hard-sm">
+      <div className="text-edu-ink">
+        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-neo border-neo bg-neo-pink text-edu-ink shadow-hard-sm">
           <Mail className="h-6 w-6" />
         </div>
         <h2 className="text-xl font-bold font-neo-display">{t('education.access.verify_email_title')}</h2>
-        <p className="mt-2 text-neo-white/85">
+        <p className="mt-2 text-edu-ink/85">
           {t('education.access.verify_email_body', { email: user.email ?? '' })}
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
@@ -163,7 +165,7 @@ export function AccessRequestGate({ onApproved }: { onApproved?: (approval: Acce
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="inline-flex items-center gap-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-4 py-3 font-bold text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="inline-flex items-center gap-2 rounded-neo border-neo border-edu-line bg-edu-surface px-4 py-3 font-bold text-edu-ink shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             {t('education.access.verify_email_refresh')}
           </button>

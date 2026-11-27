@@ -36,10 +36,13 @@ const MinimalToastLayout = memo<MinimalToastLayoutProps>(({
         animate={{ y: 0, scale: 1 }}
         exit={{ y: -10, scale: 0.95 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-        className={cn('max-w-full px-2 py-1 md:px-4 md:py-2 rounded-neo border-3 shadow-hard', `bg-linear-to-r ${bgGradient}`, textColor, borderColor)}
+        data-testid="tv-toast-card"
+        className="max-w-full rounded-neo-lg border-[3px] border-neo-black bg-edu-paper px-2 py-1 text-neo-black shadow-edu-lip-sm md:px-3 md:py-1.5"
       >
         <div className="flex min-w-0 items-center gap-3">
-          <Icon className="size-4 md:size-6 shrink-0" aria-hidden />
+          <span data-testid="tv-toast-icon" className="grid size-7 shrink-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-yellow md:size-10">
+            <Icon className="size-4 md:size-6" aria-hidden />
+          </span>
           <p className="min-w-0 leading-tight [overflow-wrap:break-word]">
             {player && <bdi className="font-black text-sm md:text-lg lg:text-2xl">{player}</bdi>}
             {player && ' '}

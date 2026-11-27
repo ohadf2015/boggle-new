@@ -15,6 +15,6 @@ describe('AssignmentWordcraftOption', () => {
 
   it('gives the unpicked card a visible cream edge on navy', () => {
     render(<AssignmentWordcraftOption selected={false} disabled={false} onSelect={vi.fn()} t={t} />);
-    expect(screen.getByTestId('assignment-mode-wordcraft').className).toMatch(/border-neo-cream\/50/);
+    expect(screen.getByTestId('assignment-mode-wordcraft').className).toMatch(/(^|\s)border-edu-line(\s|$)/);
   });
 });

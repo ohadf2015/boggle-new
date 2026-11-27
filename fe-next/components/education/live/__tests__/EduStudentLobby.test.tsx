@@ -174,4 +174,37 @@ describe('EduStudentLobby', () => {
     const { container } = render(<EduStudentLobby {...base} isReady />);
     expect(allClasses(container).filter((c) => /#[0-9a-fA-F]{3,6}\b/.test(c))).toEqual([]);
   });
+
+  describe('on the sky page', () => {
+    const tok = (el: Element) => (el.getAttribute('class') ?? '').split(/\s+/);
+
+    it('paints no navy arena art behind the room', () => {
+      render(<EduStudentLobby {...base} />);
+      expect(screen.queryByTestId('academy-backdrop')).toBeNull();
+    });
+
+    it('the stage is a white card with a 3px outline on a bottom lip', () => {
+      render(<EduStudentLobby {...base} />);
+      expect(tok(screen.getByTestId('edu-student-panel'))).toEqual(expect.arrayContaining(['border-[3px]', 'shadow-edu-lip', 'bg-edu-surface']));
+    });
+
+    it('READY and the waiting line sit straight on the sky, not on a white bar', () => {
+      render(<EduStudentLobby {...base} />);
+      const bar = tok(screen.getByTestId('edu-student-lobby-bar'));
+      expect(bar).not.toContain('bg-edu-surface');
+      expect(bar.some((c) => c.startsWith('border-t'))).toBe(false);
+    });
+
+    it('the class count is a white card with its icon on a yellow square', () => {
+      render(<EduStudentLobby {...base} />);
+      const count = screen.getByTestId('edu-student-count');
+      expect(tok(count)).toEqual(expect.arrayContaining(['bg-edu-surface', 'shadow-edu-lip-sm']));
+      expect(tok(count.querySelector('[data-testid="edu-student-count-icon"]')!)).toContain('bg-neo-yellow');
+    });
+
+    it("\"You're in\" is a pink tag with black ink", () => {
+      render(<EduStudentLobby {...base} />);
+      expect(tok(screen.getByText('eduLiveRoom.student.youreIn'))).toEqual(expect.arrayContaining(['bg-neo-pink', 'text-neo-black']));
+    });
+  });
 });

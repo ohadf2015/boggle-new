@@ -57,8 +57,8 @@ export function TrialUrgencyBanner({ trial, href, onDismiss, ctaLabel, recap }: 
           </Link>
         }
       >
-        <TrialRecapLine recap={recap} className="mt-1 font-neo-body text-sm font-black text-neo-cream" />
-        <p data-testid="trial-expired-kept" className="mt-1 font-neo-body text-sm font-semibold text-neo-cream/70">
+        <TrialRecapLine recap={recap} className="mt-1 font-neo-body text-sm font-black text-edu-ink" />
+        <p data-testid="trial-expired-kept" className="mt-1 font-neo-body text-sm font-semibold text-edu-ink/70">
           {t('education.trial.expired_kept')}
         </p>
       </ProBanner>

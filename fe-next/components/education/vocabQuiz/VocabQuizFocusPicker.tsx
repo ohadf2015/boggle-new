@@ -104,16 +104,16 @@ export function VocabQuizFocusPicker({
       'flex min-w-0 flex-col items-start gap-1 rounded-neo border-2 px-3 py-2.5 text-start transition-colors',
       CALM_FOCUS,
       !enabled && 'cursor-not-allowed opacity-60',
-      selected && enabled ? CALM_SELECTED : enabled ? CALM_IDLE : 'border-neo-cream/35 bg-transparent text-neo-cream'
+      selected && enabled ? CALM_SELECTED : enabled ? CALM_IDLE : 'border-edu-line bg-transparent text-edu-ink'
     );
 
   return (
     <div className="space-y-6">
       <div>
-        <div id="vocab-quiz-focus-label" className="mb-1 block font-neo-display text-base font-bold text-neo-cream">
+        <div id="vocab-quiz-focus-label" className="mb-1 block font-neo-display text-base font-bold text-edu-ink">
           {t('vocabQuiz.setup.focusTitle')}
         </div>
-        <p className="mb-3 font-neo-body text-sm text-neo-cream/70">
+        <p className="mb-3 font-neo-body text-sm text-edu-ink/70">
           {t('vocabQuiz.setup.focusDescription')}
         </p>
 
@@ -127,11 +127,11 @@ export function VocabQuizFocusPicker({
             className={`${chipClass(focus === 'any', anyCount > 0)} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
           >
             <span className="flex min-w-0 items-center gap-2 break-words font-neo-display text-sm font-bold">
-              <Shuffle className="size-4 shrink-0 text-neo-cream/70" aria-hidden />
+              <Shuffle className="size-4 shrink-0 text-edu-ink/70" aria-hidden />
               {focus === 'any' && anyCount > 0 && <Check className="order-last ms-auto size-3.5 shrink-0" strokeWidth={3} aria-hidden="true" />}
               {t('vocabQuiz.focus.any')}
             </span>
-            <span className="text-xs text-neo-cream/80">
+            <span className="text-xs text-edu-ink/80">
               {t('vocabQuiz.setup.questionsAvailable', { count: anyCount })}
             </span>
           </button>
@@ -150,11 +150,11 @@ export function VocabQuizFocusPicker({
                 className={`${chipClass(focus === key, enabled)} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
               >
                 <span className="flex min-w-0 items-center gap-2 break-words font-neo-display text-sm font-bold">
-                  <Icon className="size-4 shrink-0 text-neo-cream/70" aria-hidden />
+                  <Icon className="size-4 shrink-0 text-edu-ink/70" aria-hidden />
                   {focus === key && enabled && <Check className="order-last ms-auto size-3.5 shrink-0" strokeWidth={3} aria-hidden="true" />}
                   {t(`vocabQuiz.focus.${key}`)}
                 </span>
-                <span className="text-xs text-neo-cream/80">
+                <span className="text-xs text-edu-ink/80">
                   {enabled
                     ? t('vocabQuiz.setup.questionsAvailable', { count })
                     : t('vocabQuiz.setup.focusLocked')}
@@ -167,12 +167,12 @@ export function VocabQuizFocusPicker({
         {/* The one message that matters most with today's lesson data: WHERE to
             add what is missing, not just that it is missing. */}
         {bestSingle === 0 ? (
-          <div role="note" className="mt-3 rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light p-3 font-neo-body text-sm text-neo-cream/85">
+          <div role="note" className="mt-3 rounded-neo border-2 border-edu-line bg-edu-surface p-3 font-neo-body text-sm text-edu-ink/85">
             {t('vocabQuiz.setup.noQuestions')}
           </div>
         ) : (
           Object.values(availability).some((n) => n === 0) && (
-            <div role="note" className="mt-3 rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light p-3 font-neo-body text-sm text-neo-cream/85">
+            <div role="note" className="mt-3 rounded-neo border-2 border-edu-line bg-edu-surface p-3 font-neo-body text-sm text-edu-ink/85">
               {t('vocabQuiz.setup.enrichHint')}
             </div>
           )
@@ -180,8 +180,8 @@ export function VocabQuizFocusPicker({
       </div>
 
       <div>
-        <div id="vocab-quiz-count-label" className="mb-3 block font-neo-display text-base font-bold text-neo-cream">
-          <ListOrdered className="me-2 inline size-4 text-neo-cream/70" />
+        <div id="vocab-quiz-count-label" className="mb-3 block font-neo-display text-base font-bold text-edu-ink">
+          <ListOrdered className="me-2 inline size-4 text-edu-ink/70" />
           {t('vocabQuiz.setup.questionCount')}
         </div>
         <div role="radiogroup" aria-labelledby="vocab-quiz-count-label" className="grid grid-cols-4 gap-3">
@@ -204,15 +204,15 @@ export function VocabQuizFocusPicker({
           ))}
         </div>
         {plannedCount > 0 && plannedCount < questionCount && (
-          <p className="mt-2 font-neo-body text-sm text-neo-cream/70">
+          <p className="mt-2 font-neo-body text-sm text-edu-ink/70">
             {t('vocabQuiz.setup.cappedNotice', { count: plannedCount })}
           </p>
         )}
       </div>
 
       <div>
-        <div id="vocab-quiz-seconds-label" className="mb-3 block font-neo-display text-base font-bold text-neo-cream">
-          <Timer className="me-2 inline size-4 text-neo-cream/70" />
+        <div id="vocab-quiz-seconds-label" className="mb-3 block font-neo-display text-base font-bold text-edu-ink">
+          <Timer className="me-2 inline size-4 text-edu-ink/70" />
           {t('vocabQuiz.setup.secondsPerQuestion')}
         </div>
         <div role="radiogroup" aria-labelledby="vocab-quiz-seconds-label" className="grid grid-cols-4 gap-3">
@@ -238,7 +238,7 @@ export function VocabQuizFocusPicker({
 
       {/* Advanced: Treasure Chests toggle — absent when the mode never deals chests */}
       {onTreasureChestsChange && (
-        <div className="border-t-2 border-neo-cream/20 pt-6">
+        <div className="border-t-2 border-edu-line/20 pt-6">
           <button
             type="button"
             role="switch"
@@ -250,20 +250,20 @@ export function VocabQuizFocusPicker({
               treasureChestsEnabled ? CALM_SELECTED : CALM_IDLE
             )}
           >
-            <Gift className="size-4 shrink-0 text-neo-cream/70" aria-hidden />
+            <Gift className="size-4 shrink-0 text-edu-ink/70" aria-hidden />
             <span className="flex-1 text-start font-neo-display text-sm font-bold">
               {t('vocabQuiz.setup.treasureChests')}
             </span>
             <span
               className={cn(
                 'shrink-0 rounded border-2 px-2 py-0.5 text-xs font-bold',
-                treasureChestsEnabled ? 'border-neo-lime text-neo-cream' : 'border-neo-cream/35 text-neo-cream/70'
+                treasureChestsEnabled ? 'border-neo-lime text-edu-ink' : 'border-edu-line text-edu-ink/70'
               )}
             >
               {treasureChestsEnabled ? t('vocabQuiz.setup.on') : t('vocabQuiz.setup.off')}
             </span>
           </button>
-          <p className="mt-2 font-neo-body text-sm text-neo-cream/70">{t('vocabQuiz.setup.treasureChestsHint')}</p>
+          <p className="mt-2 font-neo-body text-sm text-edu-ink/70">{t('vocabQuiz.setup.treasureChestsHint')}</p>
         </div>
       )}
     </div>

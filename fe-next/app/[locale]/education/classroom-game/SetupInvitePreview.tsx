@@ -35,7 +35,7 @@ export function SetupInvitePreview() {
   const roster = { students, arrivals: students.slice(-1).map((s) => s.id), loading: false };
 
   return (
-    <div className={cn('fixed inset-0 z-[80] flex flex-col overflow-y-auto overscroll-contain bg-neo-navy', language === 'he' && 'rtl')}>
+    <div className={cn('fixed inset-0 z-[80] flex flex-col overflow-y-auto overscroll-contain bg-edu-page', language === 'he' && 'rtl')}>
       <EducationHeader compact showBackButton title={t('eduShell.setup.title')} />
       <ClassSetupInviteView
         classroom={CLASSROOM}

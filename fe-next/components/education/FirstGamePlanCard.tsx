@@ -66,14 +66,14 @@ export function FirstGamePlanCard({ classroom, joinUrl, origin, language, t, cla
           <CalendarPlus className="size-5" />
         </span>
         <div className="min-w-0">
-          <h2 id={`${inputId}-title`} className="font-neo-display text-lg font-black text-neo-cream">
+          <h2 id={`${inputId}-title`} className="font-neo-display text-lg font-black text-edu-ink">
             {t('eduShell.setup.plan.title')}
           </h2>
-          <p className="font-neo-body text-sm text-neo-cream/80">{t('eduShell.setup.plan.body')}</p>
+          <p className="font-neo-body text-sm text-edu-ink/80">{t('eduShell.setup.plan.body')}</p>
         </div>
       </div>
 
-      <label htmlFor={inputId} className="flex flex-col gap-1 font-neo-body text-sm font-bold text-neo-cream">
+      <label htmlFor={inputId} className="flex flex-col gap-1 font-neo-body text-sm font-bold text-edu-ink">
         {t('eduShell.setup.plan.when')}
         <input
           id={inputId}
@@ -107,9 +107,9 @@ export function FirstGamePlanCard({ classroom, joinUrl, origin, language, t, cla
       </div>
 
       {onSendHomeLink ? (
-        <div data-testid="first-game-plan-home" className="flex flex-col gap-2 border-t-[3px] border-neo-cream/20 pt-3">
-          <p className="font-neo-body text-sm text-neo-cream/85">
-            <span className="font-bold text-neo-cream">{t('eduShell.setup.plan.homeTitle')}</span> {t('eduShell.setup.plan.homeBody')}
+        <div data-testid="first-game-plan-home" className="flex flex-col gap-2 border-t-[3px] border-edu-line/20 pt-3">
+          <p className="font-neo-body text-sm text-edu-ink/85">
+            <span className="font-bold text-edu-ink">{t('eduShell.setup.plan.homeTitle')}</span> {t('eduShell.setup.plan.homeBody')}
           </p>
           <button
             type="button"

@@ -46,7 +46,7 @@ export interface JoinSheetProps {
 export function JoinSheet({ code, className, origin, language, t }: JoinSheetProps) {
   if (!code) {
     return (
-      <main data-testid="join-sheet-invalid" className="mx-auto max-w-lg p-6 font-neo-body text-neo-cream">
+      <main data-testid="join-sheet-invalid" className="mx-auto max-w-lg p-6 font-neo-body text-edu-ink">
         <p className="mb-4 font-bold">{t('teacher.joinSheet.invalid')}</p>
         <Link href={`/${language}/teacher`} className="underline">{t('teacher.joinSheet.back')}</Link>
       </main>
@@ -62,19 +62,19 @@ export function JoinSheet({ code, className, origin, language, t }: JoinSheetPro
   };
 
   return (
-    <div data-testid="join-sheet" className="min-h-dvh bg-neo-navy print:min-h-0 print:bg-white">
+    <div data-testid="join-sheet" className="min-h-dvh bg-edu-page print:min-h-0 print:bg-white">
       <style>{PRINT_CSS}</style>
       <header className="mx-auto flex max-w-3xl flex-wrap items-center gap-3 p-4 print:hidden">
         <Link
           href={`/${language}/teacher`}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] border-neo-cream px-3 font-neo-body text-sm font-bold text-neo-cream hover:bg-neo-navy-light"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] border-edu-line px-3 font-neo-body text-sm font-bold text-edu-ink hover:bg-edu-surface"
         >
           <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden="true" />
           {t('teacher.joinSheet.back')}
         </Link>
         <div className="min-w-0 flex-1 basis-60">
-          <h1 className="font-neo-display text-xl font-black text-neo-cream" dir="auto">{t('teacher.joinSheet.title', { name })}</h1>
-          <p className="font-neo-body text-sm text-neo-cream/80">{t('teacher.joinSheet.subtitle')}</p>
+          <h1 className="font-neo-display text-xl font-black text-edu-ink" dir="auto">{t('teacher.joinSheet.title', { name })}</h1>
+          <p className="font-neo-body text-sm text-edu-ink/80">{t('teacher.joinSheet.subtitle')}</p>
         </div>
         <button
           type="button"

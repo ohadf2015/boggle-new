@@ -128,7 +128,7 @@ export function ProWelcomeCelebration({ grant, paid = false, onReturnPage = fals
 
         <div className={NB_DIALOG_BODY}>
           {!paid && grant?.note && (
-            <blockquote className="mb-4 rounded-neo border-[3px] border-s-[6px] border-neo-cream/50 border-s-neo-cyan bg-neo-navy-light p-3 font-neo-body text-sm italic text-neo-cream/90">
+            <blockquote className="mb-4 rounded-neo border-[3px] border-s-[6px] border-edu-line border-s-neo-cyan bg-edu-surface p-3 font-neo-body text-sm italic text-edu-ink/90">
               {grant.note}
             </blockquote>
           )}
@@ -149,13 +149,13 @@ export function ProWelcomeCelebration({ grant, paid = false, onReturnPage = fals
             ))}
           </ul>
           {paid ? (
-            <p className="mt-4 text-center font-neo-body text-xs font-bold text-neo-cream/75">
-              <Link href={`/${language}/teacher/profile`} className="underline decoration-2 underline-offset-4 hover:text-neo-cream">
+            <p className="mt-4 text-center font-neo-body text-xs font-bold text-edu-ink/75">
+              <Link href={`/${language}/teacher/profile`} className="underline decoration-2 underline-offset-4 hover:text-edu-ink">
                 {t('teacher.proWelcome.manage')}
               </Link>
             </p>
           ) : (
-            <p className="mt-4 text-center font-neo-body text-xs font-bold text-neo-cream/75">{t('teacher.proWelcome.noCard')}</p>
+            <p className="mt-4 text-center font-neo-body text-xs font-bold text-edu-ink/75">{t('teacher.proWelcome.noCard')}</p>
           )}
         </div>
 

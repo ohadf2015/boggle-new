@@ -32,7 +32,7 @@ export function ReportsFreeInsightsView({ free, others, children }: { free: Name
     <section data-testid="reports-free-insights" aria-label={t('teacher.weekInsight.title')} className="flex flex-col gap-3">
       {free ? (
         <div className="flex flex-col gap-2">
-          <p className="font-neo-display text-lg font-black text-neo-cream">
+          <p className="font-neo-display text-lg font-black text-edu-ink">
             <bdi>{free.name}</bdi>
           </p>
           {children}
@@ -41,15 +41,15 @@ export function ReportsFreeInsightsView({ free, others, children }: { free: Name
       {others.length > 0 ? (
         <div
           data-testid="reports-free-other-classes"
-          className="flex flex-col gap-2 rounded-neo-lg border-2 border-dashed border-neo-cream/40 p-3 sm:flex-row sm:items-center sm:gap-3"
+          className="flex flex-col gap-2 rounded-neo-lg border-2 border-dashed border-edu-line p-3 sm:flex-row sm:items-center sm:gap-3"
         >
-          <p className="flex items-center gap-2 font-neo-body text-sm font-bold text-neo-cream/90">
+          <p className="flex items-center gap-2 font-neo-body text-sm font-bold text-edu-ink/90">
             <Lock className="size-4 shrink-0" aria-hidden="true" />
             {t('teacher.reports.freeOtherClasses')}
           </p>
           <ul className="flex flex-wrap gap-1.5">
             {others.map((c) => (
-              <li key={c.id} className="rounded-full border-2 border-neo-cream/40 px-2.5 py-0.5 font-neo-body text-xs font-bold text-neo-cream/80">
+              <li key={c.id} className="rounded-full border-2 border-edu-line px-2.5 py-0.5 font-neo-body text-xs font-bold text-edu-ink/80">
                 <bdi>{c.name}</bdi>
               </li>
             ))}

@@ -77,7 +77,7 @@ function DeliveryShort({ delivery, t }: { delivery: ModeDelivery; t: T }) {
     <span
       data-testid={`delivery-tag-${delivery}`}
       title={t(deliveryKey(delivery))}
-      className="inline-flex items-center gap-1 whitespace-nowrap font-neo-body text-xs font-bold leading-none text-neo-cream/80"
+      className="inline-flex items-center gap-1 whitespace-nowrap font-neo-body text-xs font-bold leading-none text-neo-cream/80 edu-sky:text-edu-ink/80"
     >
       <Icon className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
       {t(`eduShell.deliveryShort.${delivery}`)}
@@ -136,13 +136,13 @@ export function ClassroomModeCardRow({ selected, recommended = null, selectedMin
   };
 
   const chevron =
-    'absolute top-1/2 z-20 hidden size-10 -translate-y-1/2 place-items-center rounded-full border-[2px] border-neo-cream/40 bg-neo-navy/80 text-neo-cream backdrop-blur-sm transition-colors hover:border-neo-cream hover:bg-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan md:grid lg:hidden';
+    'absolute top-1/2 z-20 hidden size-10 -translate-y-1/2 place-items-center rounded-full border-[2px] border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy/80 edu-sky:bg-edu-surface/80 text-neo-cream edu-sky:text-edu-ink backdrop-blur-sm transition-colors hover:border-neo-cream edu-sky:hover:border-edu-line hover:bg-neo-navy edu-sky:hover:bg-edu-surface focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan md:grid lg:hidden';
 
   return (
     <div className="flex flex-col" dir={dir}>
     <p
       data-testid="mode-row-swipe-hint"
-      className="lg:hidden flex items-center justify-end gap-1 px-0.5 font-neo-body text-xs font-bold text-neo-cream/70"
+      className="lg:hidden flex items-center justify-end gap-1 px-0.5 font-neo-body text-xs font-bold text-neo-cream/70 edu-sky:text-edu-ink/70"
     >
       {t('eg2Modes.swipeHint', { count: modes.length })}
       <DirectionalIcon icon={ChevronsRight} className="h-4 w-4" />
@@ -174,7 +174,7 @@ export function ClassroomModeCardRow({ selected, recommended = null, selectedMin
             // Equal card widths across groups: n sevenths of the row minus its share of the gaps.
             style={{ ['--group-basis' as string]: `calc((100% - ${(modes.length - 1) * 12}px) * ${group.length} / ${modes.length} + ${(group.length - 1) * 12}px)` }}
           >
-            <span className="flex items-center gap-1.5 px-0.5 text-start font-neo-body text-xs font-bold text-neo-cream/80 lg:text-sm">
+            <span className="flex items-center gap-1.5 px-0.5 text-start font-neo-body text-xs font-bold text-neo-cream/80 edu-sky:text-edu-ink/80 lg:text-sm">
               <span aria-hidden="true" className="h-[3px] w-3 shrink-0 bg-neo-cream" />
               {t(`eg2Modes.category.${category}`)}
             </span>

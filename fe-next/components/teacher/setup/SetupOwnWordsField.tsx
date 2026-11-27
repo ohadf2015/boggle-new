@@ -6,7 +6,7 @@ import { NB_BLOCK, NB_INPUT } from '../nb/nbStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
-export const SETUP_FIELD_LABEL = 'font-neo-body text-sm font-black text-neo-cream';
+export const SETUP_FIELD_LABEL = 'font-neo-body text-sm font-black text-edu-ink';
 
 export interface SetupOwnWords {
   text: string;
@@ -23,7 +23,7 @@ export function SetupOwnWordsField({ own, t }: { own: SetupOwnWords; t: T }) {
   return (
     <div className="flex flex-col gap-1.5">
       <label htmlFor="setup-own-words" className={SETUP_FIELD_LABEL}>
-        {t('eduShell.setup.words.label')} <span className="font-semibold text-neo-cream/70">· {t('common.optional')}</span>
+        {t('eduShell.setup.words.label')} <span className="font-semibold text-edu-ink/70">· {t('common.optional')}</span>
       </label>
       <textarea
         id="setup-own-words"
@@ -38,7 +38,7 @@ export function SetupOwnWordsField({ own, t }: { own: SetupOwnWords; t: T }) {
         className={cn(NB_INPUT, 'resize-none py-2 leading-snug', own.text.trim() ? 'h-28' : 'h-16')}
       />
       {short ? (
-        <p data-testid="setup-own-words-status" aria-live="polite" className="font-neo-body text-sm font-semibold text-neo-cream/80">
+        <p data-testid="setup-own-words-status" aria-live="polite" className="font-neo-body text-sm font-semibold text-edu-ink/80">
           {t('eduShell.setup.ownWords.needMore', { count: own.min - own.count })}
         </p>
       ) : null}
@@ -58,7 +58,7 @@ export function SetupOwnWordsField({ own, t }: { own: SetupOwnWords; t: T }) {
                 <li
                   key={`${word}-${i}`}
                   data-testid="setup-dropped-word"
-                  className="max-w-full truncate rounded-neo-pill border-2 border-neo-black bg-neo-white px-2 font-neo-body text-xs font-black text-neo-black line-through decoration-2"
+                  className="max-w-full truncate rounded-neo-pill border-2 border-neo-black bg-edu-paper px-2 font-neo-body text-xs font-black text-neo-black line-through decoration-2"
                 >
                   {word}
                 </li>

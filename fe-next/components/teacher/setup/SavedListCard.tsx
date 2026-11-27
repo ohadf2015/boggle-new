@@ -30,8 +30,8 @@ export function SavedListCard({ list, onChangeWords, t }: { list: SavedList; onC
             <ClipboardList className="size-5" />
           </span>
           <div className="min-w-0">
-            <p className="font-neo-body text-xs font-black uppercase tracking-wide text-neo-cream/70">{t('eduShell.setup.words.title')}</p>
-            <h2 id="saved-list-name" data-testid="saved-list-name" dir="auto" className="truncate font-neo-display text-lg font-black leading-tight text-neo-cream sm:text-xl">
+            <p className="font-neo-body text-xs font-black uppercase tracking-wide text-edu-ink/70">{t('eduShell.setup.words.title')}</p>
+            <h2 id="saved-list-name" data-testid="saved-list-name" dir="auto" className="truncate font-neo-display text-lg font-black leading-tight text-edu-ink sm:text-xl">
               {ready ? ready.name : ' '}
             </h2>
           </div>
@@ -51,7 +51,7 @@ export function SavedListCard({ list, onChangeWords, t }: { list: SavedList; onC
             </li>
           ))}
           {rest > 0 ? (
-            <li data-testid="saved-list-more" className={cn(CHIP, 'bg-neo-navy-light text-neo-cream')}>
+            <li data-testid="saved-list-more" className={cn(CHIP, 'bg-edu-surface text-edu-ink')}>
               {t('teacher.weekInsight.more', { count: rest })}
             </li>
           ) : null}
@@ -59,13 +59,13 @@ export function SavedListCard({ list, onChangeWords, t }: { list: SavedList; onC
       ) : (
         <div className="flex flex-wrap gap-1.5" aria-hidden="true">
           {[64, 80, 56, 72, 60, 88].map((w) => (
-            <span key={w} style={{ width: w }} className="h-8 rounded-neo-pill bg-neo-cream/15 motion-safe:animate-pulse" />
+            <span key={w} style={{ width: w }} className="h-8 rounded-neo-pill bg-edu-ink/15 motion-safe:animate-pulse" />
           ))}
         </div>
       )}
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="min-w-0 font-neo-body text-sm font-semibold text-neo-cream/80 sm:flex-1">{t('eduShell.setup.words.yours')}</p>
+        <p className="min-w-0 font-neo-body text-sm font-semibold text-edu-ink/80 sm:flex-1">{t('eduShell.setup.words.yours')}</p>
         <NeoButton variant="small" tone="navy" data-testid="saved-list-change" onClick={onChangeWords} disabled={!ready} className="min-h-11 shrink-0 self-start sm:self-auto">
           <Pencil className="size-4" aria-hidden="true" />
           {t('eduShell.setup.savedList.change')}

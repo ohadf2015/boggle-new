@@ -24,7 +24,7 @@ export function JoinNextAssignmentCta({ classroomId }: { classroomId: string }) 
 
   if (isLoading) {
     return (
-      <p role="status" className="text-center font-neo-body text-sm font-bold text-neo-lime">
+      <p role="status" className="text-center font-neo-body text-sm font-bold text-edu-lime-ink">
         {t(`${K}.flow.findingAssignment`)}
       </p>
     );
@@ -38,7 +38,7 @@ export function JoinNextAssignmentCta({ classroomId }: { classroomId: string }) 
     <Link
       href={`/${language}/student`}
       data-testid="join-open-academy"
-      className="flex min-h-[48px] w-full items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cyan px-4 py-3 font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+      className="flex min-h-[48px] w-full items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cyan px-4 py-3 font-neo-display text-lg font-black uppercase text-neo-navy shadow-edu-lip-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
     >
       {t(`${K}.flow.openAcademy`)}
     </Link>

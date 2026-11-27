@@ -16,13 +16,13 @@ export function TvRecapHeader({ title, lessonNames }: TvRecapHeaderProps) {
       data-testid="tv-recap-header"
       className="shrink-0 @max-[64rem]/results:mt-auto flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-1 @3xl/results:gap-x-4 @3xl/results:px-16 @5xl/results:justify-start @5xl/results:ps-1 @5xl/results:pe-20"
     >
-      {title && <h2 className="font-neo-display font-black leading-none text-neo-cream text-xl @3xl/results:text-3xl @[96rem]/results:text-4xl @[137.5rem]/results:text-6xl">
+      {title && <h2 className="font-neo-display font-black leading-none text-edu-ink text-2xl @3xl/results:text-4xl @[96rem]/results:text-5xl @[137.5rem]/results:text-7xl">
         {title}
       </h2>}
       {lesson && (
         <p
           dir="auto"
-          className="inline-flex min-w-0 max-w-full -rotate-1 items-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-cyan px-3 py-1 font-neo-body font-black text-neo-black shadow-hard text-sm @3xl/results:text-lg @[137.5rem]/results:text-3xl"
+          className="inline-flex min-w-0 max-w-full items-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-cyan px-3 py-1 font-neo-display font-bold text-neo-black shadow-edu-lip-sm text-sm @3xl/results:text-lg @[137.5rem]/results:text-3xl"
         >
           <BookOpen className="size-4 shrink-0 @3xl/results:size-5" aria-hidden="true" />
           <span className="truncate">{lesson}</span>

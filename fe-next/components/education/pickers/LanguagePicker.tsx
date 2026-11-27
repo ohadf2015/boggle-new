@@ -66,7 +66,7 @@ export function LanguagePicker<V extends string>({
       className={cn('min-w-0', className)}
     >
       <legend
-        className={hideLabel ? 'sr-only' : cn('mb-2 block font-neo-body text-sm font-bold', themed ? 'text-neo-black dark:text-neo-cream' : 'text-neo-cream')}
+        className={hideLabel ? 'sr-only' : cn('mb-2 block font-neo-body text-sm font-bold', themed ? 'text-neo-black dark:text-edu-ink' : 'text-edu-ink')}
       >
         {label}
       </legend>
@@ -87,12 +87,12 @@ export function LanguagePicker<V extends string>({
                 OPTION_BASE,
                 variant === 'filter' ? 'min-h-9 gap-1.5 px-2 text-xs' : dense ? 'min-h-10 px-2.5 text-sm' : 'min-h-12 px-3 py-2 text-base',
                 checked && ring
-                  ? 'border-neo-lime bg-neo-navy-light text-neo-cream ring-2 ring-neo-lime'
+                  ? 'border-neo-lime bg-edu-surface text-edu-ink ring-2 ring-neo-lime'
                   : checked
                   ? 'border-neo-black bg-neo-lime text-neo-black shadow-hard-sm'
                   : themed
-                    ? 'border-neo-black/60 bg-neo-cream text-neo-black hover:bg-neo-black/5 dark:border-neo-cream/50 dark:bg-neo-navy-light dark:text-neo-cream dark:hover:bg-neo-navy'
-                    : 'border-neo-cream/50 bg-neo-navy-light text-neo-cream hover:border-neo-cream hover:bg-neo-navy'
+                    ? 'border-neo-black/60 bg-neo-cream text-neo-black hover:bg-neo-black/5 dark:border-edu-line dark:bg-edu-surface dark:text-edu-ink dark:hover:bg-edu-surface'
+                    : 'border-edu-line bg-edu-surface text-edu-ink hover:border-edu-line hover:bg-edu-surface'
               )}
             >
               <input
@@ -109,15 +109,15 @@ export function LanguagePicker<V extends string>({
               <span className="flex min-w-0 flex-col text-start leading-tight">
                 <span lang={isAll ? undefined : code} className="truncate">{native}</span>
                 {!dense && translated && translated !== native && (
-                  <span className={cn('truncate text-xs font-semibold', checked && !ring ? 'text-neo-black/70' : themed ? 'text-neo-black/65 dark:text-neo-cream/65' : 'text-neo-cream/65')}>
+                  <span className={cn('truncate text-xs font-semibold', checked && !ring ? 'text-neo-black/70' : themed ? 'text-neo-black/65 dark:text-edu-ink/65' : 'text-edu-ink/65')}>
                     {translated}
                   </span>
                 )}
               </span>
               {dense && translated && translated !== native && <span className="sr-only">{translated}</span>}
               {checked && ring ? (
-                <span data-picker-check="" aria-hidden="true" className="absolute -end-1.5 -top-1.5 grid size-4 place-items-center rounded-full border border-neo-lime bg-neo-navy">
-                  <Check className="size-3 text-neo-lime" strokeWidth={3.5} />
+                <span data-picker-check="" aria-hidden="true" className="absolute -end-1.5 -top-1.5 grid size-4 place-items-center rounded-full border border-neo-lime bg-edu-surface">
+                  <Check className="size-3 text-edu-lime-ink" strokeWidth={3.5} />
                 </span>
               ) : null}
             </label>
@@ -125,7 +125,7 @@ export function LanguagePicker<V extends string>({
         })}
       </div>
       {showBoardHint && (
-        <p id={hintId} className={cn('mt-1.5 font-neo-body text-xs', themed ? 'text-neo-black/70 dark:text-neo-cream/70' : 'text-neo-cream/70')}>
+        <p id={hintId} className={cn('mt-1.5 font-neo-body text-xs', themed ? 'text-neo-black/70 dark:text-edu-ink/70' : 'text-edu-ink/70')}>
           {t('eduPickers.language.defaultHint', 'New lists start in this language. Lessons can be in any language; each game plays in its list’s language.')}
         </p>
       )}

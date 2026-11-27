@@ -2,8 +2,8 @@
  * WinnerSpotlight — the payoff.
  *
  * Blooket ends a game on the word "Victory" and a character standing on a
- * plinth. Same instinct, louder: Lexi actually celebrates (a 2s trophy loop),
- * the room hears one short sting, and confetti fires on the winner's beat —
+ * plinth. Same instinct, louder: Lexi's trophy pulses, the room hears one
+ * short sting, and confetti fires on the winner's beat —
  * the moment the podium's first placard lands, not a frame before.
  *
  * CLASS-5 RULES, all of them, on purpose:
@@ -11,10 +11,8 @@
  *    a drumroll line; revealed, it shows the name. Nothing enters from
  *    `opacity: 0`, nothing reserves an empty hole, and the projector layout
  *    does not move when the winner arrives.
- *  - Reduced motion swaps the video for its own poster still and fires no
- *    confetti — the celebration becomes a painted trophy, not a stalled one.
- *  - `bg-neo-navy-elevated` is hardcoded: this is a dark-only game surface, so
- *    the cream/dark pair that flashes cream on a lazy mount is never used.
+ *  - Reduced motion stops the pulse and fires no confetti — the celebration
+ *    becomes a painted trophy, not a stalled one.
  *
  * The sting and the confetti are ref-guarded to fire ONCE per mount: a results
  * screen re-renders every time a score payload settles, and a fanfare that
@@ -35,13 +33,6 @@ import { playRoundEndCue, ROUND_WIN_SOUND } from '@/lib/education/roundEndSound'
 import type { RoundOutcomeKind } from './roundOutcome';
 
 const TROPHY_STILL = '/mascot/teacher/badge-trophy.webp';
-/**
- * The 384px faststart encode (75KB), not the 640px master (662KB). Measured on
- * a cold profile at the back of a real round: the master was still `paused`
- * for every frame of the 4.4s reveal, so the celebration was a photograph of a
- * trophy. The reveal is the whole budget — the loop has to be moving inside it.
- */
-const TROPHY_LOOP = '/mascot/teacher/video/trophy-celebrate-384.mp4';
 
 export interface WinnerSpotlightProps {
   /** The room's first place. Absent (a room nobody scored in) renders nothing. */
@@ -141,10 +132,10 @@ export function WinnerSpotlight({
       data-active={String(active)}
       data-outcome={kind}
       className={cn(
-        'relative flex items-center gap-4 text-neo-white',
+        'relative flex items-center gap-4 text-edu-ink',
         quiet
-          ? cn('rounded-neo-lg border-[3px] shadow-hard-xl', lead ? 'border-neo-black bg-neo-pink' : 'border-neo-cream/50 bg-neo-navy-light')
-          : 'rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated shadow-hard',
+          ? 'rounded-neo-xl border-[3px] border-edu-line bg-edu-surface shadow-edu-lip'
+          : 'rounded-neo border-[3px] border-edu-line bg-edu-surface shadow-edu-lip-sm',
         projector
           ? quiet
             ? 'px-4 py-3 gap-4 @[96rem]/results:px-6 @[96rem]/results:py-4 @[137.5rem]/results:px-10 @[137.5rem]/results:py-6'
@@ -157,11 +148,6 @@ export function WinnerSpotlight({
           the bar is never an empty rectangle waiting for content. */}
       <div
         data-testid="winner-mascot-frame"
-        // A headless renderer routinely leaves the <video> `paused` on its
-        // poster (the 640px encode did exactly that for every frame of a 4.4s
-        // reveal). Then the trophy is a photograph, and two shots a second
-        // apart are identical — half of why round 4's five frames matched.
-        // This CSS pulse does not care whether the video decodes.
         data-trophy-pulse={active && earned && !calm && !lostBoss ? 'on' : 'off'}
         style={
           active && earned && !calm && !lostBoss
@@ -175,7 +161,7 @@ export function WinnerSpotlight({
           // nothing about hit-testing, and a capture run lost a lobby click to
           // `covered by <video>`. Nothing here is ever the target of a tap.
           'pointer-events-none shrink-0 overflow-hidden rounded-neo',
-          lead ? 'border-[3px] border-neo-black bg-neo-cream' : 'border-[2px] border-neo-cream bg-neo-navy',
+          lead ? 'border-[3px] border-neo-black bg-neo-pink' : 'border-[3px] border-edu-line bg-edu-surface',
           projector
             ? quiet
               ? 'w-20 h-20 @[96rem]/results:w-28 @[96rem]/results:h-28 @[137.5rem]/results:w-40 @[137.5rem]/results:h-40'
@@ -191,28 +177,12 @@ export function WinnerSpotlight({
           <span data-testid="winner-hitter-avatar" data-username={winner.username} className="grid h-full w-full place-items-center bg-neo-yellow [&_svg]:h-full [&_svg]:w-full">
             <Avatar userId={winner.username} size="xl" disableEffects className="!h-full !w-full" />
           </span>
-        ) : calm || (active && !earned) ? (
-          // The still IS the video's own poster frame; routing it through
-          // next/image would request a second, differently-encoded copy of an
-          // asset the browser already has.
+        ) : (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             data-testid="winner-mascot-still"
             src={TROPHY_STILL}
             alt=""
-            aria-hidden
-            className="pointer-events-none w-full h-full object-cover"
-          />
-        ) : (
-          <video
-            data-testid="winner-mascot-video"
-            src={TROPHY_LOOP}
-            poster={TROPHY_STILL}
-            preload="auto"
-            autoPlay
-            loop
-            muted
-            playsInline
             aria-hidden
             className="pointer-events-none w-full h-full object-cover"
           />
@@ -226,7 +196,7 @@ export function WinnerSpotlight({
             quiet ? 'tracking-normal' : 'uppercase tracking-widest',
             // 40% white on navy-elevated measured 3.50:1 — a smudge at the
             // back of a room, which is the only place this line is read from.
-            !active ? 'text-neo-white/75' : lead ? 'text-neo-white' : quiet ? 'text-neo-cream' : 'text-neo-yellow',
+            !active ? 'text-edu-ink/75' : lead ? 'text-edu-ink' : quiet ? 'text-edu-ink' : 'text-edu-yellow-ink',
             projector ? (quiet ? 'text-2xl @[96rem]/results:text-3xl @[137.5rem]/results:text-5xl' : 'text-3xl @[137.5rem]/results:text-5xl') : quiet ? 'text-base' : 'text-sm'
           )}
         >
@@ -236,7 +206,7 @@ export function WinnerSpotlight({
         {active && earned && (
           <p
             className={cn(
-              'mt-1 flex items-baseline gap-3 font-neo-display font-black text-neo-white truncate',
+              'mt-1 flex items-baseline gap-3 font-neo-display font-black text-edu-ink truncate',
               projector ? 'text-5xl @[137.5rem]/results:text-8xl' : 'text-2xl'
             )}
           >
@@ -249,7 +219,7 @@ export function WinnerSpotlight({
           <p
             data-testid="winner-zero-body"
             className={cn(
-              'mt-1 font-neo-body font-bold leading-snug text-neo-cream',
+              'mt-1 font-neo-body font-bold leading-snug text-edu-ink',
               projector ? (quiet ? 'text-lg @[96rem]/results:text-xl @[137.5rem]/results:text-4xl' : 'text-xl @[137.5rem]/results:text-4xl') : 'text-sm'
             )}
           >
@@ -268,7 +238,7 @@ export function WinnerSpotlight({
               animate={{ scale: 1, rotate: i === 0 ? -4 : 5 }}
               transition={calm ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 14, delay: 0.15 + i * 0.12 }}
               className={cn(
-                'grid place-items-center overflow-hidden rounded-full border-[3px] border-neo-black bg-neo-yellow shadow-hard [&_svg]:h-full [&_svg]:w-full',
+                'grid place-items-center overflow-hidden rounded-full border-[3px] border-neo-black bg-neo-yellow shadow-edu-lip-sm [&_svg]:h-full [&_svg]:w-full',
                 'size-24 @[96rem]/results:size-32 @[137.5rem]/results:size-48',
                 i > 0 && '-ms-6'
               )}

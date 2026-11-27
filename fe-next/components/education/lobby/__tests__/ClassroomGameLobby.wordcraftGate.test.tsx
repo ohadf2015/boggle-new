@@ -83,7 +83,7 @@ describe('ClassroomGameLobby — Wordcraft gate', () => {
     lessonWords = LONG;
     render(<ClassroomGameLobby onBack={vi.fn()} initialMode="wordcraft" />);
     const cls = screen.getByTestId('lobby-go-live').className.split(/\s+/);
-    expect(cls).toEqual(expect.arrayContaining(['disabled:bg-neo-navy-light', 'disabled:text-neo-cream/70', 'disabled:shadow-none']));
+    expect(cls).toEqual(expect.arrayContaining(['edu-sky:disabled:bg-edu-surface', 'edu-sky:disabled:text-edu-ink/70', 'disabled:shadow-none']));
     expect(cls).not.toContain('disabled:bg-neo-lime/60');
   });
 

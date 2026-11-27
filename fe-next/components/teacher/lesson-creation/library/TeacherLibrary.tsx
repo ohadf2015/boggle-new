@@ -51,7 +51,7 @@ export function TeacherLibrary({ onImportSuccess }: TeacherLibraryProps) {
     <div data-testid="teacher-library" className="space-y-6">
       <section id={SECTION_ID.mine} aria-labelledby="library-title" className="scroll-mt-4">
         <LessonBuilder
-          heading={<h1 id="library-title" className="font-neo-display text-2xl font-bold text-neo-white sm:text-3xl">{t('eduLibrary.title')}</h1>}
+          heading={<h1 id="library-title" className="font-neo-display text-4xl font-black leading-none text-edu-ink sm:text-5xl">{t('eduLibrary.title')}</h1>}
           onBrowseDiscover={() => goTo('discover')}
           onListCount={setListCount}
           hideDiscoverLink
@@ -59,10 +59,10 @@ export function TeacherLibrary({ onImportSuccess }: TeacherLibraryProps) {
       </section>
 
       <section id={SECTION_ID.discover} aria-labelledby="library-discover-title" className="scroll-mt-4 space-y-3">
-        <div className={cn('relative flex min-h-16 items-center gap-3 px-4 py-3 has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-neo-cream', GAME_CARD, GAME_CARD_HOVER)}>
-          <Compass className="size-7 shrink-0 text-neo-cyan" aria-hidden="true" />
+        <div className={cn('relative flex min-h-16 items-center gap-3 px-4 py-3 has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-edu-line', GAME_CARD, GAME_CARD_HOVER)}>
+          <Compass className="size-7 shrink-0 text-edu-cyan-ink" aria-hidden="true" />
           <div className="min-w-0 flex-1">
-            <h2 id="library-discover-title" className="font-neo-display text-xl font-bold leading-tight text-neo-white">
+            <h2 id="library-discover-title" className="font-neo-display text-xl font-bold leading-tight text-edu-ink">
               <button
                 type="button"
                 data-testid="library-discover-toggle"
@@ -74,9 +74,9 @@ export function TeacherLibrary({ onImportSuccess }: TeacherLibraryProps) {
                 {t('eduLibrary.tabs.discover')}
               </button>
             </h2>
-            <p className="font-neo-body text-sm font-semibold text-neo-cream/80">{t('eduLibrary.discover.hint')}</p>
+            <p className="font-neo-body text-sm font-semibold text-edu-ink/80">{t('eduLibrary.discover.hint')}</p>
           </div>
-          <ChevronDown className={cn('size-6 shrink-0 text-neo-cream transition-transform motion-reduce:transition-none', discoverOpen && 'rotate-180')} aria-hidden="true" />
+          <ChevronDown className={cn('size-6 shrink-0 text-edu-ink transition-transform motion-reduce:transition-none', discoverOpen && 'rotate-180')} aria-hidden="true" />
         </div>
         {discoverOpen ? (
           <div id={DISCOVER_PANEL_ID}>

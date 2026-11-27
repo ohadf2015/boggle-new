@@ -94,7 +94,7 @@ function MatrixTable({ classroomId, matrix }: { classroomId: string; matrix: Ass
       <section data-testid="assignment-progress-matrix">
         <SectionTitle>{t('teacher.reports.progressMatrix.title')}</SectionTitle>
         <ReportEmpty />
-        <p className="mt-2 text-center text-sm text-neo-cream/70">{t('teacher.reports.progressMatrix.empty')}</p>
+        <p className="mt-2 text-center text-sm text-edu-ink/70">{t('teacher.reports.progressMatrix.empty')}</p>
       </section>
     );
   }
@@ -104,10 +104,10 @@ function MatrixTable({ classroomId, matrix }: { classroomId: string; matrix: Ass
       <SectionTitle>
         {t('teacher.reports.progressMatrix.title')} <ProPoweredChip className="ms-1 align-middle" />
       </SectionTitle>
-      <div className="overflow-x-auto rounded-neo border-2 border-neo-cream/40 bg-neo-navy">
+      <div className="overflow-x-auto rounded-neo border-2 border-edu-line bg-edu-surface">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="bg-neo-navy text-neo-cream/80">
+            <tr className="bg-edu-surface text-edu-ink/80">
               <th scope="col" className="p-3 text-start font-bold">{t('teacher.reports.columns.student')}</th>
               {matrix.assignments.map((a) => (
                 <th
@@ -125,8 +125,8 @@ function MatrixTable({ classroomId, matrix }: { classroomId: string; matrix: Ass
           </thead>
           <tbody>
             {matrix.rows.map((row) => (
-              <tr key={row.studentId} data-testid="progress-matrix-row" className="border-t border-neo-cream/20">
-                <th scope="row" dir="auto" className="px-3 py-2 text-start font-bold text-neo-white">
+              <tr key={row.studentId} data-testid="progress-matrix-row" className="border-t border-edu-line/20">
+                <th scope="row" dir="auto" className="px-3 py-2 text-start font-bold text-edu-ink">
                   {row.studentName}
                 </th>
                 {row.cells.map((cell, i) => (
@@ -137,19 +137,19 @@ function MatrixTable({ classroomId, matrix }: { classroomId: string; matrix: Ass
                     data-assignment={matrix.assignments[i].id}
                     data-completed={cell.completed}
                     data-started={cell.started}
-                    className="px-3 py-2 text-neo-white tabular-nums"
+                    className="px-3 py-2 text-edu-ink tabular-nums"
                   >
                     {cell.completed ? (
                       <span
                         className="inline-flex items-center gap-1.5"
                         aria-label={t('teacher.reports.progressMatrix.cellCompleted', { score: cell.correctness ?? 0 })}
                       >
-                        <Check className="size-4 text-neo-lime" aria-hidden="true" />
+                        <Check className="size-4 text-edu-lime-ink" aria-hidden="true" />
                         {cell.correctness}%
                       </span>
                     ) : cell.started ? (
                       <span
-                        className="inline-flex items-center gap-1 text-neo-yellow"
+                        className="inline-flex items-center gap-1 text-edu-yellow-ink"
                         aria-label={t('teacher.reports.progressMatrix.cellStarted')}
                         title={t('teacher.reports.progressMatrix.cellStarted')}
                       >
@@ -160,7 +160,7 @@ function MatrixTable({ classroomId, matrix }: { classroomId: string; matrix: Ass
                     )}
                   </td>
                 ))}
-                <td className="px-3 py-2 text-end text-neo-white">
+                <td className="px-3 py-2 text-end text-edu-ink">
                   <TrendBadge trend={row.trend} />
                 </td>
               </tr>
@@ -186,11 +186,11 @@ function TrendBadge({ trend }: { trend: AssignmentProgressMatrixData['rows'][num
   return (
     <span className="inline-flex items-center gap-1 text-xs font-bold" aria-label={label} title={label}>
       {trend === 'up' ? (
-        <TrendingUp className="size-4 text-neo-lime" aria-hidden="true" />
+        <TrendingUp className="size-4 text-edu-lime-ink" aria-hidden="true" />
       ) : trend === 'down' ? (
-        <TrendingDown className="size-4 text-neo-pink" aria-hidden="true" />
+        <TrendingDown className="size-4 text-edu-pink-ink" aria-hidden="true" />
       ) : (
-        <Minus className={trend === 'flat' ? 'size-4 text-neo-cream' : 'size-4 text-neo-white/40'} aria-hidden="true" />
+        <Minus className={trend === 'flat' ? 'size-4 text-edu-ink' : 'size-4 text-edu-ink/40'} aria-hidden="true" />
       )}
     </span>
   );
@@ -217,12 +217,12 @@ function MatrixPaywall({ trialEnded }: { trialEnded: boolean }) {
   return (
     <section data-testid="progress-matrix-paywall" className="space-y-4">
       <SectionTitle>{t('teacher.reports.progressMatrix.title')}</SectionTitle>
-      <div className="rounded-neo border-neo border-neo-lime bg-neo-navy-light p-4 shadow-hard sm:p-5">
+      <div className="rounded-neo border-neo border-neo-lime bg-edu-surface p-4 shadow-hard sm:p-5">
         <div className="grid items-center gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-6">
           <div data-testid="progress-matrix-sample" aria-hidden="true" className="pointer-events-none select-none">
-            <div className="rounded-neo border-2 border-neo-cream/50 bg-neo-navy p-3 text-start shadow-hard-sm">
+            <div className="rounded-neo border-2 border-edu-line bg-edu-surface p-3 text-start shadow-hard-sm">
               <div className="mb-2 flex items-center justify-between gap-2">
-                <p className="truncate font-neo-display text-sm font-black text-neo-white">
+                <p className="truncate font-neo-display text-sm font-black text-edu-ink">
                   {t('teacher.reports.progressMatrix.sampleTitle')}
                 </p>
                 <span
@@ -234,8 +234,8 @@ function MatrixPaywall({ trialEnded }: { trialEnded: boolean }) {
               </div>
               <div className="space-y-1.5">
                 {sampleStudents.map((s, i) => (
-                  <div key={names[i]} className="flex items-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-2 py-1">
-                    <span className="w-14 shrink-0 truncate text-xs font-bold text-neo-white">{names[i]}</span>
+                  <div key={names[i]} className="flex items-center gap-2 rounded-neo border-2 border-edu-line bg-edu-surface px-2 py-1">
+                    <span className="w-14 shrink-0 truncate text-xs font-bold text-edu-ink">{names[i]}</span>
                     {[0, 1, 2].map((c) => {
                       // Separate elements, not a ternary className: the border
                       // contrast scan concatenates quoted fragments and would
@@ -245,7 +245,7 @@ function MatrixPaywall({ trialEnded }: { trialEnded: boolean }) {
                         return (
                           <span
                             key={c}
-                            className="flex-1 rounded-sm border border-neo-cream/50 bg-neo-navy px-1 py-0.5 text-center text-[10px] font-bold text-neo-cream/70"
+                            className="flex-1 rounded-sm border border-edu-line bg-edu-page px-1 py-0.5 text-center text-[10px] font-bold text-edu-ink/70"
                           >
                             —
                           </span>
@@ -270,14 +270,14 @@ function MatrixPaywall({ trialEnded }: { trialEnded: boolean }) {
               <Crown className="size-3" aria-hidden="true" />
               {t('teacher.subscription.proPlanName')}
             </span>
-            <h3 className="mb-2 font-neo-display text-xl font-black text-neo-white">
+            <h3 className="mb-2 font-neo-display text-xl font-black text-edu-ink">
               {t('teacher.reports.progressMatrix.gateTitle')}
             </h3>
-            <p className="mb-4 text-sm font-bold leading-relaxed text-neo-white/80">
+            <p className="mb-4 text-sm font-bold leading-relaxed text-edu-ink/80">
               {t('teacher.reports.progressMatrix.gateBody')}
             </p>
             {blockedInApp ? (
-              <p data-testid="progress-matrix-not-in-app" className="text-sm font-bold text-neo-white/80">
+              <p data-testid="progress-matrix-not-in-app" className="text-sm font-bold text-edu-ink/80">
                 {t('teacher.subscription.notInApp')}
               </p>
             ) : (
@@ -297,10 +297,10 @@ function MatrixPaywall({ trialEnded }: { trialEnded: boolean }) {
                   <Lock className="size-4" aria-hidden="true" />
                   {t('teacher.reports.progressMatrix.gateCta', { price: `$${TEACHER_PRO_PRICE_USD}` })}
                 </button>
-                <p className="mt-2 text-xs font-bold text-neo-white/60">{t('teacher.subscription.trustCancel')}</p>
+                <p className="mt-2 text-xs font-bold text-edu-ink/60">{t('teacher.subscription.trustCancel')}</p>
               </>
             )}
-            <p data-testid="progress-matrix-honest-line" className="mt-2 text-xs font-bold text-neo-cream/80">
+            <p data-testid="progress-matrix-honest-line" className="mt-2 text-xs font-bold text-edu-ink/80">
               {trialEnded ? t('teacher.proGate.trialEnded') : t('teacher.proGate.freeKeeps', { modes: PRO_COPY_PARAMS.modes })}
             </p>
           </div>

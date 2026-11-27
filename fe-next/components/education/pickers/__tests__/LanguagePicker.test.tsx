@@ -86,7 +86,7 @@ describe('LanguagePicker', () => {
     const en = container.querySelector('[data-picker-option="en"]') as HTMLElement;
     expect(he.className).not.toMatch(/bg-neo-lime/);
     expect(he.className).toMatch(/ring-neo-lime/);
-    expect(he.className).toMatch(/text-neo-cream/);
+    expect(he.className).toMatch(/text-edu-ink/);
     expect(he.querySelector('[data-picker-check]')).not.toBeNull();
     expect(en.querySelector('[data-picker-check]')).toBeNull();
     expect(en.className).not.toMatch(/ring-neo-lime/);

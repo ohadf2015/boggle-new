@@ -146,8 +146,8 @@ describe('LobbyPressureDials — monetization visibility (round 2)', () => {
   it('sits on a solid calm panel, not naked on the full-bleed art', () => {
     setup();
     const section = screen.getByTestId('pressure-dials');
-    expect(section.className).toContain('bg-neo-navy-light');
-    expect(section.className).toContain('border-neo-cream/35');
+    expect(section.className).toContain('bg-edu-surface');
+    expect(section.className).toContain('border-edu-line');
   });
 
   it.each([

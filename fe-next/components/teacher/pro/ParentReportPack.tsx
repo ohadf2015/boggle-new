@@ -168,7 +168,7 @@ export function ParentReportPack({ classroomId: fixedClassId }: ParentReportPack
               aria-label={t('eg2Pro.pack.pickClass')}
               value={classId}
               onChange={(e) => setPickedClassId(e.target.value)}
-              className="min-h-11 w-full rounded-neo border-2 border-neo-black bg-neo-white px-3 text-sm font-bold"
+              className="min-h-11 w-full rounded-neo border-2 border-neo-black bg-edu-paper px-3 text-sm font-bold"
             >
               {(classes ?? []).map((c) => (
                 <option key={c.id} value={c.id}>{t('eg2Pro.pack.classOption', { name: c.name, count: c.member_count })}</option>
@@ -204,11 +204,11 @@ export function ParentReportPack({ classroomId: fixedClassId }: ParentReportPack
             <button type="button" onClick={() => { void copy(parentLinksToText(named, { origin, locale: language }), t('eg2Pro.pack.copied', { count: named.length })); }} className={`${BTN} bg-neo-yellow`}>
               <Copy className="h-4 w-4" aria-hidden /> {t('eg2Pro.pack.copyAll')}
             </button>
-            <button type="button" onClick={csv} className={`${BTN} bg-neo-white`}>
+            <button type="button" onClick={csv} className={`${BTN} bg-edu-paper`}>
               <Download className="h-4 w-4" aria-hidden /> {t('eg2Pro.pack.csv')}
             </button>
           </div>
-          <ul className="max-h-64 space-y-1 overflow-y-auto rounded-neo border-2 border-neo-black bg-neo-white p-2">
+          <ul className="max-h-64 space-y-1 overflow-y-auto rounded-neo border-2 border-neo-black bg-edu-paper p-2">
             {named.map((l) => (
               <li key={l.studentId} data-testid="parent-pack-row" className="flex items-center gap-2 text-sm font-bold">
                 <bdi className="min-w-0 flex-1 truncate" title={l.name}>{l.name}</bdi>

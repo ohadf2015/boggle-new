@@ -37,7 +37,7 @@ export function TeacherClassEntryCard({ trial, previewClass }: TeacherClassEntry
     >
       <span
         aria-hidden="true"
-        className={cn('h-10 w-10 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cream bg-neo-navy text-neo-cyan motion-safe:transition-transform motion-safe:group-hover:-rotate-6', newest ? 'hidden sm:flex' : 'flex')}
+        className={cn('h-10 w-10 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-cyan edu-sky:text-edu-cyan-ink motion-safe:transition-transform motion-safe:group-hover:-rotate-6', newest ? 'hidden sm:flex' : 'flex')}
       >
         <GraduationCap className="h-5 w-5" strokeWidth={2.5} />
       </span>
@@ -51,7 +51,7 @@ export function TeacherClassEntryCard({ trial, previewClass }: TeacherClassEntry
               'block truncate font-neo-display font-black leading-tight',
               newest ? 'text-xs uppercase tracking-wide rtl:tracking-normal' : 'text-base sm:text-lg',
               'after:absolute after:inset-0 after:rounded-[inherit] after:content-[""]',
-              'focus:outline-hidden focus-visible:after:ring-4 focus-visible:after:ring-neo-black focus-visible:after:ring-offset-2 focus-visible:after:ring-offset-neo-navy'
+              'focus:outline-hidden focus-visible:after:ring-4 focus-visible:after:ring-neo-black focus-visible:after:ring-offset-2 focus-visible:after:ring-offset-neo-navy edu-sky:focus-visible:after:ring-offset-edu-surface'
             )}
           >
             {t('education.nav.myClassroom')}
@@ -67,7 +67,7 @@ export function TeacherClassEntryCard({ trial, previewClass }: TeacherClassEntry
         <span
           aria-hidden="true"
           data-testid="home-teacher-class-open"
-          className="inline-flex w-full items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream bg-neo-navy px-3 py-2 font-neo-display text-sm font-black text-neo-lime shadow-hard-sm sm:w-auto sm:shrink-0"
+          className="inline-flex w-full items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface px-3 py-2 font-neo-display text-sm font-black text-neo-lime edu-sky:text-edu-lime-ink shadow-hard-sm sm:w-auto sm:shrink-0"
         >
           {t('homeFresh.sections.classrooms.openClassroom')}
           <DirectionalIcon icon={ArrowRight} className="h-4 w-4" />

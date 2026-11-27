@@ -332,6 +332,15 @@ describe('ReportsPageClient', () => {
       ).toBeInTheDocument();
     });
 
+    it('puts a decorative desktop-only mascot beside the page heading', () => {
+      render(<ReportsPageClient />);
+      const mascot = screen.getByTestId('reports-heading-mascot');
+      expect(mascot).toHaveAttribute('aria-hidden', 'true');
+      expect(mascot.className).toContain('max-lg:hidden');
+      expect(mascot.querySelector('img')).toHaveAttribute('alt', '');
+      expect(mascot.parentElement).toContainElement(screen.getByRole('heading', { name: /progress reports/i }));
+    });
+
     it('classroom buttons are accessible', () => {
       render(<ReportsPageClient />);
 

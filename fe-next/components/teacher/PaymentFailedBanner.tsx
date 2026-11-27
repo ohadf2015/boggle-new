@@ -40,7 +40,7 @@ export function PaymentFailedBanner({ portalUrl, stillPro }: PaymentFailedBanner
       proLabel={t('eduShell.nav.pro')}
       title={t('teacher.subscription.paymentFailedTitle')}
       body={t(stillPro ? 'teacher.subscription.paymentFailedBody' : 'teacher.subscription.paymentFailedBodyPaused')}
-      lead={<CreditCard className="size-8 shrink-0 text-neo-pink" aria-hidden="true" />}
+      lead={<CreditCard className="size-8 shrink-0 text-edu-pink-ink" aria-hidden="true" />}
       action={
         <a
           data-testid="payment-failed-cta"

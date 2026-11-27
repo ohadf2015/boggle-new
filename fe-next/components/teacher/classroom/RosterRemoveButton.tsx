@@ -46,7 +46,7 @@ export function RosterRemoveButton({ classroomId, studentId, name, onRemoved }: 
         aria-busy={removing}
         onClick={() => setConfirming(true)}
         className={cn(
-          'grid size-11 shrink-0 place-items-center rounded-neo border-2 border-black bg-neo-white text-neo-black shadow-hard-sm',
+          'grid size-11 shrink-0 place-items-center rounded-neo border-2 border-black bg-edu-paper text-neo-black shadow-hard-sm',
           'transition-transform hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-60 motion-reduce:transition-none',
           'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
         )}

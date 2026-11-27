@@ -15,7 +15,7 @@ describe('education CTA tickets', () => {
   it.each(cases)('%s is a navy ticket with an accent start edge, not a filled slab', (_n, mount, accent) => {
     const { container } = mount();
     const box = container.firstElementChild as HTMLElement;
-    expect(box.className).toContain('bg-neo-navy-light');
+    expect(box.className).toContain('bg-edu-surface');
     expect(box.className).toContain(`border-s-${accent}`);
     expect(box.className).not.toContain('shadow-hard-lg');
     expect(box.className).not.toMatch(/(^|\s)border-4(\s|$)/);
@@ -34,7 +34,7 @@ describe('education CTA tickets', () => {
   it('uses the light pink for the Teacher Pro heading on navy', () => {
     render(<TeacherProCheckoutCta locale="en" />);
     const heading = screen.getByText(/Teacher Pro: \$/, { selector: 'p' });
-    expect(heading.className).toContain('text-neo-pink-light');
+    expect(heading.className).toContain('text-edu-pink-ink');
   });
 
   it('keeps the no-account join a solid lime button by default for the landings where it is the hero action', () => {

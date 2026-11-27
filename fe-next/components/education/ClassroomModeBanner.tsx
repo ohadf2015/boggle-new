@@ -155,15 +155,15 @@ export function ClassroomModeBanner({
           'text-sm font-neo-body'
         )}
       >
-        <div className="flex items-center gap-2 text-neo-cyan font-bold">
+        <div className="flex items-center gap-2 text-neo-cyan edu-sky:text-edu-cyan-ink font-bold">
           <GraduationCap className="w-4 h-4" />
           <span>{sessionLabel}</span>
         </div>
 
         {lessonName && (
           <>
-            <span className="text-neo-white" aria-hidden="true">|</span>
-            <div className="flex items-center gap-1.5 text-neo-white">
+            <span className="text-neo-white edu-sky:text-edu-ink" aria-hidden="true">|</span>
+            <div className="flex items-center gap-1.5 text-neo-white edu-sky:text-edu-ink">
               <BookOpen className="w-3.5 h-3.5" />
               <span className="truncate max-w-[200px] sm:max-w-[400px]">{lessonName}</span>
             </div>
@@ -172,8 +172,8 @@ export function ClassroomModeBanner({
 
         {wordCount > 0 && (
           <>
-            <span className="text-neo-white" aria-hidden="true">|</span>
-            <span className="text-neo-white">
+            <span className="text-neo-white edu-sky:text-edu-ink" aria-hidden="true">|</span>
+            <span className="text-neo-white edu-sky:text-edu-ink">
               {t(pluralKeyOf('education.classroomGame.words', wordCount, uiLanguage), { count: wordCount })}
             </span>
           </>

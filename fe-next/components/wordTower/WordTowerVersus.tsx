@@ -21,6 +21,34 @@ import { useQuickReactions } from '@/hooks/useQuickReactions';
 import { QuickReactions, FloatingReaction } from '@/components/game/QuickReactions';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerVersusRail } from './WordTowerVersusRail';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
+
+const SKIN = {
+  arcade: {
+    waiting: 'flex min-h-[100dvh] items-center justify-center bg-neo-navy',
+    waitingText: 'animate-pulse font-neo-display text-xl text-neo-cyan',
+    root: 'relative min-h-[100dvh] w-full overflow-hidden bg-neo-navy',
+    heightCard: 'rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 shadow-hard backdrop-blur-sm',
+    height: 'font-neo-display text-2xl font-bold text-neo-white tabular-nums',
+    unit: 'text-sm text-neo-cyan',
+    clock: 'font-neo-body text-xs font-bold text-neo-orange tabular-nums',
+    anchor: 'flex h-11 w-11 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-yellow font-neo-display text-2xl font-bold text-black shadow-hard ring-2 ring-neo-yellow ring-offset-2 ring-offset-neo-navy',
+    usedTile: 'bg-neo-navy-light text-neo-white/30',
+    backspace: 'rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-3 text-neo-white shadow-hard disabled:opacity-40',
+  },
+  classroom: {
+    waiting: 'flex min-h-[100dvh] items-center justify-center bg-edu-page',
+    waitingText: 'animate-pulse font-neo-display text-xl text-edu-ink',
+    root: 'relative min-h-[100dvh] w-full overflow-hidden bg-edu-page',
+    heightCard: 'rounded-neo border-neo-thick border-black bg-edu-surface px-3 py-2 shadow-edu-lip-sm',
+    height: 'font-neo-display text-2xl font-bold text-edu-ink tabular-nums',
+    unit: 'text-sm text-edu-cyan-ink',
+    clock: 'font-neo-body text-xs font-bold text-edu-orange-ink tabular-nums',
+    anchor: 'flex h-11 w-11 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-yellow font-neo-display text-2xl font-bold text-black shadow-hard ring-2 ring-neo-black ring-offset-2 ring-offset-edu-surface',
+    usedTile: 'bg-edu-surface text-edu-ink/30',
+    backspace: 'rounded-neo border-neo-thick border-black bg-edu-surface px-3 py-3 text-edu-ink shadow-hard disabled:opacity-40',
+  },
+} as const;
 
 interface WordTowerVersusProps {
   socket: Socket | null;
@@ -33,6 +61,7 @@ interface WordTowerVersusProps {
 
 export function WordTowerVersus({ socket, username, onQuit, remainingTime }: WordTowerVersusProps) {
   const { t, dir, language } = useLanguage();
+  const skin = SKIN[useClassroomBoard() ? 'classroom' : 'arcade'];
   const selfId = username;
 
   const versusSocket = socket as unknown as VersusSocket | null;
@@ -76,14 +105,14 @@ export function WordTowerVersus({ socket, username, onQuit, remainingTime }: Wor
 
   if (!you) {
     return (
-      <div className="flex min-h-[100dvh] items-center justify-center bg-neo-navy" dir={dir}>
-        <p className="animate-pulse font-neo-display text-xl text-neo-cyan">{t('wordTower.versus.waiting')}</p>
+      <div className={skin.waiting} dir={dir}>
+        <p className={skin.waitingText}>{t('wordTower.versus.waiting')}</p>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-hidden bg-neo-navy" dir={dir}>
+    <div className={skin.root} dir={dir}>
       {/* Bomb shake — an incoming hit physically rocks the battlefield (the red
           flash alone read as a UI glitch, not a HIT). Class toggles on/off per
           bombKey so the keyframe replays without remounting the Pixi scene. */}
@@ -110,9 +139,9 @@ export function WordTowerVersus({ socket, username, onQuit, remainingTime }: Wor
           {onQuit && (
             <ExitRoomButton onClick={onQuit} label={t('common.backToHome')} />
           )}
-          <div className="rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 shadow-hard backdrop-blur-sm">
-            <div className="font-neo-display text-2xl font-bold text-neo-white tabular-nums">{Math.round(you.heightM)}<span className="text-sm text-neo-cyan"> m</span></div>
-            {secondsLeft !== null && <div className="font-neo-body text-xs font-bold text-neo-orange tabular-nums">{Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}</div>}
+          <div className={skin.heightCard}>
+            <div className={skin.height}>{Math.round(you.heightM)}<span className={skin.unit}> m</span></div>
+            {secondsLeft !== null && <div className={skin.clock}>{Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}</div>}
           </div>
           <QuickReactions onReaction={sendReaction} layout="bar" />
         </div>
@@ -131,7 +160,7 @@ export function WordTowerVersus({ socket, username, onQuit, remainingTime }: Wor
       {/* Bottom: tray control */}
       <div className="absolute inset-x-0 bottom-0 z-10 space-y-3 p-4">
         <div className="flex items-center justify-center gap-1.5">
-          <span className="flex h-11 w-11 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-yellow font-neo-display text-2xl font-bold text-black shadow-hard ring-2 ring-neo-yellow ring-offset-2 ring-offset-neo-navy">
+          <span className={skin.anchor}>
             {you.anchorLetter}
           </span>
           {tower.state.selected.map((idx, k) => (
@@ -153,7 +182,7 @@ export function WordTowerVersus({ socket, username, onQuit, remainingTime }: Wor
                 onClick={() => tower.selectTile(i)}
                 aria-label={t('wordTower.a11y.tile', { letter })}
                 className={`flex aspect-square min-h-[44px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-2xl font-bold shadow-hard active:translate-y-0.5 ${
-                  isSel ? 'bg-neo-navy-light text-neo-white/30' : 'bg-neo-lime text-black'
+                  isSel ? skin.usedTile : 'bg-neo-lime text-black'
                 }`}
               >
                 {letter}
@@ -166,7 +195,7 @@ export function WordTowerVersus({ socket, username, onQuit, remainingTime }: Wor
           <button type="button" onClick={tower.scramble} disabled={you.scramblesLeft <= 0} aria-label={t('wordTower.hud.scramble')} className="flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-purple px-3 py-3 font-neo-display font-bold text-neo-white shadow-hard disabled:opacity-40">
             <Shuffle className="h-5 w-5" /> <span className="tabular-nums">{you.scramblesLeft}</span>
           </button>
-          <button type="button" data-feedback-ignore-rage="true" onClick={tower.backspace} disabled={tower.state.selected.length === 0} aria-label={t('wordTower.hud.backspace')} className="rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-3 text-neo-white shadow-hard disabled:opacity-40">
+          <button type="button" data-feedback-ignore-rage="true" onClick={tower.backspace} disabled={tower.state.selected.length === 0} aria-label={t('wordTower.hud.backspace')} className={skin.backspace}>
             <Delete className="h-5 w-5" />
           </button>
           <button type="button" onClick={tower.submit} disabled={!canSubmit} className="flex flex-1 items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-cyan py-3 font-neo-display text-lg font-bold text-black shadow-hard disabled:opacity-40">

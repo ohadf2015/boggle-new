@@ -8,12 +8,12 @@ import { useFitPageSize } from '@/components/teacher/lesson-creation/library/use
 
 const ROW_H = 40;
 const PAGER_RESERVE = 112;
-const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-neo-cream/60 px-3 text-sm font-bold text-neo-cream hover:border-neo-cream disabled:opacity-40';
+const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-edu-line px-3 text-sm font-bold text-edu-ink hover:border-edu-line disabled:opacity-40';
 const LEVEL_FILL: Record<string, string> = {
   mastered: 'bg-neo-cream',
   practicing: 'bg-neo-cream/45',
   struggling: 'bg-neo-pink',
-  notStarted: 'bg-neo-navy/50',
+  notStarted: 'bg-edu-surface/50',
 };
 
 interface VocabularyHeatmapProps {
@@ -50,7 +50,7 @@ export function VocabularyHeatmap({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-neo-white">Loading...</div>
+        <div className="text-edu-ink">Loading...</div>
       </div>
     );
   }
@@ -58,7 +58,7 @@ export function VocabularyHeatmap({
   // Error state
   if (error) {
     return (
-      <div className="p-4 bg-neo-orange/20 border-neo border-neo-orange text-neo-white rounded-neo">
+      <div className="p-4 bg-neo-orange/20 border-neo border-neo-orange text-edu-ink rounded-neo">
         {error.message}
       </div>
     );
@@ -68,10 +68,10 @@ export function VocabularyHeatmap({
   if (!heatmapData || heatmapData.students.length === 0 || heatmapData.words.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
-        <div className="text-neo-white text-lg font-neo-display mb-2">
+        <div className="text-edu-ink text-lg font-neo-display mb-2">
           {t('education.analytics.noVocabularyData')}
         </div>
-        <div className="text-neo-white">
+        <div className="text-edu-ink">
           {t('education.analytics.practiceToSee')}
         </div>
       </div>
@@ -94,17 +94,17 @@ export function VocabularyHeatmap({
   return (
     <div className="space-y-4">
       {/* Legend */}
-      <div className="flex items-center gap-4 p-3 bg-neo-navy/30 rounded-neo border-neo border-neo-white/40">
-        <span className="text-neo-white font-neo-display text-sm">
+      <div className="flex items-center gap-4 p-3 bg-edu-surface/30 rounded-neo border-neo border-edu-line">
+        <span className="text-edu-ink font-neo-display text-sm">
           {t('education.analytics.masteryLevels')}:
         </span>
         <div className="flex gap-3">
           {['mastered', 'practicing', 'struggling', 'notStarted'].map((key) => ({ key, color: LEVEL_FILL[key] })).map(level => (
             <div key={level.key} className="flex items-center gap-2">
               <div
-                className={`w-4 h-4 ${level.color} border-2 border-neo-cream/40 rounded-sm`}
+                className={`w-4 h-4 ${level.color} border-2 border-edu-line rounded-sm`}
               />
-              <span className="text-neo-white text-sm">
+              <span className="text-edu-ink text-sm">
                 {t(`education.analytics.${level.key}`)}
               </span>
             </div>
@@ -115,18 +115,18 @@ export function VocabularyHeatmap({
       {/* Heatmap Grid */}
       <div className="overflow-x-auto">
         <div className="inline-block min-w-full">
-          <div className="border-neo border-neo-white/20 rounded-neo overflow-hidden">
+          <div className="border-neo border-edu-line/20 rounded-neo overflow-hidden">
             {/* Header Row - Student Names */}
-            <div className="flex bg-neo-navy">
+            <div className="flex bg-edu-surface">
               {/* Corner cell */}
-              <div className="w-32 shrink-0 p-2 border-neo border-neo-white/20" />
+              <div className="w-32 shrink-0 p-2 border-neo border-edu-line/20" />
               {/* Student name cells */}
               {heatmapData.students.map(student => (
                 <div
                   key={student.id}
-                  className="w-24 shrink-0 p-2 border-neo border-neo-white/20 text-center"
+                  className="w-24 shrink-0 p-2 border-neo border-edu-line/20 text-center"
                 >
-                  <span className="text-neo-white text-sm font-neo-display truncate block">
+                  <span className="text-edu-ink text-sm font-neo-display truncate block">
                     {student.name}
                   </span>
                 </div>
@@ -137,8 +137,8 @@ export function VocabularyHeatmap({
             {pageWords.map(word => (
               <div key={word} className="flex">
                 {/* Word label (sticky) */}
-                <div className="w-32 shrink-0 p-2 border-neo border-neo-white/40 bg-neo-navy flex items-center">
-                  <span className="text-neo-white text-sm font-neo-body truncate">
+                <div className="w-32 shrink-0 p-2 border-neo border-edu-line bg-edu-surface flex items-center">
+                  <span className="text-edu-ink text-sm font-neo-body truncate">
                     {word}
                   </span>
                 </div>
@@ -156,7 +156,7 @@ export function VocabularyHeatmap({
                       data-cell="true"
                       data-mastery={cellData?.masteryLevel}
                       className={`
-                        w-24 shrink-0 p-2 border-neo border-neo-white/20
+                        w-24 shrink-0 p-2 border-neo border-edu-line/20
                         ${getMasteryColor(cellData?.masteryLevel || 'not-started')}
                         ${isHovered ? 'shadow-hard-sm' : ''}
                         cursor-pointer transition-shadow
@@ -188,7 +188,7 @@ export function VocabularyHeatmap({
           <button type="button" disabled={shownPage === 0} onClick={() => setPage(shownPage - 1)} className={PAGER_BUTTON}>
             {t('eduLibrary.pager.prev')}
           </button>
-          <span className="text-sm font-bold text-neo-cream/80">{t('eduLibrary.pager.status', { page: shownPage + 1, total: pageCount })}</span>
+          <span className="text-sm font-bold text-edu-ink/80">{t('eduLibrary.pager.status', { page: shownPage + 1, total: pageCount })}</span>
           <button type="button" disabled={shownPage >= pageCount - 1} onClick={() => setPage(shownPage + 1)} className={PAGER_BUTTON}>
             {t('eduLibrary.pager.next')}
           </button>

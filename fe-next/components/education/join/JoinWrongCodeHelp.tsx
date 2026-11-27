@@ -17,15 +17,15 @@ export function JoinWrongCodeHelp({ code }: { code: string }) {
   return (
     <>
       {LOOKALIKE.test(code) && (
-        <p className="font-neo-body text-sm font-bold text-neo-yellow lg:text-base">{t(`${K}.noLookalikes`)}</p>
+        <p className="font-neo-body text-sm font-bold text-edu-yellow-ink lg:text-base">{t(`${K}.noLookalikes`)}</p>
       )}
       {!isLoading && classroomId && (
         <div className="flex flex-col gap-2">
-          <p className="font-neo-body text-sm text-neo-white/85 lg:text-base">{t(`${K}.wrongCodeClassLine`)}</p>
+          <p className="font-neo-body text-sm text-edu-ink/85 lg:text-base">{t(`${K}.wrongCodeClassLine`)}</p>
           <Link
             data-testid="wrong-code-to-class"
             href={joinClassHref(language)}
-            className="inline-flex min-h-11 items-center self-start rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-2 font-neo-display text-sm font-black uppercase text-neo-navy shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-lime"
+            className="inline-flex min-h-11 items-center self-start rounded-neo border-3 border-edu-line bg-edu-surface px-4 py-2 font-neo-display text-sm font-black uppercase text-edu-ink shadow-edu-lip-sm transition-transform active:translate-y-[2px] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan"
           >
             {t('education.student.gameEnded.toClass')}
           </Link>

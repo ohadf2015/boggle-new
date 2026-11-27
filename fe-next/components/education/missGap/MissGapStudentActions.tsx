@@ -46,7 +46,7 @@ export function MissGapStudentActions({
   return (
     <div className="mt-5 space-y-3">
       <p
-        className="flex items-center gap-2 text-neo-cream font-bold text-sm"
+        className="flex items-center gap-2 text-neo-cream edu-sky:text-edu-ink font-bold text-sm"
         data-testid="miss-gap-async-due-banner"
       >
         <ClipboardList className="w-4 h-4" aria-hidden />
@@ -61,8 +61,8 @@ export function MissGapStudentActions({
           'w-full flex items-center justify-center gap-2 px-4',
           'font-neo-display font-bold border-[3px] rounded-neo transition',
           completed
-            ? 'py-2.5 text-sm bg-neo-navy text-neo-cream border-neo-cream'
-            : 'py-4 text-lg bg-neo-lime text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg',
+            ? 'py-2.5 text-sm bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink border-neo-cream edu-sky:border-edu-line'
+            : 'py-4 text-lg bg-neo-lime edu-sky:bg-neo-lime text-neo-black edu-sky:text-neo-black border-neo-black edu-sky:border-neo-black shadow-hard hover:shadow-hard-lg',
         )}
       >
         {completed ? (

@@ -270,7 +270,7 @@ export function AcademyHubView(props: AcademyHubViewProps) {
       data-chrome={hub.chrome}
       data-scale={hub.scale}
       ref={hubRef}
-      className="fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] overflow-hidden bg-neo-navy text-neo-white [&[data-covered]>main]:[content-visibility:hidden]"
+      className="fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] overflow-hidden bg-edu-page text-edu-ink [&[data-covered]>main]:[content-visibility:hidden]"
     >
       {/* Inline position: a global landscape-phone rule forces every <main> to relative. */}
       <main className="absolute inset-0" style={{ position: 'absolute', inset: 0 }} aria-label={t('academy.student.mapLabel', 'Academy map')}>
@@ -388,7 +388,7 @@ export function AcademyHubView(props: AcademyHubViewProps) {
               : <div aria-hidden="true" data-testid="academy-mascot-slot" className="h-16" />)}
             {ready && isLive && props.autoJoinPending && props.onStayHere && <ClassroomAutoJoinNotice onStay={props.onStayHere} />}
             {ready && classroomId && !isLive && action.kind !== 'waiting' && (
-              <p role="status" data-testid="academy-waiting-for-teacher" className="pointer-events-auto rounded-neo border-3 border-neo-black bg-neo-cyan px-3 py-2 text-center font-neo-display text-sm font-black uppercase leading-tight text-neo-navy shadow-hard-sm [overflow-wrap:anywhere]">
+              <p role="status" data-testid="academy-waiting-for-teacher" className="edu-card pointer-events-auto px-3 py-1.5 text-center font-neo-display text-sm font-black uppercase leading-tight shadow-edu-lip-sm [overflow-wrap:anywhere]">
                 {t('academy.student.waitingForTeacher', 'Waiting for your teacher')}
               </p>
             )}
@@ -409,7 +409,7 @@ export function AcademyHubView(props: AcademyHubViewProps) {
                 data-testid="academy-cta-pending"
                 aria-busy="true"
                 className={cn(
-                  'w-full animate-pulse rounded-[20px] border-3 border-neo-cream bg-neo-navy-light',
+                  'w-full animate-pulse rounded-[20px] border-3 border-edu-line bg-edu-surface',
                   rail ? 'h-14' : wide ? 'h-[92px]' : 'h-[68px] sm:h-[76px]',
                 )}
               />

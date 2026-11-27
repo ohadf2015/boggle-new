@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, act, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import GridComponent from '../GridComponent';
+import { ClassroomBoardProvider } from '@/components/education/live/classroomBoard';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { stubBoardLayout, drag, press, release, selectedKeys, tileEl } from '../board/__tests__/boardTestUtils';
 
@@ -262,5 +263,17 @@ describe('GridComponent tile skins', () => {
     expect(container.querySelector('[data-tile-skin="neon"]')).not.toBeNull();
     const tiles = [...container.querySelectorAll('[data-tile]')];
     expect(tiles.every((el) => el.classList.contains('letter-tile-gradient'))).toBe(true);
+  });
+});
+
+describe('GridComponent classroom frame', () => {
+  it('given the arcade board, then the frame carries no classroom skin', () => {
+    const { container } = render(<GridComponent grid={GRID} />, { wrapper: Wrapper });
+    expect(container.querySelector('.game-board-frame')?.className).not.toContain('edu-');
+  });
+
+  it('given a classroom board, then the navy frame turns cream with the black outline kept', () => {
+    const { container } = render(<ClassroomBoardProvider value><GridComponent grid={GRID} /></ClassroomBoardProvider>, { wrapper: Wrapper });
+    expect(container.querySelector('.game-board-frame')?.className).toContain('![background:var(--edu-surface)]');
   });
 });

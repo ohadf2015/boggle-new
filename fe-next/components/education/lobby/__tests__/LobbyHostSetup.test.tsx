@@ -68,4 +68,16 @@ describe('LobbyHostSetup first frame', () => {
     fireEvent.click(screen.getByTestId('preset-friday-battle'));
     expect(onApplyPreset).toHaveBeenCalledWith('friday-battle');
   });
+
+  it('Given the fold is open, Then each preset icon is a filled accent square and the chosen card is marked in ink and pink, not lime', () => {
+    renderSetup({ gamesOpen: true });
+    const fills = ['standard', 'friday-battle', 'sped'].map((id) => within(screen.getByTestId(`preset-${id}`)).getByTestId('preset-icon'));
+    expect(fills.map((f) => ['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-yellow'].find((c) => f.classList.contains(c)))).toEqual(['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-yellow']);
+    for (const f of fills) expect(f).toHaveClass('border-neo-black', 'text-neo-black');
+    const on = screen.getByTestId('preset-standard');
+    expect(on.className).not.toMatch(/neo-lime/);
+    expect(on).toHaveClass('border-neo-black');
+    expect(within(on).getByTestId('preset-check')).toHaveClass('border-neo-black');
+    expect(within(on).getByTestId('preset-check').innerHTML).not.toMatch(/lime/);
+  });
 });

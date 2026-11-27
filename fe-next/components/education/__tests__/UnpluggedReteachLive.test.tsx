@@ -260,7 +260,7 @@ describe('UnpluggedReteachLive', () => {
   describe('control contrast', () => {
     /** The audit's edge rule: a control needs a fill OR a >=3:1 border. */
     const hasVisibleEdge = (el: HTMLElement) =>
-      /border-neo-cream|border-neo-cyan|bg-neo-(lime|cyan|pink|cream|white|orange|yellow)/.test(
+      /border-edu-line|border-neo-cream|border-neo-cyan|bg-neo-(lime|cyan|pink|cream|white|orange|yellow)/.test(
         el.className,
       );
 
@@ -269,7 +269,7 @@ describe('UnpluggedReteachLive', () => {
       // 30s is the default, so 20s and 45s are the unselected pair.
       const unselected = screen.getByTestId('unplugged-preset-20');
       expect(unselected).toHaveAttribute('aria-pressed', 'false');
-      expect(unselected.className).not.toContain('bg-neo-navy ');
+      expect(unselected.className).not.toContain('bg-edu-page');
       expect(hasVisibleEdge(unselected)).toBe(true);
     });
 
@@ -287,7 +287,7 @@ describe('UnpluggedReteachLive', () => {
       fireEvent.click(screen.getByTestId('unplugged-start'));
       fireEvent.click(screen.getByTestId('unplugged-reteach-reveal'));
       const notYet = screen.getByTestId('unplugged-not-yet');
-      expect(notYet.className).not.toContain('bg-neo-navy ');
+      expect(notYet.className).not.toContain('bg-edu-page');
       expect(hasVisibleEdge(notYet)).toBe(true);
     });
 

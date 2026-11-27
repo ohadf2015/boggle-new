@@ -25,7 +25,7 @@ export function StudentMissedWords({ words, definitions, language, t, onPractice
     return (
       <section
         data-testid="student-missed-words"
-        className={cn('flex items-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-3 py-2 text-neo-black shadow-hard', className)}
+        className={cn('flex items-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-3 py-2 text-neo-black shadow-edu-lip', className)}
       >
         <PartyPopper aria-hidden="true" className="size-5 shrink-0" />
         <p className="font-neo-display text-sm font-black">{t('eduStudent.results.missedNone')}</p>
@@ -36,10 +36,10 @@ export function StudentMissedWords({ words, definitions, language, t, onPractice
   return (
     <section
       data-testid="student-missed-words"
-      className={cn('rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-3 py-2 shadow-hard', className)}
+      className={cn('rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 py-2 shadow-edu-lip', className)}
     >
       <div className="mb-1.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
-        <h3 className="min-w-0 font-neo-display text-sm font-black uppercase leading-tight tracking-wide text-neo-yellow">
+        <h3 className="min-w-0 font-neo-display text-sm font-black uppercase leading-tight tracking-wide text-edu-yellow-ink">
           {t('eduStudent.results.missedTitle')}
         </h3>
         {onPractice && (
@@ -47,7 +47,7 @@ export function StudentMissedWords({ words, definitions, language, t, onPractice
             type="button"
             onPointerDown={(e) => e.stopPropagation()}
             onClick={onPractice}
-            className="inline-flex shrink-0 items-center gap-1 rounded-full border-2 border-neo-black bg-neo-cyan px-2.5 py-1 font-neo-display text-xs font-black uppercase text-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+            className="inline-flex shrink-0 items-center gap-1 rounded-full border-2 border-neo-black bg-neo-cyan px-2.5 py-1 font-neo-display text-xs font-black uppercase text-neo-black shadow-edu-lip-sm active:translate-y-0.5 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             <BookOpenCheck aria-hidden="true" className="size-3.5" />
             {t('eduStudent.results.practiceThese')}
@@ -72,7 +72,7 @@ export function StudentMissedWords({ words, definitions, language, t, onPractice
                 void speakWord(word, language).finally(() => setSpeaking((w) => (w === word ? null : w)));
               }}
               className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
-                'inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-cream px-2.5 py-1 font-neo-display text-base font-black text-neo-black shadow-hard-sm transition-transform active:scale-95 active:shadow-none',
+                'inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-cream px-2.5 py-1 font-neo-display text-base font-black text-neo-black shadow-edu-lip-sm transition-transform active:scale-95 active:shadow-none',
                 speaking === word && 'bg-neo-yellow motion-safe:animate-pulse'
               )}
             >
@@ -80,7 +80,7 @@ export function StudentMissedWords({ words, definitions, language, t, onPractice
               <Volume2 aria-hidden="true" className="size-4 text-neo-navy/70" />
             </button>
             {definition && (
-              <span data-testid="missed-word-definition" dir="auto" className="min-w-0 flex-1 font-neo-body text-sm leading-snug text-neo-cream/90">
+              <span data-testid="missed-word-definition" dir="auto" className="min-w-0 flex-1 font-neo-body text-sm leading-snug text-edu-ink/90">
                 {definition}
               </span>
             )}

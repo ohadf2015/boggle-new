@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { useClassroomBoard, CLASSROOM_BOARD_FRAME } from '@/components/education/live/classroomBoard';
 import { cn } from '@/lib/utils';
 
 interface BlastBoardTrayProps {
@@ -35,6 +36,7 @@ function glowColor(chainLevel: number, comboFlashTier: number): string {
  */
 export function BlastBoardTray({ chainLevel, comboFlashTier, animateGlow, isDesktopCanvas, children, footer }: BlastBoardTrayProps) {
   const glowing = chainLevel >= 2 || comboFlashTier >= 2;
+  const classroom = useClassroomBoard();
   return (
     <div className="blast-tray-slot flex w-full min-h-0 flex-1 flex-col items-center justify-center gap-2 [container-type:size]">
       <div
@@ -43,6 +45,7 @@ export function BlastBoardTray({ chainLevel, comboFlashTier, animateGlow, isDesk
           'blast-tray relative w-[min(100cqw,calc(100cqh-3.5rem))] rounded-neo border-3 p-1 shadow-hard-lg transition-colors duration-300 sm:p-1.5',
           isDesktopCanvas ? 'max-w-[min(680px,82dvh)]' : '2xl:max-w-[min(820px,86dvh)]',
           trayBorder(chainLevel, comboFlashTier),
+          classroom && CLASSROOM_BOARD_FRAME,
         )}
         style={{
           '--frame-glow-color': glowColor(chainLevel, comboFlashTier),

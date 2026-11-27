@@ -73,7 +73,7 @@ export function WordStudentGrid({
       <div
         data-testid="report-grid-scroll"
         className={cn(
-          'overflow-x-auto rounded-neo border-3 border-neo-black bg-neo-white',
+          'overflow-x-auto rounded-neo border-3 border-neo-black bg-neo-white edu-sky:bg-edu-paper',
           // A printed report must show every column, not the first screenful.
           'print:overflow-visible print:border-black print:text-[9px]'
         )}
@@ -106,11 +106,11 @@ export function WordStudentGrid({
                     className={cn(
                       'w-full min-h-[44px] min-w-[3.5rem] max-w-[7rem] px-2 py-1 rounded-neo',
                       'font-black text-xs leading-tight break-words',
-                      'hover:bg-neo-lime hover:text-black transition-colors duration-100',
+                      'hover:bg-neo-lime hover:text-black edu-sky:hover:text-black transition-colors duration-100',
                       'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
                       selectedStudentId === col.studentId
-                        ? 'bg-neo-lime text-black'
-                        : 'text-neo-cream',
+                        ? 'bg-neo-lime text-black edu-sky:text-black'
+                        : 'text-neo-cream edu-sky:text-edu-ink',
                       !col.played && 'italic opacity-70'
                     )}
                   >

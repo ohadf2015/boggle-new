@@ -110,13 +110,13 @@ const DroppableDefinitionSlot = memo<DroppableDefinitionSlotProps>(({
         isMatched && 'border-neo-green bg-neo-green/10',
         // A black edge over a 5% white wash is invisible on navy (1.23:1); an
         // empty slot still has to read as a place a card can land.
-        !isMatched && 'border-neo-cream bg-neo-navy-light',
+        !isMatched && 'border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-tile',
         isOver && !isMatched && 'bg-neo-cyan/20 border-neo-cyan',
         feedback === 'correct' && 'border-neo-green bg-neo-green/20',
         feedback === 'incorrect' && 'border-neo-pink bg-neo-pink/20 animate-neo-shake'
       )}
     >
-      <span className="text-neo-white text-center">{item.text}</span>
+      <span className="text-neo-white edu-sky:text-edu-ink text-center">{item.text}</span>
 
       {isMatched && (
         <div className="absolute -top-2 -right-2 w-6 h-6 bg-neo-green rounded-full flex items-center justify-center">
@@ -126,7 +126,7 @@ const DroppableDefinitionSlot = memo<DroppableDefinitionSlotProps>(({
 
       {feedback === 'incorrect' && (
         <div className="absolute -top-2 -right-2 w-6 h-6 bg-neo-pink rounded-full flex items-center justify-center">
-          <X className="w-4 h-4 text-neo-white" />
+          <X className="w-4 h-4 text-neo-white edu-sky:text-edu-ink" />
         </div>
       )}
     </div>
@@ -252,7 +252,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
 
     if (showResults) {
       return (
-        <div className="min-h-full bg-neo-navy flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="min-h-full bg-neo-navy edu-sky:bg-edu-page flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
           <PracticeResultsCard
             correct={correctCount}
             total={attempts}
@@ -267,7 +267,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
     }
 
     return (
-      <div className="min-h-full bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="min-h-full bg-neo-navy edu-sky:bg-edu-page p-4" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Header */}
         <div className="max-w-5xl mx-auto mb-4">
           <div className="flex items-center justify-between">
@@ -276,17 +276,17 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
               size="sm"
               onClick={onBack}
               aria-label={t('common.back')}
-              className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
+              className="edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:shadow-edu-lip-sm text-neo-white edu-sky:text-edu-ink hover:text-neo-white edu-sky:hover:text-edu-ink hover:bg-neo-white/10 edu-sky:hover:bg-edu-ink/10"
             >
               <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
             </Button>
 
             <div className="text-center">
-              <h2 className="text-xl font-neo-display text-neo-white mb-1">
+              <h2 className="text-xl font-neo-display text-neo-white edu-sky:text-edu-ink mb-1">
                 {t('education.practice.matchPairs')}
               </h2>
               <div className="flex flex-col items-center gap-1">
-                <p className="text-neo-white font-neo-body">
+                <p className="text-neo-white edu-sky:text-edu-ink font-neo-body">
                   {matchedPairs.size} / {usable.length}
                 </p>
                 <div className="h-1.5 w-24 bg-neo-black/30 rounded-neo overflow-hidden">
@@ -318,7 +318,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
           >
             {/* Word column */}
             <div className="space-y-3">
-              <h3 className="text-sm font-neo-display text-neo-white uppercase tracking-wide mb-3">
+              <h3 className="text-sm font-neo-display text-neo-white edu-sky:text-edu-ink uppercase tracking-wide mb-3">
                 {t('education.practice.matchingWords')}
               </h3>
               <AdaptiveMotion.div className="space-y-3">
@@ -351,7 +351,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
 
             {/* Definition column */}
             <div className="space-y-3">
-              <h3 className="text-sm font-neo-display text-neo-white uppercase tracking-wide mb-3">
+              <h3 className="text-sm font-neo-display text-neo-white edu-sky:text-edu-ink uppercase tracking-wide mb-3">
                 {t('education.practice.matchingDefinitions')}
               </h3>
               <AdaptiveMotion.div className="space-y-3">

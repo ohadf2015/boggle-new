@@ -22,7 +22,7 @@ function DockCash({ cash, gain }: { cash: number; gain: number }) {
   const { t } = useLanguage();
   const reduced = useReducedMotion() ?? false;
   return (
-    <span data-testid="dock-cash" className="absolute -top-3 start-2 inline-flex items-center gap-1 rounded-full border-2 border-neo-yellow bg-neo-navy px-1.5 py-0.5 text-xs font-black leading-none text-neo-yellow tabular-nums shadow-hard-sm">
+    <span data-testid="dock-cash" className="absolute -top-3 start-2 inline-flex items-center gap-1 rounded-full border-2 border-neo-yellow bg-neo-navy edu-sky:bg-edu-surface px-1.5 py-0.5 text-xs font-black leading-none text-neo-yellow edu-sky:text-edu-yellow-ink tabular-nums shadow-hard-sm">
       <CoinArt size={14} />
       <span className="sr-only">{t('economy.hud.cash', { cash })}</span>
       <m.span
@@ -92,7 +92,7 @@ export default function ClassroomEconomyDock({ gameCode }: ClassroomEconomyDockP
                       initial={reduced ? false : { scale: 0.4 }}
                       animate={{ scale: 1 }}
                       transition={{ type: 'spring', stiffness: 420, damping: 14 }}
-                      className="absolute -end-2 -top-2 grid size-6 place-items-center rounded-full border-2 border-neo-black bg-neo-pink text-xs font-black text-neo-cream"
+                      className="absolute -end-2 -top-2 grid size-6 place-items-center rounded-full border-2 border-neo-black bg-neo-pink text-xs font-black text-neo-cream edu-sky:text-edu-ink"
                     >
                       {ready}
                     </m.span>
@@ -108,22 +108,22 @@ export default function ClassroomEconomyDock({ gameCode }: ClassroomEconomyDockP
           </div>
         </div>
         {econ.hint && (
-          <p role="status" className="text-center text-xs font-bold text-neo-lime">
+          <p role="status" className="text-center text-xs font-bold text-neo-lime edu-sky:text-edu-lime-ink">
             {t('economy.hint.text', { letter: econ.hint.letter, length: econ.hint.length })}
           </p>
         )}
         {econ.error && (
-          <m.p role="alert" initial={reduced ? false : { y: 4 }} animate={{ y: 0 }} className="text-center text-xs font-bold text-neo-pink">
+          <m.p role="alert" initial={reduced ? false : { y: 4 }} animate={{ y: 0 }} className="text-center text-xs font-bold text-neo-pink edu-sky:text-edu-pink-ink">
             {t(`economy.error.${econ.error}`)}
           </m.p>
         )}
       </div>
 
       {sheet && (
-        <div className="fixed inset-x-0 bottom-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-neo border-t-3 border-neo-cream bg-neo-navy p-4 pb-6 text-neo-cream">
+        <div className="fixed inset-x-0 bottom-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-neo border-t-3 border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface p-4 pb-6 text-neo-cream edu-sky:text-edu-ink">
           <div className="mb-3 flex items-center justify-between">
-            <span className="text-sm font-bold text-neo-cream">{sheet === 'shop' ? t('economy.shop.title') : t('economy.board.title')}</span>
-            <button type="button" onClick={() => setSheet(null)} className="min-h-11 px-3 text-sm font-bold text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
+            <span className="text-sm font-bold text-neo-cream edu-sky:text-edu-ink">{sheet === 'shop' ? t('economy.shop.title') : t('economy.board.title')}</span>
+            <button type="button" onClick={() => setSheet(null)} className="min-h-11 px-3 text-sm font-bold text-neo-cream edu-sky:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
               {t('economy.sheet.close')}
             </button>
           </div>

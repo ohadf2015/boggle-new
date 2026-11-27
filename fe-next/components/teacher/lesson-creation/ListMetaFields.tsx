@@ -7,8 +7,8 @@ import { GRADE_BANDS, LIBRARY_TOPICS, isGradeBand, isLibraryTopic } from '@/lib/
 import type { ListDraft } from './ListEditorSheet';
 
 const SELECT =
-  'h-11 w-full min-w-0 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-2 font-neo-body text-sm font-bold text-neo-white shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan';
-const LABEL = 'mb-1 block text-[11px] font-bold uppercase tracking-wide text-neo-white/70';
+  'h-11 w-full min-w-0 rounded-neo border-2 border-edu-line bg-edu-surface px-2 font-neo-body text-sm font-bold text-edu-ink shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan';
+const LABEL = 'mb-1 block text-[11px] font-bold uppercase tracking-wide text-edu-ink/70';
 
 interface ListMetaFieldsProps {
   draft: ListDraft;

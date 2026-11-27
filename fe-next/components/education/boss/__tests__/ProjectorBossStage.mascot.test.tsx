@@ -53,4 +53,10 @@ describe('ProjectorBossStage — mascot crowd', () => {
     act(() => useClassroomBossStore.setState({ view: view('defeated') }));
     expect(screen.getByTestId('edu-mascot-crowd')).toBeTruthy();
   });
+
+  it('keeps the boss name and HP bar on the dark art as a dark island, so their ink stays light on the sky page', () => {
+    act(() => useClassroomBossStore.setState({ view: view('fighting') }));
+    render(<ProjectorBossStage remainingTime={60} />);
+    expect(screen.getByRole('heading', { level: 1 }).closest('header')).toHaveAttribute('data-edu-theme', 'dark');
+  });
 });

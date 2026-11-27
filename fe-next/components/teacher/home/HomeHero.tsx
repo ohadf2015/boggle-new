@@ -2,7 +2,7 @@
 
 import { createElement, useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { Check, ChevronDown, ExternalLink, Loader2, Play, Plus, RotateCcw, Share2, Users } from 'lucide-react';
+import { Check, ChevronDown, ExternalLink, Gamepad2, Loader2, Play, Plus, RotateCcw, Share2, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -16,11 +16,17 @@ import { neoChunkyPress } from '@/components/ui/neoStyles';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { HomeShareSheet } from './HomeShareSheet';
 import { HomeGreeting } from './HomeGreeting';
+import { EduMascot } from '@/components/education/EduMascot';
 import { NB_PRIMARY_FACE, NB_STICKER, NB_BLOCK } from '../nb/nbStyles';
-import { HERO_CHIP } from './homeStyles';
+import { DESK_CODE, HERO_CHIP, HERO_PICK } from './homeStyles';
 
 const PRIMARY_PRESS = cn(NB_PRIMARY_FACE, 'min-h-[72px] w-full whitespace-nowrap text-2xl sm:min-h-[84px] sm:max-w-md sm:text-3xl');
-const MENU_ROW = 'min-h-[44px] font-neo-body font-semibold text-neo-cream';
+const MENU_ROW = 'min-h-[44px] font-neo-body font-semibold text-edu-ink';
+// Home's class name sits on a colour band, the class page's on the page itself. Fill and ink share one literal.
+const BAND = {
+  pink: 'self-start rounded-neo-lg border-[3px] border-neo-black bg-neo-pink px-3 py-1 text-neo-black shadow-edu-lip-sm sm:px-4',
+  purple: 'self-start rounded-neo-lg border-[3px] border-neo-black bg-neo-purple px-3 py-1 text-white shadow-edu-lip-sm sm:px-4',
+} as const;
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -68,7 +74,7 @@ export interface HomeHeroProps {
   testIds?: { start?: string; code?: string; share?: string };
 }
 
-/** The class desk, open on the page backdrop: class name, one quiet line with the code chip, one huge Start, and small secondaries. */
+/** The class desk: class name, its facts and code, one huge Start, then the second actions. A white card on Home, open on the class page. */
 export function HomeHero({
   classrooms, selectedId, onSelect, onStart, language, t, rehearse, meta, eyebrow, titleLevel = 2, tone = 'pink',
   newClassHref, classesHref, classPageLink = true, joinGoal, capLabel, replay, startHref, onShare, testIds,
@@ -83,50 +89,75 @@ export function HomeHero({
     onStart?.();
   };
 
+  const desk = titleLevel === 2;
   const heading = createElement(
     `h${titleLevel}`,
-    { id: 'home-hero-title', className: 'min-w-0 font-neo-display text-3xl font-black leading-tight text-neo-white sm:text-5xl' },
+    { id: 'home-hero-title', className: cn('min-w-0 max-w-full font-neo-display text-3xl font-black leading-tight text-edu-ink sm:text-5xl', desk && BAND[tone]) },
     <ClassMenu classrooms={classrooms} selected={selected} onSelect={onSelect} capLabel={capLabel} newClassHref={newClassHref} classesHref={classesHref} classPageHref={classPageLink && selected ? `/${language}/teacher/classroom/${selected.id}` : undefined} t={t} />,
   );
   const playIcon = pending
     ? <Loader2 className="size-7 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" />
     : null;
 
+  const codeButton = code ? (
+    <CodeChip code={code} big={desk} onShare={() => (onShare ? onShare() : setShareOpen(true))} t={t} testIds={testIds} />
+  ) : null;
+
   return (
-    <div className="flex min-w-0 flex-col gap-5 sm:gap-6">
-      {titleLevel === 2 && eyebrow ? <HomeGreeting greeting={eyebrow} /> : null}
-      <section data-testid="home-hero" data-tone={tone} aria-labelledby="home-hero-title" className="flex min-w-0 flex-col gap-4">
-        <div className="flex min-w-0 flex-col gap-2">
-          {titleLevel === 1 && eyebrow ? <p className={cn(NB_STICKER, NB_BLOCK.cream, 'self-start')}>{eyebrow}</p> : null}
-          {heading}
-          <div data-testid="home-hero-meta-row" className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
-            {meta}
-            {code ? (
-              <CodeChip code={code} onShare={() => (onShare ? onShare() : setShareOpen(true))} t={t} testIds={testIds} />
-            ) : null}
+    <div className="flex min-w-0 flex-col gap-3 sm:gap-4">
+      {desk && eyebrow ? <HomeGreeting greeting={eyebrow} mascot={false} /> : null}
+      <section
+        data-testid="home-hero"
+        data-tone={tone}
+        aria-labelledby="home-hero-title"
+        className={cn('flex min-w-0 flex-col gap-4', desk && 'edu-card relative gap-4 p-4 sm:gap-5 sm:p-5 lg:p-6')}
+      >
+        <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
+          <div className="flex min-w-0 flex-col gap-2">
+            {!desk && eyebrow ? <p className={cn(NB_STICKER, NB_BLOCK.cream, 'self-start')}>{eyebrow}</p> : null}
+            {heading}
+            <div data-testid="home-hero-meta-row" className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
+              {meta}
+              {desk ? null : codeButton}
+            </div>
+            {desk ? null : joinGoal ? <div data-testid="home-join-goal-line">{joinGoal}</div> : null}
           </div>
-          {joinGoal ? <div data-testid="home-join-goal-line">{joinGoal}</div> : null}
+          {desk ? (
+            <div className="flex min-w-0 shrink-0 flex-col gap-2 lg:flex-row lg:items-start lg:gap-4">
+              <div className="flex min-w-0 flex-col gap-2">
+                {codeButton}
+                {joinGoal ? <div data-testid="home-join-goal-line">{joinGoal}</div> : null}
+              </div>
+              <span data-testid="home-desk-mascot" aria-hidden="true" className="max-lg:hidden">
+                <EduMascot moment="welcome" size={112} className="size-24 shrink-0 xl:size-28" />
+              </span>
+            </div>
+          ) : (
+            <span data-testid="class-page-mascot" aria-hidden="true" className="shrink-0 max-lg:hidden">
+              <EduMascot moment="welcome" size={112} className="size-24 xl:size-28" />
+            </span>
+          )}
         </div>
 
-        <div data-testid="home-hero-start-row" className="flex min-w-0 flex-col items-stretch gap-3">
+        <div data-testid="home-hero-start-row" className={cn('flex min-w-0 flex-col items-stretch gap-3', desk && 'lg:flex-row lg:gap-4')}>
           {replay?.kind === 'pending' ? (
-            <div data-testid="home-start-pending" aria-busy="true" className={cn(PRIMARY_PRESS, neoChunkyPress(6), 'cursor-progress opacity-80')}>
+            <div data-testid="home-start-pending" aria-busy="true" className={cn(PRIMARY_PRESS, neoChunkyPress(6), 'cursor-progress opacity-80', desk && 'lg:max-w-none lg:flex-[1.25]')}>
               <Loader2 className="size-6 animate-spin motion-reduce:animate-none" aria-hidden="true" />
               <span className="sr-only">{t('eduShell.home.loop.loading')}</span>
             </div>
           ) : replay?.kind === 'ready' ? (
-            <PressSurface asChild lip={6} className={cn(PRIMARY_PRESS, 'group animate-edu-shine')}>
+            <PressSurface asChild lip={6} className={cn(PRIMARY_PRESS, 'group animate-edu-shine', desk && 'lg:max-w-none lg:flex-[1.25]')}>
               <Link href={replay.href} data-testid={testIds?.start ?? 'home-play-again'} data-hero="true" data-magnet aria-busy={pending || undefined} onClick={begin}>
                 <span aria-hidden="true" className="edu-shine-track" />
-                {playIcon ?? <RotateCcw className="edu-wiggle-on-hover size-7 shrink-0" strokeWidth={3} aria-hidden="true" />}
+                {playIcon ?? <RotateCcw className="edu-wiggle-on-hover size-7 shrink-0 sm:size-8" strokeWidth={3} aria-hidden="true" />}
                 <span className="flex min-w-0 flex-col items-start leading-tight">
                   <span>{t('eduShell.home.loop.playAgain')}</span>
-                  {replay.detail ? <span data-testid="home-play-again-detail" className="max-w-full truncate font-neo-body text-sm font-bold opacity-80">{replay.detail}</span> : null}
+                  {replay.detail ? <span data-testid="home-play-again-detail" className="max-w-full truncate font-neo-body text-sm font-bold opacity-80 sm:text-base">{replay.detail}</span> : null}
                 </span>
               </Link>
             </PressSurface>
           ) : (
-            <PressSurface asChild lip={6} className={cn(PRIMARY_PRESS, 'group animate-edu-shine')}>
+            <PressSurface asChild lip={6} className={cn(PRIMARY_PRESS, 'group animate-edu-shine', desk && 'lg:max-w-none lg:flex-[1.25]')}>
               <Link href={startHref ?? pickHref} data-testid={testIds?.start ?? 'home-start-live'} data-hero="true" data-magnet aria-busy={pending || undefined} onClick={begin}>
                 <span aria-hidden="true" className="edu-shine-track" />
                 {playIcon ?? <Play className="edu-wiggle-on-hover size-7 fill-current" aria-hidden="true" />}
@@ -135,11 +166,14 @@ export function HomeHero({
             </PressSurface>
           )}
           {rehearse || replay?.kind === 'ready' ? (
-            <div data-testid="home-hero-chips" className="flex min-w-0 flex-wrap items-center gap-2">
+            <div data-testid="home-hero-chips" className={cn('flex min-w-0 flex-wrap items-stretch gap-3 [&>*]:grow [&>*]:basis-56', desk && 'lg:grid lg:flex-[2] lg:auto-cols-fr lg:grid-flow-col')}>
               {rehearse}
               {replay?.kind === 'ready' ? (
-                <PressSurface asChild lip={2} className={HERO_CHIP}>
-                  <Link href={startHref ?? pickHref} data-testid="home-pick-game">{t('eduShell.home.loop.pickGame')}</Link>
+                <PressSurface asChild lip={4} className={HERO_PICK}>
+                  <Link href={startHref ?? pickHref} data-testid="home-pick-game">
+                    <Gamepad2 aria-hidden="true" />
+                    <span className="min-w-0">{t('eduShell.home.loop.pickGame')}</span>
+                  </Link>
                 </PressSurface>
               ) : null}
             </div>
@@ -160,21 +194,34 @@ export function HomeHero({
   );
 }
 
-/** "Class code K7Q2WM · Share": the six big tiles live in the share sheet and on the projector, where students read them. */
-function CodeChip({ code, onShare, t, testIds }: { code: string; onShare: () => void; t: T; testIds?: HomeHeroProps['testIds'] }) {
+/** The class code as letter tiles inside the one share button: big on Home's desk, a compact chip on the class page. */
+function CodeChip({ code, big, onShare, t, testIds }: { code: string; big: boolean; onShare: () => void; t: T; testIds?: HomeHeroProps['testIds'] }) {
   return (
     <div data-testid="home-join-row" className="inline-flex min-w-0">
       <PressSurface
-        lip={2}
+        lip={big ? 4 : 2}
         data-testid={testIds?.share ?? 'home-share-code'}
         aria-haspopup="dialog"
         aria-label={`${t('eduShell.home.shareCode')}: ${code}`}
         onClick={onShare}
-        className={cn(HERO_CHIP, 'gap-2')}
+        className={big ? DESK_CODE : cn(HERO_CHIP, 'gap-2')}
       >
-        <span className="font-neo-body text-xs font-bold text-neo-cream/75">{t('academy.hq.classCode')}</span>
-        <code data-testid={testIds?.code ?? 'home-desk-code'} dir="ltr" className="font-neo-display text-base font-black tracking-wider text-neo-cream">{code}</code>
-        <Share2 className="size-4 shrink-0" aria-hidden="true" />
+        <span className={cn('flex items-center gap-1.5 font-neo-body font-bold text-edu-ink/75', big ? 'text-sm' : 'text-xs')}>
+          {t('academy.hq.classCode')}
+          {big ? <Share2 className="size-4 shrink-0" aria-hidden="true" /> : null}
+        </span>
+        <code data-testid={testIds?.code ?? 'home-desk-code'} dir="ltr" className="flex gap-1 font-neo-display font-black text-edu-ink sm:gap-1.5">
+          {[...code].map((ch, i) => (
+            <span
+              key={i}
+              data-testid="home-desk-code-tile"
+              className={cn('edu-tile', big ? 'size-10 text-2xl sm:size-11' : 'size-7 rounded-neo border-2 text-sm shadow-none')}
+            >
+              {ch}
+            </span>
+          ))}
+        </code>
+        {big ? null : <Share2 className="size-4 shrink-0" aria-hidden="true" />}
       </PressSurface>
     </div>
   );
@@ -200,19 +247,19 @@ function ClassMenu({ classrooms, selected, onSelect, capLabel, newClassHref, cla
       <DropdownMenuTrigger
         data-testid="home-class-switcher"
         aria-label={several ? t('eduShell.home.switchClass') : undefined}
-        className="inline-flex min-h-[44px] min-w-0 max-w-full items-center gap-1 rounded-neo text-start transition-colors duration-150 hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream"
+        className="inline-flex min-h-[44px] min-w-0 max-w-full items-center gap-1 rounded-neo text-start transition-colors duration-150 hover:bg-edu-ink/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line"
       >
         {label}
         <ChevronDown className="size-6 shrink-0 sm:size-8" aria-hidden="true" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="max-h-80 w-64 overflow-y-auto rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-1 shadow-hard">
+      <DropdownMenuContent align="start" className="max-h-80 w-64 overflow-y-auto rounded-neo-lg border-[3px] border-edu-line bg-edu-surface p-1.5 shadow-edu-lip">
         {several ? classrooms.map((c) => (
           <DropdownMenuItem key={c.id} data-testid="home-class-option" onSelect={() => onSelect(c.id)} className={MENU_ROW}>
             <Check className={cn('size-4 shrink-0', c.id === selected?.id ? 'opacity-100' : 'opacity-0')} aria-hidden="true" />
             <span dir="auto" className="truncate">{c.name}</span>
           </DropdownMenuItem>
         )) : null}
-        {several && (classPageHref || newClassHref || classesHref) ? <DropdownMenuSeparator className="bg-neo-cream/10" /> : null}
+        {several && (classPageHref || newClassHref || classesHref) ? <DropdownMenuSeparator className="bg-edu-ink/10" /> : null}
         {classPageHref ? (
           <DropdownMenuItem asChild className={MENU_ROW}>
             <Link href={classPageHref} data-testid="home-class-page">
@@ -238,7 +285,7 @@ function ClassMenu({ classrooms, selected, onSelect, capLabel, newClassHref, cla
           </DropdownMenuItem>
         ) : null}
         {capLabel ? (
-          <p data-testid="home-class-menu-cap" className="mt-1 border-t-2 border-neo-cream/10 px-2 pb-1 pt-2 font-neo-body text-xs font-bold text-neo-cream/70">
+          <p data-testid="home-class-menu-cap" className="mt-1 border-t-2 border-edu-line/10 px-2 pb-1 pt-2 font-neo-body text-xs font-bold text-edu-ink/70">
             {capLabel}
           </p>
         ) : null}

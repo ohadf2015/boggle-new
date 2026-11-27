@@ -216,7 +216,7 @@ export default function SoloPracticeBoard({
 
   if (showComplete) {
     return (
-      <div className="flex min-h-full items-center justify-center bg-neo-navy p-4" translate="no">
+      <div className="flex min-h-full items-center justify-center bg-neo-navy edu-sky:bg-edu-page p-4" translate="no">
         <PracticeCompletionMoment
           correct={vocabularyFound.length}
           total={vocabularyWords.length}
@@ -247,47 +247,47 @@ export default function SoloPracticeBoard({
             size="sm"
             onClick={onBack}
             aria-label={t('common.back')}
-            className="text-neo-cream hover:text-neo-white"
+            className="edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:shadow-edu-lip-sm text-neo-cream edu-sky:text-edu-ink hover:text-neo-white edu-sky:hover:text-edu-ink"
           >
             <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-xl font-neo-display text-neo-white">
+            <h1 className="text-xl font-neo-display text-neo-white edu-sky:text-edu-ink">
               {t('education.practice.soloBoard')}
             </h1>
-            <p className="text-sm text-neo-cream">{lessonName}</p>
+            <p className="text-sm text-neo-cream edu-sky:text-edu-ink">{lessonName}</p>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleRegenerate}
             aria-label={t('common.refresh')}
-            className="text-neo-cream hover:text-neo-white"
+            className="edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:shadow-edu-lip-sm text-neo-cream edu-sky:text-edu-ink hover:text-neo-white edu-sky:hover:text-edu-ink"
           >
             <RotateCcw className="w-4 h-4" />
           </Button>
         </div>
 
         {/* Stats bar */}
-        <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4">
+        <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 edu-sky:bg-edu-surface mb-4">
           <CardContent className="py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-neo-yellow" />
-                  <span className="font-neo-display text-neo-white">{score}</span>
+                  <Star className="w-4 h-4 text-neo-yellow edu-sky:text-edu-yellow-ink" />
+                  <span className="font-neo-display text-neo-white edu-sky:text-edu-ink">{score}</span>
                 </div>
                 <div className="h-4 w-px bg-neo-black/30" />
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-neo-cyan" />
-                  <span className="text-sm text-neo-cream">
+                  <CheckCircle className="w-4 h-4 text-neo-cyan edu-sky:text-edu-cyan-ink" />
+                  <span className="text-sm text-neo-cream edu-sky:text-edu-ink">
                     {validWordCount} {t('education.practice.wordCount')}
                   </span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Target className="w-4 h-4 text-neo-orange" />
-                <span className="text-sm text-neo-cream">
+                <Target className="w-4 h-4 text-neo-orange edu-sky:text-edu-orange-ink" />
+                <span className="text-sm text-neo-cream edu-sky:text-edu-ink">
                   {vocabularyFound.length}/{vocabularyWords.length} {t('education.practice.vocab')}
                 </span>
               </div>
@@ -333,9 +333,9 @@ export default function SoloPracticeBoard({
 
         {/* Found words */}
         {validWords.length > 0 && (
-          <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4">
+          <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 edu-sky:bg-edu-surface mb-4">
             <CardContent className="py-3">
-              <p className="text-xs text-neo-cream mb-2">{t('education.practice.foundWordsLabel')}</p>
+              <p className="text-xs text-neo-cream edu-sky:text-edu-ink mb-2">{t('education.practice.foundWordsLabel')}</p>
               <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
                 {validWords.map((word) => (
                   <span
@@ -343,8 +343,8 @@ export default function SoloPracticeBoard({
                     className={cn(
                       'px-2 py-1 text-sm rounded font-neo-body',
                       isVocabularyWordCheck(word)
-                        ? 'bg-neo-cyan/20 text-neo-cyan'
-                        : 'bg-neo-black/30 text-neo-cream'
+                        ? 'bg-neo-cyan/20 text-neo-cyan edu-sky:text-edu-cyan-ink'
+                        : 'bg-neo-black/30 text-neo-cream edu-sky:text-edu-ink'
                     )}
                   >
                     {word}

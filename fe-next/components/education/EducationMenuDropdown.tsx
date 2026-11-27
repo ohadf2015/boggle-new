@@ -64,8 +64,8 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
         className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
           'flex items-center justify-center',
           'w-11 h-11',
-          'bg-neo-navy text-neo-white',
-          'border-3 border-neo-cream/40',
+          'bg-neo-navy edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink',
+          'border-3 border-neo-cream/40 edu-sky:border-edu-line',
           'rounded-neo shadow-hard-sm',
           'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard',
           'active:translate-x-px active:translate-y-px active:shadow-none',
@@ -84,8 +84,8 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
             role="menu"
             className={cn(
               'absolute top-full end-0 mt-2 w-56',
-              'bg-neo-navy-light',
-              'border-3 border-neo-cream/40',
+              'bg-neo-navy-light edu-sky:bg-edu-surface',
+              'border-3 border-neo-cream/40 edu-sky:border-edu-line',
               'rounded-neo shadow-hard-lg',
               'overflow-hidden z-50',
               'animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-150'
@@ -101,8 +101,8 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                   className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                     'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors',
                     isOnTeacherSection
-                      ? 'bg-neo-cyan text-neo-black'
-                      : 'text-neo-white hover:bg-neo-cyan/30'
+                      ? 'bg-neo-cyan text-neo-black edu-sky:text-neo-black'
+                      : 'text-neo-white edu-sky:text-edu-ink hover:bg-neo-cyan/30'
                   )}
                 >
                   <Users className="w-4 h-4" />
@@ -116,7 +116,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                     onNavigate={() => setIsOpen(false)}
                     className={cn(
                       'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors',
-                      'text-neo-white hover:bg-neo-lime/30',
+                      'text-neo-white edu-sky:text-edu-ink hover:bg-neo-lime/30',
                     )}
                   />
                   <ForSchoolsLink
@@ -125,7 +125,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                     onNavigate={() => setIsOpen(false)}
                     className={cn(
                       'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors',
-                      'text-neo-white hover:bg-neo-lime/30',
+                      'text-neo-white edu-sky:text-edu-ink hover:bg-neo-lime/30',
                     )}
                   />
                 </>
@@ -139,8 +139,8 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                   className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                     'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors',
                     isOnStudentSection
-                      ? 'bg-neo-cyan text-neo-black'
-                      : 'text-neo-white hover:bg-neo-cyan/30'
+                      ? 'bg-neo-cyan text-neo-black edu-sky:text-neo-black'
+                      : 'text-neo-white edu-sky:text-edu-ink hover:bg-neo-cyan/30'
                   )}
                 >
                   <BookOpen className="w-4 h-4" />
@@ -154,7 +154,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                 onClick={() => setIsOpen(false)}
                 className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                   'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors',
-                  'text-neo-white hover:bg-neo-lime/30'
+                  'text-neo-white edu-sky:text-edu-ink hover:bg-neo-lime/30'
                 )}
               >
                 <GraduationCap className="w-4 h-4" />
@@ -164,7 +164,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
 
             {isAuthenticated && (
               <>
-                <div className="h-px bg-neo-cream/20 mx-2" />
+                <div className="h-px bg-neo-cream/20 edu-sky:bg-edu-ink/20 mx-2" />
 
                 <div className="p-2">
                   <button
@@ -175,7 +175,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                     }}
                     className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                       'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors w-full',
-                      'text-neo-white hover:bg-neo-pink/30'
+                      'text-neo-white edu-sky:text-edu-ink hover:bg-neo-pink/30'
                     )}
                   >
                     <LogOut className="w-4 h-4" />
@@ -186,7 +186,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
             )}
 
             {/* Every viewer, guests included, matching the phone menu: it is their only way out. */}
-            <div className="h-px bg-neo-cream/20 mx-2" />
+            <div className="h-px bg-neo-cream/20 edu-sky:bg-edu-ink/20 mx-2" />
 
             <div className="p-2">
               <Link
@@ -195,7 +195,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                 onClick={() => setIsOpen(false)}
                 className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                   'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors w-full',
-                  'text-neo-white hover:bg-neo-pink/30'
+                  'text-neo-white edu-sky:text-edu-ink hover:bg-neo-pink/30'
                 )}
               >
                 <Home className="w-4 h-4" />

@@ -28,10 +28,10 @@ export function AssignmentCreatorDueDate({ value, onChange }: { value: string; o
 
   return (
     <div>
-      <p className="mb-2 flex items-center gap-1.5 text-sm font-neo-body text-neo-white">
+      <p className="mb-2 flex items-center gap-1.5 text-sm font-neo-body text-edu-ink">
         <Calendar className="size-4 shrink-0" aria-hidden="true" />
-        {value ? <time dateTime={value}>{shown}</time> : <span className="text-neo-pink">{shown}</span>}
-        <span data-testid="due-date-required" aria-hidden="true" className="font-black text-neo-pink">
+        {value ? <time dateTime={value}>{shown}</time> : <span className="text-edu-pink-ink">{shown}</span>}
+        <span data-testid="due-date-required" aria-hidden="true" className="font-black text-edu-pink-ink">
           *
         </span>
         <span className="sr-only">{t('eduPro.assign.required')}</span>
@@ -49,7 +49,7 @@ export function AssignmentCreatorDueDate({ value, onChange }: { value: string; o
                 'min-h-11 rounded-neo border-2 px-2 font-neo-body text-sm font-bold transition-[transform,box-shadow] active:translate-y-0.5 motion-reduce:transition-none',
                 active
                   ? 'border-black bg-neo-lime text-neo-black shadow-hard-sm'
-                  : 'border-neo-cyan/70 bg-neo-cyan/10 text-neo-cyan hover:bg-neo-cyan/20',
+                  : 'border-edu-line bg-edu-surface text-edu-ink hover:bg-edu-tile',
               )}
             >
               {t(key)}
@@ -57,7 +57,7 @@ export function AssignmentCreatorDueDate({ value, onChange }: { value: string; o
           );
         })}
       </div>
-      <label className="mt-2 flex items-center gap-2 text-xs text-neo-white/80">
+      <label className="mt-2 flex items-center gap-2 text-xs text-edu-ink/80">
         <span className="shrink-0">{t('teacher.assignment.customDate')}</span>
         <input
           type="date"
@@ -65,8 +65,8 @@ export function AssignmentCreatorDueDate({ value, onChange }: { value: string; o
           onChange={(e) => onChange(e.target.value)}
           aria-label={t('teacher.assignment.customDate')}
           className={cn(
-            'min-h-10 w-full rounded-neo border-2 bg-neo-navy p-2 text-sm text-neo-white',
-            custom ? 'border-neo-lime' : 'border-neo-cream/40',
+            'min-h-10 w-full rounded-neo border-2 bg-edu-page p-2 text-sm text-edu-ink',
+            custom ? 'border-neo-lime' : 'border-edu-line',
           )}
         />
       </label>

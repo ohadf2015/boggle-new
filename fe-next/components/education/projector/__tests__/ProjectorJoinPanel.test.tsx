@@ -69,9 +69,9 @@ describe('ProjectorJoinPanel — one hero: address, code and QR', () => {
     expect(screen.getByTestId('projector-join-panel').outerHTML).not.toMatch(/\d(vw|vh)\b/);
   });
 
-  it('Given the QR, Then it sits on a light plate so a phone camera can read it on a dark wall', () => {
+  it('Given the QR, Then it sits on a light paper plate with a black outline so a phone camera can read it', () => {
     render(<ProjectorJoinPanel {...props} />);
-    expect(screen.getByTestId('projector-qr').className).toContain('bg-neo-white');
+    expect(screen.getByTestId('projector-qr')).toHaveClass('bg-edu-paper', 'border-neo-black');
   });
 
   it('Given nobody in yet, Then the QR beckons; once someone joins it rests', () => {

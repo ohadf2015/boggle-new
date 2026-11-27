@@ -44,10 +44,10 @@ export interface AchievementProgressCardProps {
 // >= 4.5:1. Silver in particular previously used `bg-neo-white/60` as a
 // text color, which renders ~2.5:1 on navy.
 const TIER_COLORS = {
-  bronze: { bg: 'bg-neo-orange', fill: 'bg-neo-orange', text: 'text-neo-orange' },
-  silver: { bg: 'bg-neo-cream', fill: 'bg-neo-cream', text: 'text-neo-cream' },
-  gold: { bg: 'bg-neo-yellow', fill: 'bg-neo-yellow', text: 'text-neo-yellow' },
-  platinum: { bg: 'bg-neo-cyan', fill: 'bg-neo-cyan', text: 'text-neo-cyan' },
+  bronze: { bg: 'bg-neo-orange', fill: 'bg-neo-orange', text: 'text-edu-orange-ink' },
+  silver: { bg: 'bg-neo-cream', fill: 'bg-neo-cream', text: 'text-edu-ink' },
+  gold: { bg: 'bg-neo-yellow', fill: 'bg-neo-yellow', text: 'text-edu-yellow-ink' },
+  platinum: { bg: 'bg-neo-cyan', fill: 'bg-neo-cyan', text: 'text-edu-cyan-ink' },
 };
 
 // ============================================
@@ -89,8 +89,8 @@ export default function AchievementProgressCard({
   return (
     <article
       className={`
-        relative rounded-neo border-neo border-neo-cream/40
-        ${isEarned ? 'bg-neo-navy/50 shadow-hard' : 'bg-neo-navy-light/70 opacity-80'}
+        relative rounded-neo border-neo border-edu-line
+        ${isEarned ? 'bg-edu-surface/50 shadow-hard' : 'bg-edu-surface/70 opacity-80'}
         p-4 transition
       `}
       aria-label={`${t(`education.achievements.${achievement.key}.name`)} achievement`}
@@ -103,7 +103,7 @@ export default function AchievementProgressCard({
           className={`
             shrink-0 w-16 h-16 rounded-full flex items-center justify-center
             border-neo-thick
-            ${tierColors ? `${tierColors.bg} border-neo-black` : 'bg-neo-navy-light border-neo-cream/40'}
+            ${tierColors ? `${tierColors.bg} border-neo-black` : 'bg-edu-surface border-edu-line'}
             ${isLocked ? 'opacity-40' : ''}
           `}
         >
@@ -126,18 +126,18 @@ export default function AchievementProgressCard({
           {/* Name + Tier */}
           <div className="flex items-center justify-between gap-2 mb-2">
             <div className="flex-1 min-w-0">
-              <h3 className="font-neo-display font-bold text-neo-white text-lg truncate">
+              <h3 className="font-neo-display font-bold text-edu-ink text-lg truncate">
                 {achievement.isSecret && isLocked
                   ? t('education.achievements.secret')
                   : t(`education.achievements.${achievement.key}.name`)}
               </h3>
               {isEarned && achievement.currentTier && (
-                <p className={`text-sm font-neo-body font-bold ${tierColors?.text || 'text-neo-white'}`}>
+                <p className={`text-sm font-neo-body font-bold ${tierColors?.text || 'text-edu-ink'}`}>
                   {t(`education.achievements.tiers.${achievement.currentTier}`)}
                 </p>
               )}
               {isLocked && (
-                <p className="text-sm text-neo-white">
+                <p className="text-sm text-edu-ink">
                   {t('education.achievements.locked')}
                 </p>
               )}
@@ -153,7 +153,7 @@ export default function AchievementProgressCard({
                 className={`
                   w-11 h-11 rounded flex items-center justify-center
                   border-neo transition
-                  ${isPinned ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard-sm' : 'bg-neo-navy-light text-neo-white border-neo-cream/40'}
+                  ${isPinned ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard-sm' : 'bg-edu-surface text-edu-ink border-edu-line'}
                   ${!isPinned && !canPin ? 'opacity-40 cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
                  focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
               >
@@ -167,7 +167,7 @@ export default function AchievementProgressCard({
             <div className="mt-3">
               {/* Progress Bar */}
               <div
-                className="h-3 bg-neo-navy-light border-neo border-neo-cream/40 rounded-sm overflow-hidden"
+                className="h-3 bg-edu-surface border-neo border-edu-line rounded-sm overflow-hidden"
                 role="progressbar"
                 aria-valuenow={achievement.progressValue}
                 aria-valuemax={achievement.nextThreshold}
@@ -179,7 +179,7 @@ export default function AchievementProgressCard({
               </div>
 
               {/* Progress Text */}
-              <div className="flex items-center justify-between mt-2 text-xs text-neo-white">
+              <div className="flex items-center justify-between mt-2 text-xs text-edu-ink">
                 <span>{t('education.achievements.progress', {
                   current: achievement.progressValue,
                   next: achievement.nextThreshold,
@@ -204,7 +204,7 @@ export default function AchievementProgressCard({
           {/* Hint for Locked Badges */}
           {isLocked && (
             <div className="mt-3">
-              <p className="text-sm text-neo-white italic">
+              <p className="text-sm text-edu-ink italic">
                 {achievement.isSecret
                   ? t(`education.achievements.${achievement.key}.hint`)
                   : t(`education.achievements.${achievement.key}.hint`)}

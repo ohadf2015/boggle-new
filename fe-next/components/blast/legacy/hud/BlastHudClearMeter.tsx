@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { useClearPulse } from './useHudCounters';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 interface BlastHudClearMeterProps {
   tilesCleared: number;
@@ -46,6 +47,8 @@ function Bar({ pct, goalMet, pulse, accent, thick }: { pct: number; goalMet: boo
 
 export function BlastHudClearMeter({ tilesCleared, totalTiles, passPct, goalMet, accent, clearedLabel, layout }: BlastHudClearMeterProps) {
   const { pulse, delta, burstKey } = useClearPulse(tilesCleared);
+  const classroom = useClassroomBoard();
+  const lime = classroom ? 'text-edu-lime-ink' : 'text-neo-lime';
   const needed = passPct ? tilesNeededToPass(totalTiles, passPct) : totalTiles;
   const pct = needed > 0 ? Math.min(100, Math.round((tilesCleared / needed) * 100)) : 0;
 
@@ -54,13 +57,13 @@ export function BlastHudClearMeter({ tilesCleared, totalTiles, passPct, goalMet,
       key={burstKey}
       data-testid="blast-clear-delta"
       aria-hidden="true"
-      className="blast-clear-delta-pop pointer-events-none absolute end-1 -top-1 text-sm font-black text-neo-lime"
+      className={cn('blast-clear-delta-pop pointer-events-none absolute end-1 -top-1 text-sm font-black', lime)}
     >
       +{delta}
     </span>
   );
   const readyMark = (
-    <span data-testid="blast-progress-label" aria-hidden="true" className="h-3.5 text-sm font-black leading-none text-neo-lime">
+    <span data-testid="blast-progress-label" aria-hidden="true" className={cn('h-3.5 text-sm font-black leading-none', lime)}>
       {goalMet ? '✓' : ' '}
     </span>
   );
@@ -69,8 +72,8 @@ export function BlastHudClearMeter({ tilesCleared, totalTiles, passPct, goalMet,
       className={cn(
         'shrink-0 font-black uppercase tabular-nums transition-transform duration-150',
         layout === 'card' ? 'text-xs tracking-wide tv:text-base' : 'text-[9px] tracking-wider origin-[100%_50%] rtl:origin-[0%_50%]',
-        goalMet ? 'text-neo-lime' : 'text-neo-white',
-        pulse && 'scale-110 text-neo-lime',
+        goalMet ? lime : classroom ? 'text-edu-ink' : 'text-neo-white',
+        pulse && cn('scale-110', lime),
       )}
     >
       {Math.min(tilesCleared, needed)}/{needed}{layout === 'strip' ? ` ${clearedLabel ?? ''}` : ''}

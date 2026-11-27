@@ -85,7 +85,7 @@ export function GamePageSeoContent({
 
   const body = (
     <>
-      <p className="mb-8 max-w-prose text-sm leading-relaxed text-neo-cream/90 sm:text-base">
+      <p className="mb-8 max-w-prose text-sm leading-relaxed text-neo-cream/90 edu-sky:text-edu-ink/90 sm:text-base">
         {description}
       </p>
 
@@ -96,9 +96,9 @@ export function GamePageSeoContent({
           {features.map((f, i) => (
             <li
               key={i}
-              className="flex items-start gap-2 rounded-neo border-2 border-neo-black bg-neo-navy px-3 py-2 text-sm leading-snug text-neo-cream/90 shadow-hard-sm"
+              className="flex items-start gap-2 rounded-neo border-2 border-neo-black bg-neo-navy edu-sky:bg-edu-tile px-3 py-2 text-sm leading-snug text-neo-cream/90 edu-sky:text-edu-ink/90 shadow-hard-sm"
             >
-              <span aria-hidden className="mt-1.5 size-1.5 shrink-0 bg-neo-lime" />
+              <span aria-hidden className="mt-1.5 size-1.5 shrink-0 bg-neo-lime edu-sky:bg-edu-ink" />
               <span>{f}</span>
             </li>
           ))}
@@ -111,26 +111,26 @@ export function GamePageSeoContent({
             faqAsHeadings ? (
               <article
                 key={i}
-                className="rounded-neo border-2 border-neo-black bg-neo-navy px-3 py-3 shadow-hard-sm sm:px-4 sm:py-4"
+                className="rounded-neo border-2 border-neo-black bg-neo-navy edu-sky:bg-edu-tile px-3 py-3 shadow-hard-sm sm:px-4 sm:py-4"
               >
-                <h3 className="font-neo-display font-bold text-neo-white">{item.question}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-neo-cream/90">{item.answer}</p>
+                <h3 className="font-neo-display font-bold text-neo-white edu-sky:text-edu-ink">{item.question}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-neo-cream/90 edu-sky:text-edu-ink/90">{item.answer}</p>
               </article>
             ) : (
               <details
                 key={i}
-                className="group rounded-neo border-2 border-neo-black bg-neo-navy shadow-hard-sm"
+                className="group rounded-neo border-2 border-neo-black bg-neo-navy edu-sky:bg-edu-tile shadow-hard-sm"
               >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-3 font-neo-display font-bold text-neo-white marker:hidden sm:p-4">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-3 font-neo-display font-bold text-neo-white edu-sky:text-edu-ink marker:hidden sm:p-4">
                   <span>{item.question}</span>
                   <span
                     aria-hidden
-                    className="shrink-0 font-black text-neo-pink transition-transform duration-200 group-open:rotate-45"
+                    className="shrink-0 font-black text-neo-pink edu-sky:text-edu-pink-ink transition-transform duration-200 group-open:rotate-45"
                   >
                     +
                   </span>
                 </summary>
-                <p className="px-3 pb-3 text-sm leading-relaxed text-neo-cream/90 sm:px-4 sm:pb-4">
+                <p className="px-3 pb-3 text-sm leading-relaxed text-neo-cream/90 edu-sky:text-edu-ink/90 sm:px-4 sm:pb-4">
                   {item.answer}
                 </p>
               </details>
@@ -149,13 +149,13 @@ export function GamePageSeoContent({
     return (
       <section
         aria-label={title}
-        className="mx-auto mt-4 w-full max-w-4xl px-4 pb-12 pt-10 font-neo-body text-neo-white"
+        className="mx-auto mt-4 w-full max-w-4xl px-4 pb-12 pt-10 font-neo-body text-neo-white edu-sky:text-edu-ink"
       >
-        <details className="group/card rounded-neo border-3 border-neo-black bg-neo-navy-light/60 shadow-hard">
+        <details className="group/card rounded-neo border-3 border-neo-black bg-neo-navy-light/60 edu-sky:bg-edu-surface shadow-hard">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 marker:hidden sm:p-6 [&::-webkit-details-marker]:hidden">
             <Heading
               className={cn(
-                'm-0 font-neo-display font-black text-neo-white text-balance',
+                'm-0 font-neo-display font-black text-neo-white edu-sky:text-edu-ink text-balance',
                 asH1 ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'
               )}
             >
@@ -163,7 +163,7 @@ export function GamePageSeoContent({
             </Heading>
             <span
               aria-hidden
-              className="shrink-0 font-black text-neo-pink transition-transform duration-200 group-open/card:rotate-45"
+              className="shrink-0 font-black text-neo-pink edu-sky:text-edu-pink-ink transition-transform duration-200 group-open/card:rotate-45"
             >
               +
             </span>
@@ -187,12 +187,12 @@ export function GamePageSeoContent({
   return (
     <section
       aria-label={title}
-      className="mx-auto mt-4 w-full max-w-4xl px-4 pb-12 pt-10 font-neo-body text-neo-white"
+      className="mx-auto mt-4 w-full max-w-4xl px-4 pb-12 pt-10 font-neo-body text-neo-white edu-sky:text-edu-ink"
     >
-      <div className="rounded-neo border-3 border-neo-black bg-neo-navy-light/60 p-6 shadow-hard sm:p-8">
+      <div className="rounded-neo border-3 border-neo-black bg-neo-navy-light/60 edu-sky:bg-edu-surface p-6 shadow-hard sm:p-8">
         <Heading
           className={cn(
-            'mb-3 font-neo-display font-black text-neo-white text-balance',
+            'mb-3 font-neo-display font-black text-neo-white edu-sky:text-edu-ink text-balance',
             asH1 ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl'
           )}
         >

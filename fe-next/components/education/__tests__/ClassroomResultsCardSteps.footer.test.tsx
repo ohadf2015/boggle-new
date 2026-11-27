@@ -33,7 +33,7 @@ describe('ClassroomResultsCardSteps footer and celebration', () => {
   it('given misses, when the footer shows, then review is a quiet text button and never a second heavy button', () => {
     renderScore();
     const ghost = screen.getByTestId('results-steps-ghost');
-    expect(ghost.className).toContain('text-neo-white/60');
+    expect(ghost.className).toContain('text-edu-ink/60');
     expect(ghost.className).not.toMatch(/bg-neo-lime|shadow-\[0_4px|border-neo-white(\s|$)/);
     expect(ghost.className).not.toContain('w-full');
   });

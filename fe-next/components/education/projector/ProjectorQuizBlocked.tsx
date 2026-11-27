@@ -64,7 +64,7 @@ export function ProjectorQuizBlocked({ gameCode, reasonKey = REASON_KEY, current
       <p
         data-testid="quiz-blocked-reason"
         role="alert"
-        className="font-neo-body leading-snug text-neo-cream/85 text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]"
+        className="font-neo-body leading-snug text-neo-cream/85 edu-sky:text-edu-ink/85 text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]"
       >
         {t(reasonKey)}
       </p>

@@ -178,7 +178,7 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm', onRe
           className={cn(
             'whitespace-nowrap rounded-full border-2 font-neo-display text-xs font-black uppercase leading-[14px]',
             size === 'md' ? 'absolute -bottom-2 left-1/2 -translate-x-1/2 px-1.5 tracking-wider' : 'relative -mt-2.5 px-1 tracking-normal',
-            fresh ? 'border-neo-black bg-neo-yellow text-neo-black' : 'border-neo-cream bg-neo-navy text-neo-white/80',
+            fresh ? 'border-neo-black edu-sky:border-neo-black bg-neo-yellow edu-sky:bg-neo-yellow text-neo-black edu-sky:text-neo-black' : 'border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-white/80 edu-sky:text-edu-ink/80',
           )}
           style={fresh ? toneStyle('gold', { shadow: 2, trim: 1 }) : undefined}
         >
@@ -197,7 +197,7 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm', onRe
           dir={dir}
           className={cn(
             // Opaque, so the compositor can skip everything under it.
-            'fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden bg-neo-navy px-6',
+            'fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden bg-neo-navy edu-sky:bg-edu-page px-6',
             !covering && 'invisible pointer-events-none',
           )}
         >
@@ -228,7 +228,7 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm', onRe
                 chips={[{ id: 'xp', icon: <XpIcon />, value: <ChestXp counting={isOpen} reducedMotion={reducedMotion} />, label: t('economy.chest.chip.xp') }]}
               />
             </div>
-            <p className="font-neo-display text-lg font-black uppercase text-neo-white">
+            <p className="font-neo-display text-lg font-black uppercase text-neo-white edu-sky:text-edu-ink">
               {claimFailed
                 ? t('academy.student.chestFailed', "Couldn't save your XP — tap the chest to try again")
                 : t('academy.student.chestComeBack', 'Come back tomorrow for another chest')}
@@ -237,7 +237,7 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm', onRe
               type="button"
               tabIndex={isOpen ? undefined : -1}
               onClick={() => setPhase('idle')}
-              className="min-h-[48px] rounded-neo border-3 border-neo-black bg-neo-yellow px-8 font-neo-display text-lg font-black uppercase text-neo-black shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+              className="min-h-[48px] rounded-neo border-3 border-neo-black bg-neo-yellow px-8 font-neo-display text-lg font-black uppercase text-neo-black shadow-edu-lip active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
             >
               {t('academy.student.chestCollect', 'Collect')}
             </button>

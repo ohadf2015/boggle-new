@@ -25,12 +25,12 @@ export function FirstClassBridgeCard({ language, href, onStart, className }: Fir
       data-testid="day0-first-class-bridge"
       dir={dir}
       className={cn(
-        'shrink-0 rounded-neo border-2 border-neo-cream bg-neo-navy-light p-4 text-neo-white',
+        'shrink-0 rounded-neo border-2 border-edu-line bg-edu-surface p-4 text-edu-ink',
         className,
       )}
     >
-      <h2 className="font-neo-display text-base font-black leading-snug text-neo-cream">{copy.title}</h2>
-      <p className="mt-1 text-sm leading-relaxed text-neo-white/80">{copy.body}</p>
+      <h2 className="font-neo-display text-base font-black leading-snug text-edu-ink">{copy.title}</h2>
+      <p className="mt-1 text-sm leading-relaxed text-edu-ink/80">{copy.body}</p>
       <Link
         href={href}
         data-testid="day0-first-class-cta"

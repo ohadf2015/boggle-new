@@ -212,7 +212,7 @@ describe('round-end text clears WCAG AA at the size it is drawn', () => {
 
   it('never fades the winner drumroll to 40% — 3.50:1 on navy-elevated', () => {
     expect(source('components/education/results/WinnerSpotlight.tsx')).not.toContain(
-      'text-neo-white/40'
+      'text-edu-ink/40'
     );
   });
 

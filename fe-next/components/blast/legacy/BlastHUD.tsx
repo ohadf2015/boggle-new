@@ -21,6 +21,7 @@ import { useAnimatedScore } from './hud/useHudCounters';
 import { BlastHudMoves } from './hud/BlastHudMoves';
 import { BlastHudClearMeter } from './hud/BlastHudClearMeter';
 import { BlastHudGoal } from './hud/BlastHudGoal';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 /** Pre-game buff chip — shown in HUD top row when player claimed a rewarded-ad boost. */
 type ActiveBuff = 'shield' | 'bomb' | 'combo2x';
@@ -177,6 +178,7 @@ export function BlastHUD({
   t,
 }: BlastHUDProps) {
   const ownMute = (ownMuteProp ?? !isMultiplayer) && !isDesktopCanvas;
+  const classroom = useClassroomBoard();
   useRegisterHeaderAudioControl(ownMute);
   const showTimer =
     !isDesktopCanvas &&
@@ -194,7 +196,7 @@ export function BlastHUD({
 
   return (
     <div
-      className={cn('flex flex-col gap-0 bg-neo-navy border-b-2 border-neo-black', showProgress && 'border-b-4')}
+      className={cn(classroom ? 'flex flex-col gap-0 bg-edu-surface text-edu-ink border-b-2 border-neo-black' : 'flex flex-col gap-0 bg-neo-navy border-b-2 border-neo-black', showProgress && 'border-b-4')}
       style={accent ? { borderBottomColor: accent } : undefined}
       data-testid="blast-hud"
     >
@@ -296,10 +298,10 @@ export function BlastHUD({
           <BlastHudMoves movesRemaining={movesRemaining} label={t('blast.movesLeft')} />
         ) : (
           <div className="flex flex-col items-center gap-0.5 w-[56px]" aria-live="polite">
-            <span className="text-xl font-black text-neo-white tabular-nums">
+            <span className={classroom ? 'text-xl font-black text-edu-ink tabular-nums' : 'text-xl font-black text-neo-white tabular-nums'}>
               {wordsFoundCount}
             </span>
-            <span className="text-[9px] font-bold uppercase tracking-wider text-white">
+            <span className={classroom ? 'text-[9px] font-bold uppercase tracking-wider text-edu-ink' : 'text-[9px] font-bold uppercase tracking-wider text-white'}>
               {t('blast.words')}
             </span>
           </div>
@@ -311,14 +313,14 @@ export function BlastHUD({
         >
           <span
             data-testid="blast-score-label"
-            className="text-[9px] font-black uppercase tracking-[0.14em] text-white leading-none tv:text-xs"
+            className={classroom ? 'text-[9px] font-black uppercase tracking-[0.14em] text-edu-ink leading-none tv:text-xs' : 'text-[9px] font-black uppercase tracking-[0.14em] text-white leading-none tv:text-xs'}
           >
             {t('blast.score')}
           </span>
           <span
             data-board-score-target=""
             className={cn(
-              'block w-fit font-neo-display text-[30px] font-black leading-tight tabular-nums text-neo-white transition-transform duration-150 origin-[0%_50%] rtl:origin-[100%_50%] tv:text-5xl',
+              classroom ? 'block w-fit font-neo-display text-[30px] font-black leading-tight tabular-nums text-edu-ink transition-transform duration-150 origin-[0%_50%] rtl:origin-[100%_50%] tv:text-5xl' : 'block w-fit font-neo-display text-[30px] font-black leading-tight tabular-nums text-neo-white transition-transform duration-150 origin-[0%_50%] rtl:origin-[100%_50%] tv:text-5xl',
               scorePulse && 'scale-110',
             )}
           >
@@ -330,7 +332,7 @@ export function BlastHUD({
               dir="ltr"
               className={cn(
                 'flex w-fit items-center gap-1 text-[11px] font-black tabular-nums leading-none tv:text-sm',
-                scoreGoal.isComplete ? 'text-neo-lime' : 'text-white/80',
+                scoreGoal.isComplete ? (classroom ? 'text-edu-lime-ink' : 'text-neo-lime') : classroom ? 'text-edu-ink/80' : 'text-white/80',
               )}
             >
               {scoreGoal.isComplete
@@ -359,7 +361,7 @@ export function BlastHUD({
             <span
               data-testid="blast-combo-idle"
               aria-hidden="true"
-              className="grid h-10 w-10 place-items-center rounded-full border-[3px] border-white/15 font-neo-display text-xs font-black text-white/35"
+              className={classroom ? 'grid h-10 w-10 place-items-center rounded-full border-[3px] border-edu-line/20 font-neo-display text-xs font-black text-edu-ink/50' : 'grid h-10 w-10 place-items-center rounded-full border-[3px] border-white/15 font-neo-display text-xs font-black text-white/35'}
             >
               ×1
             </span>

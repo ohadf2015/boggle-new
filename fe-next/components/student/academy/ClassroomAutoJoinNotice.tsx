@@ -10,7 +10,7 @@ export function ClassroomAutoJoinNotice({ onStay }: { onStay: () => void }) {
       role="status"
       aria-live="polite"
       data-testid="classroom-auto-join-notice"
-      className="pointer-events-auto flex items-center justify-between gap-3 rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-2 text-neo-navy shadow-hard-sm"
+      className="pointer-events-auto flex items-center justify-between gap-3 rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-2 text-neo-navy shadow-edu-lip-sm"
     >
       <span className="min-w-0 font-neo-display text-base font-black leading-tight">{t('academy.student.autoJoin.title')}</span>
       <button

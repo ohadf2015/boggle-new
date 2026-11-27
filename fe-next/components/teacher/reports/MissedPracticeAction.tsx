@@ -47,7 +47,7 @@ export function MissedPracticeAction({
     return (
       <div className="flex flex-wrap items-start gap-3">
         <ProInlineLock feature="missedPractice" label={t('eduPro.practice.cta')} />
-        <span className="self-center text-xs font-bold text-neo-cream/70">{t('eduPro.practice.hint')}</span>
+        <span className="self-center text-xs font-bold text-edu-ink/70">{t('eduPro.practice.hint')}</span>
       </div>
     );
   }
@@ -126,7 +126,7 @@ export function MissedPracticeAction({
                 hero
                   ? 'flex min-h-16 w-full items-center justify-center gap-3 rounded-neo-lg border-[3px] border-neo-black bg-neo-lime px-5 py-3 text-start font-neo-display text-xl font-black text-neo-black shadow-hard'
                   : 'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-4 py-2 font-neo-display text-sm font-black text-neo-black shadow-hard',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white disabled:opacity-70',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edu-line disabled:opacity-70',
                 PRESS,
               )}
             >
@@ -142,15 +142,15 @@ export function MissedPracticeAction({
                 </span>
               ) : status.kind === 'saving' ? t('eduPro.practice.assigning') : t('eduPro.practice.cta')}
             </button>
-            {hero ? null : <span className="text-xs font-bold text-neo-cream/70">{t('eduPro.practice.hint')}</span>}
+            {hero ? null : <span className="text-xs font-bold text-edu-ink/70">{t('eduPro.practice.hint')}</span>}
           </m.div>
         )}
       </AnimatePresence>
       {status.kind === 'already' && (
-        <p role="status" className="text-sm font-black text-neo-cyan">{t('eduPro.practice.already')}</p>
+        <p role="status" className="text-sm font-black text-edu-cyan-ink">{t('eduPro.practice.already')}</p>
       )}
       {status.kind === 'failed' && (
-        <p role="alert" className="text-sm font-black text-neo-pink">{t('eduPro.practice.failed')}</p>
+        <p role="alert" className="text-sm font-black text-edu-pink-ink">{t('eduPro.practice.failed')}</p>
       )}
     </div>
   );

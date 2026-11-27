@@ -81,43 +81,43 @@ export default function PracticeModeSelector({
     {
       type: 'flashcard',
       icon: <Layers className="w-8 h-8" />,
-      colorClass: 'text-neo-cyan',
+      colorClass: 'text-neo-cyan edu-sky:text-edu-cyan-ink',
       bgClass: 'bg-neo-cyan/10 hover:bg-neo-cyan/20',
     },
     {
       type: 'solo_board',
       icon: <Grid3X3 className="w-8 h-8" />,
-      colorClass: 'text-neo-orange',
+      colorClass: 'text-neo-orange edu-sky:text-edu-orange-ink',
       bgClass: 'bg-neo-orange/10 hover:bg-neo-orange/20',
     },
     {
       type: 'word_list',
       icon: <List className="w-8 h-8" />,
-      colorClass: 'text-neo-yellow',
+      colorClass: 'text-neo-yellow edu-sky:text-edu-yellow-ink',
       bgClass: 'bg-neo-yellow/10 hover:bg-neo-yellow/20',
     },
     {
       type: 'warmup',
       icon: <Zap className="w-8 h-8" />,
-      colorClass: 'text-neo-pink',
+      colorClass: 'text-neo-pink edu-sky:text-edu-pink-ink',
       bgClass: 'bg-neo-pink/10 hover:bg-neo-pink/20',
     },
     {
       type: 'matching',
       icon: <Shuffle className="w-8 h-8" />,
-      colorClass: 'text-neo-cyan',
+      colorClass: 'text-neo-cyan edu-sky:text-edu-cyan-ink',
       bgClass: 'bg-neo-cyan/10 hover:bg-neo-cyan/20',
     },
     {
       type: 'spelling',
       icon: <PenLine className="w-8 h-8" />,
-      colorClass: 'text-neo-purple',
+      colorClass: 'text-neo-purple edu-sky:text-edu-purple-ink',
       bgClass: 'bg-neo-purple/10 hover:bg-neo-purple/20',
     },
     {
       type: 'blitz',
       icon: <Timer className="w-8 h-8" />,
-      colorClass: 'text-neo-pink',
+      colorClass: 'text-neo-pink edu-sky:text-edu-pink-ink',
       bgClass: 'bg-neo-pink/10 hover:bg-neo-pink/20',
     },
   ];
@@ -125,13 +125,13 @@ export default function PracticeModeSelector({
   const getMasteryColor = (level: MasteryLevel) => {
     switch (level) {
       case 'mastered':
-        return 'text-neo-cyan';
+        return 'text-neo-cyan edu-sky:text-edu-cyan-ink';
       case 'practicing':
-        return 'text-neo-yellow';
+        return 'text-neo-yellow edu-sky:text-edu-yellow-ink';
       case 'started':
-        return 'text-neo-orange';
+        return 'text-neo-orange edu-sky:text-edu-orange-ink';
       default:
-        return 'text-neo-white';
+        return 'text-neo-white edu-sky:text-edu-ink';
     }
   };
 
@@ -167,7 +167,7 @@ export default function PracticeModeSelector({
   };
 
   return (
-    <div className="min-h-screen bg-neo-navy p-4 sm:p-6">
+    <div className="min-h-screen bg-neo-navy edu-sky:bg-edu-page p-4 sm:p-6">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <AdaptiveMotion.div
@@ -181,15 +181,15 @@ export default function PracticeModeSelector({
             size="sm"
             onClick={onBack}
             aria-label={t('common.back')}
-            className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
+            className="edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:shadow-edu-lip-sm text-neo-white edu-sky:text-edu-ink hover:text-neo-white edu-sky:hover:text-edu-ink hover:bg-neo-white/10 edu-sky:hover:bg-edu-ink/10"
           >
             <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-2xl font-neo-display text-neo-white">
+            <h1 className="text-2xl font-neo-display text-neo-white edu-sky:text-edu-ink">
               {t('education.practice.title')}
             </h1>
-            <p className="text-sm text-neo-white">{lessonName}</p>
+            <p className="text-sm text-neo-white edu-sky:text-edu-ink">{lessonName}</p>
           </div>
         </AdaptiveMotion.div>
 
@@ -199,13 +199,13 @@ export default function PracticeModeSelector({
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 400, damping: 24, delay: 0.05 }}
         >
-          <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-6">
+          <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/80 edu-sky:bg-edu-surface mb-6">
             <CardContent className="py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="text-center">
-                    <p className="text-2xl font-neo-display text-neo-white">{wordCount}</p>
-                    <p className="text-xs text-neo-white">
+                    <p className="text-2xl font-neo-display text-neo-white edu-sky:text-edu-ink">{wordCount}</p>
+                    <p className="text-xs text-neo-white edu-sky:text-edu-ink">
                       {t('education.practice.wordCount')}
                     </p>
                   </div>

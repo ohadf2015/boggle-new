@@ -101,3 +101,16 @@ describe('<AssignmentDueCard>', () => {
     expect(reminderShownMock).not.toHaveBeenCalled();
   });
 });
+
+describe('<AssignmentDueCard> on the sky skin', () => {
+  it.each(['due_soon', 'overdue'] as const)('Given a %s card over the map art, Then it is a solid cream card with ink text, the colour only in its icon square', (kind) => {
+    render(
+      <AssignmentDueCard assignmentId="a" title="Space words" href="/x" dueDate={new Date(Date.now() + 3 * HOUR_MS).toISOString()} kind={kind} />,
+    );
+    const card = screen.getByTestId('assignment-due-card');
+    expect(card.className).toContain('bg-edu-surface');
+    expect(card.className).toContain('border-edu-line');
+    expect(card.className).not.toMatch(/bg-neo-(yellow|red)\/\d+/);
+    expect(card.className).not.toContain('text-neo-red');
+  });
+});

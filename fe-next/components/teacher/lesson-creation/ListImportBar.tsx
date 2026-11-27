@@ -9,8 +9,8 @@ import { parseWordTable, type WordEntry } from '@/lib/education/library';
 import { STARTER_LESSON_PACKS } from '@/lib/education/starterLessonPacks';
 
 const CHIP = cn(
-  'inline-flex min-h-10 min-w-0 cursor-pointer items-center gap-1.5 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-3',
-  'font-neo-display text-xs font-bold uppercase text-neo-white shadow-hard-sm transition',
+  'inline-flex min-h-10 min-w-0 cursor-pointer items-center gap-1.5 rounded-neo border-2 border-edu-line bg-edu-surface px-3',
+  'font-neo-display text-xs font-bold uppercase text-edu-ink shadow-hard-sm transition',
   'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-none',
   'focus-within:ring-2 focus-within:ring-neo-cyan',
 );
@@ -40,7 +40,7 @@ export default function ListImportBar({ language, onEntries, onFileError }: List
   return (
     <div className="flex flex-wrap items-center gap-2">
       <label className={CHIP}>
-        <FileSpreadsheet className="size-4 shrink-0 text-neo-lime" aria-hidden="true" />
+        <FileSpreadsheet className="size-4 shrink-0 text-edu-lime-ink" aria-hidden="true" />
         <span className="truncate">{t('eduLibrary.editor.importFile')}</span>
         <input
           ref={fileRef}
@@ -57,7 +57,7 @@ export default function ListImportBar({ language, onEntries, onFileError }: List
       </label>
 
       <label className={cn(CHIP, 'relative pe-2')}>
-        <Package className="size-4 shrink-0 text-neo-pink" aria-hidden="true" />
+        <Package className="size-4 shrink-0 text-edu-pink-ink" aria-hidden="true" />
         <span className="truncate">{t('eduLibrary.editor.starterPack')}</span>
         <select
           aria-label={t('eduLibrary.editor.starterPack')}

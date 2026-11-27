@@ -89,23 +89,23 @@ function TeacherProfileInner() {
           <Avatar customAvatar={profile?.avatar_config ?? null} userId={user?.id} size="xl" className="shrink-0" />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-              <h1 data-testid="teacher-display-name" className="break-words font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-3xl">
+              <h1 data-testid="teacher-display-name" className="break-words font-neo-display text-2xl font-black leading-tight text-edu-ink sm:text-3xl">
                 {displayName}
               </h1>
               <span className={cn(NB_STICKER, NB_BLOCK.cyan)}>{t('teacher.profile.teacherBadge')}</span>
             </div>
             {user.email ? (
-              <p data-testid="teacher-email" className="mt-1 break-all font-neo-body text-sm font-bold text-neo-cream/80">{user.email}</p>
+              <p data-testid="teacher-email" className="mt-1 break-all font-neo-body text-sm font-bold text-edu-ink/80">{user.email}</p>
             ) : null}
-            <dl className="mt-2.5 flex flex-wrap gap-2 font-neo-body text-sm font-bold text-neo-cream/85">
+            <dl className="mt-2.5 flex flex-wrap gap-2 font-neo-body text-sm font-bold text-edu-ink/85">
               {[
-                { id: 'classroom-count', icon: BookOpen, tone: 'text-neo-cyan', label: t('teacher.profile.classrooms'), value: classrooms.length },
-                { id: 'total-student-count', icon: Users, tone: 'text-neo-lime', label: t('teacher.profile.totalStudents'), value: totalStudents },
+                { id: 'classroom-count', icon: BookOpen, tone: 'text-edu-cyan-ink', label: t('teacher.profile.classrooms'), value: classrooms.length },
+                { id: 'total-student-count', icon: Users, tone: 'text-edu-lime-ink', label: t('teacher.profile.totalStudents'), value: totalStudents },
               ].map(({ id, icon: Icon, tone, label, value }) => (
-                <div key={id} className="flex items-center gap-1.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-2.5 py-1">
+                <div key={id} className="flex items-center gap-1.5 rounded-neo border-2 border-edu-line bg-edu-surface px-2.5 py-1">
                   <Icon aria-hidden="true" className={cn('size-4 shrink-0', tone)} />
                   <dt>{label}</dt>
-                  <dd data-testid={id} className="font-neo-display font-black tabular-nums text-neo-cream">
+                  <dd data-testid={id} className="font-neo-display font-black tabular-nums text-edu-ink">
                     {classroomsLoading ? '–' : value}
                   </dd>
                 </div>
@@ -116,12 +116,12 @@ function TeacherProfileInner() {
 
         <ProfilePlanRow usage={usage} />
 
-        <div data-testid="contact-admin-section" className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t-2 border-neo-cream/15 px-5 py-3 sm:px-6">
+        <div data-testid="contact-admin-section" className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t-2 border-edu-line/15 px-5 py-3 sm:px-6">
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className={cn(NB_ICON_TILE, NB_BLOCK.purple)}>
               <School className="size-5" />
             </span>
-            <h2 className="font-neo-display text-base font-bold text-neo-cream">{t('teacher.profile.schoolTitle')}</h2>
+            <h2 className="font-neo-display text-base font-bold text-edu-ink">{t('teacher.profile.schoolTitle')}</h2>
           </div>
           <Link
             href={`/${language}/education/for-schools`}

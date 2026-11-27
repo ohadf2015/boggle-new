@@ -149,7 +149,7 @@ export function AcademyReward({
           initial={reduce ? false : { y: -20, scale: 0.8 }}
           animate={{ y: 0, scale: 1 }}
           transition={{ type: 'spring', stiffness: 380, damping: 16 }}
-          className="relative z-10 shrink-0 text-center font-neo-display text-3xl font-black uppercase leading-none text-neo-white sm:text-5xl lg:hidden"
+          className="relative z-10 shrink-0 text-center font-neo-display text-3xl font-black uppercase leading-none text-edu-ink sm:text-5xl lg:hidden"
           style={{ textShadow: '3px 3px 0 rgb(var(--neo-black)), 0 0 24px rgba(0,0,0,0.6)' }}
         >
           {headline}
@@ -230,18 +230,18 @@ export function AcademyReward({
       {/* Payout + trophies + actions */}
       <div className={cn('flex w-full flex-col items-center gap-2 sm:gap-3 lg:max-w-[40rem] lg:flex-none lg:basis-1/2 lg:items-start lg:justify-center lg:gap-6', open ? 'shrink-0 gap-4' : 'shrink-0')}>
         <h2
-          className="hidden font-neo-display text-7xl font-black uppercase leading-none text-neo-white lg:block"
+          className="hidden font-neo-display text-7xl font-black uppercase leading-none text-edu-ink lg:block"
           style={{ textShadow: '4px 4px 0 rgb(var(--neo-black))' }}
         >
           {headline}
         </h2>
         <div className="flex min-h-14 items-center justify-center lg:min-h-24">
           {!open ? (
-              <p className="font-neo-display text-lg font-black uppercase text-neo-cream lg:text-3xl">
+              <p className="font-neo-display text-lg font-black uppercase text-edu-ink lg:text-3xl">
                 {t('academy.modes.openForXp', 'Open the chest for your XP!')}
               </p>
             ) : xp === null ? (
-              <span data-testid="academy-xp-pending" className="rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-4 py-2 font-neo-display text-lg font-bold text-neo-cream lg:text-3xl">
+              <span data-testid="academy-xp-pending" className="rounded-neo border-[3px] border-edu-line bg-edu-surface px-4 py-2 font-neo-display text-lg font-bold text-edu-ink lg:text-3xl">
                 {t('academy.modes.savingXp', 'Saving XP…')}
               </span>
             ) : (
@@ -258,7 +258,7 @@ export function AcademyReward({
               animate={{ y: 0, scale: 1 }}
               transition={{ type: 'spring', stiffness: 360, damping: 18, delay: reduce ? 0 : 0.15 + i * 0.1 }}
               className={cn(
-                'relative flex flex-col items-center rounded-neo border-[3px] border-neo-yellow bg-neo-navy-elevated px-1 text-center shadow-hard lg:py-5',
+                'relative flex flex-col items-center rounded-neo border-[3px] border-neo-yellow bg-edu-surface px-1 text-center shadow-hard lg:py-5',
                 open ? 'min-h-[10rem] justify-center pb-3 pt-6 lg:min-h-0' : 'py-2',
                 i === 0 && 'border-neo-lime',
               )}
@@ -268,7 +268,7 @@ export function AcademyReward({
               <span
                 className={cn(
                   'grid place-items-center text-neo-black [&>svg]:h-5 [&>svg]:w-5 lg:[&>svg]:h-9 lg:[&>svg]:w-9',
-                  open ? 'absolute -top-5 h-10 w-10 rounded-full border-[3px] border-neo-black lg:static lg:h-auto lg:w-auto lg:border-0 lg:!bg-transparent lg:text-neo-yellow' : 'text-neo-yellow',
+                  open ? 'absolute -top-5 h-10 w-10 rounded-full border-[3px] border-neo-black lg:static lg:h-auto lg:w-auto lg:border-0 lg:!bg-transparent lg:text-edu-yellow-ink' : 'text-edu-yellow-ink',
                 )}
                 style={open ? { background: i === 0 ? 'var(--neo-lime)' : 'var(--neo-yellow)', boxShadow: '2px 2px 0 rgb(var(--neo-black))' } : undefined}
                 aria-hidden
@@ -278,16 +278,16 @@ export function AcademyReward({
               <span
                 dir="ltr"
                 className={cn(
-                  'whitespace-nowrap font-neo-display font-black leading-none text-neo-white tabular-nums',
+                  'whitespace-nowrap font-neo-display font-black leading-none text-edu-ink tabular-nums',
                   !open && (s.value.length > 5 ? 'text-2xl sm:text-3xl lg:text-5xl' : 'text-3xl sm:text-4xl lg:text-6xl'),
                   open && 'lg:text-6xl',
                 )}
                 style={open ? { textShadow: '3px 3px 0 rgb(var(--neo-black))', fontSize: trophySize } : undefined}
               >
                 {s.value}
-                {s.suffix && <span className="ms-0.5 align-baseline text-[0.42em] text-neo-cream">{s.suffix}</span>}
+                {s.suffix && <span className="ms-0.5 align-baseline text-[0.42em] text-edu-ink">{s.suffix}</span>}
               </span>
-              <span className="mt-1 line-clamp-1 font-neo-display text-xs font-bold uppercase tracking-wide text-neo-cream sm:text-xs lg:text-lg">{s.label}</span>
+              <span className="mt-1 line-clamp-1 font-neo-display text-xs font-bold uppercase tracking-wide text-edu-ink sm:text-xs lg:text-lg">{s.label}</span>
             </m.li>
           ))}
         </ul>

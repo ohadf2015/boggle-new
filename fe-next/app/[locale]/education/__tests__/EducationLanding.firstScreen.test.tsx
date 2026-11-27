@@ -85,7 +85,7 @@ describe('Education Landing — first-screen declutter (R1)', () => {
       const start = screen.getByTestId('landing-header-start');
       expect(start.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
       expect(start.className).not.toMatch(/(^|\s)shadow-hard/);
-      expect(start).toHaveClass('border-neo-cream');
+      expect(start).toHaveClass('border-edu-line');
       expect(start).toHaveAttribute('href', '/en/education/access');
     });
 

@@ -52,8 +52,8 @@ describe('PracticePickerTile contrast', () => {
     const button = screen.getByTestId('practice-tile-matching');
     // ONE card style for every tile: navy-light fill, 3px cream edge. The hero
     // owns the screen's accent fill, so four posters never put four accents up.
-    expect(button.className).toContain('bg-neo-navy-light');
-    expect(button.className).toContain('border-neo-cream');
+    expect(button.className).toContain('bg-edu-surface');
+    expect(button.className).toContain('border-edu-line');
     expect(button.className).toContain('border-[3px]');
   });
 
@@ -70,6 +70,16 @@ describe('PracticePickerTile contrast', () => {
     ).not.toBeNull();
   });
 
+  it('shows the whole poster above the name band, on its own field colour', () => {
+    render(<PracticePickerTile tile={tile({ id: 'blitz', mode: 'blitz' })} onSelect={vi.fn()} />);
+    const art = screen.getByTestId('practice-tile-art-blitz');
+    const frame = art.closest('[data-poster-frame]')!;
+    expect(art.className).toContain('object-contain');
+    expect(frame).toHaveStyle({ backgroundColor: '#ff1493' });
+    expect(frame.className).toContain('flex-1');
+    expect(frame.className).not.toContain('absolute');
+  });
+
   it('keeps a locked tile bordered so it still reads as a control', () => {
     vi.mocked(useExperiment).mockReturnValue({ variant: 'control', trackExposure: vi.fn() });
     render(
@@ -81,7 +91,7 @@ describe('PracticePickerTile contrast', () => {
     const button = screen.getByTestId('practice-tile-vocab_focus:synonym');
     // Cream on navy measures 16.8:1; the black edge the tile used to carry
     // measures 1.23:1 and reads as no edge at all.
-    expect(button.className).toContain('border-neo-cream');
+    expect(button.className).toContain('border-edu-line');
     expect(button.className).not.toContain('opacity-');
     expect(button.className).toContain('border-[3px]');
   });

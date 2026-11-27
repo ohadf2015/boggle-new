@@ -8,6 +8,7 @@ import { StudentWordBank } from '@/components/education/StudentWordBank';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useGameStore } from '@/hooks/gameState';
 import type { Language } from '@/shared/types/game';
+import { ClassroomBoardProvider } from '@/components/education/live/classroomBoard';
 
 const BOARDS: Record<string, { grid: string[][]; words: string[] }> = {
   en: {
@@ -34,7 +35,8 @@ export function PhoneGamePreview() {
   }, [board, language, foundWords]);
 
   return (
-    <div className="flex h-dvh min-h-0 flex-col bg-neo-navy">
+    <ClassroomBoardProvider value>
+    <div className="flex h-dvh min-h-0 flex-col bg-edu-page">
       <InGameScreen
         username="Maya"
         gameCode="YHNCF4"
@@ -57,5 +59,6 @@ export function PhoneGamePreview() {
       />
       <StudentWordBank level="core" words={board.words} />
     </div>
+    </ClassroomBoardProvider>
   );
 }

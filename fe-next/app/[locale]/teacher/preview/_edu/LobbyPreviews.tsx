@@ -54,7 +54,7 @@ export function LobbyHostPreview({ v }: { v?: string }) {
   const pro = v === 'pro' || v === 'options-pro';
 
   return (
-    <div className={cn('fixed inset-0 z-[80] flex flex-col overflow-hidden bg-neo-navy', language === 'he' && 'rtl')}>
+    <div className={cn('fixed inset-0 z-[80] flex flex-col overflow-hidden bg-edu-page', language === 'he' && 'rtl')}>
       <EducationHeader compact showBackButton title={t('education.classroomGame.title')} />
       <main className={cn('relative mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col overflow-hidden px-3 py-2 sm:px-6 sm:py-3', TV_STAGE_ZOOM_CLASS)}>
         <ClassroomLobbyShell
@@ -105,9 +105,9 @@ export function LiveControlsPreview({ v }: { v?: string }) {
   const { t } = useLanguage();
   const [paused, setPaused] = useState(v === 'paused');
   return (
-    <div className="flex min-h-dvh flex-col bg-neo-navy">
+    <div className="flex min-h-dvh flex-col bg-edu-page">
       <div className="mx-auto grid w-full max-w-md flex-1 place-items-center p-6">
-        <div aria-hidden="true" className="grid aspect-square w-full grid-cols-4 gap-2 rounded-neo-lg border-[3px] border-neo-cream/35 p-3">
+        <div aria-hidden="true" className="grid aspect-square w-full grid-cols-4 gap-2 rounded-neo-lg border-[3px] border-edu-line p-3">
           {'PLANETRIVERSHOP'.split('').concat('X').map((ch, i) => (
             <span key={i} className="grid place-items-center rounded-neo border-2 border-neo-black bg-neo-cream font-neo-display text-2xl font-black text-neo-black">{ch}</span>
           ))}

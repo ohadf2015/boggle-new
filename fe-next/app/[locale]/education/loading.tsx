@@ -1,6 +1,6 @@
-import { EducationRouteLoading } from '@/components/teacher/hq/EducationRouteLoading';
+import { EducationSegmentLoading } from './EducationSegmentLoading';
 
 /** Same mascot loader as [locale]/loading — except mid GO LIVE, which keeps its designed launch stage. */
 export default function Loading() {
-  return <EducationRouteLoading />;
+  return <EducationSegmentLoading />;
 }

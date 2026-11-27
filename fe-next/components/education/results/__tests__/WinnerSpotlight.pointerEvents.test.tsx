@@ -35,10 +35,10 @@ describe('WinnerSpotlight — the trophy never eats a tap', () => {
     expect(screen.getByTestId('winner-mascot-frame').className).toMatch(/pointer-events-none/);
   });
 
-  it('the video itself is aria-hidden AND unhittable', () => {
+  it('the trophy itself is aria-hidden AND unhittable', () => {
     render(<WinnerSpotlight winner={winner} active t={t} />);
-    const video = screen.getByTestId('winner-mascot-video');
-    expect(video).toHaveAttribute('aria-hidden');
-    expect(video.className).toMatch(/pointer-events-none/);
+    const still = screen.getByTestId('winner-mascot-still');
+    expect(still).toHaveAttribute('aria-hidden');
+    expect(still.className).toMatch(/pointer-events-none/);
   });
 });

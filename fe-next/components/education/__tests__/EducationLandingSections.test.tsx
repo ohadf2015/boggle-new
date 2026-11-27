@@ -18,7 +18,7 @@ describe('ACCENT palette', () => {
   it('spells every class out as a literal (Tailwind v4 cannot see composed names)', () => {
     for (const accent of ['lime', 'pink', 'cyan', 'purple'] as const) {
       expect(ACCENT[accent].fill).toBe(`bg-neo-${accent}`);
-      expect(ACCENT[accent].text).toBe(`text-neo-${accent}`);
+      expect(ACCENT[accent].text).toBe(`text-neo-${accent} edu-sky:text-edu-${accent}-ink`);
     }
   });
 });

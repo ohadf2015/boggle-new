@@ -40,11 +40,11 @@ export function BlooketFreeTierHonestyStrip({
       data-testid="blooket-free-tier-honesty-strip"
       aria-labelledby="blooket-free-tier-honesty-heading"
       className={cn(
-        'mb-12 rounded-neo border-3 border-neo-cyan/50 bg-neo-navy/60 p-5 shadow-hard sm:p-6',
+        'mb-12 rounded-neo border-3 border-neo-cyan/50 bg-neo-navy/60 edu-sky:bg-edu-surface/60 p-5 shadow-hard sm:p-6',
         className,
       )}
     >
-      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-neo-cyan">
+      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-neo-cyan edu-sky:text-edu-cyan-ink">
         {t('education.vsBlooket.freeTier.eyebrow')}
       </p>
       <h2
@@ -53,19 +53,19 @@ export function BlooketFreeTierHonestyStrip({
       >
         {t('education.vsBlooket.freeTier.title')}
       </h2>
-      <p className="mb-5 text-sm leading-relaxed text-neo-gray-200 sm:text-base">
+      <p className="mb-5 text-sm leading-relaxed text-neo-gray-200 edu-sky:text-edu-ink/80 sm:text-base">
         {t('education.vsBlooket.freeTier.lede')}
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <article
           data-testid="blooket-free-tier-caps-card"
-          className="rounded-neo border-3 border-neo-gray-400/50 bg-neo-navy/40 p-4"
+          className="rounded-neo border-3 border-neo-gray-400/50 edu-sky:border-edu-line/30 bg-neo-navy/40 edu-sky:bg-edu-surface/40 p-4"
         >
-          <h3 className="mb-2 font-bold text-neo-gray-300">
+          <h3 className="mb-2 font-bold text-neo-gray-300 edu-sky:text-edu-ink/70">
             {t('education.vsBlooket.freeTier.blooketTitle')}
           </h3>
-          <p className="text-sm text-neo-gray-200">
+          <p className="text-sm text-neo-gray-200 edu-sky:text-edu-ink/80">
             {t('education.vsBlooket.freeTier.blooketBody')}
           </p>
         </article>
@@ -73,22 +73,22 @@ export function BlooketFreeTierHonestyStrip({
           data-testid="lexiclash-free-tier-50-card"
           className="rounded-neo border-3 border-neo-lime/50 bg-neo-lime/10 p-4"
         >
-          <h3 className="mb-2 font-bold text-neo-lime">
+          <h3 className="mb-2 font-bold text-neo-lime edu-sky:text-edu-lime-ink">
             {t('education.vsBlooket.freeTier.lexiTitle')}
           </h3>
-          <p className="text-sm text-neo-gray-200">
+          <p className="text-sm text-neo-gray-200 edu-sky:text-edu-ink/80">
             {t('education.vsBlooket.freeTier.lexiBody')}
           </p>
         </article>
       </div>
 
-      <p className="mt-4 text-xs text-neo-gray-300">
+      <p className="mt-4 text-xs text-neo-gray-300 edu-sky:text-edu-ink/70">
         {t('education.vsBlooket.freeTier.citePrefix')}{' '}
         <a
           href={IS_FREE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan edu-sky:hover:text-edu-cyan-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="blooket-free-tier-is-free-link"
         >
           {t('education.vsBlooket.freeTier.citeIsFreeLabel')}
@@ -98,7 +98,7 @@ export function BlooketFreeTierHonestyStrip({
           href={PLUS_FEATURES_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan edu-sky:hover:text-edu-cyan-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="blooket-free-tier-plus-link"
         >
           {t('education.vsBlooket.freeTier.citePlusLabel')}
@@ -108,7 +108,7 @@ export function BlooketFreeTierHonestyStrip({
           href={UPGRADE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan edu-sky:hover:text-edu-cyan-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="blooket-free-tier-upgrade-link"
         >
           {t('education.vsBlooket.freeTier.citeUpgradeLabel')}
