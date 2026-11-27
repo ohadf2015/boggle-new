@@ -82,8 +82,8 @@ export function LessonPicker({
   if (lessons.length === 0) {
     return (
       <div className={cn('py-6 text-center', className)}>
-        <BookOpen className="mx-auto mb-3 size-12 text-neo-white" aria-hidden="true" />
-        <p className="font-neo-body text-neo-white">{t('education.classroomGame.noLessonsAvailable')}</p>
+        <BookOpen className="mx-auto mb-3 size-12 text-edu-ink" aria-hidden="true" />
+        <p className="font-neo-body text-edu-ink">{t('education.classroomGame.noLessonsAvailable')}</p>
         {createHref && (
           <Link
             href={createHref}
@@ -106,18 +106,18 @@ export function LessonPicker({
     <div className={cn('@container space-y-3', className)}>
       {mode === 'multi' && (
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 id={headingId} className="font-neo-display text-lg text-neo-white">{t('education.classroomGame.selectLessons')}</h3>
+          <h3 id={headingId} className="font-neo-display text-lg text-edu-ink">{t('education.classroomGame.selectLessons')}</h3>
           <div className="flex items-center gap-2">
-            <span className="rounded-neo border-2 border-neo-cyan bg-neo-navy-light px-2 py-1 font-neo-body text-sm font-bold text-neo-cyan">
+            <span className="rounded-neo border-2 border-neo-cyan bg-edu-surface px-2 py-1 font-neo-body text-sm font-bold text-edu-cyan-ink">
               {t(selectedIds.length === 1 ? 'education.classroomGame.lessonSelected' : 'education.classroomGame.lessonsSelected', { count: selectedIds.length })}
             </span>
             <button
               type="button"
               onClick={() => onChange(allSelected ? [] : pool.map((l) => l.id))}
               className={cn(
-                'rounded-neo border-[3px] border-neo-cream px-4 py-2.5 text-sm font-bold transition-colors duration-150',
+                'rounded-neo border-[3px] border-edu-line px-4 py-2.5 text-sm font-bold transition-colors duration-150',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
-                allSelected ? 'bg-neo-white/20 text-neo-white hover:bg-neo-white/30' : 'bg-neo-cyan/20 text-neo-cyan hover:bg-neo-cyan/30'
+                allSelected ? 'bg-edu-ink/20 text-edu-ink hover:bg-edu-ink/30' : 'bg-neo-cyan/20 text-edu-cyan-ink hover:bg-neo-cyan/30'
               )}
             >
               {allSelected
@@ -160,13 +160,13 @@ export function LessonPicker({
       {notice && (
         <p
           data-testid={notice.id}
-          className="flex items-start gap-2 rounded-neo border-2 border-neo-yellow bg-neo-navy-light px-3 py-2 font-neo-body text-sm font-bold text-neo-yellow"
+          className="flex items-start gap-2 rounded-neo border-2 border-neo-yellow bg-edu-surface px-3 py-2 font-neo-body text-sm font-bold text-edu-yellow-ink"
         >
           <TriangleAlert className="mt-0.5 size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
           {notice.text}
         </p>
       )}
-      <p role="status" className={switchedTo ? 'font-neo-body text-sm text-neo-cream/85' : 'sr-only'}>
+      <p role="status" className={switchedTo ? 'font-neo-body text-sm text-edu-ink/85' : 'sr-only'}>
         {switchedTo
           ? t('eduPickers.lesson.boardSwitched', 'Board switched to {language}. One game plays in one language.', {
               language: nativeLanguageName(switchedTo),
@@ -175,7 +175,7 @@ export function LessonPicker({
       </p>
 
       {visible.length === 0 ? (
-        <p data-testid="lesson-picker-no-match" className="py-4 text-center font-neo-body text-sm text-neo-cream/80">
+        <p data-testid="lesson-picker-no-match" className="py-4 text-center font-neo-body text-sm text-edu-ink/80">
           {t('eduPickers.lesson.noMatch', 'No lists match "{query}"', { query: query.trim() })}
         </p>
       ) : (
@@ -199,7 +199,7 @@ export function LessonPicker({
       )}
 
       {mode === 'multi' && selectedIds.length > 1 && !board.mixed && (
-        <p className="font-neo-body text-sm text-neo-white">{t('education.classroomGame.multiLessonHelp')}</p>
+        <p className="font-neo-body text-sm text-edu-ink">{t('education.classroomGame.multiLessonHelp')}</p>
       )}
     </div>
   );

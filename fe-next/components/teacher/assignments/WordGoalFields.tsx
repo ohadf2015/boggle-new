@@ -23,10 +23,10 @@ export function WordGoalFields({
   if (kind === 'word_count') {
     return (
       <div>
-        <label className="block text-sm font-neo-body text-neo-white mb-2" htmlFor="word-count-goal">
+        <label className="block text-sm font-neo-body text-edu-ink mb-2" htmlFor="word-count-goal">
           {t('teacher.assignment.wordCountLabel')}
         </label>
-        <p className="text-xs text-neo-white/70 font-neo-body mb-2 text-pretty">
+        <p className="text-xs text-edu-ink/70 font-neo-body mb-2 text-pretty">
           {t('teacher.assignment.wordCountGoalHint')}
         </p>
         <input
@@ -37,7 +37,7 @@ export function WordGoalFields({
           max={WORD_COUNT_MAX}
           value={wordCount}
           onChange={(e) => onWordCount(Number(e.target.value) || WORD_COUNT_DEFAULT)}
-          className="w-full p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body"
+          className="w-full p-3 rounded-neo border-neo border-edu-line bg-edu-surface text-edu-ink font-neo-body"
         />
       </div>
     );
@@ -45,10 +45,10 @@ export function WordGoalFields({
 
   return (
     <div>
-      <label className="block text-sm font-neo-body text-neo-white mb-2" htmlFor="word-list-goal">
+      <label className="block text-sm font-neo-body text-edu-ink mb-2" htmlFor="word-list-goal">
         {t('teacher.assignment.wordListGoal')}
       </label>
-      <p className="text-xs text-neo-white/70 font-neo-body mb-2 text-pretty">
+      <p className="text-xs text-edu-ink/70 font-neo-body mb-2 text-pretty">
         {t('teacher.assignment.wordListGoalHint')}
       </p>
       <textarea
@@ -59,7 +59,7 @@ export function WordGoalFields({
         rows={4}
         placeholder={t('teacher.assignment.wordListPlaceholder')}
         className={cn(
-          'w-full p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body resize-none',
+          'w-full p-3 rounded-neo border-neo border-edu-line bg-edu-surface text-edu-ink font-neo-body resize-none',
         )}
       />
     </div>

@@ -164,7 +164,7 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
       <div className="space-y-3 sm:space-y-4 [@media(orientation:landscape)_and_(max-height:500px)]:space-y-1.5">
         <div data-testid="classroom-manager-toprow" className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
           {heading}
-          <span aria-hidden="true" className="h-10 w-28 animate-pulse rounded-neo bg-neo-cream/10" />
+          <span aria-hidden="true" className="h-10 w-28 animate-pulse rounded-neo bg-edu-ink/10" />
         </div>
         <ClassGridSkeleton columns={pageSize} />
       </div>

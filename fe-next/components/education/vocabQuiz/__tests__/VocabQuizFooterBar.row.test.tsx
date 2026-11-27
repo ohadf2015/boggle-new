@@ -56,8 +56,8 @@ describe('Vocab quiz footer band: one idea, room count as a chip', () => {
     const room = screen.getByTestId('vocab-quiz-footer-room');
     expect(room).toHaveTextContent('vocabQuiz.footer.roomCount:2,4');
     expect(room.className).toContain('ms-auto');
-    expect(room.className).toContain('text-neo-white');
-    expect(room.className).not.toContain('text-neo-cyan');
+    expect(room.className).toContain('text-edu-ink');
+    expect(room.className).not.toContain('text-edu-cyan-ink');
     expect(room.className).not.toMatch(/max-w-\[/);
   });
 
@@ -69,7 +69,7 @@ describe('Vocab quiz footer band: one idea, room count as a chip', () => {
     expect(headline.querySelector('svg')).not.toBeNull();
     expect(headline.className).not.toMatch(/\bbg-neo-/);
     expect(headline.compareDocumentPosition(picked) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(picked.className).toMatch(/text-neo-white\/\d+/);
+    expect(picked.className).toMatch(/text-edu-ink\/\d+/);
   });
 
   it('holds the row on the question column with 16px gutters, pinned to the bottom above the safe area', () => {

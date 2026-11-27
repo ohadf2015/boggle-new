@@ -41,8 +41,8 @@ export function LobbyGameOptions({ opts, roundMinutes, gameMode, vocabQuizVarian
     <LobbySetupDisclosure label={t('eduShell.host.gameOptions')} summary={summary} open={open} onToggle={() => setOpen((v) => !v)}>
       <div className="grid gap-4 @3xl/opts:grid-cols-2 @3xl/opts:gap-5">
         <section data-testid="lobby-options-pro" aria-labelledby="lobby-options-pro-title" className="flex flex-col gap-2 @3xl/opts:col-span-2">
-          <h3 id="lobby-options-pro-title" className="flex items-center gap-2 font-neo-display text-base font-bold text-neo-cream">
-            <Crown className="size-5 shrink-0 text-neo-cream/70" strokeWidth={2.5} aria-hidden="true" />
+          <h3 id="lobby-options-pro-title" className="flex items-center gap-2 font-neo-display text-base font-bold text-edu-ink">
+            <Crown className="size-5 shrink-0 text-edu-ink/70" strokeWidth={2.5} aria-hidden="true" />
             {t('eduShell.host.proOptions')}
           </h3>
           <LobbyPressureDials pressure={opts.pressure} onChange={opts.setPressure} access={proAccess} />
@@ -94,11 +94,11 @@ export function LobbyGameOptions({ opts, roundMinutes, gameMode, vocabQuizVarian
           </LobbyOptionGroup>
           <LobbyEconomyToggles value={opts.economy} onChange={opts.setEconomy} />
           {homework ? (
-            <section data-testid="lobby-options-homework" aria-labelledby="lobby-options-homework-title" className="flex flex-col items-start gap-2 rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light p-3">
-              <h3 id="lobby-options-homework-title" className="font-neo-display text-base font-bold text-neo-cream">
+            <section data-testid="lobby-options-homework" aria-labelledby="lobby-options-homework-title" className="flex flex-col items-start gap-2 rounded-neo-lg border-2 border-edu-line bg-edu-surface p-3">
+              <h3 id="lobby-options-homework-title" className="font-neo-display text-base font-bold text-edu-ink">
                 {t('eduShell.host.homeworkTitle')}
               </h3>
-              <p className="font-neo-body text-sm text-neo-cream/75">{t('eduShell.host.homeworkHint')}</p>
+              <p className="font-neo-body text-sm text-edu-ink/75">{t('eduShell.host.homeworkHint')}</p>
               {homework}
             </section>
           ) : null}

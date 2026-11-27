@@ -6,6 +6,7 @@ import { isClassroomLiveNow } from '@/lib/education/classroomLivePath';
 import type { Socket } from 'socket.io-client';
 import { useGameMode } from '@/hooks/gameState/store';
 import { cn } from '@/lib/utils';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 import Image from 'next/image';
 import { TvWordDropFeed, FEED_ROWS, type WordDrop } from './TvWordDropFeed';
 
@@ -99,6 +100,37 @@ TvBlastActivityPanel.displayName = 'TvBlastActivityPanel';
 
 // ==================== Word Hunt Panel ====================
 
+const HUNT_SKIN = {
+  arcade: {
+    targetLabel: 'text-xs font-bold text-neo-cream/60 uppercase me-2',
+    slot: 'w-6 h-8 rounded border-2 border-neo-pink/60 bg-neo-pink/10 flex items-center justify-center',
+    slotInk: 'text-neo-pink font-black text-lg',
+    radar: 'relative w-48 h-48 rounded-full border-3 border-neo-cyan/40',
+    ring1: 'absolute inset-4 rounded-full border-2 border-neo-cyan/25',
+    ring2: 'absolute inset-8 rounded-full border-2 border-neo-cyan/15',
+    ring3: 'absolute inset-12 rounded-full border-2 border-neo-cyan/10',
+    statLabel: 'text-xs font-bold text-neo-cream/60 uppercase',
+    stat: 'text-xl font-black text-neo-cream',
+    alive: 'text-xl font-black text-neo-lime',
+    aliveOf: 'text-neo-cream/40',
+    hunting: 'text-lg font-black text-neo-cyan uppercase tracking-wider',
+  },
+  classroom: {
+    targetLabel: 'text-xs font-bold text-edu-ink/70 uppercase me-2',
+    slot: 'w-6 h-8 rounded border-2 border-neo-black bg-neo-pink flex items-center justify-center',
+    slotInk: 'text-neo-black font-black text-lg',
+    radar: 'relative w-48 h-48 rounded-full border-3 border-edu-cyan-ink/60',
+    ring1: 'absolute inset-4 rounded-full border-2 border-edu-cyan-ink/40',
+    ring2: 'absolute inset-8 rounded-full border-2 border-edu-cyan-ink/25',
+    ring3: 'absolute inset-12 rounded-full border-2 border-edu-cyan-ink/15',
+    statLabel: 'text-xs font-bold text-edu-ink/70 uppercase',
+    stat: 'text-xl font-black text-edu-ink',
+    alive: 'text-xl font-black text-edu-lime-ink',
+    aliveOf: 'text-edu-ink/50',
+    hunting: 'text-lg font-black text-edu-cyan-ink uppercase tracking-wider',
+  },
+} as const;
+
 const TvWordHuntActivityPanel = memo<{
   wordsHunted: number;
   blipCount: number;
@@ -108,18 +140,19 @@ const TvWordHuntActivityPanel = memo<{
   totalPlayers: number;
   t: TvActivityPanelProps['t'];
 }>(({ wordsHunted, blipCount: _blipCount, reducedMotion, targetLength, aliveCount, totalPlayers, t }) => {
+  const k = HUNT_SKIN[useClassroomBoard() ? 'classroom' : 'arcade'];
   return (
     <div data-testid="tv-wordhunt-panel" className="flex flex-col h-full">
       {/* Target word length indicator */}
       {targetLength > 0 && (
         <div className="flex items-center justify-center gap-1.5 p-3 border-b-2 border-neo-black/20">
-          <p className="text-xs font-bold text-neo-cream/60 uppercase me-2">{t('tvBroadcast.targetLength')}:</p>
+          <p className={k.targetLabel}>{t('tvBroadcast.targetLength')}:</p>
           {Array.from({ length: targetLength }, (_, i) => (
             <div
               key={`slot-${i}`}
-              className="w-6 h-8 rounded border-2 border-neo-pink/60 bg-neo-pink/10 flex items-center justify-center"
+              className={k.slot}
             >
-              <span className="text-neo-pink font-black text-lg">_</span>
+              <span className={k.slotInk}>_</span>
             </div>
           ))}
         </div>
@@ -129,12 +162,12 @@ const TvWordHuntActivityPanel = memo<{
       <div className="flex-1 flex items-center justify-center p-4">
         <div
           data-testid="wordhunt-radar"
-          className="relative w-48 h-48 rounded-full border-3 border-neo-cyan/40"
+          className={k.radar}
         >
           {/* Concentric circles */}
-          <div className="absolute inset-4 rounded-full border-2 border-neo-cyan/25" />
-          <div className="absolute inset-8 rounded-full border-2 border-neo-cyan/15" />
-          <div className="absolute inset-12 rounded-full border-2 border-neo-cyan/10" />
+          <div className={k.ring1} />
+          <div className={k.ring2} />
+          <div className={k.ring3} />
           {/* Center dot */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-2 h-2 rounded-full bg-neo-cyan" />
@@ -154,18 +187,18 @@ const TvWordHuntActivityPanel = memo<{
       {/* Stats bar */}
       <div className="flex justify-around items-center p-3 border-t-2 border-neo-black/20">
         <div className="text-center">
-          <p className="text-xs font-bold text-neo-cream/60 uppercase">{t('tvBroadcast.wordsHunted')}</p>
-          <p className="text-xl font-black text-neo-cream">{wordsHunted}</p>
+          <p className={k.statLabel}>{t('tvBroadcast.wordsHunted')}</p>
+          <p className={k.stat}>{wordsHunted}</p>
         </div>
         {totalPlayers > 0 && (
           <div className="text-center">
-            <p className="text-xs font-bold text-neo-cream/60 uppercase">{t('tvBroadcast.playersAlive')}</p>
-            <p className="text-xl font-black text-neo-lime">{aliveCount}<span className="text-neo-cream/40">/{totalPlayers}</span></p>
+            <p className={k.statLabel}>{t('tvBroadcast.playersAlive')}</p>
+            <p className={k.alive}>{aliveCount}<span className={k.aliveOf}>/{totalPlayers}</span></p>
           </div>
         )}
         <div className="text-center">
           <p className={cn(
-            'text-lg font-black text-neo-cyan uppercase tracking-wider',
+            k.hunting,
             !reducedMotion && 'animate-pulse',
           )}>
             {t('tvBroadcast.hunting')}...
@@ -193,6 +226,7 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
 }) => {
   const gameMode = useGameMode() || 'classic';
   const reducedMotion = useReducedMotion() ?? false;
+  const classroom = useClassroomBoard();
 
   // Activity tracking via refs to avoid re-renders
   const totalActivityRef = useRef(0);
@@ -274,7 +308,7 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
     <div
       data-testid="tv-activity-panel"
       className={cn(
-        'h-full flex flex-col bg-neo-navy rounded-neo border-3 border-neo-black overflow-hidden relative',
+        classroom ? 'h-full flex flex-col bg-edu-surface text-edu-ink rounded-neo border-3 border-neo-black overflow-hidden relative' : 'h-full flex flex-col bg-neo-navy rounded-neo border-3 border-neo-black overflow-hidden relative',
         fireRoundActive && 'ring-2 ring-neo-orange/60',
         earthquakeShaking && !reducedMotion && 'animate-neo-shake',
       )}

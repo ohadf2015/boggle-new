@@ -75,7 +75,7 @@ export function ProjectorStartBar({
       data-testid="projector-start-bar"
       style={style}
       className={cn(
-        'flex flex-col gap-2 self-center [@container(max-height:800px)]:sticky [@container(max-height:800px)]:bottom-0 [@container(max-height:800px)]:z-10 [@container(max-height:800px)]:bg-neo-navy [@container(max-height:800px)]:py-2 @max-5xl:sticky @max-5xl:bottom-0 @max-5xl:z-10 @max-5xl:-mx-3 @max-5xl:-mb-3 @max-5xl:border-t-[3px] @max-5xl:border-neo-cream/50 @max-5xl:bg-neo-navy @max-5xl:p-3',
+        'flex flex-col gap-2 self-center [@container(max-height:800px)]:sticky [@container(max-height:800px)]:bottom-0 [@container(max-height:800px)]:z-10 [@container(max-height:800px)]:bg-edu-page [@container(max-height:800px)]:py-2 @max-5xl:sticky @max-5xl:bottom-0 @max-5xl:z-10 @max-5xl:-mx-3 @max-5xl:-mb-3 @max-5xl:border-t-[3px] @max-5xl:border-edu-line @max-5xl:bg-edu-surface @max-5xl:p-3',
         RISE,
         className
       )}
@@ -84,7 +84,7 @@ export function ProjectorStartBar({
         <div role="status" aria-live="polite" className="flex items-center justify-between gap-3 rounded-neo border-[3px] border-neo-black bg-neo-cream px-3 py-2 font-neo-display font-black text-neo-black shadow-hard text-[clamp(1rem,min(1.2cqw,2.2cqh),1.75rem)]">
           {t('hostView.allReadyAutoStart', { seconds: autoStartSecondsLeft })}
           {onCancelAutoStart && (
-            <button type="button" data-testid="projector-autostart-cancel" onClick={onCancelAutoStart} className={cn('min-h-11 rounded-neo border-[3px] border-neo-black bg-neo-white px-3 text-sm text-neo-black shadow-hard-sm', PRESS)}>
+            <button type="button" data-testid="projector-autostart-cancel" onClick={onCancelAutoStart} className={cn('min-h-11 rounded-neo border-[3px] border-neo-black bg-edu-paper px-3 text-sm text-neo-black shadow-hard-sm', PRESS)}>
               {t('common.cancel')}
             </button>
           )}
@@ -106,9 +106,9 @@ export function ProjectorStartBar({
               ? 'min-h-16 flex-[2_1_14rem] px-6 py-3 text-[clamp(1.5rem,min(3cqw,5.5cqh),4.5rem)]'
               : cn('min-h-12 px-4 py-2 text-[clamp(1rem,min(1.4cqw,2.6cqh),2rem)]', canStart ? 'flex-[1_1_14rem]' : 'flex-[1_1_100%]'),
             startLocked
-              ? 'border-[3px] border-dashed border-neo-cream/50 bg-neo-navy-light font-bold text-neo-cream/80 shadow-none hover:translate-y-0 hover:shadow-none'
+              ? 'border-[3px] border-dashed border-edu-line bg-edu-surface font-bold text-edu-ink/80 shadow-none hover:translate-y-0 hover:shadow-none'
               : waitingOnClass
-                ? 'border-[3px] border-neo-cream/50 bg-neo-navy-elevated font-bold text-neo-cream shadow-hard'
+                ? 'border-[3px] border-edu-line bg-edu-surface font-bold text-edu-ink shadow-edu-lip-sm'
                 : 'motion-safe:animate-[edu-live-unlock_300ms_cubic-bezier(0.23,1,0.32,1)]',
             lobby.quizBlocked && 'hidden'
           )}
@@ -145,12 +145,12 @@ export function ProjectorStartBar({
         {lockSlot}
       </div>
       {waitingOnClass && (
-        <p data-testid="projector-still-learning" role="status" className="font-neo-display font-bold text-neo-cream text-[clamp(1rem,min(1.3cqw,2.4cqh),1.875rem)]">
+        <p data-testid="projector-still-learning" role="status" className="font-neo-display font-bold text-edu-ink text-[clamp(1rem,min(1.3cqw,2.4cqh),1.875rem)]">
           {t('education.projectorLobby.stillLearning', { count: stillLearning })}
         </p>
       )}
       {!canStart && (
-        <p data-testid="projector-start-reason" role="status" className="font-neo-body text-neo-cream/75 text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]">
+        <p data-testid="projector-start-reason" role="status" className="font-neo-body text-edu-ink/75 text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]">
           <span className="block">{t('eduLiveRoom.lobby.startBlocked')}</span>
           {rehearseHere && (
             <span data-testid="rehearsal-private-note" className="block">
@@ -160,7 +160,7 @@ export function ProjectorStartBar({
         </p>
       )}
       {lessonWordsBlock && (
-        <p data-testid="projector-lesson-words" role="alert" className="flex flex-wrap items-center gap-2 font-neo-body font-bold text-neo-yellow text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]">
+        <p data-testid="projector-lesson-words" role="alert" className="flex flex-wrap items-center gap-2 font-neo-body font-bold text-edu-yellow-ink text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]">
           {t(lessonWordsBlock.status === 'loading' ? 'education.projectorLobby.lessonWordsLoading' : 'education.projectorLobby.lessonWordsFailed')}
           {lessonWordsBlock.status === 'error' && (
             <button type="button" data-testid="projector-lesson-words-retry" onClick={lessonWordsBlock.onRetry} className={cn('min-h-11 rounded-neo border-[3px] border-neo-black bg-neo-cream px-3 text-sm font-black text-neo-black shadow-hard-sm', PRESS)}>
@@ -170,7 +170,7 @@ export function ProjectorStartBar({
         </p>
       )}
       {practiceRoundFailed && (
-        <p role="alert" className="font-neo-body text-sm font-bold text-neo-pink">
+        <p role="alert" className="font-neo-body text-sm font-bold text-edu-pink-ink">
           {t(practiceRoundFailedKey)}
         </p>
       )}

@@ -208,7 +208,7 @@ describe('PracticeCompletionMoment', () => {
   it('gives the tertiary action a border that survives the navy card', () => {
     render(<PracticeCompletionMoment {...baseProps} />);
     const back = screen.getByTestId('practice-completion-exit');
-    expect(back.className).toContain('border-neo-cream');
+    expect(back.className).toContain('border-edu-line');
     expect(back.className).not.toMatch(/border-black(?!\/)/);
   });
 });
@@ -253,7 +253,7 @@ describe('PracticeCompletionMoment — one dominant action', () => {
     const exit = screen.getByTestId('practice-completion-exit');
     expect(exit).toHaveAttribute('aria-label');
     // Bordered so it still reads as a control on the navy card.
-    expect(exit.className).toContain('border-neo-cream');
+    expect(exit.className).toContain('border-edu-line');
     expect(container.querySelector('[data-testid="practice-completion-actions"]')!.contains(exit)).toBe(false);
     fireEvent.click(exit);
     expect(onBack).toHaveBeenCalled();
@@ -304,8 +304,8 @@ describe('PracticeCompletionMoment card edge', () => {
       <PracticeCompletionMoment correct={5} total={6} onAgain={vi.fn()} onBack={vi.fn()} />
     );
     const card = screen.getByTestId('practice-completion');
-    expect(card.className).toContain('border-neo-cream');
-    expect(card.className).toContain('bg-neo-navy-light');
+    expect(card.className).toContain('border-edu-line');
+    expect(card.className).toContain('bg-edu-surface');
     expect(card.className).not.toContain('border-black');
   });
 });

@@ -18,10 +18,10 @@ interface AssignmentFocusPickerProps {
 export function AssignmentFocusPicker({ focus, onFocus, supportedFocuses, focusCounts, language, t }: AssignmentFocusPickerProps) {
   return (
     <div>
-      <label className="block text-sm font-neo-body text-neo-white mb-1">
+      <label className="block text-sm font-neo-body text-edu-ink mb-1">
         {t('teacher.assignment.focus.label')}
       </label>
-      <p className="text-xs text-neo-white/70 font-neo-body mb-2 text-pretty">
+      <p className="text-xs text-edu-ink/70 font-neo-body mb-2 text-pretty">
         {t('teacher.assignment.focus.help')}
       </p>
       <div
@@ -38,7 +38,7 @@ export function AssignmentFocusPicker({ focus, onFocus, supportedFocuses, focusC
             'min-h-12 p-3 rounded-neo border-neo text-start transition',
             focus === 'any'
               ? 'bg-neo-cyan border-neo-cyan text-neo-black shadow-hard-sm'
-              : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
+              : 'bg-edu-surface/50 border-neo-black text-edu-ink hover:bg-edu-surface/80'
           )}
         >
           <span className="font-bold block">{t('teacher.assignment.focus.any')}</span>
@@ -58,8 +58,8 @@ export function AssignmentFocusPicker({ focus, onFocus, supportedFocuses, focusC
               className={cn(
                 'min-h-12 p-3 rounded-neo border-neo text-start transition',
                 active && 'bg-neo-yellow border-neo-yellow text-neo-black shadow-hard-sm',
-                !active && supported && 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80',
-                !supported && 'bg-neo-navy/30 border-neo-black/40 text-neo-white/50 cursor-not-allowed'
+                !active && supported && 'bg-edu-surface/50 border-neo-black text-edu-ink hover:bg-edu-surface/80',
+                !supported && 'bg-edu-surface/30 border-neo-black/40 text-edu-ink/50 cursor-not-allowed'
               )}
             >
               <span className="font-bold flex items-center gap-1.5">

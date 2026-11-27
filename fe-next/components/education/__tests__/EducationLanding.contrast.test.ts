@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
  * jsdom does not resolve Tailwind colors, so these assert the class strings.
  * Bright fills (pink #ff1493, purple #8b5cf6, red #ff3366) need black text:
  * white on them is 3.64 / 4.23 / 3.55. Navy text on purple is 4.03. Pink and
- * purple text on navy-light need the *-light tokens (6.09 and 5.84). A hover
+ * purple copy uses the edu accent inks, which follow the sky scope. A hover
  * that only translates, or that fades the accent (`/80`), keeps the failure.
  */
 const ROOT = path.resolve(__dirname, '../../..');
@@ -49,17 +49,17 @@ describe('education landing contrast', () => {
 
   });
 
-  it('uses the light accent on navy cards, including hover', () => {
-    expect(page).not.toMatch(/'text-neo-pink'/);
-    expect(page).not.toMatch(/'text-neo-purple'/);
-    expect(page).toContain('text-neo-pink-light');
-    expect(page).toContain('text-neo-purple-light');
+  it('uses the sky accent inks for coloured copy, including hover', () => {
+    expect(page).not.toMatch(/'text-neo-pink(-light)?'/);
+    expect(page).not.toMatch(/'text-neo-purple(-light)?'/);
+    expect(page).toContain('text-edu-pink-ink');
+    expect(page).toContain('text-edu-purple-ink');
 
-    expect(client).not.toMatch(/text-neo-purple(?!-light)/);
+    expect(client).not.toMatch(/text-neo-purple/);
     expect(client).not.toContain('hover:text-neo-purple');
 
-    expect(upsell).not.toContain('text-neo-purple"');
-    expect(upsell).toContain('text-neo-purple-light');
+    expect(upsell).not.toMatch(/text-neo-purple(-light)?"/);
+    expect(upsell).toContain('text-edu-purple-ink');
   });
 
   it('does not put black text on a pink wash over navy', () => {

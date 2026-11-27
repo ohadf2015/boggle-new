@@ -178,7 +178,7 @@ export function TeacherProCheckoutCta({
         >
           {c.cta}
         </Link>
-        <p className="mt-2 text-center text-xs font-bold text-neo-white/70">{c.note}</p>
+        <p className="mt-2 text-center text-xs font-bold text-edu-ink/70">{c.note}</p>
       </div>
     );
   }
@@ -186,12 +186,12 @@ export function TeacherProCheckoutCta({
     <div
       ref={rootRef}
       data-testid="teacher-pro-checkout-cta"
-      className={`max-w-xl rounded-neo border-2 border-s-4 border-neo-cream/40 border-s-neo-pink bg-neo-navy-light p-4 text-neo-white sm:p-5 ${className}`}
+      className={`max-w-xl rounded-neo border-2 border-s-4 border-edu-line border-s-neo-pink bg-edu-surface p-4 text-edu-ink sm:p-5 ${className}`}
     >
-      <p className="font-neo-display text-base font-bold leading-snug text-neo-pink-light sm:text-lg">
+      <p className="font-neo-display text-base font-bold leading-snug text-edu-pink-ink sm:text-lg">
         {c.heading}
       </p>
-      <p className="mt-1.5 text-sm leading-relaxed text-neo-white/80">{c.body}</p>
+      <p className="mt-1.5 text-sm leading-relaxed text-edu-ink/80">{c.body}</p>
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
         <Link
           href={`/${locale}${TEACHER_PRO_CHECKOUT_PATH}`}
@@ -201,7 +201,7 @@ export function TeacherProCheckoutCta({
         >
           {c.cta}
         </Link>
-        <p className="text-xs font-semibold text-neo-white/65">{c.note}</p>
+        <p className="text-xs font-semibold text-edu-ink/65">{c.note}</p>
       </div>
     </div>
   );

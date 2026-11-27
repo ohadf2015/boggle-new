@@ -37,9 +37,9 @@ function RewardChestHarness() {
     const cash = Number(params.get('cash') ?? 16);
     const snapshot = { ...ZERO_ECONOMY_SNAPSHOT, cash, cashEarned: cash, streak: 4, multiplier: 2 as const, lastDelta: { kind: 'correct' as const, delta: 4, multiplier: 2 as const, cost: 0 } };
     return (
-      <main className="flex min-h-screen flex-col gap-6 bg-neo-navy p-4 text-white">
+      <main className="flex min-h-screen flex-col gap-6 bg-edu-page p-4 text-edu-ink">
         {params.get('setup') && <LobbyEconomyToggles value={economy} onChange={setEconomy} />}
-        <div className="rounded-neo border-3 border-neo-cream bg-neo-navy-light px-3 py-2 shadow-hard">
+        <div className="rounded-neo border-3 border-edu-line bg-edu-surface px-3 py-2 shadow-hard">
           <EconomyHud snapshot={snapshot} />
         </div>
         <PowerUpShop snapshot={snapshot} onBuy={() => {}} />
@@ -52,7 +52,7 @@ function RewardChestHarness() {
 
   if (surface === 'daily' || surface === 'goal') {
     return (
-      <main className="flex min-h-screen flex-col items-center gap-6 bg-neo-navy p-6 text-white">
+      <main className="flex min-h-screen flex-col items-center gap-6 bg-edu-page p-6 text-edu-ink">
         {surface === 'daily' ? (
           <DailyChest userId="dev-harness" reducedMotion={false} onGranted={() => {}} size="md" />
         ) : (
@@ -80,7 +80,7 @@ function RewardChestHarness() {
   };
 
   return (
-    <main className="min-h-screen bg-neo-navy p-6 text-white">
+    <main className="min-h-screen bg-edu-page p-6 text-edu-ink">
       <button type="button" data-testid="harness-open" onClick={() => setOpen(true)} className="rounded-xl border-2 border-black bg-neo-lime px-4 py-2 font-bold text-neo-navy">
         {t('economy.chest.open')}
       </button>

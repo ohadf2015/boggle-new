@@ -26,13 +26,13 @@ export function PublicTeacherPayCta({ locale }: { locale: string }) {
         data-testid="public-teacher-pay-cta"
         className="mx-auto w-full max-w-6xl px-4 py-4 text-center sm:px-6 lg:px-8"
       >
-        <p className="text-sm text-neo-cream/70">
+        <p className="text-sm text-edu-ink/70">
           {t('teacher.schoolBulkCta.text')}{' '}
           <a
             data-testid="school-bulk-pricing-link"
             data-ph-capture-attribute-cta="teacher_dashboard_school_bulk_pricing"
             href={`/${locale}/education/for-schools#lead`}
-            className="font-bold text-neo-lime underline"
+            className="font-bold text-edu-lime-ink underline"
           >
             {t('teacher.schoolBulkCta.link')}
           </a>

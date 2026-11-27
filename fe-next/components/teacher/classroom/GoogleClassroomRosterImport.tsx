@@ -8,7 +8,7 @@ const API = '/api/education/google-classroom';
 const K = 'teacher.classrooms.gcImport';
 
 const ACTION =
-  'flex min-h-10 w-full items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream/40 px-3 py-1.5 font-neo-body text-sm font-bold text-neo-cream hover:bg-neo-cream/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan disabled:opacity-60';
+  'flex min-h-10 w-full items-center justify-center gap-1.5 rounded-neo border-2 border-edu-line px-3 py-1.5 font-neo-body text-sm font-bold text-edu-ink hover:bg-edu-ink/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan disabled:opacity-60';
 
 interface Course {
   id: string;
@@ -84,7 +84,7 @@ export function GoogleClassroomRosterImport({ classroomId }: { classroomId: stri
   const courses = phase.kind === 'courses' || phase.kind === 'result' ? phase.courses : [];
 
   return (
-    <div className="mt-2 space-y-2 font-neo-body text-sm text-neo-cream" data-testid="gc-roster-import">
+    <div className="mt-2 space-y-2 font-neo-body text-sm text-edu-ink" data-testid="gc-roster-import">
       {phase.kind === 'idle' && (
         <button type="button" className={ACTION} onClick={loadCourses}>
           {t(`${K}.action`)}
@@ -116,7 +116,7 @@ export function GoogleClassroomRosterImport({ classroomId }: { classroomId: stri
             id={selectId}
             value={courseId}
             onChange={(e) => setCourseId(e.target.value)}
-            className="min-h-10 min-w-0 flex-1 rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-2 text-neo-cream"
+            className="min-h-10 min-w-0 flex-1 rounded-neo border-2 border-edu-line bg-edu-page px-2 text-edu-ink"
           >
             {courses.map((c) => (
               <option key={c.id} value={c.id}>
@@ -144,7 +144,7 @@ function RosterResult({ result, linked, busy, onLink }: { result: MatchResult; l
       {result.unmatched.length > 0 && (
         <div>
           <p className="font-bold">{t(`${K}.unmatchedTitle`, { count: result.unmatched.length })}</p>
-          <ul className="ps-4 list-disc text-neo-cream/80">
+          <ul className="ps-4 list-disc text-edu-ink/80">
             {result.unmatched.map((u, i) => (
               <li key={`${u.displayName}-${i}`}>{u.displayName}</li>
             ))}
@@ -154,8 +154,8 @@ function RosterResult({ result, linked, busy, onLink }: { result: MatchResult; l
       {needConsent.length > 0 && (
         <div>
           <p className="font-bold">{t(`${K}.consentTitle`, { count: needConsent.length })}</p>
-          <p className="text-neo-cream/80">{t(`${K}.consentHint`)}</p>
-          <ul className="ps-4 list-disc text-neo-cream/80">
+          <p className="text-edu-ink/80">{t(`${K}.consentHint`)}</p>
+          <ul className="ps-4 list-disc text-edu-ink/80">
             {needConsent.map((m) => (
               <li key={m.studentId}>{m.name || t('teacher.classrooms.students.unknown')}</li>
             ))}

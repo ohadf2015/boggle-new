@@ -54,7 +54,7 @@ export default function WordSkillFields({
     <>
       {/* Multiple meanings — 2+ senses unlock the multiple-meaning drill */}
       <label className="block">
-        <span className="text-xs text-neo-white/80 font-neo-body">{t('teacher.wordDetails.meanings')}</span>
+        <span className="text-xs text-edu-ink/80 font-neo-body">{t('teacher.wordDetails.meanings')}</span>
         <Input
           value={meaningsDraft ?? joinSenses(word.meanings)}
           onChange={(e) => onMeaningsChange(index, e.target.value)}
@@ -67,18 +67,18 @@ export default function WordSkillFields({
             isAiFilled('meanings') && aiHighlightClass
           )}
         />
-        <span className="block mt-1 text-[11px] text-neo-white/60 font-neo-body">
+        <span className="block mt-1 text-[11px] text-edu-ink/60 font-neo-body">
           {t('teacher.wordDetails.meaningsHelp')}
         </span>
       </label>
 
       {/* Word parts — root / prefix / suffix drive the roots & affixes drill */}
       <fieldset className="border-0 p-0 m-0">
-        <legend className="text-xs text-neo-white/80 font-neo-body">{t('teacher.wordDetails.morphology')}</legend>
+        <legend className="text-xs text-edu-ink/80 font-neo-body">{t('teacher.wordDetails.morphology')}</legend>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-1">
           {MORPHEME_FIELDS.map((field) => (
             <label key={field} className="block">
-              <span className="text-[11px] text-neo-white/70 font-neo-body">
+              <span className="text-[11px] text-edu-ink/70 font-neo-body">
                 {t(`teacher.wordDetails.${field}`)}
               </span>
               <Input
@@ -95,7 +95,7 @@ export default function WordSkillFields({
             </label>
           ))}
         </div>
-        <span className="block mt-1 text-[11px] text-neo-white/60 font-neo-body">
+        <span className="block mt-1 text-[11px] text-edu-ink/60 font-neo-body">
           {t('teacher.wordDetails.morphologyHelp')}
         </span>
       </fieldset>

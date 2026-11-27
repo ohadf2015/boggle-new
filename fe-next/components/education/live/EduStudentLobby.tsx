@@ -12,7 +12,6 @@ import { LIVE_KEYFRAMES, PRESS } from "./eduLiveStyles";
 import { EduStudentLobbyCrowd } from "./EduStudentLobbyCrowd";
 import { EduStudentLobbyFold } from "./EduStudentLobbyFold";
 import { EduStudentLobbyHud } from "./EduStudentLobbyHud";
-import { AcademyBackdrop } from "@/components/student/academy/AcademyBackdrop";
 
 const STICKER_KEYFRAMES =
   "@keyframes edu-sticker-slap{0%{transform:rotate(-30deg) scale(2)}100%{transform:rotate(-8deg) scale(1)}}";
@@ -57,16 +56,17 @@ export function EduStudentLobby({
   return (
     <div
       data-testid="edu-student-lobby"
-      className="relative isolate flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream"
+      className="relative isolate flex min-h-0 flex-1 flex-col overflow-hidden bg-edu-page text-edu-ink"
     >
-      <AcademyBackdrop art="arena" />
       <style>{LIVE_KEYFRAMES + STICKER_KEYFRAMES}</style>
       <header className="flex shrink-0 items-center justify-between gap-3 pe-16 ps-4 pt-3">
         <span
           data-testid="edu-student-count"
-          className="inline-flex items-center gap-1.5 rounded-full border-[3px] border-neo-black bg-neo-cyan px-3 py-1 font-neo-display text-sm font-black text-neo-black shadow-hard-sm"
+          className="inline-flex min-h-11 items-center gap-2 rounded-neo border-[3px] border-edu-line bg-edu-surface py-1 pe-3 ps-1 font-neo-display text-base font-black text-edu-ink shadow-edu-lip-sm"
         >
-          <Users className="size-4" aria-hidden="true" />
+          <span data-testid="edu-student-count-icon" aria-hidden="true" className="grid size-8 place-items-center rounded-[0.5rem] bg-neo-yellow text-neo-black">
+            <Users className="size-5" strokeWidth={2.5} />
+          </span>
           {t("eduLiveRoom.student.inClass", { count: classSize })}
         </span>
         <button
@@ -75,7 +75,7 @@ export function EduStudentLobby({
           onClick={onExit}
           aria-label={t("eduLiveRoom.student.leave")}
           className={cn(
-            "inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated px-3 font-neo-display text-sm font-black uppercase text-neo-cream shadow-hard-sm hover:bg-neo-navy-light",
+            "inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 font-neo-display text-base font-black uppercase text-edu-ink shadow-edu-lip-sm hover:bg-edu-surface",
             PRESS,
           )}
         >
@@ -87,7 +87,7 @@ export function EduStudentLobby({
       <main className="relative flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-3 [container-type:size]">
         <div
           data-testid="edu-student-panel"
-          className="mx-auto my-auto grid w-full max-w-lg shrink-0 grid-cols-1 gap-4 rounded-neo-lg border-4 border-neo-cream bg-neo-navy-light p-4 shadow-hard-lg lg:max-w-5xl lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[auto_1fr] lg:gap-x-10 lg:p-8 tv:max-w-6xl"
+          className="mx-auto my-auto grid w-full max-w-lg shrink-0 grid-cols-1 gap-4 rounded-neo-xl border-[3px] border-edu-line bg-edu-surface p-4 shadow-edu-lip lg:max-w-5xl lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[auto_1fr] lg:gap-x-10 lg:p-8 tv:max-w-6xl"
         >
           <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 lg:col-start-2 lg:row-start-1 lg:self-start">
             <div className="relative row-span-2 shrink-0">
@@ -97,7 +97,7 @@ export function EduStudentLobby({
                 onClick={onEditAvatar}
                 aria-label={t("eduLiveRoom.student.changeLook")}
                 className={cn(
-                  "relative block size-16 overflow-hidden rounded-full border-4 border-neo-black bg-neo-cream shadow-hard [&_svg]:h-full [&_svg]:w-full lg:size-20",
+                  "relative block size-20 overflow-hidden rounded-full border-[3px] border-neo-black bg-neo-cream [&_svg]:h-full [&_svg]:w-full lg:size-24",
                   PRESS,
                   isReady && "ring-4 ring-neo-lime",
                 )}
@@ -120,10 +120,10 @@ export function EduStudentLobby({
               )}
             </div>
             <div className="col-start-2 row-start-1 min-w-0">
-              <h1 className="font-neo-display text-sm font-black uppercase tracking-wide text-neo-lime">
+              <h1 className="w-max rounded-[0.375rem] bg-neo-pink px-2 py-0.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-black">
                 {t("eduLiveRoom.student.youreIn")}
               </h1>
-              <div className="min-w-0 font-neo-display text-2xl font-black leading-tight [overflow-wrap:anywhere]">
+              <div className="mt-1 min-w-0 font-neo-display text-3xl font-black leading-tight [overflow-wrap:anywhere]">
                 {nameSlot}
               </div>
             </div>
@@ -163,13 +163,13 @@ export function EduStudentLobby({
 
       <footer
         data-testid="edu-student-lobby-bar"
-        className="shrink-0 border-t-[3px] border-neo-cream bg-neo-navy-light px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3"
+        className="shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-1"
       >
         <div className="mx-auto flex w-full max-w-lg flex-col gap-2">
           <p
             data-testid="edu-student-waiting"
             role="status"
-            className="text-center font-neo-body text-sm font-bold leading-snug text-neo-cream lg:text-base"
+            className="text-center font-neo-display text-base font-bold leading-snug text-edu-ink lg:text-lg"
           >
             {t(waitingKey)}
           </p>
@@ -177,7 +177,7 @@ export function EduStudentLobby({
             <>
               <p
                 data-testid="study-ready-locked"
-                className="flex min-h-14 items-center justify-center gap-2 rounded-neo border-[3px] border-dashed border-neo-cream/50 px-3 py-2 text-center font-neo-display text-base font-bold text-neo-cream"
+                className="flex min-h-14 items-center justify-center gap-2 rounded-neo border-[3px] border-dashed border-edu-line px-3 py-2 text-center font-neo-display text-base font-bold text-edu-ink"
               >
                 <Lock className="size-5 shrink-0" aria-hidden="true" />
                 {t(
@@ -193,7 +193,7 @@ export function EduStudentLobby({
                   data-testid="study-skip"
                   onClick={() => setSkipped(true)}
                   className={cn(
-                    "min-h-11 rounded-neo font-neo-display text-base font-black text-neo-cream underline underline-offset-4",
+                    "min-h-11 rounded-neo font-neo-display text-base font-black text-edu-ink underline underline-offset-4",
                     PRESS,
                   )}
                 >

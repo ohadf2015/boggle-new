@@ -64,9 +64,21 @@ describe('access PageClient — CLS reserve while access is loading', () => {
 
   it('Suspense fallback in page.tsx reserves pitch chrome, not the approved card', () => {
     const src = readFileSync(join(__dirname, '..', 'page.tsx'), 'utf8');
-    expect(src).toMatch(/max-w-md/);
-    expect(src).toMatch(/h-\[136px\] w-\[136px\]/);
+    expect(src).toMatch(/max-w-lg/);
+    expect(src).toMatch(/h-\[176px\] sm:h-\[232px\]/);
     expect(src).toMatch(/min-h-\[220px\]/);
     expect(src).not.toMatch(/already_approved/);
+  });
+
+  it('Given the sky page, Then the mascot stands between chunky A/B tiles, not in a faded cyan box', () => {
+    render(<PageClient />);
+    const art = screen.getByTestId('access-art');
+    expect(art.className).not.toMatch(/bg-neo-cyan\/\d+|border-neo-cyan\/\d+/);
+    expect(art.querySelectorAll('.edu-tile')).toHaveLength(2);
+    expect(art.className).toMatch(/h-\[176px\] sm:h-\[232px\]/);
+    const stage = screen.getByTestId('access-stage');
+    expect(stage.parentElement).toBe(art);
+    expect(stage.contains(screen.getByTestId('access-mascot'))).toBe(false);
+    expect(readFileSync(join(__dirname, '..', 'page.tsx'), 'utf8')).not.toMatch(/bg-neo-cyan\/10/);
   });
 });

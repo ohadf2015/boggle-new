@@ -33,6 +33,14 @@ describe('TvLeaderboard — classroom rows that fit the card', () => {
     expect(screen.getByTestId('tv-classroom-more')).toHaveTextContent('tvBroadcast.moreStudents:{"count":1}');
   });
 
+  it('Given the sky wall, Then the title and overflow line read in page ink, not cream or yellow', () => {
+    fitRef.current = 3;
+    render(<TvLeaderboard players={players(4)} classroom t={t} />);
+    const html = screen.getByTestId('tv-classroom-standings').outerHTML;
+    expect(html).not.toMatch(/text-neo-cream|text-neo-yellow/);
+    expect(screen.getByTestId('tv-classroom-more').className).toContain('text-edu-ink');
+  });
+
   it('Given room for everyone, Then no overflow line is drawn', () => {
     fitRef.current = 8;
     render(<TvLeaderboard players={players(4)} classroom t={t} />);

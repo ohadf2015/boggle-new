@@ -26,7 +26,7 @@ export function StudentAssignmentResumeCard({ next }: StudentAssignmentResumeCar
   return (
     <div
       data-testid={STUDENT_ASSIGNMENT_RESUME_TESTID}
-      className="mb-3 rounded-neo border-3 border-neo-black bg-neo-cyan p-3 shadow-hard-sm"
+      className="mb-3 rounded-neo border-3 border-neo-black bg-neo-cyan p-3 shadow-edu-lip-sm"
     >
       <p className="font-neo-body text-xs font-black uppercase text-neo-black/70">
         {t('student.classView.resumeAssignmentLabel', 'Continue your assignment')}
@@ -41,7 +41,7 @@ export function StudentAssignmentResumeCard({ next }: StudentAssignmentResumeCar
             lesson_id: next.lessonId,
           });
         }}
-        className="mt-2 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-white px-4 py-3 font-neo-display text-lg font-black uppercase text-neo-black outline-none transition-transform hover:-translate-y-0.5 active:translate-y-[2px] focus-visible:ring-2 focus-visible:ring-neo-yellow"
+        className="mt-2 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-edu-paper px-4 py-3 font-neo-display text-lg font-black uppercase text-neo-black outline-none transition-transform hover:-translate-y-0.5 active:translate-y-[2px] focus-visible:ring-2 focus-visible:ring-neo-yellow"
       >
         <DirectionalIcon icon={Play} mirror className="h-5 w-5 fill-neo-black text-neo-black" />
         <span dir="auto" className="line-clamp-2 text-center">

@@ -4,7 +4,7 @@ import { Users } from 'lucide-react';
 import XpProgressBar from '@/components/education/XpProgressBar';
 import type { Translate } from './eduLiveStyles';
 
-const CARD = 'rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-elevated p-3 shadow-hard';
+const CARD = 'rounded-neo-lg border-[3px] border-edu-line bg-edu-surface p-3 shadow-hard';
 
 export function EduStudentXpBar({ totalXp }: { totalXp: number }) {
   return (

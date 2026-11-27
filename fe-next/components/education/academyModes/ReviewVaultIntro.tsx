@@ -164,38 +164,23 @@ export function ReviewVaultIntro({
         transition={{ type: 'spring', stiffness: 260, damping: 22, delay: reduce ? 0 : 0.15 }}
         className={INTRO_COPY}
       >
-        <p className={cn(INTRO_KICKER, 'text-neo-cyan')}>{lessonName}</p>
+        <p className={cn(INTRO_KICKER, 'text-edu-cyan-ink')}>{lessonName}</p>
         <h2 className={cn(INTRO_TITLE, 'mb-1 lg:text-[clamp(2.25rem,min(4.4vw,7.5vh),7rem)]')} style={{ textShadow: '3px 3px 0 rgb(var(--neo-black))' }}>
           {loading ? t('common.loading', 'Loading…') : t('academy.modes.review.vaultTitle', '{count} words locked in the vault', { count: words.length })}
         </h2>
-        <p className="mb-3 font-neo-body text-sm text-neo-cream sm:text-base [@media(orientation:landscape)_and_(max-height:520px)]:mb-2! [@media(orientation:landscape)_and_(max-height:520px)]:text-sm! lg:mb-[clamp(1rem,3.5vh,2rem)] lg:text-[clamp(1rem,min(1.6vw,2.6vh),1.75rem)]">
+        <p className="mb-3 font-neo-body text-sm text-edu-ink sm:text-base [@media(orientation:landscape)_and_(max-height:520px)]:mb-2! [@media(orientation:landscape)_and_(max-height:520px)]:text-sm! lg:mb-[clamp(1rem,3.5vh,2rem)] lg:text-[clamp(1rem,min(1.6vw,2.6vh),1.75rem)]">
           {t('academy.modes.review.introBody', '{n} quick cards, then open the chest.', { n: REVIEW_RUN_SIZE })}
         </p>
         <m.button
           type="button"
           data-testid={loading ? 'review-start-pending' : 'review-start'}
           disabled={loading}
-          whileTap={{ scale: 0.95 }}
           onClick={onStart}
-          animate={
-            reduce || loading
-              ? undefined
-              : {
-                  boxShadow: [
-                    '6px 6px 0 rgb(var(--neo-black)), 0 0 16px rgba(0,255,255,0.4)',
-                    '6px 6px 0 rgb(var(--neo-black)), 0 0 44px rgba(0,255,255,0.95)',
-                    '6px 6px 0 rgb(var(--neo-black)), 0 0 16px rgba(0,255,255,0.4)',
-                  ],
-                }
-          }
-          transition={reduce ? undefined : { duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
           className={cn(
             INTRO_CTA,
             'text-2xl [@media(orientation:landscape)_and_(max-height:520px)]:text-xl! lg:text-[clamp(1.5rem,min(3vw,5vh),4.25rem)]',
           )}
-          style={{ background: 'linear-gradient(180deg, color-mix(in srgb, var(--neo-cyan-light) 45%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-cyan) 80%, var(--neo-purple-light)) 45%, var(--neo-purple) 120%)', boxShadow: '6px 6px 0 rgb(var(--neo-black)), 0 0 28px rgba(0,255,255,0.7)' }}
         >
-          <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-neo-white/60" />
           <KeyRound className="relative h-[1.2em] w-[1.2em] shrink-0" aria-hidden />
           <span className="relative">{loading ? t('common.loading', 'Loading…') : t('academy.modes.review.crack', 'Crack the vault')}</span>
         </m.button>

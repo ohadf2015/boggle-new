@@ -77,9 +77,9 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
           data-testid="reteach-more-actions"
           className={cn(
             'flex cursor-pointer list-none items-center gap-2 rounded-neo px-4 py-2 [&::-webkit-details-marker]:hidden',
-            'border-[3px] border-neo-cream bg-neo-navy-elevated text-neo-cream shadow-hard-sm',
+            'border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink shadow-hard-sm',
             'font-neo-display text-base font-black uppercase tracking-wide lg:text-xl min-[2200px]:px-6 min-[2200px]:py-3 min-[2200px]:text-3xl',
-            'min-h-11 hover:bg-neo-purple/30 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan'
+            'min-h-11 hover:bg-neo-purple/30 edu-sky:hover:bg-neo-purple/30 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan'
           )}
         >
           <MoreHorizontal className="size-5 shrink-0 lg:size-6 min-[2200px]:size-9" aria-hidden />
@@ -88,9 +88,9 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
         </summary>
         <div
           data-testid="reteach-more-panel"
-          className="absolute inset-x-0 z-30 max-lg:top-full max-lg:bottom-auto max-lg:mt-2 lg:bottom-full lg:mb-2 max-h-[min(60dvh,34rem)] overflow-y-auto overscroll-contain rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy p-3 shadow-hard-lg"
+          className="absolute inset-x-0 z-30 max-lg:top-full max-lg:bottom-auto max-lg:mt-2 lg:bottom-full lg:mb-2 max-h-[min(60dvh,34rem)] overflow-y-auto overscroll-contain rounded-neo-lg border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface p-3 shadow-hard-lg"
         >
-          <p className="mb-3 font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream lg:text-base">
+          <p className="mb-3 font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream edu-sky:text-edu-ink lg:text-base">
             {t('education.results.moreWaysToReteach')}
           </p>
           <ReteachOptionGrid
@@ -147,7 +147,7 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
       {statusNote && <div className="mt-2">{statusNote}</div>}
 
       {sendHome && (
-      <details className="group mt-3 rounded-neo border-[3px] border-neo-cream bg-neo-navy overflow-hidden">
+      <details className="group mt-3 rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface overflow-hidden">
         <summary
           data-testid="reteach-more-actions"
           className={cn(
@@ -155,9 +155,9 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
             // A 2px cream edge, not navy-on-navy: a disclosure is a control and
             // has to have a visible edge on a dark card (design addendum —
             // fill OR border must clear 3:1 against what surrounds it).
-            'font-neo-display font-bold text-sm text-neo-white bg-neo-navy-elevated',
-            'border-2 border-neo-cream',
-            'min-h-11 hover:bg-neo-purple/30 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan'
+            'font-neo-display font-bold text-sm text-neo-white edu-sky:text-edu-ink bg-neo-navy-elevated edu-sky:bg-edu-surface',
+            'border-2 border-neo-cream edu-sky:border-edu-line',
+            'min-h-11 hover:bg-neo-purple/30 edu-sky:hover:bg-neo-purple/30 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan'
           )}
         >
           {t('education.results.moreWaysToReteach')}
@@ -172,8 +172,8 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
 }
 
 const ROW =
-  'flex w-full items-center gap-2.5 rounded-neo border-[2px] border-neo-cream/70 bg-neo-navy-elevated px-3 py-2 ' +
-  'min-h-11 text-start font-neo-body text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
+  'flex w-full items-center gap-2.5 rounded-neo border-[2px] border-neo-cream/70 edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface px-3 py-2 ' +
+  'min-h-11 text-start font-neo-body text-sm font-bold text-neo-cream edu-sky:text-edu-ink transition-colors hover:border-neo-cream edu-sky:hover:border-edu-line hover:bg-neo-navy-light edu-sky:hover:bg-edu-surface focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
 const ICON = 'grid size-7 shrink-0 place-items-center rounded-neo border-2 border-neo-black text-neo-black [&>svg]:size-4';
 
@@ -189,7 +189,7 @@ function RowContent({ icon, tone, label }: { icon: ReactNode; tone: string; labe
 function Group({ testId, title, children }: { testId: string; title: string; children: ReactNode }) {
   return (
     <section data-testid={testId} className="flex flex-col gap-1.5">
-      <h3 className="font-neo-display text-xs font-black uppercase tracking-widest text-neo-yellow lg:text-sm">{title}</h3>
+      <h3 className="font-neo-display text-xs font-black uppercase tracking-widest text-neo-yellow edu-sky:text-edu-yellow-ink lg:text-sm">{title}</h3>
       <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">{children}</div>
     </section>
   );
@@ -252,7 +252,7 @@ function ReteachOptionGrid({
         {googleLinks.length > 0 && (
           <details data-testid="reteach-google-classroom" className="group/gc rounded-neo">
             <summary className={cn(ROW, 'cursor-pointer list-none [&::-webkit-details-marker]:hidden')}>
-              <RowContent icon={<GraduationCap />} tone="bg-neo-white" label={t('eduLive.reteach.googleClassroom')} />
+              <RowContent icon={<GraduationCap />} tone="bg-neo-white edu-sky:bg-edu-paper" label={t('eduLive.reteach.googleClassroom')} />
               <ChevronDown className="size-4 shrink-0 transition-transform group-open/gc:rotate-180" aria-hidden />
             </summary>
             <div className="mt-1.5 flex flex-col gap-1.5 ps-3">
@@ -276,7 +276,7 @@ function ReteachOptionGrid({
         <button type="button" data-testid="share-miss-gap-practice" onClick={links.onShareMissGapPractice} className={ROW}>
           <RowContent
             icon={links.missGapShareState === 'idle' ? <Share2 /> : <Check />}
-            tone={links.missGapShareState === 'idle' ? 'bg-neo-white' : 'bg-neo-lime'}
+            tone={links.missGapShareState === 'idle' ? 'bg-neo-white edu-sky:bg-edu-paper' : 'bg-neo-lime'}
             label={t(links.missGapShareState === 'idle' ? 'education.results.shareMissGapPractice' : 'education.results.shareMissGapPracticeCopied')}
           />
         </button>

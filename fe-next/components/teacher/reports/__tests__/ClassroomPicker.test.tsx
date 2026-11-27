@@ -44,3 +44,15 @@ describe('<ClassroomPicker>', () => {
     expect(accentFor(0)).not.toBe(accentFor(1));
   });
 });
+
+describe('ClassroomPicker on the sky page', () => {
+  it('Then each class is a solid cream card with a black lip, a big badge square and no translucent pill', () => {
+    render(<ClassroomPicker classrooms={[{ id: 'a', name: '5B English', member_count: 3 }]} onSelect={vi.fn()} />);
+    const card = screen.getByRole('button');
+    expect(card.className).toContain('shadow-edu-lip');
+    expect(card.className).toContain('border-[3px]');
+    expect(card.className).not.toMatch(/bg-edu-surface\/\d+/);
+    expect(card.innerHTML).not.toMatch(/bg-neo-black\/\d+/);
+    expect(screen.getByText('5B').closest('[aria-hidden]')!.className).toContain('size-20');
+  });
+});

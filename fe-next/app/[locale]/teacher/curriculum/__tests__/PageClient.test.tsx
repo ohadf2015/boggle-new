@@ -138,7 +138,7 @@ describe('CurriculumPageClient', () => {
       const wrapper = container.firstChild as HTMLElement;
       expect(wrapper).toHaveClass('h-dvh');
       expect(wrapper).toHaveClass('overflow-hidden');
-      expect(wrapper).toHaveClass('bg-neo-navy');
+      expect(wrapper).toHaveClass('bg-edu-page');
     });
   });
 

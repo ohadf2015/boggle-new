@@ -47,6 +47,8 @@ import type { ClearedTileEvent } from './BlastEffectsCanvas';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
 import type { BlastHudProgress } from '@/components/blast/progress/BlastHudProgress';
 import { BlastGemCollectFx } from './effects/BlastGemCollectFx';
+import { blastStageSkin } from './blastStageSkin';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 interface BlastStageProps {
   // From engine
@@ -194,6 +196,7 @@ export const BlastStage = memo(function BlastStage({
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
   // MP Blast has timer props; SP Blast doesn't. Timer-era games hide the wave chip.
   const isMultiplayer = remainingTime !== null && remainingTime !== undefined;
+  const skin = blastStageSkin(useClassroomBoard());
 
   // In real MP the local engine never scores (server-authoritative cascades), so
   // the engine's `score` stays 0. Read the player's live score from the broadcast
@@ -378,7 +381,7 @@ export const BlastStage = memo(function BlastStage({
             <BlastBoardFooter teaching={firstUseTeaching ?? null} busy={Boolean(liveWord || currentFeedback)} onDismissTeaching={dismissFirstUse} isMultiplayer={isMultiplayer}>
               <div className="relative z-40 flex min-h-[44px] w-full max-w-[360px] shrink-0 items-center justify-center gap-2 px-2 md:max-w-[480px]">
                 <WordFormingArea word={liveWord} letterCount={liveWord.length} feedback={currentFeedback} compact morphLayout={false} />
-                {liveWord && <span className="text-[10px] font-bold tabular-nums text-white">{liveWord.length}</span>}
+                {liveWord && <span className={skin.wordLength}>{liveWord.length}</span>}
               </div>
             </BlastBoardFooter>
           )}
@@ -443,8 +446,8 @@ export const BlastStage = memo(function BlastStage({
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none"
             >
-              <div className="px-5 py-2 rounded-neo bg-neo-navy border-3 border-neo-black shadow-hard">
-                <span className="text-neo-lime font-neo-display text-xl font-black tracking-wide">
+              <div className={skin.cascadeBadge}>
+                <span className={skin.cascadeWord}>
                   {cascadeHighlightWord}
                 </span>
               </div>

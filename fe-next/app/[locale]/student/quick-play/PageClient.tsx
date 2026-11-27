@@ -19,7 +19,7 @@ function StudentQuickPlay() {
 export default function StudentQuickPlayPageClient() {
   return (
     <Suspense fallback={<div className="flex min-h-dvh"><PageLoader priority={false} /></div>}>
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-edu-page">
         <StudentQuickPlay />
         <ClassLiveGameBanner />
       </div>

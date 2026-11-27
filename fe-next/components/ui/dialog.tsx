@@ -112,6 +112,7 @@ const DialogContent = React.forwardRef<
         "max-h-[90vh] sm:max-h-[85vh]",
         // Neo-Brutalist styling
         "bg-neo-cream dark:bg-neo-navy text-neo-black dark:text-neo-white",
+        "edu-sky:bg-edu-surface edu-sky:text-edu-ink edu-sky:border-edu-line",
         // Border - supports thick variant for modal emphasis
         thickBorder
           ? "border-[6px] border-neo-black dark:border-slate-600"

@@ -26,14 +26,14 @@ function TeacherPlanChip({ plan, href, t }: { plan: TeacherPlan; href: string; t
       className={cn(
         'flex min-h-[44px] min-w-0 items-center',
         'transition-transform duration-150 active:scale-[0.97]',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface',
       )}
     >
       {plan === 'pro' ? (
         <ProBadge size="sm" label={t(CHIP_LABEL.pro)} />
       ) : (
-        <span className="inline-flex min-w-0 items-center gap-1 rounded-neo-pill border-2 border-neo-cream/40 px-2.5 py-1 font-neo-display text-sm font-bold text-neo-cream">
-          <Crown className="size-4 shrink-0 text-neo-yellow" aria-hidden="true" />
+        <span className="inline-flex min-w-0 items-center gap-1 rounded-neo-pill border-2 border-edu-line px-2.5 py-1 font-neo-display text-sm font-bold text-edu-ink">
+          <Crown className="size-4 shrink-0 text-edu-yellow-ink" aria-hidden="true" />
           <span className="truncate">{t(CHIP_LABEL[plan])}</span>
         </span>
       )}
@@ -65,7 +65,7 @@ export function EducationShellNav({
     return (
       <div
         data-testid="teacher-topbar"
-        className="flex shrink-0 items-center justify-between gap-3 border-b-[3px] border-neo-cream bg-neo-navy px-4 py-2 lg:hidden"
+        className="flex shrink-0 items-center justify-between gap-3 border-b-[3px] border-edu-line bg-edu-surface px-4 py-2 lg:hidden"
       >
         <TeacherBrand href={home} t={t} compact />
         <div className="flex min-w-0 items-center gap-1">

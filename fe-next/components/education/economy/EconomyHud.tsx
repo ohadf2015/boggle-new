@@ -24,7 +24,7 @@ export default function EconomyHud({ snapshot }: EconomyHudProps) {
   const doubling = snapshot.doubleCashMsLeft > 0;
 
   return (
-    <div className="flex min-w-0 items-center justify-between gap-2 whitespace-nowrap text-sm font-bold text-white" aria-live="polite">
+    <div className="flex min-w-0 items-center justify-between gap-2 whitespace-nowrap text-sm font-bold text-edu-ink" aria-live="polite">
       <span className="relative inline-flex items-center gap-2 font-neo-display text-xl font-black" data-testid="hud-cash">
         <CoinArt size={24} />
         <span className="sr-only">{t('economy.hud.cash', { cash: snapshot.cash })}</span>
@@ -48,7 +48,7 @@ export default function EconomyHud({ snapshot }: EconomyHudProps) {
           <m.span
             key={`${snapshot.cashEarned}-${delta.delta}`}
             dir="ltr"
-            className="relative text-xl text-neo-lime"
+            className="relative text-xl text-edu-lime-ink"
             initial={reduced ? false : { scale: 1.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 380, damping: 12 }}
@@ -56,13 +56,13 @@ export default function EconomyHud({ snapshot }: EconomyHudProps) {
             {`+${delta.delta}`}
           </m.span>
         )}
-        {delta?.kind === 'wrong' && delta.cost > 0 && <span dir="ltr" className="text-xl text-neo-pink">{`-${delta.cost}`}</span>}
+        {delta?.kind === 'wrong' && delta.cost > 0 && <span dir="ltr" className="text-xl text-edu-pink-ink">{`-${delta.cost}`}</span>}
       </span>
 
       {snapshot.streak >= 1 && (
         <m.span
           key={`streak-${snapshot.multiplier}`}
-          className={hot ? 'inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-orange px-2 py-0.5 text-neo-navy' : 'inline-flex items-center gap-1 rounded-full border-2 border-white/40 px-2 py-0.5 text-white'}
+          className={hot ? 'inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-orange px-2 py-0.5 text-neo-navy' : 'inline-flex items-center gap-1 rounded-full border-2 border-edu-line px-2 py-0.5 text-edu-ink'}
           data-testid="hud-streak"
           initial={reduced ? false : { scale: 1.25 }}
           animate={{ scale: 1 }}
@@ -75,7 +75,7 @@ export default function EconomyHud({ snapshot }: EconomyHudProps) {
       )}
 
       {doubling && (
-        <span className="text-neo-cyan" data-testid="hud-double">
+        <span className="text-edu-cyan-ink" data-testid="hud-double">
           {t('economy.hud.doubleCash', { seconds: Math.ceil(snapshot.doubleCashMsLeft / 1000) })}
         </span>
       )}

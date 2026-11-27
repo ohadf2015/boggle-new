@@ -105,7 +105,7 @@ export default function RivalTicker({ socket, className }: RivalTickerProps) {
     <div data-testid="rival-ticker" className={cn('@container w-full min-w-0', className)} aria-label={t('education.rivals.ticker.label')}>
       <ul
         data-testid="rival-ticker-list"
-        className="flex min-h-[2.2em] min-w-0 items-center gap-[1.5cqi] overflow-hidden whitespace-nowrap font-neo-display text-[clamp(1.125rem,2.1cqi,2.5rem)] font-bold text-neo-cream"
+        className="flex min-h-[2.2em] min-w-0 items-center gap-[1.5cqi] overflow-hidden whitespace-nowrap font-neo-display text-[clamp(1.125rem,2.1cqi,2.5rem)] font-bold text-edu-ink"
       >
         {lead && (
           <li
@@ -114,7 +114,9 @@ export default function RivalTicker({ socket, className }: RivalTickerProps) {
             data-kind="lead"
             className={cn(ITEM, 'max-w-full shrink-0 px-[1cqi]', lead.fading ? 'opacity-0' : 'motion-safe:animate-pop-in')}
           >
-            <Zap className="size-[1.1em] shrink-0 text-neo-lime" aria-hidden="true" />
+            <span data-testid="rival-ticker-bolt" className="grid size-[1.5em] shrink-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-pink text-neo-black" aria-hidden="true">
+              <Zap className="size-[0.9em]" />
+            </span>
             <TickerAvatar item={lead} />
             <span>{t('education.rivals.ticker.flip', { name: lead.name })}</span>
           </li>
@@ -129,7 +131,7 @@ export default function RivalTicker({ socket, className }: RivalTickerProps) {
                   data-testid="rival-ticker-item"
                   data-kind="chip"
                   aria-label={t('education.rivals.ticker.flip', { name: item.name })}
-                  className={cn(ITEM, 'h-[1.9em] shrink-0 px-[0.7cqi] text-neo-cream', item.fading ? 'opacity-0' : 'motion-safe:animate-pop-in')}
+                  className={cn(ITEM, 'h-[1.9em] shrink-0 px-[0.7cqi] text-edu-ink', item.fading ? 'opacity-0' : 'motion-safe:animate-pop-in')}
                 >
                   <TickerAvatar item={item} />
                   <bdi aria-hidden="true">{item.name}</bdi>
@@ -143,7 +145,7 @@ export default function RivalTicker({ socket, className }: RivalTickerProps) {
   );
 }
 
-const ITEM = 'flex items-center gap-[0.6cqi] rounded-neo border-2 border-neo-cream/40 bg-neo-navy py-[0.4cqi] shadow-hard-sm transition-opacity duration-700 motion-reduce:transition-none';
+const ITEM = 'flex items-center gap-[0.6cqi] rounded-neo border-2 border-edu-line bg-edu-surface py-[0.4cqi] shadow-hard-sm transition-opacity duration-700 motion-reduce:transition-none';
 
 function TickerAvatar({ item }: { item: TickerItem }) {
   return (

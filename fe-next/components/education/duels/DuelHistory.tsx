@@ -101,7 +101,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader size="lg" />
-        <p className="ms-4 text-neo-white">{t('duels.loading')}</p>
+        <p className="ms-4 text-edu-ink">{t('duels.loading')}</p>
       </div>
     );
   }
@@ -111,11 +111,11 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
     return (
       <div className={cn('max-w-4xl mx-auto p-6', className)}>
         <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-          <Swords className="w-16 h-16 text-neo-white mb-4" />
-          <h2 className="text-2xl font-neo-display font-bold text-neo-white mb-2">
+          <Swords className="w-16 h-16 text-edu-ink mb-4" />
+          <h2 className="text-2xl font-neo-display font-bold text-edu-ink mb-2">
             {t('duels.noDuelsYet')}
           </h2>
-          <p className="text-neo-white">{t('duels.challengeClassmate')}</p>
+          <p className="text-edu-ink">{t('duels.challengeClassmate')}</p>
         </div>
       </div>
     );
@@ -125,8 +125,8 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
     <div className={cn('max-w-4xl mx-auto p-6', className)}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <Trophy className="w-6 h-6 text-neo-lime" />
-        <h1 className="text-2xl font-neo-display font-bold text-neo-white">
+        <Trophy className="w-6 h-6 text-edu-lime-ink" />
+        <h1 className="text-2xl font-neo-display font-bold text-edu-ink">
           {t('duels.duelHistory')}
         </h1>
       </div>
@@ -181,7 +181,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
 
       {/* Recent Duels */}
       <div>
-        <h2 className="text-lg font-neo-display font-bold text-neo-white mb-4">
+        <h2 className="text-lg font-neo-display font-bold text-edu-ink mb-4">
           {t('duels.recentDuels')}
         </h2>
 
@@ -229,8 +229,8 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 className={cn(
-                  'p-4 rounded-neo border-[2px] border-neo-cream shadow-hard flex items-center gap-4',
-                  'bg-neo-navy',
+                  'p-4 rounded-neo border-[2px] border-edu-line shadow-hard flex items-center gap-4',
+                  'bg-edu-surface',
                   isWin && 'border-s-4 border-s-green-500',
                   isLoss && 'border-s-4 border-s-red-500',
                   isDraw && 'border-s-4 border-s-yellow-500'
@@ -246,23 +246,23 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
                 {/* Badge */}
                 <div
                   className={cn(
-                    'shrink-0 w-10 h-10 rounded-neo border-[2px] border-neo-cream shadow-hard flex items-center justify-center',
+                    'shrink-0 w-10 h-10 rounded-neo border-[2px] border-edu-line shadow-hard flex items-center justify-center',
                     isWin && 'bg-green-500',
                     isLoss && 'bg-red-500',
                     isDraw && 'bg-yellow-500'
                   )}
                 >
-                  {isWin && <Trophy className="w-5 h-5 text-white" />}
-                  {isLoss && <X className="w-5 h-5 text-white" />}
-                  {isDraw && <Minus className="w-5 h-5 text-white" />}
+                  {isWin && <Trophy className="w-5 h-5 text-edu-ink" />}
+                  {isLoss && <X className="w-5 h-5 text-edu-ink" />}
+                  {isDraw && <Minus className="w-5 h-5 text-edu-ink" />}
                 </div>
 
                 {/* Info */}
                 <div className="flex-1">
-                  <p className="text-neo-white font-neo-body font-bold mb-1">
+                  <p className="text-edu-ink font-neo-body font-bold mb-1">
                     {t('duels.vs')} {opponentName}
                   </p>
-                  <p className="text-sm text-neo-white">
+                  <p className="text-sm text-edu-ink">
                     {t('duels.you')}: {studentScore} {t('duels.vs')} {opponentName}:{' '}
                     {opponentScore}
                   </p>

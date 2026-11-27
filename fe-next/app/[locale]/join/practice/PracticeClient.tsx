@@ -24,11 +24,11 @@ export function GuestPracticeClient({ locale, pack }: GuestPracticeClientProps) 
   );
 
   return (
-    <div data-testid="guest-practice-root" dir={dir} className="flex h-dvh flex-col overflow-hidden bg-neo-navy pb-[var(--cookie-consent-height,0px)] text-neo-white">
-      <header className="flex items-center gap-3 border-b-4 border-neo-black bg-neo-navy-light px-4 py-3 tv:px-8 tv:py-5">
+    <div data-testid="guest-practice-root" dir={dir} className="flex h-dvh flex-col overflow-hidden bg-edu-page pb-[var(--cookie-consent-height,0px)] text-edu-ink">
+      <header className="flex items-center gap-3 border-b-4 border-neo-black bg-edu-surface px-4 py-3 tv:px-8 tv:py-5">
         <div className="min-w-0 flex-1">
           <h1 className="font-neo-display text-xl font-black uppercase leading-tight tv:text-3xl">{t('education.student.deadEnd.practiceTitle')}</h1>
-          <p dir="auto" className="font-neo-body text-sm font-bold leading-snug text-neo-cyan tv:text-lg">
+          <p dir="auto" className="font-neo-body text-sm font-bold leading-snug text-edu-cyan-ink tv:text-lg">
             {t(pack.nameKey)} · {t('education.student.deadEnd.wordCount', { count: String(words.length) })}
           </p>
         </div>

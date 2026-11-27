@@ -17,9 +17,10 @@ import { cn } from '@/lib/utils';
  * and drop the color transition entirely. Mirrors the MultiplayerInGameView fix
  * (66eb73c7e), closing one of the "~20+ files" instances of this latent FOUC.
  */
-export function getMpInGameContainerClass(gameMode: string): string {
+export function getMpInGameContainerClass(gameMode: string, { classroom = false } = {}): string {
   return cn(
-    'flex-1 flex flex-col min-h-0 bg-neo-navy',
+    'flex-1 flex flex-col min-h-0',
+    classroom ? 'bg-edu-page' : 'bg-neo-navy',
     // Wheel-rush has its own internal scroll container (WheelRushView with overflow-hidden
     // on the root + flex layout). Adding overflow-y-auto here creates a redundant outer
     // scroll region that pushes the score bars ~30% down the viewport. Classic/Blast/
@@ -30,6 +31,6 @@ export function getMpInGameContainerClass(gameMode: string): string {
 }
 
 /** Loading placeholder shown before the grid arrives — same navy, no FOUC. */
-export function getMpInGamePlaceholderClass(): string {
-  return 'flex-1 flex flex-col min-h-0 bg-neo-navy p-4 items-center justify-center';
+export function getMpInGamePlaceholderClass({ classroom = false } = {}): string {
+  return cn('flex-1 flex flex-col min-h-0 p-4 items-center justify-center', classroom ? 'bg-edu-page' : 'bg-neo-navy');
 }

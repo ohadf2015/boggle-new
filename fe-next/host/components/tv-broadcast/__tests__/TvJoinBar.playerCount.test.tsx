@@ -112,7 +112,7 @@ describe('TvJoinBar on a phone', () => {
     const row = screen.getByTestId('tv-join-row').className.split(/\s+/);
     expect(row).toContain('flex-wrap');
     expect(row).toContain('md:flex-nowrap');
-    const code = screen.getByText('ABC123').className.split(/\s+/);
+    const code = screen.getByLabelText('Game code: A B C 1 2 3').className.split(/\s+/);
     expect(code).toContain('text-4xl');
     expect(code).toContain('md:text-6xl');
   });

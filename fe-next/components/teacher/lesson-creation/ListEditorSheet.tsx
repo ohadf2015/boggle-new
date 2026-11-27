@@ -183,7 +183,7 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
             aria-label={t('eduLibrary.editor.titleLabel')}
             maxLength={80}
             dir="auto"
-            className="h-12 min-w-0 flex-1 rounded-neo border-[3px] border-dashed border-neo-cream/40 bg-transparent px-2.5 font-neo-display text-xl font-black text-neo-cream placeholder:text-neo-cream/45 focus:border-solid focus:border-neo-cyan focus:outline-hidden sm:text-2xl"
+            className="h-12 min-w-0 flex-1 rounded-neo border-[3px] border-dashed border-edu-line bg-transparent px-2.5 font-neo-display text-xl font-black text-edu-ink placeholder:text-edu-ink/45 focus:border-solid focus:border-neo-cyan focus:outline-hidden sm:text-2xl"
           />
           <DialogClose aria-label={t('common.close')} title={t('common.close')} className={NB_DIALOG_CLOSE}>
             <X className="size-5" strokeWidth={3} aria-hidden="true" />
@@ -193,7 +193,7 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
         <NbDialogBody className="space-y-5">
           {remixedFrom && (
             <p className={cn(NB_STICKER, NB_BLOCK.purple, 'whitespace-normal')}>
-              <Sparkles className="size-3.5 text-neo-yellow" aria-hidden="true" />
+              <Sparkles className="size-3.5 text-edu-yellow-ink" aria-hidden="true" />
               {remixedFrom.author
                 ? t('eduLibrary.remixedFrom', { title: remixedFrom.title, author: remixedFrom.author })
                 : t('eduLibrary.remixedFromNoAuthor', { title: remixedFrom.title })}
@@ -201,7 +201,7 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
           )}
 
           <div>
-            <label htmlFor="list-paste-box" className="mb-1.5 block font-neo-display text-base font-black text-neo-cream">
+            <label htmlFor="list-paste-box" className="mb-1.5 block font-neo-display text-base font-black text-edu-ink">
               {t('eduLibrary.editor.pasteLabel')}
             </label>
             <textarea
@@ -228,15 +228,15 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
             />
             <p data-testid="list-paste-feedback" aria-live="polite" className="mt-1.5 min-h-5 text-xs font-bold">
               {feedback && feedback.added > 0 && (
-                <span key={`${draft.words.length}`} className="me-2 inline-block text-neo-lime motion-safe:animate-pop-in">
+                <span key={`${draft.words.length}`} className="me-2 inline-block text-edu-lime-ink motion-safe:animate-pop-in">
                   {t('eduLibrary.editor.addedWords', { count: feedback.added })}
                 </span>
               )}
               {feedback && feedback.duplicates > 0 && (
-                <span className="text-neo-yellow">{t('eduLibrary.editor.skippedDuplicates', { count: feedback.duplicates })}</span>
+                <span className="text-edu-yellow-ink">{t('eduLibrary.editor.skippedDuplicates', { count: feedback.duplicates })}</span>
               )}
               {feedback && feedback.rejected.length > 0 && (
-                <span data-testid="list-paste-rejected" className="ms-2 inline-block text-neo-pink">
+                <span data-testid="list-paste-rejected" className="ms-2 inline-block text-edu-pink-ink">
                   {t(SINGLE_WORDS_ONLY_KEY, { terms: formatRejectedTerms(feedback.rejected) })}
                 </span>
               )}
@@ -254,14 +254,14 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
 
           <section aria-labelledby="list-words-heading" className="space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <h3 id="list-words-heading" className="flex items-center gap-2 font-neo-display text-base font-black text-neo-cream">
+              <h3 id="list-words-heading" className="flex items-center gap-2 font-neo-display text-base font-black text-edu-ink">
                 {t('eduLibrary.editor.wordsHeading')}
                 <span key={draft.words.length} className={cn(NB_STICKER, NB_BLOCK.cyan, 'text-sm tabular-nums motion-safe:animate-neo-pop')}>
                   {draft.words.length}
                 </span>
               </h3>
               {draft.words.length > 0 && (
-                <div role="group" aria-label={t('eduLibrary.editor.viewLabel')} className="flex overflow-hidden rounded-neo border-[3px] border-neo-cream/50">
+                <div role="group" aria-label={t('eduLibrary.editor.viewLabel')} className="flex overflow-hidden rounded-neo border-[3px] border-edu-line">
                   {(['chips', 'details'] as const).map((v) => (
                     <button
                       key={v}
@@ -270,7 +270,7 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
                       onClick={() => setView(v)}
                       className={cn(
                         'flex min-h-11 items-center gap-1 px-3 text-xs font-black',
-                        view === v ? 'bg-neo-cream text-neo-black' : 'bg-neo-navy-light text-neo-cream',
+                        view === v ? 'bg-neo-cream text-neo-black' : 'bg-edu-surface text-edu-ink',
                       )}
                     >
                       {v === 'chips' ? <LayoutGrid className="size-3.5" aria-hidden="true" /> : <ListChecks className="size-3.5" aria-hidden="true" />}
@@ -282,7 +282,7 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
             </div>
 
             {draft.words.length === 0 ? (
-              <p className="rounded-neo-lg border-[3px] border-dashed border-neo-cream/35 px-3 py-6 text-center font-neo-body text-sm font-semibold text-neo-cream/75">
+              <p className="rounded-neo-lg border-[3px] border-dashed border-edu-line px-3 py-6 text-center font-neo-body text-sm font-semibold text-edu-ink/75">
                 {t('eduLibrary.editor.emptyWords')}
               </p>
             ) : view === 'chips' ? (
@@ -317,8 +317,8 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
         </NbDialogBody>
 
         <NbDialogFooter className="flex-row items-center gap-3 sm:justify-between">
-          <p data-testid="list-save-hint" role="status" className="min-w-0 flex-1 font-neo-body text-sm font-bold text-neo-yellow">
-            {hint ?? (saved ? <span className="text-neo-lime">{t('eduLibrary.editor.saved')}</span> : null)}
+          <p data-testid="list-save-hint" role="status" className="min-w-0 flex-1 font-neo-body text-sm font-bold text-edu-yellow-ink">
+            {hint ?? (saved ? <span className="text-edu-lime-ink">{t('eduLibrary.editor.saved')}</span> : null)}
           </p>
           <button
             type="button"

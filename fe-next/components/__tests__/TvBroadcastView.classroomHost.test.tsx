@@ -120,8 +120,8 @@ describe('TvBroadcastView — the classroom host screen', () => {
     expect(fireConfetti).toHaveBeenCalledTimes(1);
   });
 
-  it('Given a mode backdrop, Then it paints under the board instead of dimming it', () => {
-    const { container } = render(<TvBroadcastView {...props()} />);
+  it('Given an arcade mode backdrop, Then it paints under the board instead of dimming it (the sky classroom wall has none)', () => {
+    const { container } = render(<TvBroadcastView {...props({ classroomLive: null })} />);
     const backdrop = container.querySelector('[data-testid="tv-mode-backdrop"]') as HTMLElement;
     expect(backdrop.className).toContain('-z-10');
     expect((backdrop.parentElement as HTMLElement).className).toContain('isolate');

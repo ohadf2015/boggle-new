@@ -22,7 +22,7 @@ function safeCapture(event: string, props: Record<string, unknown>): void {
 }
 
 const MANAGE_QUIET =
-  'self-center text-xs font-bold text-neo-cream/70 underline underline-offset-2 transition-colors hover:text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan sm:self-end';
+  'self-center text-xs font-bold text-edu-ink/70 underline underline-offset-2 transition-colors hover:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan sm:self-end';
 
 interface TeacherProTrialExpiringBannerProps {
   trialExpires: string | null;

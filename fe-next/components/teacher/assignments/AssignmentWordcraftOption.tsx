@@ -18,7 +18,7 @@ export function AssignmentWordcraftOption({ selected, disabled, onSelect, t }: {
         'w-full mb-3 px-4 py-3 rounded-neo-lg border-[3px] shadow-hard transition flex items-center gap-3 text-start disabled:cursor-not-allowed disabled:opacity-60',
         selected
           ? 'bg-neo-cyan border-neo-black text-neo-black'
-          : 'bg-neo-navy-light border-neo-cream/50 text-neo-white hover:-translate-y-px'
+          : 'bg-edu-surface border-edu-line text-edu-ink hover:-translate-y-px'
       )}
     >
       <Grid2x2 className="w-8 h-8 shrink-0" aria-hidden="true" />

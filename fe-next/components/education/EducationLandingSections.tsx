@@ -30,10 +30,10 @@ import { EslPlayableDemo } from '@/components/education/EslPlayableDemo';
  * pink (3.6:1) at body size.
  */
 export const ACCENT: Record<EducationAccent, { fill: string; ink: string; text: string; shadow: string }> = {
-  lime: { fill: 'bg-neo-lime', ink: 'text-neo-navy', text: 'text-neo-lime', shadow: 'shadow-hard-lime' },
-  pink: { fill: 'bg-neo-pink', ink: 'text-neo-navy', text: 'text-neo-pink', shadow: 'shadow-hard-pink' },
-  cyan: { fill: 'bg-neo-cyan', ink: 'text-neo-navy', text: 'text-neo-cyan', shadow: 'shadow-hard-cyan' },
-  purple: { fill: 'bg-neo-purple', ink: 'text-neo-navy', text: 'text-neo-purple', shadow: 'shadow-hard-purple' },
+  lime: { fill: 'bg-neo-lime', ink: 'text-neo-navy', text: 'text-neo-lime edu-sky:text-edu-lime-ink', shadow: 'shadow-hard-lime' },
+  pink: { fill: 'bg-neo-pink', ink: 'text-neo-navy', text: 'text-neo-pink edu-sky:text-edu-pink-ink', shadow: 'shadow-hard-pink' },
+  cyan: { fill: 'bg-neo-cyan', ink: 'text-neo-navy', text: 'text-neo-cyan edu-sky:text-edu-cyan-ink', shadow: 'shadow-hard-cyan' },
+  purple: { fill: 'bg-neo-purple', ink: 'text-neo-navy', text: 'text-neo-purple edu-sky:text-edu-purple-ink', shadow: 'shadow-hard-purple' },
 };
 
 /**
@@ -84,7 +84,7 @@ function SectionHeading({ title, intro }: { title: string; intro?: string }) {
   return (
     <>
       <h2 className="font-neo-display text-3xl font-black uppercase leading-[1.05] sm:text-4xl">{title}</h2>
-      {intro && <p className="mt-4 max-w-[68ch] text-base leading-relaxed text-neo-white/75 sm:text-lg">{intro}</p>}
+      {intro && <p className="mt-4 max-w-[68ch] text-base leading-relaxed text-neo-white/75 edu-sky:text-edu-ink/75 sm:text-lg">{intro}</p>}
     </>
   );
 }
@@ -114,7 +114,7 @@ export function EducationSectionRenderer({
           {section.items.map((f) => (
             <li
               key={f.text}
-              className="flex items-start gap-4 rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-4 shadow-hard"
+              className="flex items-start gap-4 rounded-neo border-3 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface p-4 shadow-hard"
             >
               <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-neo border-3 border-neo-black ${a.fill} ${a.ink} shadow-hard-sm`}>
                 <Icon name={f.icon} className="h-5 w-5" />
@@ -141,7 +141,7 @@ export function EducationSectionRenderer({
                   </span>
                 )}
                 <h3 className="mt-2 font-neo-display text-base font-black">{u.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-neo-white/75">{u.desc}</p>
+                <p className="mt-2 text-sm leading-relaxed text-neo-white/75 edu-sky:text-edu-ink/75">{u.desc}</p>
                 {u.cta && (
                   <span className={`mt-3 inline-block font-neo-display text-xs font-black uppercase tracking-widest ${a.text}`}>
                     {u.cta}
@@ -149,7 +149,7 @@ export function EducationSectionRenderer({
                 )}
               </>
             );
-            const shell = 'relative rounded-neo border-3 border-neo-cream bg-neo-navy-light p-5 shadow-hard';
+            const shell = 'relative rounded-neo border-3 border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface p-5 shadow-hard';
             // A card with somewhere to go is a link, not a div with a label that
             // looks clickable.
             return u.href ? (
@@ -177,16 +177,16 @@ export function EducationSectionRenderer({
           {section.items.map((s, i) => (
             <li
               key={s.step}
-              className="grid gap-3 rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard sm:grid-cols-[auto_1fr_2fr] sm:items-baseline sm:gap-6"
+              className="grid gap-3 rounded-neo border-3 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface p-5 shadow-hard sm:grid-cols-[auto_1fr_2fr] sm:items-baseline sm:gap-6"
             >
               <span className={`inline-grid h-9 w-9 place-items-center rounded-neo border-3 border-neo-black ${a.fill} ${a.ink} font-neo-display text-sm font-black`}>
                 {i + 1}
               </span>
               <div>
                 <p className={`font-neo-display text-sm font-black uppercase tracking-wide ${a.text}`}>{s.step}</p>
-                <p className="mt-1 text-sm font-bold text-neo-white/90">{s.focus}</p>
+                <p className="mt-1 text-sm font-bold text-neo-white/90 edu-sky:text-edu-ink/90">{s.focus}</p>
               </div>
-              <p className="text-sm leading-relaxed text-neo-white/75">{s.activity}</p>
+              <p className="text-sm leading-relaxed text-neo-white/75 edu-sky:text-edu-ink/75">{s.activity}</p>
             </li>
           ))}
         </ol>
@@ -208,7 +208,7 @@ export function EducationSectionRenderer({
                 {g.words.map((w) => (
                   <li
                     key={w}
-                    className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-1.5 font-neo-body text-sm font-bold text-neo-white shadow-hard-sm"
+                    className="rounded-neo border-2 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface px-3 py-1.5 font-neo-body text-sm font-bold text-neo-white edu-sky:text-edu-ink shadow-hard-sm"
                   >
                     {w}
                   </li>
@@ -235,12 +235,12 @@ export function EducationSectionRenderer({
 
   if (section.kind === 'note') {
     return (
-      <section className="mt-16 rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard sm:p-8">
+      <section className="mt-16 rounded-neo border-3 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface p-6 shadow-hard sm:p-8">
         <h2 className={`font-neo-display text-xl font-black uppercase sm:text-2xl ${a.text}`}>{section.heading}</h2>
-        <p className="mt-3 max-w-[68ch] text-sm leading-relaxed text-neo-white/75 sm:text-base">{section.body}</p>
+        <p className="mt-3 max-w-[68ch] text-sm leading-relaxed text-neo-white/75 edu-sky:text-edu-ink/75 sm:text-base">{section.body}</p>
         <a
           href={section.href}
-          className="mt-4 inline-block font-neo-display text-sm font-black uppercase tracking-widest text-neo-cyan underline underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+          className="mt-4 inline-block font-neo-display text-sm font-black uppercase tracking-widest text-neo-cyan edu-sky:text-edu-cyan-ink underline underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {section.cta} ↗
         </a>
@@ -286,11 +286,11 @@ export function EducationSectionRenderer({
             </thead>
             <tbody>
               {section.rows.map((row) => (
-                <tr key={row.join('|')} className="border-t-2 border-neo-cream/40 bg-neo-navy-light">
+                <tr key={row.join('|')} className="border-t-2 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface">
                   {row.map((cell, ci) => (
                     <td
                       key={`${row[0]}-${ci}`}
-                      className={ci === 0 ? 'px-4 py-3 font-bold text-neo-white' : 'px-4 py-3 text-neo-white/75'}
+                      className={ci === 0 ? 'px-4 py-3 font-bold text-neo-white edu-sky:text-edu-ink' : 'px-4 py-3 text-neo-white/75 edu-sky:text-edu-ink/75'}
                     >
                       {cell}
                     </td>
@@ -309,7 +309,7 @@ export function EducationSectionRenderer({
       <SectionHeading title={section.title} />
       <div className="mt-4 space-y-4">
         {section.paragraphs.map((p) => (
-          <p key={p.slice(0, 40)} className="max-w-[68ch] text-base leading-relaxed text-neo-white/75 sm:text-lg">
+          <p key={p.slice(0, 40)} className="max-w-[68ch] text-base leading-relaxed text-neo-white/75 edu-sky:text-edu-ink/75 sm:text-lg">
             {p}
           </p>
         ))}

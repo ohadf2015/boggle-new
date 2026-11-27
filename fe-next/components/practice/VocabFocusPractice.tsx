@@ -179,7 +179,7 @@ export function VocabFocusPractice({
   // Not enough teacher data for this focus
   if (total === 0) {
     return (
-      <div className="min-h-full bg-neo-navy flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="min-h-full bg-neo-navy edu-sky:bg-edu-page flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="max-w-md w-full rounded-neo border-[3px] border-black shadow-hard bg-neo-cream p-6 text-center">
           <h2 className="text-2xl font-neo-display text-neo-black mb-2">{t(`education.vocabFocus.focus.${focus}`)}</h2>
           <p className="font-neo-body text-neo-black/80 mb-6 text-pretty">{t(`education.vocabFocus.notEnough.${focus}`)}</p>
@@ -198,7 +198,7 @@ export function VocabFocusPractice({
 
   if (showResults) {
     return (
-      <div className="min-h-full bg-neo-navy flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="min-h-full bg-neo-navy edu-sky:bg-edu-page flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
         <PracticeResultsCard
           correct={correctCount}
           total={total}
@@ -214,7 +214,7 @@ export function VocabFocusPractice({
   }
 
   return (
-    <div className="min-h-full bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-full bg-neo-navy edu-sky:bg-edu-page p-4" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
@@ -223,7 +223,7 @@ export function VocabFocusPractice({
             size="sm"
             onClick={onBack}
             aria-label={t('common.back')}
-            className="text-neo-white hover:text-neo-white hover:bg-neo-white/10 min-h-11 min-w-11"
+            className="edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:shadow-edu-lip-sm text-neo-white edu-sky:text-edu-ink hover:text-neo-white edu-sky:hover:text-edu-ink hover:bg-neo-white/10 edu-sky:hover:bg-edu-ink/10 min-h-11 min-w-11"
           >
             <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
@@ -232,13 +232,13 @@ export function VocabFocusPractice({
               <span className={cn('inline-flex items-center justify-center w-8 h-8 rounded-neo border-[2px] border-black text-neo-black', style.bg)}>
                 {style.icon}
               </span>
-              <h2 className="text-xl font-neo-display text-neo-white line-clamp-2">
+              <h2 className="text-xl font-neo-display text-neo-white edu-sky:text-edu-ink line-clamp-2">
                 {t(`education.vocabFocus.focus.${focus}`)}
               </h2>
             </div>
-            <p className="text-sm font-neo-body text-neo-white/80">{t(`education.vocabFocus.instructions.${focus}`)}</p>
+            <p className="text-sm font-neo-body text-neo-white/80 edu-sky:text-edu-ink/80">{t(`education.vocabFocus.instructions.${focus}`)}</p>
           </div>
-          <span className="text-sm font-neo-display text-neo-white tabular-nums shrink-0">
+          <span className="text-sm font-neo-display text-neo-white edu-sky:text-edu-ink tabular-nums shrink-0">
             {t('education.vocabFocus.progress', { current: index + 1, total })}
           </span>
         </div>

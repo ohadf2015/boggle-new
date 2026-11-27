@@ -30,7 +30,7 @@ export function ProPlanPanel({ status, source, trialExpires, periodEnd, portalUr
   const onTrial = !cancelAtPeriodEnd && status === 'trialing';
   const manageClassName = onTrial
     ? 'self-center text-xs font-bold text-neo-navy/75 underline underline-offset-2 transition-colors hover:text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan'
-    : 'inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-neo-cream/40 bg-neo-navy px-4 font-neo-display text-sm font-black text-neo-yellow shadow-hard-sm transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
+    : 'inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-edu-line bg-edu-page px-4 font-neo-display text-sm font-black text-edu-yellow-ink shadow-hard-sm transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
   return (
     <section data-testid="pro-plan-panel" aria-labelledby="pro-plan-title" className="rounded-neo border-3 border-neo-black bg-neo-yellow p-4 text-neo-navy shadow-hard sm:p-6">
@@ -41,7 +41,7 @@ export function ProPlanPanel({ status, source, trialExpires, periodEnd, portalUr
             {t('eg2Pro.plans.youArePro')}
           </p>
           <p data-testid="pro-plan-status" className="mt-1 text-sm font-bold text-neo-navy/85">{line}</p>
-          {cancelAtPeriodEnd && !gifted && onResumed ? <ResumeProButton onResumed={onResumed} className="mt-3 border-neo-navy bg-neo-navy text-neo-yellow" /> : null}
+          {cancelAtPeriodEnd && !gifted && onResumed ? <ResumeProButton onResumed={onResumed} className="mt-3 border-neo-navy bg-edu-surface text-edu-yellow-ink" /> : null}
         </div>
         {portalUrl && !gifted ? (
           <TeacherProManageLink
@@ -73,7 +73,7 @@ export function PlanCardsSkeleton() {
   return (
     <div data-testid="plan-cards-skeleton" aria-hidden="true" className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
       {[0, 1, 2].map((i) => (
-        <div key={i} className="h-80 animate-pulse rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light motion-reduce:animate-none" />
+        <div key={i} className="h-80 animate-pulse rounded-neo border-2 border-edu-line bg-edu-surface motion-reduce:animate-none" />
       ))}
     </div>
   );

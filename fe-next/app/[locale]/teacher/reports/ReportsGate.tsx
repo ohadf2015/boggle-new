@@ -39,7 +39,7 @@ function ReportsChecking() {
         <div
           key={i}
           aria-hidden="true"
-          className="h-20 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse"
+          className="h-20 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse"
         />
       ))}
     </div>

@@ -47,11 +47,11 @@ export function IncompleteAssignmentsPanel({
 
   return (
     <section data-testid="incomplete-assignments" className="space-y-3">
-      <h3 className="font-neo-display text-base font-black uppercase text-neo-cream">
+      <h3 className="font-neo-display text-base font-black uppercase text-edu-ink">
         {t('teacher.reports.progressMatrix.incompleteTitle')}
       </h3>
       {sections.length === 0 ? (
-        <p data-testid="incomplete-all-done" className="text-sm font-bold text-neo-lime">
+        <p data-testid="incomplete-all-done" className="text-sm font-bold text-edu-lime-ink">
           {t('teacher.reports.progressMatrix.incompleteAllDone')}
         </p>
       ) : (
@@ -59,23 +59,23 @@ export function IncompleteAssignmentsPanel({
           <div
             key={assignment.id}
             data-testid={`incomplete-assignment-${assignment.id}`}
-            className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-3"
+            className="rounded-neo border-2 border-edu-line bg-edu-surface p-3"
           >
-            <p dir="auto" className="mb-2 truncate font-neo-display text-sm font-black text-neo-white">
+            <p dir="auto" className="mb-2 truncate font-neo-display text-sm font-black text-edu-ink">
               {assignment.title}
             </p>
             <ul className="space-y-1.5">
               {students.map((student) => (
                 <li key={student.studentId} className="flex items-center gap-2">
-                  <span dir="auto" className="min-w-0 flex-1 truncate text-sm font-bold text-neo-white">
+                  <span dir="auto" className="min-w-0 flex-1 truncate text-sm font-bold text-edu-ink">
                     {student.name}
                   </span>
                   <span
                     data-testid={`incomplete-status-${assignment.id}-${student.studentId}`}
                     className={
                       student.started
-                        ? 'inline-flex shrink-0 items-center gap-1 rounded-full border border-neo-yellow/60 px-2 py-0.5 text-[10px] font-black uppercase text-neo-yellow'
-                        : 'inline-flex shrink-0 items-center gap-1 rounded-full border border-neo-cream/40 px-2 py-0.5 text-[10px] font-black uppercase text-neo-cream/70'
+                        ? 'inline-flex shrink-0 items-center gap-1 rounded-full border border-neo-yellow/60 px-2 py-0.5 text-[10px] font-black uppercase text-edu-yellow-ink'
+                        : 'inline-flex shrink-0 items-center gap-1 rounded-full border border-edu-line px-2 py-0.5 text-[10px] font-black uppercase text-edu-ink/70'
                     }
                   >
                     {student.started && <Clock className="size-3" aria-hidden="true" />}

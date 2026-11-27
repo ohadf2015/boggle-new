@@ -30,11 +30,11 @@ export function BossAttackClock({ view }: { view: ClassroomBossView }) {
     <section
       data-testid="boss-attack-clock"
       className={cn(
-        'flex flex-col items-center gap-[0.6cqw] rounded-[0.8cqw] border-[0.25cqw] border-neo-black bg-neo-navy-light/95 p-[1cqw] shadow-hard-xl',
+        'flex flex-col items-center gap-[0.6cqw] rounded-[0.8cqw] border-[0.25cqw] border-neo-black bg-neo-navy-light/95 edu-sky:bg-edu-surface/95 p-[1cqw] shadow-hard-xl',
         tg && 'border-neo-pink',
       )}
     >
-      <h3 className="font-neo-display text-center text-[1.8cqw] font-black uppercase leading-none text-neo-white">
+      <h3 className="font-neo-display text-center text-[1.8cqw] font-black uppercase leading-none text-neo-white edu-sky:text-edu-ink">
         {tg ? t(`classroomBoss.attack.${tg.kind}`) : t('classroomBoss.attackIn')}
       </h3>
       <div className={cn('relative size-[10cqw]', tg && styles.pulse)}>
@@ -51,8 +51,8 @@ export function BossAttackClock({ view }: { view: ClassroomBossView }) {
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-[0.2cqw]">
-          <Icon className={cn('size-[1.7cqw]', tg ? 'text-neo-pink' : 'text-neo-white/70')} strokeWidth={3} aria-hidden="true" />
-          <span dir="ltr" className="font-neo-display text-[2.7cqw] font-black leading-none text-neo-white tabular-nums">
+          <Icon className={cn('size-[1.7cqw]', tg ? 'text-neo-pink edu-sky:text-edu-pink-ink' : 'text-neo-white/70 edu-sky:text-edu-ink/70')} strokeWidth={3} aria-hidden="true" />
+          <span dir="ltr" className="font-neo-display text-[2.7cqw] font-black leading-none text-neo-white edu-sky:text-edu-ink tabular-nums">
             {view.status === 'fighting' || view.status === 'phase-change' ? formatClock(ms) : '--'}
           </span>
         </div>
@@ -61,7 +61,7 @@ export function BossAttackClock({ view }: { view: ClassroomBossView }) {
         )}
       </div>
       {tg && (
-        <p data-testid="boss-stagger" className="text-center text-[1.6cqw] font-black leading-tight text-neo-white">
+        <p data-testid="boss-stagger" className="text-center text-[1.6cqw] font-black leading-tight text-neo-white edu-sky:text-edu-ink">
           {t('classroomBoss.staggerHint', { n: tg.longWords, need: tg.need })}
         </p>
       )}

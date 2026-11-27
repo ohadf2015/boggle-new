@@ -7,15 +7,15 @@
  * below lg, the 240px sidebar from lg. The body fills the rest.
  */
 export const CLASSROOM_GAME_HEADER_SLOT_CLASS =
-  'min-h-[60px] shrink-0 border-b-[3px] border-neo-cream bg-neo-navy lg:hidden';
+  'min-h-[60px] shrink-0 border-b-[3px] border-edu-line bg-edu-page lg:hidden';
 export const CLASSROOM_GAME_SIDEBAR_SLOT_CLASS =
-  'hidden w-60 shrink-0 border-e-[3px] border-neo-cream bg-neo-navy lg:block';
+  'hidden w-60 shrink-0 border-e-[3px] border-edu-line bg-edu-surface lg:block';
 
 export function ClassroomGameLoadingShell() {
   return (
     <div
       data-testid="classroom-game-loading-shell"
-      className="relative flex h-dvh w-full shrink-0 flex-col overflow-hidden bg-neo-navy"
+      className="relative flex h-dvh w-full shrink-0 flex-col overflow-hidden bg-edu-page"
     >
       <div data-testid="classroom-game-header-slot" aria-hidden="true" className={CLASSROOM_GAME_HEADER_SLOT_CLASS} />
       <div className="flex min-h-0 flex-1">
@@ -24,7 +24,7 @@ export function ClassroomGameLoadingShell() {
           <div
             data-testid="classroom-game-lobby-slot"
             aria-hidden="true"
-            className="min-h-0 flex-1 animate-pulse rounded-neo bg-neo-navy-light"
+            className="min-h-0 flex-1 animate-pulse rounded-neo bg-edu-surface"
           />
         </div>
       </div>

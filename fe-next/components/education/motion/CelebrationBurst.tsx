@@ -46,7 +46,7 @@ function Sparkles() {
           data-testid="edu-burst-piece"
           data-corner={s.corner}
           viewBox="0 0 16 16"
-          className={`absolute text-neo-lime ${s.pos} ${s.size}`}
+          className={`absolute text-neo-lime edu-sky:text-edu-lime-ink ${s.pos} ${s.size}`}
           initial={{ scale: 0, rotate: 0 }}
           animate={{ scale: [0, 1.15, 0], rotate: [0, 30, 45] }}
           transition={{ duration: SPARKLE_DUR_S, delay: s.delay, times: [0, 0.4, 1], ease: 'easeOut' }}

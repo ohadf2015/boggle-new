@@ -49,7 +49,7 @@ describe('DuelRevealScreen', () => {
     render(<DuelRevealScreen {...props} />);
 
     const root = screen.getByTestId('duel-reveal');
-    expect(root.className).toContain('bg-neo-navy');
+    expect(root.className).toContain('bg-edu-page');
     expect(root.className).not.toContain('bg-neo-cream');
     expect(root.className).toContain('overflow-hidden');
   });

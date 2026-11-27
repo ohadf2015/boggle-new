@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useState, type CSSProperties } from 'react';
-import { NEO_BUTTON } from '@/components/ui/neoStyles';
+import { EDU_BUTTON } from '@/components/education/eduNeoStyles';
 import { entranceOffset, pickRevealSignature, REVEAL_SIGNATURES, type RevealSignature } from '@/lib/education/motion/revealSignature';
 
 export type Translate = (key: string, params?: Record<string, string | number>) => string;
@@ -8,9 +8,9 @@ export type Translate = (key: string, params?: Record<string, string | number>) 
 export const PRESS =
   'active:brightness-90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:cursor-not-allowed disabled:opacity-60';
 
-export const PRIMARY_BUTTON = NEO_BUTTON.livePrimary;
+export const PRIMARY_BUTTON = EDU_BUTTON.livePrimary;
 
-export const SECONDARY_BUTTON = NEO_BUTTON.liveSecondary;
+export const SECONDARY_BUTTON = EDU_BUTTON.liveSecondary;
 
 /** Keyframes as a literal string: transform only, never from scale(0), never an opacity tween (Class 5). */
 export const LIVE_KEYFRAMES =

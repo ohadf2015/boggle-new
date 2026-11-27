@@ -36,7 +36,7 @@ export function OpponentProgressBar({
   const MIN_LABEL_PCT = 18;
   return (
     <div
-      className="relative h-8 border-[2px] border-neo-cream rounded-neo shadow-hard overflow-hidden bg-neo-pink"
+      className="relative h-8 border-[2px] border-edu-line rounded-neo shadow-hard overflow-hidden bg-neo-pink"
       data-testid="opponent-progress-bar"
     >
       {/* Fill animates scaleX (compositor-only); animating width re-lays-out every frame. */}
@@ -53,7 +53,7 @@ export function OpponentProgressBar({
           <span className="truncate">{myName}</span>
           <span>{myScore}</span>
         </span>
-        <span className={cn('flex min-w-0 items-center gap-2 text-neo-white', opponentPercentage < MIN_LABEL_PCT && 'invisible')}>
+        <span className={cn('flex min-w-0 items-center gap-2 text-edu-ink', opponentPercentage < MIN_LABEL_PCT && 'invisible')}>
           <span>{opponentScore}</span>
           <span className="truncate">{opponentName}</span>
         </span>

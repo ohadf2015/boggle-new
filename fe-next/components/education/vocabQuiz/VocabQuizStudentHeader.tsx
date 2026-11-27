@@ -46,7 +46,7 @@ export function VocabQuizHudScore({ score, pop, t }: { score: number; pop: Vocab
   return (
     <span data-testid="vocab-quiz-hud-score" className="flex shrink-0 items-center gap-1 leading-none">
       <span className="sr-only">{t('vocabQuiz.hud.score')}</span>
-      <Star className="size-5 shrink-0 fill-neo-lime text-neo-lime sm:size-6" strokeWidth={2.5} aria-hidden />
+      <Star className="size-5 shrink-0 fill-neo-lime text-edu-lime-ink sm:size-6" strokeWidth={2.5} aria-hidden />
       <VocabQuizScoreCounter score={score} pop={pop} t={t} className="text-lg sm:text-2xl" />
     </span>
   );
@@ -82,7 +82,7 @@ export function VocabQuizStudentHeader({
           type="button"
           onClick={onExit}
           aria-label={t('vocabQuiz.exit')}
-          className="grid size-11 shrink-0 place-items-center rounded-neo text-neo-white/70 transition-colors hover:bg-neo-navy-elevated hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="grid size-11 shrink-0 place-items-center rounded-neo text-edu-ink/70 transition-colors hover:bg-edu-surface hover:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           <X className="size-7" strokeWidth={3} aria-hidden />
         </button>
@@ -98,28 +98,28 @@ export function VocabQuizStudentHeader({
         aria-valuemax={total}
         aria-valuenow={done}
         aria-label={t('vocabQuiz.progress', { current: done, total })}
-        className="h-5 min-w-0 flex-1 overflow-hidden rounded-full bg-neo-navy-elevated sm:h-6"
+        className="h-5 min-w-0 flex-1 overflow-hidden rounded-full border-2 border-edu-line bg-edu-surface sm:h-6"
       >
         <div
-          className="relative h-full rounded-full bg-neo-lime transition-[width] duration-500 ease-out motion-reduce:transition-none"
+          className="relative h-full rounded-full bg-neo-pink transition-[width] duration-500 ease-out motion-reduce:transition-none"
           style={{ width: `${(done / total) * 100}%` }}
         >
           <span
             data-testid="vocab-quiz-progress-stripe"
             aria-hidden
-            className="absolute inset-x-2 top-[3px] h-1 rounded-full bg-neo-white/45 sm:h-1.5"
+            className="absolute inset-x-2 top-[3px] h-1 rounded-full bg-edu-paper/45 sm:h-1.5"
           />
         </div>
       </div>
       {!finished && !playing && (
         <span data-testid="vocab-quiz-hud-question" className="flex shrink-0 flex-col items-center leading-none">
-          <span aria-hidden className="font-neo-body text-xs font-bold uppercase tracking-wider text-neo-white/60">
+          <span aria-hidden className="font-neo-body text-xs font-bold uppercase tracking-wider text-edu-ink/60">
             {t('vocabQuiz.hud.question')}
           </span>
           <span
             data-testid="vocab-quiz-progress-count"
             aria-hidden
-            className="font-neo-display text-lg font-black tabular-nums text-neo-white sm:text-xl"
+            className="font-neo-display text-lg font-black tabular-nums text-edu-ink sm:text-xl"
           >
             {t('vocabQuiz.progressShort', { current: done, total })}
           </span>
@@ -130,7 +130,7 @@ export function VocabQuizStudentHeader({
         <span
           // Keyed on the streak so every increment re-pops the flame.
           key={streak}
-          className="flex items-center gap-0.5 text-neo-orange font-neo-display font-black animate-neo-pop motion-reduce:animate-none"
+          className="flex items-center gap-0.5 text-edu-orange-ink font-neo-display font-black animate-neo-pop motion-reduce:animate-none"
           aria-label={t('vocabQuiz.streak.label', { count: streak })}
         >
           <Flame style={{ width: flamePx, height: flamePx }} aria-hidden />

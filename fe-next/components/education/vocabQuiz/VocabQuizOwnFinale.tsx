@@ -47,7 +47,7 @@ export function VocabQuizOwnFinale({ correct, total, bestStreak, t }: VocabQuizO
       // recap and the podium leave instead of being pinned to the bottom edge
       // with a void above it (measured at 390x844 with a one-player room), and
       // it still never squeezes below its own content in a thirty-name room.
-      className="grow shrink-0 flex items-center gap-3 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated p-3 shadow-hard"
+      className="grow shrink-0 flex items-center gap-3 rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface p-3 shadow-hard"
     >
       <VocabQuizMascotFace
         face={perfect ? 'celebration' : 'trophy'}
@@ -76,7 +76,7 @@ export function VocabQuizOwnFinale({ correct, total, bestStreak, t }: VocabQuizO
           </span>
         )}
 
-        <span className="font-neo-body text-sm text-neo-cream">
+        <span className="font-neo-body text-sm text-neo-cream edu-sky:text-edu-ink">
           {t('vocabQuiz.finished.correctOf', { correct, total })}
         </span>
       </div>

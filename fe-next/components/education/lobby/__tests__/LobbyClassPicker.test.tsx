@@ -22,4 +22,16 @@ describe('<LobbyClassPicker>', () => {
     expect(spy).toHaveBeenCalledWith({ block: 'nearest', inline: 'nearest' });
     expect(spy.mock.contexts[0]).toBe(screen.getByRole('radio', { name: '3C' }));
   });
+
+  it('Given two classes, Then the chosen one is a pink chip with black ink and an outline, never a lime ring on cream', () => {
+    render(<LobbyClassPicker classrooms={[{ id: 'a', name: '5B' }, { id: 'b', name: '4A' }]} selectedId="b" onSelect={vi.fn()} label="Class" />);
+    const on = screen.getByRole('radio', { name: '4A' });
+    expect(on).toHaveClass('bg-neo-pink', 'text-neo-black', 'border-neo-black');
+    expect(on.className).not.toMatch(/neo-lime/);
+  });
+
+  it('Given many classes on a wide lobby, Then the row stops short of the mascot hanging over its end', () => {
+    render(<LobbyClassPicker classrooms={[{ id: 'a', name: '5B' }, { id: 'b', name: '4A' }]} selectedId="b" onSelect={vi.fn()} label="Class" />);
+    expect(screen.getByTestId('lobby-class-picker').parentElement?.className).toContain('@4xl/lobby:pe-[9.5rem]');
+  });
 });

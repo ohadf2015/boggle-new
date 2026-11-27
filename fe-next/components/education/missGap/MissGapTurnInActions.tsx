@@ -48,7 +48,7 @@ export function MissGapTurnInActions({
     <>
       {completed && gradeScore && gradePassbackHref ? (
         <div className="space-y-2" data-testid="miss-gap-async-grade-passback">
-          <p className="text-neo-cream font-bold text-sm">
+          <p className="text-neo-cream edu-sky:text-edu-ink font-bold text-sm">
             {t('education.results.missGapGradePassbackScore', {
               points: gradeScore.pointsEarned,
               max: gradeScore.maxPoints,
@@ -90,8 +90,8 @@ export function MissGapTurnInActions({
             // the 3:1 edge rule on navy without competing with the lime CTA
             // above it; the glyph keeps the WhatsApp green so the control is
             // still recognisable at a glance.
-            'bg-neo-navy text-neo-cream border-[2px] border-neo-cream rounded-neo',
-            'transition-colors hover:bg-neo-navy-light',
+            'bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink border-[2px] border-neo-cream edu-sky:border-edu-line rounded-neo',
+            'transition-colors hover:bg-neo-navy-light edu-sky:hover:bg-edu-surface',
           )}
         >
           <WhatsAppIcon className="w-5 h-5 text-brand-whatsapp" />

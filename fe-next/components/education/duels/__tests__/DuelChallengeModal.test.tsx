@@ -253,7 +253,7 @@ describe('DuelChallengeModal', () => {
       // colour class; cream rather than black because a black edge on navy
       // measures 1.23:1 and simply disappears.
       expect(modal).toHaveClass('border-[3px]');
-      expect(modal).toHaveClass('border-neo-cream');
+      expect(modal).toHaveClass('border-edu-line');
       expect(modal).toHaveClass('shadow-hard-lg');
     });
   });
@@ -275,7 +275,7 @@ describe('DuelChallengeModal', () => {
 
       const cancelButton = screen.getByText('Cancel');
       expect(cancelButton).toHaveClass('border-[3px]');
-      expect(cancelButton).toHaveClass('border-neo-cream');
+      expect(cancelButton).toHaveClass('border-edu-line');
       expect(cancelButton).toHaveClass('shadow-hard-sm');
     });
   });

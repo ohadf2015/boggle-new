@@ -136,3 +136,12 @@ describe('studentsNotReady', () => {
     expect(studentsNotReady([{ username: 'Maya' }], ['Maya'])).toEqual([]);
   });
 });
+
+describe('hero fits the wall height (Start stays on screen)', () => {
+  // Measured on the sky lobby: code tiles plus QR overflowed a 1920x1080 wall by 44px and 1366x768 by 47px.
+  it.each([[1920, 1080, 44], [1366, 768, 47]] as Array<[number, number, number]>)('Given %ix%i, Then code and QR together are smaller than the old pair by more than the overflow', (w, h, overflow) => {
+    const old = cqMin('min(7.6cqw,14cqh)', w, h) * 1.2 + cqMin('min(14cqw,30cqh)', w, h);
+    const now = sizeAt(HERO_CODE_TEXT, 'text-', w, h) * 1.2 + sizeAt(HERO_QR_SIZE, 'size-', w, h);
+    expect(old - now).toBeGreaterThan(overflow);
+  });
+});

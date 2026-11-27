@@ -64,8 +64,8 @@ export function SwipeFeedbackOverlay({
         style={{ opacity: dontKnowOpacity }}
       >
         <div className="flex items-center gap-3 bg-neo-pink px-6 py-3 rounded-neo shadow-hard-sm rotate-12">
-          <X size={32} className="text-neo-white" strokeWidth={3} />
-          <span className="text-2xl font-neo-display text-neo-white uppercase">
+          <X size={32} className="text-neo-white edu-sky:text-edu-ink" strokeWidth={3} />
+          <span className="text-2xl font-neo-display text-neo-white edu-sky:text-edu-ink uppercase">
             {t('education.lesson.dontKnow')}
           </span>
         </div>

@@ -27,17 +27,17 @@ export function NoClassPanel({ className }: { className?: string }) {
     <form
       data-testid="academy-no-class"
       onSubmit={(e) => { e.preventDefault(); go(code); }}
-      className={cn('pointer-events-auto mx-auto flex w-full max-w-md flex-col gap-4 rounded-neo border-3 border-neo-cream bg-neo-navy p-5 text-neo-white shadow-hard-lg', className)}
+      className={cn('pointer-events-auto mx-auto flex w-full max-w-md flex-col gap-4 rounded-neo border-3 border-edu-line bg-edu-surface p-5 text-edu-ink shadow-edu-lip', className)}
     >
       <div className="flex items-center gap-3">
-        <span aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm">
+        <span aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black shadow-edu-lip-sm">
           <KeyRound className="size-6" strokeWidth={2.75} />
         </span>
         <div className="min-w-0">
           <h1 className="font-neo-display text-2xl font-black uppercase leading-none tracking-tight wrap-break-word sm:text-3xl">
             {t('academy.student.noClass.title', 'Enter your class code')}
           </h1>
-          <p className="mt-1 font-neo-body text-sm font-bold text-neo-cyan">{t('education.student.join.flow.codeSub')}</p>
+          <p className="mt-1 font-neo-body text-sm font-bold text-edu-cyan-ink">{t('education.student.join.flow.codeSub')}</p>
         </div>
       </div>
       <JoinCodeField

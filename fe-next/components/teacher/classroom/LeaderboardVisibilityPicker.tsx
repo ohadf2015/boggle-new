@@ -24,8 +24,8 @@ export function LeaderboardVisibilityPicker({ value, onChange }: LeaderboardVisi
   const loading = value === null;
   return (
     <fieldset role="radiogroup" data-testid="leaderboard-visibility-picker" aria-busy={loading || undefined} className="min-w-0">
-      <legend className="mb-1 block font-neo-body text-sm font-black text-neo-cream">{t('teacher.classroom.leaderboard.label')}</legend>
-      <p className="mb-2 font-neo-body text-xs font-semibold text-neo-cream/75">{t('teacher.classroom.leaderboard.hint')}</p>
+      <legend className="mb-1 block font-neo-body text-sm font-black text-edu-ink">{t('teacher.classroom.leaderboard.label')}</legend>
+      <p className="mb-2 font-neo-body text-xs font-semibold text-edu-ink/75">{t('teacher.classroom.leaderboard.hint')}</p>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         {LEADERBOARD_VISIBILITIES.map((option) => {
           const checked = option === value;
@@ -36,8 +36,8 @@ export function LeaderboardVisibilityPicker({ value, onChange }: LeaderboardVisi
               data-option={option}
               className={cn(
                 'relative flex min-h-12 cursor-pointer select-none items-start gap-2 rounded-neo border-2 px-3 py-2 font-neo-body transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100',
-                'has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-neo-cyan has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-neo-navy',
-                checked ? 'border-neo-black bg-neo-lime text-neo-black shadow-hard-sm' : 'border-neo-cream/50 bg-neo-navy-light text-neo-cream hover:border-neo-cream',
+                'has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-neo-cyan has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-edu-surface',
+                checked ? 'border-neo-black bg-neo-lime text-neo-black shadow-hard-sm' : 'border-edu-line bg-edu-surface text-edu-ink hover:border-edu-line',
                 loading && 'cursor-wait opacity-60',
               )}
             >
@@ -45,7 +45,7 @@ export function LeaderboardVisibilityPicker({ value, onChange }: LeaderboardVisi
               <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" strokeWidth={2.5} />
               <span className="flex min-w-0 flex-col leading-tight">
                 <span className="text-sm font-black">{t(`teacher.classroom.leaderboard.${KEY[option]}`)}</span>
-                <span className={cn('text-xs font-semibold', checked ? 'text-neo-black/75' : 'text-neo-cream/70')}>
+                <span className={cn('text-xs font-semibold', checked ? 'text-neo-black/75' : 'text-edu-ink/70')}>
                   {t(`teacher.classroom.leaderboard.${KEY[option]}Hint`)}
                 </span>
               </span>

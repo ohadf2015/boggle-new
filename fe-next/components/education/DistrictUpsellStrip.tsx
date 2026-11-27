@@ -60,13 +60,13 @@ export function DistrictUpsellStrip({ hideTeacherCta = false }: { hideTeacherCta
     <div ref={containerRef} className="mx-auto my-8 max-w-3xl flex flex-col gap-4">
       {/* Individual teacher CTA — hidden on the access page itself (self-link) */}
       {!hideTeacherCta && (
-        <aside className="rounded-neo border-neo border-neo-lime/60 bg-neo-navy-light px-6 py-5 shadow-hard">
+        <aside className="rounded-neo border-neo border-neo-lime/60 bg-neo-navy-light edu-sky:bg-edu-surface px-6 py-5 shadow-hard">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="text-lg font-neo-display font-black text-neo-lime">
+              <h3 className="text-lg font-neo-display font-black text-neo-lime edu-sky:text-edu-lime-ink">
                 {t('education.landing.teacherLeadCta.title')}
               </h3>
-              <p className="mt-1 text-sm text-neo-white/80">
+              <p className="mt-1 text-sm text-neo-white/80 edu-sky:text-edu-ink/80">
                 {t('education.landing.teacherLeadCta.body')}
               </p>
             </div>
@@ -75,7 +75,7 @@ export function DistrictUpsellStrip({ hideTeacherCta = false }: { hideTeacherCta
               onClick={() =>
                 trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_individual' })
               }
-              className="shrink-0 rounded-neo border-neo border-neo-lime bg-neo-lime/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition hover:bg-neo-lime/30 hover:shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+              className="shrink-0 rounded-neo border-neo border-neo-lime bg-neo-lime/20 px-5 py-2.5 font-bold text-neo-white edu-sky:text-edu-ink shadow-hard-sm transition hover:bg-neo-lime/30 hover:shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {t('education.landing.teacherLeadCta.button')}
             </Link>
@@ -84,13 +84,13 @@ export function DistrictUpsellStrip({ hideTeacherCta = false }: { hideTeacherCta
       )}
 
       {/* District / bulk CTA */}
-      <aside className="rounded-neo border-neo border-neo-purple/90 bg-neo-navy-light px-6 py-5 shadow-hard">
+      <aside className="rounded-neo border-neo border-neo-purple/90 bg-neo-navy-light edu-sky:bg-edu-surface px-6 py-5 shadow-hard">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-lg font-neo-display font-black text-neo-purple-light">
+            <h3 className="text-lg font-neo-display font-black text-neo-purple-light edu-sky:text-edu-purple-ink">
               {t('education.landing.districtCta.title')}
             </h3>
-            <p className="mt-1 text-sm text-neo-white/80">
+            <p className="mt-1 text-sm text-neo-white/80 edu-sky:text-edu-ink/80">
               {t('education.landing.districtCta.body')}
             </p>
           </div>
@@ -99,7 +99,7 @@ export function DistrictUpsellStrip({ hideTeacherCta = false }: { hideTeacherCta
             onClick={() =>
               trackGrowthEvent('landing_cta_clicked', { cta: 'district_upsell' })
             }
-            className="shrink-0 rounded-neo border-neo border-neo-purple bg-neo-purple/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition hover:bg-neo-purple/30 hover:shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+            className="shrink-0 rounded-neo border-neo border-neo-purple bg-neo-purple/20 px-5 py-2.5 font-bold text-neo-white edu-sky:text-edu-ink shadow-hard-sm transition hover:bg-neo-purple/30 hover:shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             {t('education.landing.districtCta.button')}
           </Link>

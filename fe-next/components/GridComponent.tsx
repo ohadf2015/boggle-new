@@ -14,6 +14,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { WordFeedback } from './game/WordFormingArea';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
+import { CLASSROOM_BOARD_FRAME, useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 export interface HighlightedCell {
   row: number;
@@ -119,6 +120,7 @@ const GridComponent = memo<GridComponentProps>(({
   const [gridNode, setGridNode] = useState<HTMLDivElement | null>(null);
 
   const equippedBoardTheme = useEquippedCosmetic('boardTheme');
+  const classroom = useClassroomBoard();
   const playerTileSkin = useEquippedCosmetic('tileSkin');
   const tileSkin = tileSkinOverride ?? playerTileSkin;
   const a11yLargeLetters = useLargeLetters();
@@ -205,7 +207,7 @@ const GridComponent = memo<GridComponentProps>(({
     <div className="relative w-full h-full flex items-center justify-center">
       {!hideComboIndicator && <ComboIndicator comboLevel={comboLevel} reduceMotion={reduceMotion} />}
       <div
-        className={cn('game-board-frame relative', equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`)}
+        className={cn('game-board-frame relative', equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`, classroom && CLASSROOM_BOARD_FRAME)}
         {...(tileSkin && { 'data-tile-skin': tileSkin.replace('tile-', '') })}
       >
         <LetterBoard

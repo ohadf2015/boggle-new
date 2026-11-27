@@ -80,7 +80,7 @@ export function PronunciationButton({
           className="
             absolute top-full mt-2 left-1/2 -translate-x-1/2
             px-3 py-2
-            bg-neo-navy text-neo-white
+            bg-neo-navy edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink
             border-[3px] border-neo-yellow
             rounded-neo
             shadow-hard
@@ -91,7 +91,7 @@ export function PronunciationButton({
           "
           role="tooltip"
         >
-          <div className="text-xs text-neo-yellow mb-1">
+          <div className="text-xs text-neo-yellow edu-sky:text-edu-yellow-ink mb-1">
             {t('education.lesson.pronunciationFallback')}
           </div>
           <div className="font-mono">{ipaPronunciation}</div>

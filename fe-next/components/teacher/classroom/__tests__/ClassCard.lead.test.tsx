@@ -58,7 +58,7 @@ describe('ClassCard on a list of classes: one lime action per screen', () => {
     render(<ClassCard {...baseProps} lead={false} />);
     const start = screen.getByTestId('classroom-card-start-game');
     expect(start.className).not.toMatch(LIME);
-    expect(start.className).toMatch(/bg-neo-navy/);
+    expect(start.className).toMatch(/bg-edu-surface/);
   });
 
   it('Given an empty class further down, Then Share code is not lime either', () => {

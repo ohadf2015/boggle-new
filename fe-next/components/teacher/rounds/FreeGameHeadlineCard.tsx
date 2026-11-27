@@ -29,14 +29,14 @@ export function FreeGameHeadlineCard({ classroomId }: { classroomId: string }) {
     <section
       data-testid="free-game-headline"
       aria-labelledby="free-game-headline-title"
-      className="rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-3 shadow-hard-lg sm:p-4"
+      className="rounded-neo-xl border-[3px] border-edu-line bg-edu-surface p-3 shadow-hard-lg sm:p-4"
     >
       <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-        <h2 id="free-game-headline-title" className="font-neo-display text-lg font-bold text-neo-cream">
+        <h2 id="free-game-headline-title" className="font-neo-display text-lg font-bold text-edu-ink">
           {t('teacher.lastGame.freeHeadlineTitle')}
-          <span className="ms-2 text-sm font-bold text-neo-cream/70">{t(roundTitleKey(headline.gameMode))}</span>
+          <span className="ms-2 text-sm font-bold text-edu-ink/70">{t(roundTitleKey(headline.gameMode))}</span>
         </h2>
-        <p data-testid="free-headline-players" className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-cream/85">
+        <p data-testid="free-headline-players" className="inline-flex items-center gap-1.5 text-sm font-bold text-edu-ink/85">
           <Users className="size-4" aria-hidden />
           {t(pluralKeyOf('teacher.lastGame.playersPlayed', headline.players, language), { count: headline.players })}
         </p>
@@ -50,7 +50,7 @@ export function FreeGameHeadlineCard({ classroomId }: { classroomId: string }) {
               /* analytics must never block */
             }
           }}
-          className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-neo-cream/85 underline decoration-2 underline-offset-4 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream"
+          className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-edu-ink/85 underline decoration-2 underline-offset-4 hover:text-edu-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edu-line"
         >
           <ProBadge size="xs" label={t('teacher.lastGame.proBadge')} />
           {t('teacher.lastGame.proLine')}
@@ -59,13 +59,13 @@ export function FreeGameHeadlineCard({ classroomId }: { classroomId: string }) {
 
       <div className="mt-3 grid grid-cols-[auto_1fr] items-start gap-2">
         <div data-testid="free-headline-average" className="max-w-[9rem] pe-3">
-          <p className="font-neo-display text-2xl font-black tabular-nums text-neo-cream">{headline.classAverage}</p>
-          <p className="text-xs font-bold text-neo-cream/70">{t('teacher.lastGame.classAverage')}</p>
+          <p className="font-neo-display text-2xl font-black tabular-nums text-edu-ink">{headline.classAverage}</p>
+          <p className="text-xs font-bold text-edu-ink/70">{t('teacher.lastGame.classAverage')}</p>
         </div>
         <div className="min-w-0">
-          <p className="mb-1.5 text-xs font-bold text-neo-cream/70">{t('teacher.lastGame.topMissed')}</p>
+          <p className="mb-1.5 text-xs font-bold text-edu-ink/70">{t('teacher.lastGame.topMissed')}</p>
           {headline.topMissed.length === 0 ? (
-            <p className="text-sm font-bold text-neo-cream/80">{t('teacher.lastGame.nothingToReview')}</p>
+            <p className="text-sm font-bold text-edu-ink/80">{t('teacher.lastGame.nothingToReview')}</p>
           ) : (
             <ul className="flex flex-wrap gap-1.5">
               {headline.topMissed.map((word) => (

@@ -85,4 +85,12 @@ describe('<ClassroomGameEndedState> — practice first, the retry last', () => {
     expect(container.textContent).not.toMatch(/upgrade|\$|price/i);
     for (const a of screen.getAllByRole('link')) expect(a.getAttribute('href')).not.toMatch(/pricing|upgrade/);
   });
+
+  it('GIVEN the sky page THEN the card is the cream surface and the only lime is the practice action', () => {
+    const { container } = render(<ClassroomGameEndedState {...base} roomCode="ABC123" />);
+    const card = screen.getByRole('heading', { level: 1 }).parentElement as HTMLElement;
+    expect(card).toHaveClass('bg-edu-surface', 'border-neo-black', 'shadow-edu-lip');
+    expect(screen.getByTestId('dead-end-practice')).toHaveClass('bg-neo-lime', 'text-neo-black');
+    expect(container.querySelectorAll('.bg-neo-lime')).toHaveLength(1);
+  });
 });

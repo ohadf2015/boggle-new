@@ -63,6 +63,13 @@ describe('VocabQuizStudentHeader', () => {
     expect(screen.getByRole('progressbar').getAttribute('aria-label')).toBe('vocabQuiz.progress:3,8');
   });
 
+  it('Given a question, Then the progress bar is an outlined track with a pink fill, leaving lime to the right answer', () => {
+    setup({ questionNumber: 3, totalQuestions: 8 });
+    const bar = screen.getByRole('progressbar');
+    expect(bar).toHaveClass('border-2', 'border-edu-line');
+    expect(bar.firstElementChild).toHaveClass('bg-neo-pink');
+  });
+
   it('Given the round is over, Then no question count is drawn', () => {
     setup({ finished: true });
     expect(screen.queryByTestId('vocab-quiz-progress-count')).toBeNull();

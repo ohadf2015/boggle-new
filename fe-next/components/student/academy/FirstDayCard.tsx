@@ -29,7 +29,7 @@ export function FirstDayCard({ goals, hasClass, chestArt = true }: Props) {
     <section
       data-testid="academy-first-day"
       aria-label={t('student.firstDay.title', 'First-day goals')}
-      className="pointer-events-auto flex flex-col gap-1 rounded-[14px] border-2 border-neo-cream/40 bg-neo-navy/90 p-1.5 text-neo-white shadow-hard-sm"
+      className="pointer-events-auto flex flex-col gap-1 rounded-[14px] border-2 border-edu-line bg-edu-surface p-1.5 text-edu-ink shadow-edu-lip-sm"
     >
       <div className="flex items-center gap-2">
         {chestArt && (
@@ -44,7 +44,7 @@ export function FirstDayCard({ goals, hasClass, chestArt = true }: Props) {
               data-testid={`academy-first-day-${g.id}`}
               data-done={g.done ? 'true' : 'false'}
               className={`flex min-w-0 flex-col gap-0.5 rounded-neo border-2 border-neo-black px-1.5 py-1 font-neo-body text-xs font-bold leading-tight ${
-                g.done ? 'bg-neo-lime text-neo-black' : 'bg-neo-white/10 text-neo-white'
+                g.done ? 'bg-neo-lime text-neo-black' : 'bg-edu-ink/10 text-edu-ink'
               }`}
             >
               <span className="flex items-center gap-1">
@@ -56,7 +56,7 @@ export function FirstDayCard({ goals, hasClass, chestArt = true }: Props) {
           ))}
         </ul>
       </div>
-      <p className="font-neo-body text-xs font-bold uppercase tracking-wide text-neo-yellow [@media(max-height:900px)]:sr-only">
+      <p className="font-neo-body text-xs font-bold uppercase tracking-wide text-edu-yellow-ink [@media(max-height:900px)]:sr-only">
         {hasClass
           ? t('student.firstDay.classStreakHint', "Today's class game starts your class streak")
           : t('student.firstDay.chestHint', 'Win chests in class games')}

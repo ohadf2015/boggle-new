@@ -18,7 +18,7 @@ interface ThemedProps {
 function ThemedPackCard({ pack, isSeason, onSelect }: { pack: ThemedPack; isSeason: boolean; onSelect: () => void }) {
   const { t, language } = useLanguage();
   return (
-    <article className="flex flex-col gap-3 rounded-neo border-3 border-neo-cream bg-neo-navy/80 p-4 shadow-hard">
+    <article className="flex flex-col gap-3 rounded-neo border-3 border-edu-line bg-edu-surface/80 p-4 shadow-hard">
       <div className="flex flex-wrap items-center gap-1.5">
         {isSeason && <span className={cn(chipClass, 'bg-neo-lime')}>{t('education.starterPacks.themed.thisSeason')}</span>}
         <span className={cn(chipClass, 'bg-neo-cyan')}>{t(`eduLibrary.grade.${pack.gradeBand}`)}</span>
@@ -26,8 +26,8 @@ function ThemedPackCard({ pack, isSeason, onSelect }: { pack: ThemedPack; isSeas
       </div>
       <div className="flex flex-1 items-start gap-3">
         <div className="min-w-0 flex-1" lang={pack.language} dir="auto">
-          <h4 className="font-neo-display text-lg font-black text-neo-white">{pack.name}</h4>
-          <p className="mt-1 line-clamp-2 font-neo-body text-sm leading-relaxed text-neo-white">{pack.description}</p>
+          <h4 className="font-neo-display text-lg font-black text-edu-ink">{pack.name}</h4>
+          <p className="mt-1 line-clamp-2 font-neo-body text-sm leading-relaxed text-edu-ink">{pack.description}</p>
         </div>
         <CardArt pose={pack.mascot} />
       </div>
@@ -53,10 +53,10 @@ export function ThemedPacksSection({ packs, onSelectPack }: ThemedProps) {
   return (
     <section aria-labelledby={headingId} className="space-y-3">
       <div>
-        <h3 id={headingId} className="font-neo-display text-xl font-black text-neo-white">
+        <h3 id={headingId} className="font-neo-display text-xl font-black text-edu-ink">
           {t('education.starterPacks.themed.title')}
         </h3>
-        <p className="font-neo-body text-sm text-neo-white">{t('education.starterPacks.themed.subtitle')}</p>
+        <p className="font-neo-body text-sm text-edu-ink">{t('education.starterPacks.themed.subtitle')}</p>
       </div>
       <div className="grid grid-cols-1 gap-3 @xl:grid-cols-2 @5xl:grid-cols-3">
         {visible.map((pack) => (
@@ -72,7 +72,7 @@ export function ThemedPacksSection({ packs, onSelectPack }: ThemedProps) {
         <button
           type="button"
           onClick={() => setShowAll((v) => !v)}
-          className="mx-auto flex min-h-11 w-full items-center justify-center rounded-neo border-2 border-dashed border-neo-cream/60 px-5 font-neo-body text-sm font-black text-neo-white transition-colors hover:border-solid hover:border-neo-cream hover:bg-neo-cream/10 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan active:scale-[0.98] motion-reduce:transition-none @xl:w-auto"
+          className="mx-auto flex min-h-11 w-full items-center justify-center rounded-neo border-2 border-dashed border-edu-line px-5 font-neo-body text-sm font-black text-edu-ink transition-colors hover:border-solid hover:border-edu-line hover:bg-edu-ink/10 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan active:scale-[0.98] motion-reduce:transition-none @xl:w-auto"
         >
           {showAll
             ? t('education.starterPacks.themed.showLess')

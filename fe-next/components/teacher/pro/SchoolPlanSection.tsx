@@ -16,11 +16,11 @@ export function SchoolPlanSection({ requester }: { requester: string }) {
   return (
     <section data-testid="school-plan-section" className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-8">
       <div className="min-w-0">
-        <p className="text-xs font-black uppercase tracking-widest text-neo-yellow">{t('eg2Pro.school.eyebrow')}</p>
-        <h2 className="mt-1 font-neo-display text-2xl font-black text-neo-white lg:text-3xl" style={{ textWrap: 'balance' }}>
+        <p className="text-xs font-black uppercase tracking-widest text-edu-yellow-ink">{t('eg2Pro.school.eyebrow')}</p>
+        <h2 className="mt-1 font-neo-display text-2xl font-black text-edu-ink lg:text-3xl" style={{ textWrap: 'balance' }}>
           {t('eg2Pro.school.title')}
         </h2>
-        <p className="mt-2 text-sm font-bold leading-relaxed text-neo-white/80">{t('eg2Pro.school.lead')}</p>
+        <p className="mt-2 text-sm font-bold leading-relaxed text-edu-ink/80">{t('eg2Pro.school.lead')}</p>
         <SchoolPriceTag className="mt-4 inline-block rounded-neo border-3 border-neo-black bg-neo-purple px-4 py-3 text-neo-white shadow-hard-sm" />
         <ol className="mt-5 space-y-3">
           {STEPS.map(({ icon: Icon, key }, i) => (
@@ -29,10 +29,10 @@ export function SchoolPlanSection({ requester }: { requester: string }) {
                 {i + 1}
               </span>
               <div className="min-w-0">
-                <p className="flex items-center gap-1.5 text-sm font-black text-neo-white">
-                  <Icon className="h-4 w-4 text-neo-yellow" aria-hidden /> {t(`eg2Pro.school.${key}Title`)}
+                <p className="flex items-center gap-1.5 text-sm font-black text-edu-ink">
+                  <Icon className="h-4 w-4 text-edu-yellow-ink" aria-hidden /> {t(`eg2Pro.school.${key}Title`)}
                 </p>
-                <p className="text-sm font-bold text-neo-white/70">{t(`eg2Pro.school.${key}Body`)}</p>
+                <p className="text-sm font-bold text-edu-ink/70">{t(`eg2Pro.school.${key}Body`)}</p>
               </div>
             </li>
           ))}

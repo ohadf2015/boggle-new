@@ -49,42 +49,42 @@ export function OwnClassProPreviewView({ className, students }: { className: str
     <section
       data-testid="own-class-pro-preview"
       aria-labelledby="own-class-pro-preview-title"
-      className="rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-4 shadow-hard-lg sm:p-5"
+      className="rounded-neo-xl border-[3px] border-edu-line bg-edu-surface p-4 shadow-hard-lg sm:p-5"
     >
-      <h2 id="own-class-pro-preview-title" className="font-neo-display text-lg font-black leading-tight text-neo-cream sm:text-xl">
+      <h2 id="own-class-pro-preview-title" className="font-neo-display text-lg font-black leading-tight text-edu-ink sm:text-xl">
         {t('teacher.reports.ownPreview.title', { class: className })}
       </h2>
-      <p data-testid="own-preview-line" className="mt-1 max-w-prose font-neo-body text-sm leading-snug text-neo-cream/90">
+      <p data-testid="own-preview-line" className="mt-1 max-w-prose font-neo-body text-sm leading-snug text-edu-ink/90">
         {t('teacher.reports.ownPreview.line')}
       </p>
       <div role="table" aria-label={t('teacher.reports.ownPreview.title', { class: className })} className="mt-3">
-        <div role="row" className={`${GRID} border-b-2 border-neo-cream/20 pb-1.5`}>
-          <span role="columnheader" className="font-neo-body text-xs font-bold text-neo-cream/80">
+        <div role="row" className={`${GRID} border-b-2 border-edu-line/20 pb-1.5`}>
+          <span role="columnheader" className="font-neo-body text-xs font-bold text-edu-ink/80">
             {t('teacher.reports.ownPreview.columns.student')}
           </span>
           {COLUMNS.map((c) => (
-            <span key={c} role="columnheader" className="text-end font-neo-body text-xs font-bold text-neo-cream/80">
+            <span key={c} role="columnheader" className="text-end font-neo-body text-xs font-bold text-edu-ink/80">
               {t(`teacher.reports.ownPreview.columns.${c}`)}
             </span>
           ))}
         </div>
         {students.slice(0, ROWS_SHOWN).map((s) => (
-          <div key={s.id} role="row" data-testid="own-preview-row" className={`${GRID} border-b border-neo-cream/10 py-2`}>
-            <bdi role="cell" data-testid="own-preview-name" className="min-w-0 truncate font-neo-body text-sm font-bold text-neo-cream">
+          <div key={s.id} role="row" data-testid="own-preview-row" className={`${GRID} border-b border-edu-line/10 py-2`}>
+            <bdi role="cell" data-testid="own-preview-name" className="min-w-0 truncate font-neo-body text-sm font-bold text-edu-ink">
               {s.name}
             </bdi>
             {COLUMNS.map((c) => (
               <span key={c} role="cell" data-testid="own-preview-locked" className="flex items-center justify-end gap-1.5">
                 <span className="sr-only">{t('teacher.reports.ownPreview.locked')}</span>
-                <span aria-hidden="true" className="h-3 w-full max-w-14 rounded-full bg-neo-cream/20 blur-[1px]" />
-                <Lock aria-hidden="true" className="size-3.5 shrink-0 text-neo-cream/60" />
+                <span aria-hidden="true" className="h-3 w-full max-w-14 rounded-full bg-edu-ink/20 blur-[1px]" />
+                <Lock aria-hidden="true" className="size-3.5 shrink-0 text-edu-ink/60" />
               </span>
             ))}
           </div>
         ))}
       </div>
       {hidden > 0 ? (
-        <p data-testid="own-preview-more" className="mt-2 font-neo-body text-xs font-bold text-neo-cream/80">
+        <p data-testid="own-preview-more" className="mt-2 font-neo-body text-xs font-bold text-edu-ink/80">
           {t(pluralKey(MORE_KEYS, hidden, language), { count: hidden })}
         </p>
       ) : null}

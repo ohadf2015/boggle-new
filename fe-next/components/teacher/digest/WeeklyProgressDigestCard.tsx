@@ -152,21 +152,21 @@ export function WeeklyProgressDigestCard({
         <h2 data-accent-decor className={cn(STICKER, "bg-neo-cyan text-base")}>
           {t('teacher.digest.weeklyTitle')}
         </h2>
-        <p className="mt-2 text-sm font-bold text-neo-cream/75">{t('teacher.digest.weeklySubtitle')}</p>
+        <p className="mt-2 text-sm font-bold text-edu-ink/75">{t('teacher.digest.weeklySubtitle')}</p>
       </header>
 
       {isLoading ? (
         <div
           data-testid="weekly-progress-digest-loading"
           aria-busy="true"
-          className="flex min-h-20 items-center justify-center gap-2 text-neo-cream/80"
+          className="flex min-h-20 items-center justify-center gap-2 text-edu-ink/80"
         >
           <Loader2 className="size-5 animate-spin" aria-hidden="true" />
           <span>{t('teacher.digest.weeklyLoading')}</span>
         </div>
       ) : error || !week || !wow ? (
         <NeoPanel tone="navy" className="p-4 text-center" data-testid="weekly-progress-digest-error">
-          <p className="font-bold text-neo-white">{t('teacher.digest.weeklyLoadError')}</p>
+          <p className="font-bold text-edu-ink">{t('teacher.digest.weeklyLoadError')}</p>
           <button
             type="button"
             onClick={() => void refresh()}
@@ -203,12 +203,12 @@ export function WeeklyProgressDigestCard({
               className="w-full"
             />
           </div>
-          <p className="text-xs font-bold uppercase tracking-wide text-neo-cream/60">
+          <p className="text-xs font-bold uppercase tracking-wide text-edu-ink/60">
             {t('teacher.digest.weeklyWow')} {formatWowDelta(wow.studentsActive)} / {formatWowDelta(wow.gamesCompleted)}
           </p>
           <div data-testid="weekly-progress-digest-movement" className="space-y-1">
-            <p className="text-sm font-bold text-neo-white">{t('teacher.digest.weeklyMovement')}</p>
-            <ul className="space-y-1 text-sm font-semibold text-neo-cream/85">
+            <p className="text-sm font-bold text-edu-ink">{t('teacher.digest.weeklyMovement')}</p>
+            <ul className="space-y-1 text-sm font-semibold text-edu-ink/85">
               {movers.map((s) => (
                 <li key={s.studentId}>
                   {s.name}
@@ -217,7 +217,7 @@ export function WeeklyProgressDigestCard({
               ))}
             </ul>
           </div>
-          <p data-testid="weekly-progress-digest-inactive" className="text-sm font-semibold text-neo-cream/80">
+          <p data-testid="weekly-progress-digest-inactive" className="text-sm font-semibold text-edu-ink/80">
             {t(pluralKeyOf('teacher.digest.weeklyInactiveCount', inactive.length, language), { count: inactive.length })}
             {inactive.length > 0 ? `: ${inactive.slice(0, 8).map((s) => s.name).join(', ')}${inactive.length > 8 ? ` +${inactive.length - 8}` : ''}` : ''}
           </p>
@@ -227,9 +227,9 @@ export function WeeklyProgressDigestCard({
       {!proLoading && showCta && (
         <div
           data-testid={`weekly-progress-digest-${ctaKind}-cta`}
-          className="rounded-neo border-neo border-neo-lime bg-neo-navy-light p-5 text-center shadow-hard"
+          className="rounded-neo border-neo border-neo-lime bg-edu-surface p-5 text-center shadow-hard"
         >
-          <p className="mb-3 text-sm font-bold text-neo-white/85">{t(ctaHintKey)}</p>
+          <p className="mb-3 text-sm font-bold text-edu-ink/85">{t(ctaHintKey)}</p>
           <Link
             href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
             data-testid="weekly-progress-digest-pro-link"

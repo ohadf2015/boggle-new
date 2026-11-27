@@ -5,6 +5,7 @@ import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { HOLD_SUBMIT_MS } from '@/hooks/useHoldToSubmit';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 // ==========================================
 // Hold-to-submit progress ring
@@ -77,6 +78,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
   showHoldRing = false, onHoldStart, onHoldEnd, tileSkin, compact = false, large = false, scaleInShell = false,
 }) => {
   const btnRef = useRef<HTMLButtonElement>(null);
+  const classroom = useClassroomBoard();
   const { t } = useLanguage();
   // Reskin only resting outer letters — the center keeps its lime "must-use"
   // cue and used letters keep their dimmed state. Mirrors the grid's tile skins
@@ -122,8 +124,10 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
             ? 'bg-neo-lime/40 text-neo-black/40 shadow-hard-lg'
             : 'bg-neo-lime text-neo-black shadow-[3px_3px_0px_black,0_0_20px_rgba(191,255,0,0.5)]'
           : isUsed
-            ? 'bg-neo-navy-light text-neo-white border-neo-cream/20 shadow-none'
-            : 'bg-neo-white text-neo-navy shadow-[2px_2px_0px_black,0_0_8px_rgba(191,255,0,0.15)] hover:shadow-[2px_2px_0px_black,0_0_14px_rgba(191,255,0,0.35)] hover:bg-neo-cream active:bg-neo-lime/30',
+            ? classroom ? 'bg-edu-ink/10 text-edu-ink/40 border-edu-line/30 shadow-none' : 'bg-neo-navy-light text-neo-white border-neo-cream/20 shadow-none'
+            : classroom
+              ? 'bg-edu-tile text-neo-black shadow-[2px_2px_0px_black] hover:bg-neo-cream active:bg-neo-lime/30'
+              : 'bg-neo-white text-neo-navy shadow-[2px_2px_0px_black,0_0_8px_rgba(191,255,0,0.15)] hover:shadow-[2px_2px_0px_black,0_0_14px_rgba(191,255,0,0.35)] hover:bg-neo-cream active:bg-neo-lime/30',
         'cursor-pointer',
       )}
       onClick={() => {
@@ -185,6 +189,7 @@ export interface WordTileProps {
 
 export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isCenter }) => {
   const { t } = useLanguage();
+  const classroom = useClassroomBoard();
   return (
   <m.button
     type="button"
@@ -196,7 +201,7 @@ export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isC
       'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
       isCenter
         ? 'bg-neo-lime text-neo-black shadow-[2px_2px_0px_black,0_0_12px_rgba(191,255,0,0.3)]'
-        : 'bg-neo-white text-neo-navy shadow-[2px_2px_0px_black,0_0_6px_rgba(255,255,255,0.1)]',
+        : classroom ? 'bg-edu-tile text-neo-black shadow-[2px_2px_0px_black]' : 'bg-neo-white text-neo-navy shadow-[2px_2px_0px_black,0_0_6px_rgba(255,255,255,0.1)]',
     )}
     onClick={() => onRemove(index)}
     initial={{ scale: 0, y: 20 }}

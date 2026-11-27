@@ -66,11 +66,11 @@ describe('EduStudentResults on a 390x844 phone', () => {
     window.sessionStorage.clear();
   });
 
-  it('given my round, when results show, then they stand on the podium scene, not a flat navy page', () => {
+  it('given my round, when results show, then they stand on the sky page: no navy podium art behind them', () => {
     render(<EduStudentResults {...(props as object)} />);
     const root = screen.getByTestId('edu-student-results');
-    expect(root).toContainElement(screen.getByTestId('academy-backdrop'));
-    expect(screen.getByTestId('academy-backdrop')).toHaveAttribute('data-art', 'podium');
+    expect(screen.queryByTestId('academy-backdrop')).toBeNull();
+    expect(root.className).toContain('bg-edu-page');
     expect(root.className).toContain('isolate');
   });
 

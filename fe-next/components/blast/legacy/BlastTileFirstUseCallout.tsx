@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import type { BlastTileType } from './types';
 import { getTileTooltip } from './utils/blastTileTooltips';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 const AUTO_DISMISS_MS = 4500;
 /** MP is time-pressured + hands-busy: dismiss sooner and never demand a tap. */
@@ -28,6 +29,7 @@ interface BlastTileFirstUseCalloutProps {
 export function BlastTileFirstUseCallout({ type, onDismiss, isMultiplayer = false }: BlastTileFirstUseCalloutProps) {
   const { t } = useLanguage();
   const reducedMotion = usePrefersReducedMotion();
+  const classroom = useClassroomBoard();
   const tip = getTileTooltip(type, t);
   const dismissRef = useRef(onDismiss);
   dismissRef.current = onDismiss;
@@ -47,13 +49,13 @@ export function BlastTileFirstUseCallout({ type, onDismiss, isMultiplayer = fals
     >
       <div
         data-testid="blast-tile-first-use"
-        className={`pointer-events-auto flex max-w-xs items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-2 text-neo-cream shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+        className={`${classroom ? 'pointer-events-auto flex max-w-xs items-center gap-3 rounded-neo border-neo-thick border-black bg-edu-surface px-3 py-2 text-edu-ink shadow-hard' : 'pointer-events-auto flex max-w-xs items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-2 text-neo-cream shadow-hard'} ${reducedMotion ? '' : 'animate-neo-pop'}`}
         role="status"
       >
         <span className="text-2xl leading-none" aria-hidden="true">{tip.icon}</span>
         <div className="min-w-0 flex-1">
-          <p className="font-neo-display text-sm font-bold leading-tight text-neo-lime">{tip.name}</p>
-          <p className="font-neo-body text-xs leading-snug text-neo-cream/90">{tip.desc}</p>
+          <p className={classroom ? 'font-neo-display text-sm font-bold leading-tight text-edu-ink' : 'font-neo-display text-sm font-bold leading-tight text-neo-lime'}>{tip.name}</p>
+          <p className={classroom ? 'font-neo-body text-xs leading-snug text-edu-ink/80' : 'font-neo-body text-xs leading-snug text-neo-cream/90'}>{tip.desc}</p>
         </div>
         {!isMultiplayer && (
           <button

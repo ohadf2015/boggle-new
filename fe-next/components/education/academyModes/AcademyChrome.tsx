@@ -57,14 +57,14 @@ export function AcademyPlayerChip({ player, className }: { player: AcademyPlayer
     <div
       data-testid="academy-player"
       className={cn(
-        'flex min-w-0 items-center gap-2 rounded-full border-[3px] border-neo-yellow bg-neo-navy-elevated py-0.5 pe-3 ps-0.5 shadow-hard',
+        'flex min-w-0 items-center gap-2 rounded-full border-[3px] border-neo-yellow bg-edu-surface py-0.5 pe-3 ps-0.5 shadow-hard',
         className,
       )}
     >
       <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border-[3px] border-neo-black bg-neo-orange lg:h-14 lg:w-14 min-[2200px]:h-20 min-[2200px]:w-20">
         <Avatar customAvatar={player.avatarConfig ?? null} userId={player.userId ?? player.name} pixelSize={80} disableEffects className="!h-full !w-full" />
       </span>
-      <span className="truncate font-neo-display text-base font-black text-neo-white lg:text-2xl min-[2200px]:text-4xl">{player.name}</span>
+      <span className="truncate font-neo-display text-base font-black text-edu-ink lg:text-2xl min-[2200px]:text-4xl">{player.name}</span>
     </div>
   );
 }
@@ -89,7 +89,7 @@ export function AcademyModeFrame({
   const { t } = useLanguage();
   const ribbon = { lime: 'bg-neo-lime', pink: 'bg-neo-pink', cyan: 'bg-neo-cyan', yellow: 'bg-neo-yellow' }[accent];
   return (
-    <div data-testid={testId} className="fixed inset-0 z-40 h-[100dvh] overflow-hidden bg-neo-navy text-neo-white">
+    <div data-testid={testId} className="fixed inset-0 z-40 h-[100dvh] overflow-hidden bg-edu-page text-edu-ink">
       <AcademyScene theme={theme}>
         <header className="flex shrink-0 items-center gap-2 px-3 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6 lg:px-10 lg:pt-6 min-[2200px]:gap-4 min-[2200px]:px-14 min-[2200px]:pt-10">
           <button
@@ -128,7 +128,7 @@ export function XpChip({ xp, className }: { xp: number | null; className?: strin
   const { t } = useLanguage();
   if (xp === null) {
     return (
-      <span data-testid="academy-xp-pending" className={cn('inline-flex items-center gap-1 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-3 py-1 font-neo-display text-sm font-bold text-neo-cream/80', className)}>
+      <span data-testid="academy-xp-pending" className={cn('inline-flex items-center gap-1 rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 py-1 font-neo-display text-sm font-bold text-edu-ink/80', className)}>
         {t('academy.modes.savingXp', 'Saving XP…')}
       </span>
     );

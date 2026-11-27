@@ -45,7 +45,7 @@ export function TeacherProTrialChargeSoonBanner({
         <TeacherProManageLink
           portalUrl={portalUrl}
           testId="teacher-pro-trial-charge-soon-cta"
-          className="self-center text-xs font-bold text-neo-cream/70 underline underline-offset-2"
+          className="self-center text-xs font-bold text-edu-ink/70 underline underline-offset-2"
         >
           {t('teacher.subscription.trialManageCta')}
         </TeacherProManageLink>

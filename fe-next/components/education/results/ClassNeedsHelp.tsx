@@ -80,9 +80,9 @@ export function ClassNeedsHelp({ masteryByPlayer, t }: ClassNeedsHelpProps) {
   return (
     <section
       data-testid="class-needs-help"
-      className="mb-4 p-3 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated shadow-hard-sm"
+      className="mb-4 p-3 rounded-neo border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface shadow-hard-sm"
     >
-      <p className="mb-2 flex items-center gap-2 font-neo-display font-bold text-sm uppercase tracking-wide text-neo-orange">
+      <p className="mb-2 flex items-center gap-2 font-neo-display font-bold text-sm uppercase tracking-wide text-neo-orange edu-sky:text-edu-orange-ink">
         <LifeBuoy className="w-5 h-5 shrink-0" aria-hidden />
         {t('education.results.needsHelp.title', { count: behind.length })}
       </p>
@@ -92,18 +92,18 @@ export function ClassNeedsHelp({ masteryByPlayer, t }: ClassNeedsHelpProps) {
             key={student.username}
             data-testid={`needs-help-${student.username}`}
             className={cn(
-              'flex items-center gap-2 px-3 py-1.5 rounded-neo border-[2px] border-neo-cream',
-              'bg-neo-navy text-neo-white font-neo-body font-bold text-sm'
+              'flex items-center gap-2 px-3 py-1.5 rounded-neo border-[2px] border-neo-cream edu-sky:border-edu-line',
+              'bg-neo-navy edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink font-neo-body font-bold text-sm'
             )}
           >
             <span dir="auto" className="truncate max-w-[9rem]">{student.username}</span>
-            <span className="shrink-0 tabular-nums text-neo-orange">
+            <span className="shrink-0 tabular-nums text-neo-orange edu-sky:text-edu-orange-ink">
               {student.found}/{student.total}
             </span>
           </li>
         ))}
       </ul>
-      <p className="mt-2 font-neo-body text-neo-white/60 text-xs">
+      <p className="mt-2 font-neo-body text-neo-white/60 edu-sky:text-edu-ink/60 text-xs">
         {t('education.results.needsHelp.hint')}
       </p>
     </section>

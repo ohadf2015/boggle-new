@@ -68,7 +68,7 @@ export function RehearseWithBotsButton({ classroomId, source, language, t, showN
         aria-busy={pending || undefined}
         title={showNote ? undefined : t('education.projectorLobby.rehearsePrivate')}
         {...(buttonClassName ? press : null)}
-        className={buttonClassName ?? cn(QUIET_LINK, compact && 'max-sm:min-w-11 max-sm:justify-center max-sm:border-2 max-sm:border-neo-cream/40 max-sm:no-underline')}
+        className={buttonClassName ?? cn(QUIET_LINK, compact && 'max-sm:min-w-11 max-sm:justify-center max-sm:border-2 max-sm:border-edu-line max-sm:no-underline')}
       >
         {pending ? (
           <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
@@ -78,7 +78,7 @@ export function RehearseWithBotsButton({ classroomId, source, language, t, showN
         <span className={cn(compact && 'max-sm:sr-only')}>{label ?? t('education.projectorLobby.rehearseCta')}</span>
       </button>
       {showNote ? (
-        <p className="px-2 font-neo-body text-xs font-semibold text-neo-cream/60">{t('education.projectorLobby.rehearsePrivate')}</p>
+        <p className="px-2 font-neo-body text-xs font-semibold text-edu-ink/60">{t('education.projectorLobby.rehearsePrivate')}</p>
       ) : null}
     </div>
   );

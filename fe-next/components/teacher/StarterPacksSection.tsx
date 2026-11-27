@@ -57,7 +57,7 @@ function PackCard({
   const Icon = categoryIcons[pack.category];
 
   return (
-    <article data-testid="starter-pack-card" className="@container rounded-neo border-3 border-neo-cream bg-neo-navy/80 p-4 shadow-hard">
+    <article data-testid="starter-pack-card" className="@container rounded-neo border-3 border-edu-line bg-edu-surface/80 p-4 shadow-hard">
       <div className="flex h-full flex-col gap-3 @2xl:flex-row @2xl:items-center @2xl:gap-5">
         <div className="flex min-w-0 flex-1 flex-col gap-3">
           <div className="flex flex-wrap items-center gap-1.5">
@@ -65,8 +65,8 @@ function PackCard({
           </div>
           <div className="flex items-start gap-3">
             <div className="min-w-0 flex-1">
-              <h4 className="font-neo-display text-lg font-black text-neo-white">{t(pack.nameKey)}</h4>
-              <p className="mt-1 line-clamp-2 font-neo-body text-sm leading-relaxed text-neo-white">{t(pack.descriptionKey)}</p>
+              <h4 className="font-neo-display text-lg font-black text-edu-ink">{t(pack.nameKey)}</h4>
+              <p className="mt-1 line-clamp-2 font-neo-body text-sm leading-relaxed text-edu-ink">{t(pack.descriptionKey)}</p>
             </div>
             <span
               aria-hidden="true"
@@ -145,10 +145,10 @@ export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPac
       <ThemedPacksSection packs={themedPacks} onSelectPack={onSelectPack} />
       <section aria-labelledby={headingId} className="space-y-3">
         <div>
-          <h3 id={headingId} className="text-xl font-neo-display font-black text-neo-white">
+          <h3 id={headingId} className="text-xl font-neo-display font-black text-edu-ink">
             {t('education.starterPacks.title')}
           </h3>
-          <p className="text-sm text-neo-white font-neo-body">
+          <p className="text-sm text-edu-ink font-neo-body">
             {t('education.starterPacks.subtitle')}
           </p>
         </div>

@@ -10,7 +10,7 @@ import { estimateSchoolAnnualUsd } from '@/lib/education/pro/schoolPricing';
 import { buildSchoolQuotePayload, schoolQuoteErrorKey, clampTeachers, MAX_QUOTE_TEACHERS } from '@/lib/education/pro/schoolQuote';
 
 const FIELD =
-  'mt-1 w-full rounded-neo border-2 border-neo-black bg-neo-white px-3 py-2 text-sm font-bold text-neo-black outline-none focus:shadow-hard-sm focus-visible:ring-2 focus-visible:ring-neo-cyan';
+  'mt-1 w-full rounded-neo border-2 border-neo-black bg-edu-paper px-3 py-2 text-sm font-bold text-neo-black outline-none focus:shadow-hard-sm focus-visible:ring-2 focus-visible:ring-neo-cyan';
 const LABEL = 'block text-xs font-black uppercase tracking-wide text-neo-black/80';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

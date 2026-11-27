@@ -29,7 +29,7 @@ describe('WaitingWarmUp with list words: spelling tiles', () => {
     expect(slots()).toHaveLength(3);
     expect(slots().map((s) => s.getAttribute('data-filled'))).toEqual(['false', 'false', 'false']);
     expect(slots().map((s) => s.textContent)).toEqual(['C', 'A', 'T']);
-    for (const slot of slots()) expect(slot.className).toContain('text-neo-cream/35');
+    for (const slot of slots()) expect(slot.className).toContain('text-edu-ink/35');
     const letters = within(screen.getByTestId('warmup-spell-tiles')).getAllByRole('button').map((b) => b.getAttribute('data-letter'));
     expect([...letters].sort()).toEqual(['A', 'C', 'T']);
   });
@@ -84,5 +84,24 @@ describe('WaitingWarmUp with list words: spelling tiles', () => {
     for (const b of within(screen.getByTestId('warmup-spell-tiles')).getAllByRole('button')) {
       expect(b.className).not.toMatch(/(^|\s)animate-/);
     }
+  });
+});
+
+describe('WaitingWarmUp spelling on the sky page', () => {
+  it('Given list words, Then the card is solid cream with a lip and the letters are chunky outlined tiles', () => {
+    render(<WaitingWarmUp username="Maya" words={['cat', 'dog']} t={t} />);
+    const card = screen.getByTestId('waiting-warmup');
+    expect(card).toHaveClass('bg-edu-surface', 'shadow-edu-lip');
+    expect(card.className).not.toContain('bg-edu-surface/90');
+    for (const tile of within(screen.getByTestId('warmup-spell-tiles')).getAllByRole('button')) {
+      expect(tile).toHaveClass('bg-edu-tile', 'border-neo-black', 'shadow-edu-lip-sm');
+    }
+  });
+
+  it('When a letter lands, Then its slot fills solid with black ink, never a lime outline on cream', () => {
+    render(<WaitingWarmUp username="Maya" words={['cat', 'dog']} t={t} />);
+    tapLetter('C');
+    expect(slots()[0]).toHaveClass('bg-neo-lime', 'border-neo-black', 'text-neo-black');
+    expect(slots()[0].className).not.toContain('border-neo-lime');
   });
 });

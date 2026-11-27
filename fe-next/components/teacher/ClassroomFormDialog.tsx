@@ -70,7 +70,7 @@ export function ClassroomFormDialog({
         />
         <NbDialogBody className="space-y-4">
           <div>
-            <label htmlFor="classroom-form-name" className="mb-2 block font-neo-body text-sm font-black text-neo-cream">
+            <label htmlFor="classroom-form-name" className="mb-2 block font-neo-body text-sm font-black text-edu-ink">
               {t('teacher.classroom.name')}
             </label>
             <input

@@ -1,45 +1,16 @@
 'use client';
 
 /**
- * Ambient magic over the map art, inside the art box so it tracks the islands:
- *  - the glowing letters painted into the sky (A, B, C, α on the landscape art;
- *    positions MEASURED on the webp) pulse like enchanted runes, each with a
- *    sparkle orbiting it — so they read as intentional magic, not stray glyphs;
- *  - gold motes rise slowly from the islands;
- *  - a few clouds drift at three depths (parallax);
- *  - light falls down every painted waterfall (CSS, compositor-only).
- *
- * Layout is index-based (no Math.random in render — the hub is SSR'd). Every
- * loop is skipped under reduced motion; the static glow stays.
+ * Ambient life over the daytime map art, inside the art box so it tracks the
+ * islands: a few clouds drift at three depths, and light falls down every
+ * painted waterfall (CSS, compositor-only). Index-based layout (the hub is
+ * SSR'd); every loop is skipped under reduced motion.
  */
 
 import Image from 'next/image';
 import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
-import { useCompositorLoop, type LoopSpec } from '@/lib/education/motion/compositorLoop';
+import { useCompositorLoop } from '@/lib/education/motion/compositorLoop';
 import type { MapLayout } from './AcademyMap';
-
-const RUNES: Record<MapLayout, { x: number; y: number; r: number }[]> = {
-  landscape: [
-    { x: 27, y: 15.7, r: 7 },
-    { x: 62.5, y: 20, r: 6.5 },
-    { x: 88.3, y: 26.5, r: 6 },
-    { x: 63.1, y: 74.4, r: 6.5 },
-  ],
-  portrait: [{ x: 59.8, y: 55.3, r: 6 }],
-};
-
-/** Deterministic mote field: golden-ratio spread across the art. */
-const MOTES = Array.from({ length: 16 }, (_, i) => {
-  const gx = (i * 0.618034) % 1;
-  const gy = (i * 0.381966 + 0.13) % 1;
-  return {
-    x: 6 + gx * 88,
-    y: 30 + gy * 55,
-    size: 5 + (i % 3) * 2,
-    dur: 7 + (i % 5) * 1.6,
-    delay: (i * 0.73) % 6,
-  };
-});
 
 const CLOUDS: Record<MapLayout, { x: number; y: number; w: number; depth: number; flip?: boolean }[]> = {
   portrait: [
@@ -88,57 +59,6 @@ const FALLS: Record<MapLayout, { x: number; y: number; h: number; w: number }[]>
 
 const pulse = (from: number, to: number) => [{ transform: `scale(${from})` }, { transform: `scale(${to})` }, { transform: `scale(${from})` }];
 
-function Rune({ rune, i, still }: { rune: (typeof RUNES)[MapLayout][number]; i: number; still: boolean }) {
-  const cycle = { duration: (3.2 + i * 0.5) * 1000, delay: i * 700 };
-  const glow = useCompositorLoop<HTMLSpanElement>(still ? null : [
-    { keyframes: pulse(0.85, 1.15), ...cycle },
-    { keyframes: [{ opacity: 0.55 }, { opacity: 1 }, { opacity: 0.55 }], ...cycle },
-  ]);
-  const orbit = useCompositorLoop<HTMLSpanElement>(still ? null : { keyframes: [{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }], duration: (9 + i * 2) * 1000, easing: 'linear' });
-  return (
-    <span
-      className="absolute -translate-x-1/2 -translate-y-1/2"
-      style={{ left: `${rune.x}%`, top: `${rune.y}%`, width: `${rune.r * 2}%`, aspectRatio: '1' }}
-    >
-      <span
-        ref={glow}
-        className="absolute inset-0 rounded-full mix-blend-screen"
-        style={{ background: 'radial-gradient(circle, rgba(255,214,90,0.55) 0%, rgba(255,170,40,0.18) 40%, transparent 68%)' }}
-      />
-      {!still && (
-        <span ref={orbit} className="absolute inset-0">
-          <span className="absolute left-1/2 top-[8%] -translate-x-1/2 drop-shadow-[0_0_4px_rgba(255,220,120,0.9)]">
-            <Sparkle size={10} />
-          </span>
-        </span>
-      )}
-    </span>
-  );
-}
-
-function Mote({ mote, i }: { mote: (typeof MOTES)[number]; i: number }) {
-  const cycle = { duration: mote.dur * 1000, delay: mote.delay * 1000, easing: 'ease-out' };
-  const loops: LoopSpec[] = [
-    { keyframes: [{ opacity: 0 }, { opacity: 0.9 }, { opacity: 0 }], ...cycle },
-    { keyframes: [{ transform: 'translate(0px, 0px)' }, { transform: `translate(${i % 2 ? 10 : -10}px, -60px)` }], ...cycle },
-  ];
-  const ref = useCompositorLoop<HTMLSpanElement>(loops);
-  return (
-    <span
-      ref={ref}
-      className="absolute rounded-full"
-      style={{
-        left: `${mote.x}%`,
-        top: `${mote.y}%`,
-        width: mote.size,
-        height: mote.size,
-        opacity: 0,
-        background: 'radial-gradient(circle, color-mix(in srgb, var(--neo-yellow) 20%, var(--neo-cream)) 0%, color-mix(in srgb, var(--neo-red) 10%, var(--neo-yellow)) 45%, rgba(255,210,58,0) 72%)',
-      }}
-    />
-  );
-}
-
 function Cloud({ cloud, still }: { cloud: (typeof CLOUDS)[MapLayout][number]; still: boolean }) {
   const drift = (cloud.depth + 1) * 14;
   // `translate`, not `transform`: the flip lives on transform.
@@ -162,17 +82,9 @@ function Cloud({ cloud, still }: { cloud: (typeof CLOUDS)[MapLayout][number]; st
         fill
         unoptimized
         sizes="40vw"
-        className="object-contain [filter:hue-rotate(40deg)_saturate(0.7)_brightness(0.85)]"
+        className="object-contain"
       />
     </span>
-  );
-}
-
-function Sparkle({ size }: { size: number }) {
-  return (
-    <svg viewBox="0 0 12 12" width={size} height={size} aria-hidden="true">
-      <path d="M6 0 L7.2 4.8 L12 6 L7.2 7.2 L6 12 L4.8 7.2 L0 6 L4.8 4.8 Z" fill="color-mix(in srgb, var(--neo-yellow) 30%, rgb(var(--neo-white)))" />
-    </svg>
   );
 }
 
@@ -209,10 +121,6 @@ export function AcademyAmbient({ layout, reducedMotion }: { layout: MapLayout; r
             />
           </span>
         ))}
-      {RUNES[layout].map((rune, i) => <Rune key={`rune-${i}`} rune={rune} i={i} still={still} />)}
-
-      {!still && MOTES.map((mote, i) => <Mote key={`mote-${i}`} mote={mote} i={i} />)}
-
       {CLOUDS[layout].map((cloud, i) => <Cloud key={`cloud-${i}`} cloud={cloud} still={still} />)}
     </div>
   );

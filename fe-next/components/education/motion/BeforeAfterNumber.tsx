@@ -46,7 +46,7 @@ export function BeforeAfterNumber({ before, after, holdMs = EDU_MS.streakHold, i
         initial={ignite.initial}
         animate={ignite.animate}
         transition={ignite.transition}
-        className={`inline-block font-neo-display font-black tabular-nums ${lit ? 'text-neo-yellow' : 'text-neo-cream/40'}`}
+        className={`inline-block font-neo-display font-black tabular-nums ${lit ? 'text-neo-yellow edu-sky:text-edu-yellow-ink' : 'text-neo-cream/40 edu-sky:text-edu-ink/40'}`}
       >
         {lit ? after : before}
       </m.span>

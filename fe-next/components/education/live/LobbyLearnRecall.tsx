@@ -29,7 +29,7 @@ type Phase = 'meet' | 'quiz' | 'learned';
 
 const BUTTON = 'inline-flex min-h-12 w-full items-center justify-center gap-1.5 rounded-neo border-[3px] px-4 font-neo-display text-base font-black uppercase shadow-hard-sm';
 
-const SECONDARY = 'border-neo-cream/40 bg-neo-navy text-neo-cream';
+const SECONDARY = 'border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink';
 
 export function canRecall(cards: readonly StudyCard[]): boolean {
   return quizzableCards(cards).length >= 2;
@@ -56,11 +56,11 @@ export function LobbyLearnRecall({ cards, studied, onDone, quiet = false, userna
   return (
     <section data-testid="lobby-word-study" aria-labelledby="lobby-word-study-title" className="flex w-full flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 id="lobby-word-study-title" className="font-neo-display text-2xl font-black text-neo-cream lg:text-4xl">
+        <h2 id="lobby-word-study-title" className="font-neo-display text-2xl font-black text-neo-cream edu-sky:text-edu-ink lg:text-4xl">
           {t('eduStudent.lobby.studyTitle')}
         </h2>
         {phase === 'learned' && (
-          <span data-testid="study-learned" className="inline-flex items-center gap-1 rounded-full border-2 border-neo-lime bg-neo-lime/10 px-2 py-0.5 font-neo-display text-sm font-bold text-neo-lime">
+          <span data-testid="study-learned" className="inline-flex items-center gap-1 rounded-full border-2 border-neo-lime bg-neo-lime/10 px-2 py-0.5 font-neo-display text-sm font-bold text-neo-lime edu-sky:text-edu-lime-ink">
             <CheckCircle2 className="size-4" aria-hidden="true" />
             {t(pluralKeyOf('eduStudent.lobby.studyLearned', items.length, language), { count: items.length })}
           </span>
@@ -69,7 +69,7 @@ export function LobbyLearnRecall({ cards, studied, onDone, quiet = false, userna
 
       {phase === 'meet' && (
         <>
-          <p className="font-neo-body text-base text-neo-cream/80">{t('eduStudent.recall.intro')}</p>
+          <p className="font-neo-body text-base text-neo-cream/80 edu-sky:text-edu-ink/80">{t('eduStudent.recall.intro')}</p>
           <ul data-testid="recall-meet" className="flex max-h-[40cqh] min-h-24 flex-col divide-y-2 divide-neo-black/15 overflow-y-auto rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-4 py-1 text-neo-black shadow-hard">
             {cards.map((card) => (
               <li key={card.word} className="flex flex-col py-2">
@@ -81,7 +81,7 @@ export function LobbyLearnRecall({ cards, studied, onDone, quiet = false, userna
           <button type="button" data-testid="recall-start" onClick={() => {
               startedAt.current = Date.now();
               setPhase('quiz');
-            }} className={cn(BUTTON, PRESS, quiet ? SECONDARY : 'min-h-14 border-neo-black bg-neo-lime text-lg text-neo-black')}>
+            }} className={cn(BUTTON, PRESS, quiet ? SECONDARY : 'min-h-14 border-neo-black edu-sky:border-neo-black bg-neo-lime edu-sky:bg-neo-lime text-lg text-neo-black edu-sky:text-neo-black')}>
             <Play className="size-5" aria-hidden="true" />
             {t('eduStudent.recall.start')}
           </button>

@@ -23,23 +23,23 @@ export const BossStageFooter = memo(function BossStageFooter({ remainingTime, co
     <div className="flex items-end justify-center gap-[1.6cqw]">
       <div
         data-testid="boss-timer"
-        className={cn('flex size-[8.5cqw] flex-col items-center justify-center rounded-full border-[0.3cqw] border-neo-black bg-neo-navy-light shadow-hard-xl', low && 'border-neo-red')}
+        className={cn('flex size-[8.5cqw] flex-col items-center justify-center rounded-full border-[0.3cqw] border-neo-black bg-neo-navy-light edu-sky:bg-edu-surface shadow-hard-xl', low && 'border-neo-red')}
       >
-        <span dir="ltr" className={cn('font-neo-display text-[3.2cqw] font-black leading-none tabular-nums', low ? 'text-neo-red' : 'text-neo-white')}>
+        <span dir="ltr" className={cn('font-neo-display text-[3.2cqw] font-black leading-none tabular-nums', low ? 'text-neo-red edu-sky:text-neo-red' : 'text-neo-white edu-sky:text-edu-ink')}>
           {formatClock(remainingTime * 1000)}
         </span>
         <span className="sr-only">{t('classroomBoss.timeLeft')}</span>
-        <Timer className="mt-[0.3cqw] size-[1.6cqw] text-neo-white/70" aria-hidden="true" />
+        <Timer className="mt-[0.3cqw] size-[1.6cqw] text-neo-white/70 edu-sky:text-edu-ink/70" aria-hidden="true" />
       </div>
       <div
         data-testid="boss-combo"
-        className={cn('min-w-[15cqw] rounded-[0.8cqw] border-[0.3cqw] border-neo-black bg-neo-navy-light px-[1.2cqw] py-[0.8cqw] text-center shadow-hard-xl', multiplier > 1 && 'border-neo-yellow')}
+        className={cn('min-w-[15cqw] rounded-[0.8cqw] border-[0.3cqw] border-neo-black bg-neo-navy-light edu-sky:bg-edu-surface px-[1.2cqw] py-[0.8cqw] text-center shadow-hard-xl', multiplier > 1 && 'border-neo-yellow')}
       >
-        <p className="flex items-center justify-center gap-[0.4cqw] font-neo-display text-[1.7cqw] font-black uppercase leading-none text-neo-white">
-          <Zap className="size-[1.7cqw] fill-neo-yellow text-neo-yellow" aria-hidden="true" />
+        <p className="flex items-center justify-center gap-[0.4cqw] font-neo-display text-[1.7cqw] font-black uppercase leading-none text-neo-white edu-sky:text-edu-ink">
+          <Zap className="size-[1.7cqw] fill-neo-yellow text-neo-yellow edu-sky:text-edu-yellow-ink" aria-hidden="true" />
           {t('classroomBoss.combo')}
         </p>
-        <p key={multiplier} dir="ltr" className={cn('font-neo-display text-[3.8cqw] font-black leading-none', multiplier > 1 ? 'text-neo-yellow' : 'text-neo-white/50', multiplier > 1 && styles.slideIn)}>
+        <p key={multiplier} dir="ltr" className={cn('font-neo-display text-[3.8cqw] font-black leading-none', multiplier > 1 ? 'text-neo-yellow edu-sky:text-edu-yellow-ink' : 'text-neo-white/50 edu-sky:text-edu-ink/50', multiplier > 1 && styles.slideIn)}>
           x{multiplier}
         </p>
         <div className="mt-[0.5cqw] flex gap-[0.3cqw]" aria-hidden="true">

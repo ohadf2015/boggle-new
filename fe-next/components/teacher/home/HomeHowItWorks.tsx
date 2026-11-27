@@ -23,8 +23,8 @@ function Terms({ t, className }: { t: T; className?: string }) {
             <Icon className="size-5" />
           </span>
           <div className="min-w-0">
-            <dt className="font-neo-display text-base font-black leading-tight text-neo-cream">{t(`eduShell.onboarding.howItWorks.${id}.title`)}</dt>
-            <dd className="mt-0.5 font-neo-body text-sm font-semibold leading-snug text-neo-cream/80">{t(`eduShell.onboarding.howItWorks.${id}.body`)}</dd>
+            <dt className="font-neo-display text-base font-black leading-tight text-edu-ink">{t(`eduShell.onboarding.howItWorks.${id}.title`)}</dt>
+            <dd className="mt-0.5 font-neo-body text-sm font-semibold leading-snug text-edu-ink/80">{t(`eduShell.onboarding.howItWorks.${id}.body`)}</dd>
           </div>
         </div>
       ))}
@@ -46,7 +46,7 @@ export function HomeHowItWorks({ t }: { t: T }) {
         <summary className="flex min-h-[52px] cursor-pointer list-none items-center gap-2 px-4 py-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan [&::-webkit-details-marker]:hidden">
           <span className="min-w-0 flex-1">
             <span className="block font-neo-display text-lg font-black leading-tight">{title}</span>
-            <span className="block font-neo-body text-xs font-semibold text-neo-cream/75">{hint}</span>
+            <span className="block font-neo-body text-xs font-semibold text-edu-ink/75">{hint}</span>
           </span>
           <ChevronDown className="size-5 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
         </summary>
@@ -55,7 +55,7 @@ export function HomeHowItWorks({ t }: { t: T }) {
       <div className={cn(NB_PANEL, 'hidden flex-col gap-4 p-5 sm:flex lg:p-6')}>
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
           <h2 className="font-neo-display text-2xl font-black leading-tight">{title}</h2>
-          <p className="font-neo-body text-sm font-semibold text-neo-cream/75">{hint}</p>
+          <p className="font-neo-body text-sm font-semibold text-edu-ink/75">{hint}</p>
         </div>
         <Terms t={t} />
       </div>

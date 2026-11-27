@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 export interface WordEntry {
   word: string;
@@ -32,8 +33,13 @@ const CHIP_TONE: Record<WordEntry['kind'], { chip: string; score: string }> = {
   locked: { chip: 'bg-neo-lime/15 border-neo-lime', score: 'text-neo-lime' },
   closed: { chip: 'bg-neo-navy-light border-neo-black', score: 'text-neo-cyan' },
 };
+const CHIP_TONE_CLASSROOM: Record<WordEntry['kind'], { chip: string; score: string }> = {
+  locked: { chip: 'bg-neo-lime border-neo-black', score: 'text-neo-black' },
+  closed: { chip: 'bg-edu-surface border-neo-black', score: 'text-edu-cyan-ink' },
+};
 
 export const MyWordsChips: React.FC<MyWordsChipsProps> = ({ words, dir = 'ltr', t }) => {
+  const classroom = useClassroomBoard();
   // Always render a fixed-height slot so the wheel cluster's `flex-1
   // justify-center` doesn't re-center when the first chip lands. Empty
   // state is silent — no header/placeholder, just reserved space.
@@ -45,7 +51,7 @@ export const MyWordsChips: React.FC<MyWordsChipsProps> = ({ words, dir = 'ltr', 
       className="notranslate h-16 overflow-y-auto flex flex-wrap content-start gap-1.5 justify-center"
     >
       {words.slice(0, 20).map((w) => {
-        const tone = CHIP_TONE[w.kind];
+        const tone = (classroom ? CHIP_TONE_CLASSROOM : CHIP_TONE)[w.kind];
         const closed = w.kind === 'closed';
         const label = t
           ? closed
@@ -59,7 +65,7 @@ export const MyWordsChips: React.FC<MyWordsChipsProps> = ({ words, dir = 'ltr', 
             dir={dir}
             aria-label={label}
             className={cn(
-              'inline-flex items-center h-7 px-2.5 rounded-neo border-2 text-neo-white text-xs font-semibold whitespace-nowrap shadow-hard-xs',
+              classroom ? 'inline-flex items-center h-7 px-2.5 rounded-neo border-2 text-edu-ink text-xs font-semibold whitespace-nowrap shadow-hard-xs' : 'inline-flex items-center h-7 px-2.5 rounded-neo border-2 text-neo-white text-xs font-semibold whitespace-nowrap shadow-hard-xs',
               tone.chip,
               // Status must not rely on the border color alone (WCAG 1.4.1) —
               // a closed word reads as struck-through regardless of hue.

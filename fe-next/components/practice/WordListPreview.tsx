@@ -63,32 +63,32 @@ export default function WordListPreview({
               onViewComplete?.();
               onBack();
             }}
-            className="text-neo-cream hover:text-neo-white"
+            className="text-neo-cream edu-sky:text-edu-ink hover:text-neo-white edu-sky:hover:text-edu-ink"
           >
             <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-xl font-neo-display text-neo-white flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-neo-yellow" />
+            <h1 className="text-xl font-neo-display text-neo-white edu-sky:text-edu-ink flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-neo-yellow edu-sky:text-edu-yellow-ink" />
               {t('education.practice.wordList')}
             </h1>
-            <p className="text-sm text-neo-cream">{lessonName}</p>
+            <p className="text-sm text-neo-cream edu-sky:text-edu-ink">{lessonName}</p>
           </div>
         </div>
 
         {/* Stats bar */}
-        <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4 shrink-0">
+        <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/80 edu-sky:bg-edu-surface mb-4 shrink-0">
           <CardContent className="py-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-neo-cream">
+              <span className="text-neo-cream edu-sky:text-edu-ink">
                 {usable.length} {t('education.practice.wordCount')} {t('education.practice.total')}
               </span>
               <div className="flex items-center gap-4">
-                <span className="flex items-center gap-1 text-neo-cyan">
+                <span className="flex items-center gap-1 text-neo-cyan edu-sky:text-edu-cyan-ink">
                   <CheckCircle className="w-4 h-4" />
                   {usable.filter((w) => w.canIntegrate).length} {t('education.practice.canEmbed')}
                 </span>
-                <span className="flex items-center gap-1 text-neo-yellow">
+                <span className="flex items-center gap-1 text-neo-yellow edu-sky:text-edu-yellow-ink">
                   <AlertCircle className="w-4 h-4" />
                   {usable.filter((w) => !w.canIntegrate).length} {t('education.practice.trackOnly')}
                 </span>
@@ -100,7 +100,7 @@ export default function WordListPreview({
         {/* Search */}
         <div className="relative mb-4 shrink-0">
           <Search className={cn(
-            'absolute top-1/2 -translate-y-1/2 w-4 h-4 text-neo-cream',
+            'absolute top-1/2 -translate-y-1/2 w-4 h-4 text-neo-cream edu-sky:text-edu-ink',
             isRTL ? 'right-3' : 'left-3'
           )} />
           <Input
@@ -108,7 +108,7 @@ export default function WordListPreview({
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('education.practice.searchWords')}
             className={cn(
-              'border-[3px] border-neo-black shadow-hard-sm bg-neo-navy/50',
+              'border-[3px] border-neo-black shadow-hard-sm bg-neo-navy/50 edu-sky:bg-edu-surface',
               'ps-10'
             )}
           />
@@ -118,9 +118,9 @@ export default function WordListPreview({
             the header, the counts and the done button stay put. */}
         <div className={cn('space-y-2', DRILL_SCROLL_CLASS)}>
           {filteredWords.length === 0 ? (
-            <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/50">
+            <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/50 edu-sky:bg-edu-surface">
               <CardContent className="py-8 text-center">
-                <p className="text-neo-cream">
+                <p className="text-neo-cream edu-sky:text-edu-ink">
                   {searchQuery
                     ? t('education.practice.noResults')
                     : t('education.practice.noWords')}
@@ -137,22 +137,22 @@ export default function WordListPreview({
                   'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] hover:shadow-hard-lg',
                   expandedWord === word.word
                     ? 'bg-neo-cyan/10'
-                    : 'bg-neo-navy/80 hover:bg-neo-navy/60'
+                    : 'bg-neo-navy/80 edu-sky:bg-edu-surface hover:bg-neo-navy/60 edu-sky:hover:bg-edu-surface'
                 )}
               >
                 <CardContent className="py-3 px-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       {word.canIntegrate ? (
-                        <CheckCircle className="w-4 h-4 text-neo-cyan shrink-0" />
+                        <CheckCircle className="w-4 h-4 text-neo-cyan edu-sky:text-edu-cyan-ink shrink-0" />
                       ) : (
-                        <AlertCircle className="w-4 h-4 text-neo-yellow shrink-0" />
+                        <AlertCircle className="w-4 h-4 text-neo-yellow edu-sky:text-edu-yellow-ink shrink-0" />
                       )}
-                      <span className="text-lg font-neo-body text-neo-white">
+                      <span className="text-lg font-neo-body text-neo-white edu-sky:text-edu-ink">
                         {word.word}
                       </span>
                     </div>
-                    <span className="text-xs text-neo-cream">
+                    <span className="text-xs text-neo-cream edu-sky:text-edu-ink">
                       {expandedWord === word.word ? '▲' : '▼'}
                     </span>
                   </div>
@@ -163,11 +163,11 @@ export default function WordListPreview({
                       {word.definition ? (
                         <p className="text-sm text-slate-300">{word.definition}</p>
                       ) : (
-                        <p className="text-sm text-neo-cream italic">
+                        <p className="text-sm text-neo-cream edu-sky:text-edu-ink italic">
                           {t('education.practice.noDefinition')}
                         </p>
                       )}
-                      <p className="text-xs text-neo-cream mt-2">
+                      <p className="text-xs text-neo-cream edu-sky:text-edu-ink mt-2">
                         {word.canIntegrate
                           ? t('teacher.lesson.canIntegrate')
                           : t('teacher.lesson.cannotIntegrate')}

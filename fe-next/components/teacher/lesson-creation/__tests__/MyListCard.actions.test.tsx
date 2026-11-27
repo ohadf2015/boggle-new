@@ -62,7 +62,7 @@ describe('MyListCard face', () => {
     const { rerender } = renderCard();
     const card = screen.getByTestId('my-list-L1');
     const first = card.getAttribute('data-accent');
-    expect(card.className).toContain('bg-neo-navy-light');
+    expect(card.className).toContain('bg-edu-surface');
     rerender(<MyListCard lesson={lesson} index={1} sharing={false} {...handlers} />);
     expect(screen.getByTestId('my-list-L1').getAttribute('data-accent')).not.toBe(first);
   });
@@ -131,5 +131,20 @@ describe('MyListCard menu', () => {
     renderCard({ sharing: true });
     await openMenu();
     expect(screen.getByTestId('lesson-share-L1')).toHaveAttribute('aria-disabled', 'true');
+  });
+});
+
+describe('MyListCard on the sky page', () => {
+  it('Given a list, Then its words are straight cream letter tiles with a lip, and the overflow count is a solid tile too', () => {
+    const many = { ...(lesson as object), words: Array.from({ length: 12 }, (_, i) => ({ word: `w${i}` })) } as never;
+    render(<MyListCard lesson={many} index={0} sharing={false} {...handlers} />);
+    const tiles = screen.getAllByTestId('word-tile');
+    for (const tile of tiles) {
+      expect(tile.className).toContain('edu-tile');
+      expect(tile.className).not.toMatch(/(^|\s)-?rotate-1(\s|$)/);
+    }
+    const more = screen.getByTestId('word-tile-more');
+    expect(more.className).toContain('edu-tile');
+    expect(more.className).not.toContain('border-dashed');
   });
 });

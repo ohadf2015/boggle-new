@@ -34,23 +34,23 @@ export function MasteryLockedTeaser({ words, hidden }: { words: HardWord[]; hidd
                   aria-hidden="true"
                   data-testid="mastery-ghost-row"
                   style={{ opacity: GHOST_OPACITY[i] }}
-                  className="pointer-events-none grid select-none grid-cols-[1.75rem_minmax(0,1fr)_auto] items-center gap-x-2.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-2.5 py-1.5"
+                  className="pointer-events-none grid select-none grid-cols-[1.75rem_minmax(0,1fr)_auto] items-center gap-x-2.5 rounded-neo border-2 border-edu-line bg-edu-surface px-2.5 py-1.5"
                 >
                   <span className="grid size-7 place-items-center rounded-neo border-2 border-neo-black bg-neo-cream font-neo-display text-sm font-black text-neo-black">
                     {FREE_PREVIEW_WORDS + i + 1}
                   </span>
                   <span className="min-w-0 space-y-1.5 blur-[3px]">
-                    <span className="block h-3.5 rounded-full bg-neo-white/50" style={{ width: `${width - 25}%` }} />
+                    <span className="block h-3.5 rounded-full bg-edu-paper/50" style={{ width: `${width - 25}%` }} />
                     <span className="block h-1.5 rounded-full bg-neo-pink/70" style={{ width: `${width}%` }} />
                   </span>
-                  <span className="block h-4 w-9 rounded-full bg-neo-white/40 blur-[3px]" />
+                  <span className="block h-4 w-9 rounded-full bg-edu-paper/40 blur-[3px]" />
                 </li>
               ))}
             </>
           }
         />
       ) : (
-        <p className="text-sm font-bold text-neo-cream/70">{t('eduPro.mastery.noneMissed')}</p>
+        <p className="text-sm font-bold text-edu-ink/70">{t('eduPro.mastery.noneMissed')}</p>
       )}
 
       <m.div
@@ -58,20 +58,20 @@ export function MasteryLockedTeaser({ words, hidden }: { words: HardWord[]; hidd
         initial={reduceMotion ? false : { y: 8 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 420, damping: 26, delay: 0.2 }}
-        className="relative mt-3 flex flex-col gap-3 rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-4 shadow-hard-xl sm:flex-row sm:items-center sm:justify-between sm:p-5"
+        className="relative mt-3 flex flex-col gap-3 rounded-neo-xl border-[3px] border-edu-line bg-edu-surface p-4 shadow-hard-xl sm:flex-row sm:items-center sm:justify-between sm:p-5"
       >
         <div className="min-w-0">
-          <p className="flex items-center gap-2 font-neo-display text-base font-black text-neo-white">
+          <p className="flex items-center gap-2 font-neo-display text-base font-black text-edu-ink">
             <span className="grid size-7 shrink-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-yellow text-neo-black">
               <Lock className="size-3.5" aria-hidden="true" />
             </span>
             {t('teacher.proGate.mastery.title')}
           </p>
-          {hidden > 0 && <p className="mt-1 text-xs font-black text-neo-yellow">{t('eduPro.mastery.hiddenWords', { count: hidden })}</p>}
+          {hidden > 0 && <p className="mt-1 text-xs font-black text-edu-yellow-ink">{t('eduPro.mastery.hiddenWords', { count: hidden })}</p>}
           <ul className="mt-2 space-y-1">
             {UNLOCKS.map((key) => (
-              <li key={key} data-testid="mastery-unlock-item" className="flex items-start gap-2 text-sm font-bold text-neo-cream/90">
-                <Check className="mt-0.5 size-4 shrink-0 text-neo-lime" strokeWidth={3} aria-hidden="true" />
+              <li key={key} data-testid="mastery-unlock-item" className="flex items-start gap-2 text-sm font-bold text-edu-ink/90">
+                <Check className="mt-0.5 size-4 shrink-0 text-edu-lime-ink" strokeWidth={3} aria-hidden="true" />
                 <span>{t(key)}</span>
               </li>
             ))}

@@ -50,21 +50,21 @@ export function DuelDisconnectOverlay({
       data-testid="disconnect-overlay"
       className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/90 animate-in fade-in-0 duration-300"
     >
-      <div className="bg-neo-navy border-[3px] border-neo-cream rounded-neo shadow-hard p-8 max-w-md text-center">
+      <div className="bg-edu-surface border-[3px] border-edu-line rounded-neo shadow-hard p-8 max-w-md text-center">
         {/* Icon */}
-        <WifiOff className="w-16 h-16 text-neo-pink mx-auto mb-4" />
+        <WifiOff className="w-16 h-16 text-edu-pink-ink mx-auto mb-4" />
 
         {/* Heading */}
-        <h2 className="text-2xl font-neo-display font-bold text-neo-white mb-4">
+        <h2 className="text-2xl font-neo-display font-bold text-edu-ink mb-4">
           {t('duels.opponentDisconnected', { opponentName })}
         </h2>
 
         {/* Countdown */}
         <div className="mb-6">
-          <div className="text-6xl font-neo-display font-bold text-neo-lime mb-2">
+          <div className="text-6xl font-neo-display font-bold text-edu-lime-ink mb-2">
             {secondsRemaining}
           </div>
-          <p className="text-neo-white text-sm">
+          <p className="text-edu-ink text-sm">
             {t('duels.autoForfeitMessage')}
           </p>
         </div>

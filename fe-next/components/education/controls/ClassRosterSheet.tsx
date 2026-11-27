@@ -90,7 +90,7 @@ export function ClassRosterSheet({ rows, statusOf, onRemove, t }: ClassRosterShe
                 data-idle={row.isIdle ? 'true' : 'false'}
                 className={cn(
                   'flex flex-wrap items-center gap-2 tv:gap-4 rounded-neo border-3 border-neo-black p-2 tv:p-3',
-                  row.isIdle ? 'bg-neo-yellow' : 'bg-neo-white',
+                  row.isIdle ? 'bg-neo-yellow edu-sky:bg-neo-yellow' : 'bg-neo-white edu-sky:bg-edu-paper',
                   status === 'removing' && 'opacity-60',
                 )}
               >
@@ -99,7 +99,7 @@ export function ClassRosterSheet({ rows, statusOf, onRemove, t }: ClassRosterShe
                 </span>
 
                 {row.isIdle ? (
-                  <span className="inline-flex items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-pink px-2 py-1 font-neo-display text-xs lg:text-base xl:text-lg tv:text-xl font-black uppercase text-neo-white">
+                  <span className="inline-flex items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-pink px-2 py-1 font-neo-display text-xs lg:text-base xl:text-lg tv:text-xl font-black uppercase text-neo-white edu-sky:text-edu-ink">
                     <Zap className="h-3 w-3 tv:h-5 tv:w-5" aria-hidden="true" />
                     {t('education.liveControls.idleBadge')}
                   </span>
@@ -124,7 +124,7 @@ export function ClassRosterSheet({ rows, statusOf, onRemove, t }: ClassRosterShe
                     <button
                       type="button"
                       onClick={() => setArmed(null)}
-                      className="min-h-[56px] rounded-neo border-3 border-neo-black bg-neo-white px-3 font-neo-display text-sm lg:text-lg xl:text-xl tv:text-2xl font-black uppercase text-neo-black shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+                      className="min-h-[56px] rounded-neo border-3 border-neo-black bg-neo-white edu-sky:bg-edu-paper px-3 font-neo-display text-sm lg:text-lg xl:text-xl tv:text-2xl font-black uppercase text-neo-black shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
                     >
                       {t('education.liveControls.removeCancel')}
                     </button>

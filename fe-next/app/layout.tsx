@@ -1,4 +1,5 @@
 import './globals.css';
+import './edu-sky.css';
 import type { Metadata } from 'next';
 import { getAdSenseAccountMeta } from '@/lib/ads/adSensePolicy';
 import type { ReactNode } from 'react';

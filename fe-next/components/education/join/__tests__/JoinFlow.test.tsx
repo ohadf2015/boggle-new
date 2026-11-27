@@ -79,13 +79,13 @@ describe('<JoinFlow> — code step', () => {
     render(<JoinFlow />);
     fireEvent.change(codeField(), { target: { value: ' p45-krt ' } });
     expect(onNameStep()).toBe(true);
-    expect(screen.getByText('P45KRT')).toBeInTheDocument();
+    expect(screen.getByTestId('join-code-chip')).toHaveTextContent('P45KRT');
   });
 
   it('never accepts more than six characters', () => {
     render(<JoinFlow />);
     fireEvent.change(codeField(), { target: { value: 'P45KRTXYZ' } });
-    expect(screen.getByText('P45KRT')).toBeInTheDocument();
+    expect(screen.getByTestId('join-code-chip')).toHaveTextContent('P45KRT');
   });
 
   it('starts on the nickname step when the QR already carried the code', () => {
@@ -103,7 +103,7 @@ describe('<JoinFlow> — code step', () => {
     expect(onNameStep()).toBe(false);
     rerender(<JoinFlow initialCode="P45KRT" />);
     expect(onNameStep()).toBe(true);
-    expect(screen.getByText('P45KRT')).toBeInTheDocument();
+    expect(screen.getByTestId('join-code-chip')).toHaveTextContent('P45KRT');
   });
 });
 

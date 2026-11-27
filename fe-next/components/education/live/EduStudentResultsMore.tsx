@@ -18,7 +18,7 @@ export function EduStudentResultsMore({ words, children, t }: EduStudentResultsM
     <details
       data-testid="edu-student-more"
       onToggle={(e) => e.currentTarget.open && setOpened(true)}
-      className="group rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-elevated shadow-hard"
+      className="group rounded-neo-lg border-[3px] border-edu-line bg-edu-surface shadow-hard"
     >
       <summary
         data-testid="edu-student-more-summary"
@@ -32,7 +32,7 @@ export function EduStudentResultsMore({ words, children, t }: EduStudentResultsM
           {children}
           <h2 className="flex items-baseline justify-between gap-2 font-neo-display text-base font-black">
             {t('eduLiveRoom.studentResults.yourWords')}
-            {words.length > 0 && <span className="font-neo-body text-sm font-bold tabular-nums text-neo-cream/70">{words.length}</span>}
+            {words.length > 0 && <span className="font-neo-body text-sm font-bold tabular-nums text-edu-ink/70">{words.length}</span>}
           </h2>
           {words.length > 0 ? (
             <ul className="flex flex-wrap gap-1.5">
@@ -52,7 +52,7 @@ export function EduStudentResultsMore({ words, children, t }: EduStudentResultsM
               ))}
             </ul>
           ) : (
-            <p className="font-neo-body text-sm font-bold text-neo-cream/80">{t('eduLiveRoom.studentResults.noWords')}</p>
+            <p className="font-neo-body text-sm font-bold text-edu-ink/80">{t('eduLiveRoom.studentResults.noWords')}</p>
           )}
         </div>
       )}

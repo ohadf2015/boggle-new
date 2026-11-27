@@ -77,7 +77,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
           <div
             className={cn(
               'max-w-md w-full',
-              'bg-neo-navy border-[3px] border-neo-black rounded-neo',
+              'bg-neo-navy edu-sky:bg-edu-surface border-[3px] border-neo-black rounded-neo',
               'shadow-hard-lg',
               'overflow-hidden',
               'animate-in fade-in-0 zoom-in-95 duration-300'
@@ -95,13 +95,13 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
               {/* Title */}
               <h2
                 id="onboarding-title"
-                className="text-2xl font-neo-display text-neo-white mb-2"
+                className="text-2xl font-neo-display text-neo-white edu-sky:text-edu-ink mb-2"
               >
                 {t('education.practice.swipeHint')}
               </h2>
 
               {/* Explanation */}
-              <p className="text-neo-white font-neo-body mb-6">
+              <p className="text-neo-white edu-sky:text-edu-ink font-neo-body mb-6">
                 {t('education.practice.swipeExplain', "Swipe right for 'Got It', left for 'Don't Know'")}
               </p>
 
@@ -114,12 +114,12 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
                 >
                   <div className="w-14 h-14 rounded-full bg-neo-pink/20 border-[3px] border-neo-pink flex items-center justify-center">
                     {isRTL ? (
-                      <ArrowRight className="w-7 h-7 text-neo-pink" />
+                      <ArrowRight className="w-7 h-7 text-neo-pink edu-sky:text-edu-pink-ink" />
                     ) : (
-                      <ArrowLeft className="w-7 h-7 text-neo-pink" />
+                      <ArrowLeft className="w-7 h-7 text-neo-pink edu-sky:text-edu-pink-ink" />
                     )}
                   </div>
-                  <div className="flex items-center gap-1 text-neo-pink">
+                  <div className="flex items-center gap-1 text-neo-pink edu-sky:text-edu-pink-ink">
                     <ThumbsDown className="w-4 h-4" />
                     <span className="text-sm font-neo-body">
                       {t('education.practice.dontKnow')}
@@ -131,7 +131,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
                 <div
                   className="relative"
                 >
-                  <div className="w-16 h-16 rounded-neo bg-neo-white/10 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-neo bg-neo-white/10 edu-sky:bg-edu-ink/10 flex items-center justify-center">
                     <span className="text-4xl">👆</span>
                   </div>
                 </div>
@@ -143,12 +143,12 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
                 >
                   <div className="w-14 h-14 rounded-full bg-neo-cyan/20 border-[3px] border-neo-cyan flex items-center justify-center">
                     {isRTL ? (
-                      <ArrowLeft className="w-7 h-7 text-neo-cyan" />
+                      <ArrowLeft className="w-7 h-7 text-neo-cyan edu-sky:text-edu-cyan-ink" />
                     ) : (
-                      <ArrowRight className="w-7 h-7 text-neo-cyan" />
+                      <ArrowRight className="w-7 h-7 text-neo-cyan edu-sky:text-edu-cyan-ink" />
                     )}
                   </div>
-                  <div className="flex items-center gap-1 text-neo-cyan">
+                  <div className="flex items-center gap-1 text-neo-cyan edu-sky:text-edu-cyan-ink">
                     <ThumbsUp className="w-4 h-4" />
                     <span className="text-sm font-neo-body">
                       {t('education.practice.gotIt')}

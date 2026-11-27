@@ -4,6 +4,7 @@ import { memo, useRef, useEffect, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Flame } from 'lucide-react';
 import { cn } from '../../../lib/utils';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 interface TvGapIndicatorProps {
   leaderScore: number;
@@ -29,6 +30,7 @@ const TvGapIndicator = memo<TvGapIndicatorProps>(({
 }) => {
   const gap = leaderScore - secondScore;
   const gapRatio = leaderScore > 0 ? gap / leaderScore : 0;
+  const classroom = useClassroomBoard();
   const prevGapRef = useRef(gap);
   const [isClosingFast, setIsClosingFast] = useState(false);
 
@@ -57,7 +59,7 @@ const TvGapIndicator = memo<TvGapIndicatorProps>(({
       animate={{ opacity: 1 }}
       className={cn(
         'flex items-center justify-center gap-2 py-1.5 px-3 my-1 border-dashed border-2 rounded-neo',
-        isClosingFast ? 'border-neo-orange bg-neo-orange/10' : 'border-neo-cream/25 bg-neo-navy/40'
+        isClosingFast ? 'border-neo-orange bg-neo-orange/10' : classroom ? 'border-edu-line/40 bg-edu-ink/5' : 'border-neo-cream/25 bg-neo-navy/40'
       )}
       aria-label={label}
     >
@@ -76,7 +78,7 @@ const TvGapIndicator = memo<TvGapIndicatorProps>(({
           </m.div>
         ) : (
           <m.div key="gap" className="flex items-center gap-1.5">
-            <span className="font-neo-display font-black text-sm 2xl:text-base text-neo-cream/70 uppercase tracking-widest">
+            <span className={classroom ? 'font-neo-display font-black text-sm 2xl:text-base text-edu-ink/70 uppercase tracking-widest' : 'font-neo-display font-black text-sm 2xl:text-base text-neo-cream/70 uppercase tracking-widest'}>
               {label}
             </span>
           </m.div>

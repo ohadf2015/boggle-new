@@ -55,10 +55,10 @@ export function AssignmentTemplateGallery({
 
   return (
     <div data-testid="assignment-template-gallery" className="space-y-4">
-      <p className="font-neo-body text-sm font-bold text-neo-white">
+      <p className="font-neo-body text-sm font-bold text-edu-ink">
         {t('teacher.assignment.galleryTitle')}
       </p>
-      <p className="font-neo-body text-xs text-neo-white/70 text-pretty">
+      <p className="font-neo-body text-xs text-edu-ink/70 text-pretty">
         {t('teacher.assignment.galleryHint')}
       </p>
 
@@ -127,16 +127,16 @@ export function AssignmentTemplateGallery({
               key={template.id}
               data-testid={`assignment-template-${template.id}`}
               className={cn(
-                'rounded-neo border-3 border-neo-cream bg-neo-navy-light p-4 text-start',
+                'rounded-neo border-3 border-edu-line bg-edu-surface p-4 text-start',
               )}
             >
-              <span className="block font-neo-display text-sm font-black uppercase text-neo-white">
+              <span className="block font-neo-display text-sm font-black uppercase text-edu-ink">
                 {t(template.nameKey)}
               </span>
-              <span className="mt-1 block font-neo-body text-xs text-neo-white/70 text-pretty">
+              <span className="mt-1 block font-neo-body text-xs text-edu-ink/70 text-pretty">
                 {t(template.descriptionKey)}
               </span>
-              <span className="mt-2 block font-neo-body text-xs font-bold text-neo-cyan">
+              <span className="mt-2 block font-neo-body text-xs font-bold text-edu-cyan-ink">
                 {template.words.length} {t('teacher.assignment.words')} ·{' '}
                 {t(`teacher.assignment.gradeBand${bandKey(template.gradeBand)}`)} ·{' '}
                 {t(`teacher.assignment.subject${capitalize(template.subject)}`)}
@@ -145,7 +145,7 @@ export function AssignmentTemplateGallery({
               {open ? (
                 <ul
                   data-testid={`assignment-template-words-${template.id}`}
-                  className="mt-3 max-h-40 overflow-y-auto space-y-1 font-neo-body text-xs text-neo-white/90"
+                  className="mt-3 max-h-40 overflow-y-auto space-y-1 font-neo-body text-xs text-edu-ink/90"
                 >
                   {template.words.map((word) => (
                     <li key={word.word}>
@@ -163,7 +163,7 @@ export function AssignmentTemplateGallery({
                   data-testid={`assignment-template-preview-${template.id}`}
                   disabled={isSubmitting}
                   onClick={() => setPreviewId(open ? null : template.id)}
-                  className="border-neo-cyan text-neo-cyan hover:bg-neo-cyan/20"
+                  className="border-neo-cyan text-edu-cyan-ink hover:bg-neo-cyan/20"
                 >
                   {open
                     ? t('teacher.assignment.galleryHidePreview')
@@ -191,7 +191,7 @@ export function AssignmentTemplateGallery({
             data-testid="assignment-template-create-own"
             disabled={isSubmitting}
             onClick={onCreateOwn}
-            className="border-neo-lime text-neo-lime hover:bg-neo-lime/20"
+            className="border-neo-lime text-edu-lime-ink hover:bg-neo-lime/20"
           >
             {t('teacher.assignment.galleryCreateOwn')}
           </Button>
@@ -200,7 +200,7 @@ export function AssignmentTemplateGallery({
           variant="outline"
           onClick={onClose}
           disabled={isSubmitting}
-          className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
+          className="border-neo-pink text-edu-pink-ink hover:bg-neo-pink/20"
         >
           {t('common.cancel')}
         </Button>
@@ -232,7 +232,7 @@ function FilterChip({
         'min-h-11 rounded-neo border-2 px-3 py-1.5 font-neo-body text-xs font-bold uppercase',
         active
           ? 'border-neo-lime bg-neo-lime text-neo-black'
-          : 'border-neo-cream/50 bg-neo-navy text-neo-white hover:bg-neo-navy/80',
+          : 'border-edu-line bg-edu-surface text-edu-ink hover:bg-edu-surface/80',
         'disabled:cursor-not-allowed disabled:opacity-60',
       )}
     >

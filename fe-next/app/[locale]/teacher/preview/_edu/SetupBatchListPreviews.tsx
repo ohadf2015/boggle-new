@@ -8,7 +8,6 @@ import { TeacherLibrary } from '@/components/teacher/lesson-creation/library/Tea
 import { NB_PRIMARY } from '@/components/teacher/nb/nbStyles';
 import type { LibraryLesson } from '@/lib/education/libraryTypes';
 import type { Language } from '@/lib/supabase/education/types';
-import { cn } from '@/lib/utils';
 import { fixtureFor } from './fixtures';
 import { PreviewTeacherAuth, usePreviewT } from './SetupBatchPreviews';
 
@@ -28,7 +27,7 @@ export function ClassesPreview() {
     <PreviewTeacherAuth>
       <EducationShell scrollRegionLabel={t('teacher.nav.classes')} contentClassName="relative p-4 sm:p-6 lg:px-8 lg:py-5">
         <main className="relative mx-auto max-w-6xl space-y-4">
-          <h1 className="font-neo-display text-2xl font-bold text-neo-cream sm:text-3xl">{t('academy.teacher.classesTitle')}</h1>
+          <h1 className="font-neo-display text-3xl font-black text-edu-ink sm:text-5xl">{t('academy.teacher.classesTitle')}</h1>
           <ul className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {classes.map((c, i) => (
               <li key={c.id} className="flex">
@@ -81,10 +80,10 @@ export function LibraryPreview({ v }: { v?: string }) {
             <TeacherLibrary />
           ) : (
             <section className="space-y-3">
-              <h1 className="font-neo-display text-2xl font-bold text-neo-white sm:text-3xl">{t('eduLibrary.title')}</h1>
+              <h1 className="font-neo-display text-4xl font-black leading-none text-edu-ink sm:text-5xl">{t('eduLibrary.title')}</h1>
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="max-w-prose text-sm text-neo-cream/80 max-sm:hidden">{t('teacher.lesson.sectionHint')}</p>
-                <button type="button" className={cn(NB_PRIMARY, 'min-h-11 px-4 text-sm')}>
+                <p className="max-w-prose font-neo-body text-base font-semibold text-edu-ink/85 max-sm:hidden">{t('teacher.lesson.sectionHint')}</p>
+                <button type="button" className={NB_PRIMARY}>
                   <Plus className="size-5" strokeWidth={3} aria-hidden="true" />
                   {t('eduLibrary.editor.newList')}
                 </button>

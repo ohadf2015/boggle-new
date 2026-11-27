@@ -1,6 +1,7 @@
 'use client';
 
 import { readClassroomLiveFlags } from '@/lib/education/classroomLivePath';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 import { memo, useMemo, useRef, useEffect, useState, Fragment } from 'react';
 import { m, LayoutGroup } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
@@ -73,6 +74,10 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
 }) => {
   const parentRef = useRef<HTMLDivElement>(null);
   const classroomRowsRef = useRef<HTMLDivElement>(null);
+  const skyBoard = useClassroomBoard();
+  const heading = skyBoard
+    ? 'font-neo-display text-xl 2xl:text-3xl font-black uppercase tracking-widest text-edu-ink mb-4 text-center border-b-3 border-edu-line pb-2'
+    : 'font-neo-display text-xl 2xl:text-3xl font-black uppercase tracking-widest text-neo-yellow mb-4 text-center border-b-3 border-neo-cream/15 pb-2';
   // The `classroom` prop derives from the start payload, and a coordinator
   // retry `startGame` arrives without it — the host keeps the last value, so it
   // went null after round 1. The teacher's URL carries `classroom=true` for the
@@ -128,9 +133,9 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
         role="status"
         aria-live="polite"
       >
-        <Users className="w-12 h-12 text-neo-cream/30 mb-3" />
-        <p className="text-neo-cream/70 font-bold text-lg md:text-xl text-center">{t('tvBroadcast.noPlayersYet')}</p>
-        <p className="text-neo-cream/50 text-sm mt-2 text-center">{t('tvBroadcast.waitingForPlayers')}</p>
+        <Users className={skyBoard ? 'w-12 h-12 text-edu-ink/30 mb-3' : 'w-12 h-12 text-neo-cream/30 mb-3'} />
+        <p className={skyBoard ? 'text-edu-ink/70 font-bold text-lg md:text-xl text-center' : 'text-neo-cream/70 font-bold text-lg md:text-xl text-center'}>{t('tvBroadcast.noPlayersYet')}</p>
+        <p className={skyBoard ? 'text-edu-ink/60 text-sm mt-2 text-center' : 'text-neo-cream/50 text-sm mt-2 text-center'}>{t('tvBroadcast.waitingForPlayers')}</p>
       </div>
     );
   }
@@ -139,7 +144,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
     const hiddenStudents = classroomStudents - classroomRows;
     return (
       <div className="h-full overflow-hidden p-4 flex flex-col" data-testid="tv-classroom-standings">
-        <h3 className="font-neo-display text-xl 2xl:text-3xl font-black uppercase tracking-widest text-neo-yellow mb-2 text-center border-b-3 border-neo-cream/15 pb-2 shrink-0">
+        <h3 className="font-neo-display text-xl 2xl:text-3xl font-black uppercase tracking-widest text-edu-ink mb-2 text-center border-b-3 border-edu-line pb-2 shrink-0">
           {t('tvBroadcast.leaderboard')}
         </h3>
         <div ref={classroomRowsRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
@@ -154,7 +159,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
         {hiddenStudents > 0 && (
           <p
             data-testid="tv-classroom-more"
-            className="shrink-0 pt-1 text-center font-neo-display text-lg font-black uppercase text-neo-cream/70"
+            className="shrink-0 pt-1 text-center font-neo-display text-lg font-black uppercase text-edu-ink/70"
           >
             {t('tvBroadcast.moreStudents', { count: hiddenStudents })}
           </p>
@@ -172,7 +177,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
           animate={{ opacity: 1 }}
           className="h-full overflow-y-auto overscroll-contain scrollable-area p-4 flex flex-col gap-2"
         >
-          <h3 className="font-neo-display text-xl 2xl:text-3xl font-black uppercase tracking-widest text-neo-yellow mb-4 text-center border-b-3 border-neo-cream/15 pb-2">
+          <h3 className={heading}>
             {t('tvBroadcast.leaderboard')}
           </h3>
           {sortedPlayers.map((player, index) => (
@@ -215,7 +220,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
   // Virtual rendering for large player counts
   return (
     <div className="h-full flex flex-col p-4">
-      <h3 className="font-neo-display text-xl 2xl:text-3xl font-black uppercase tracking-widest text-neo-yellow mb-4 text-center border-b-3 border-neo-cream/15 pb-2 shrink-0">
+      <h3 className={`${heading} shrink-0`}>
         {t('tvBroadcast.leaderboard')} ({sortedPlayers.length})
       </h3>
       <div

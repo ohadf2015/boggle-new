@@ -3,9 +3,9 @@
 /**
  * The frame every Academy sub-page (Lessons, Awards) sits in, so opening one
  * from the map's dock doesn't feel like a different app:
- *  - the map art, blurred and darkened, as the ground (dark-only: bg-neo-navy);
- *  - an ink plaque on top with a way back to the map and the page title;
- *  - ONE ink panel that owns all the scrolling — the page itself never scrolls;
+ *  - the map art, blurred under a sky wash, as the ground;
+ *  - a cream plaque on top with a way back to the map and the page title;
+ *  - ONE cream panel that owns all the scrolling — the page itself never scrolls;
  *  - the map's own dock at the bottom (in the top row on a phone on its side).
  *
  * Layout modes are the hub's (`pickHubLayout`), so the frame and the map switch
@@ -81,7 +81,7 @@ export function AcademyPageFrame({ title, art, badge, toolbar, regionLabel, pend
       dir={dir ?? (language === 'he' ? 'rtl' : 'ltr')}
       data-testid={pending ? 'academy-page-pending' : 'academy-page'}
       data-chrome={layout.chrome}
-      className="fixed inset-0 isolate overflow-hidden bg-neo-navy text-neo-white"
+      className="fixed inset-0 isolate overflow-hidden bg-edu-page text-edu-ink"
     >
       <AcademyBackdrop art="map" />
 
@@ -106,7 +106,7 @@ export function AcademyPageFrame({ title, art, badge, toolbar, regionLabel, pend
           aria-busy={pending || busy || undefined}
           className={cn('mx-auto flex min-h-0 w-full flex-1 flex-col', wide ? 'max-w-6xl' : 'max-w-3xl', rail && 'max-w-none')}
         >
-          {toolbar && <div className={cn('shrink-0 border-b-2 border-neo-yellow/40', rail ? 'px-2.5 py-1.5' : 'px-3 py-2.5 sm:px-4')}>{toolbar}</div>}
+          {toolbar && <div className={cn('shrink-0 border-b-3 border-edu-line', rail ? 'px-2.5 py-1.5' : 'px-3 py-2.5 sm:px-4')}>{toolbar}</div>}
           {/* The ONE scroller. Rounded clip so cards never paint over the ink edge. */}
           <div
             data-testid="academy-page-scroll"
@@ -129,7 +129,7 @@ export function FrameSkeleton({ rows = 4, grid = false }: { rows?: number; grid?
       {Array.from({ length: rows }, (_, i) => (
         <div
           key={i}
-          className={cn('rounded-[16px] bg-neo-white/10 motion-safe:animate-pulse', grid ? 'h-36' : 'h-20')}
+          className={cn('rounded-[16px] bg-edu-ink/10 motion-safe:animate-pulse', grid ? 'h-36' : 'h-20')}
         />
       ))}
     </div>

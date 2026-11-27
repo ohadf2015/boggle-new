@@ -9,9 +9,9 @@
  *
  * Two kinds of art, deliberately:
  *
- *  - **`poster`** — full-bleed illustrated art drawn for that specific mode
- *    (`public/mascot/teacher/practice-*.webp`). These are painted on the same
- *    neo-navy as the app, so they bleed edge to edge with no seam.
+ *  - **`poster`** — illustrated art drawn for that specific mode
+ *    (`public/mascot/teacher/practice-*-sky.webp`), each on a flat pink, cyan
+ *    or yellow field so it reads on the cream tile.
  *  - **`chip`** — a transparent mascot floated on the tile's accent colour, for
  *    every mode that has no bespoke poster yet.
  *
@@ -24,11 +24,14 @@
  * bug rather than a mascot.
  */
 
-/** Modes with bespoke poster art. Keep in sync with the files on disk. */
-const POSTER_ART: Record<string, string> = {
-  blitz: '/mascot/teacher/practice-blitz.webp',
-  flashcard: '/mascot/teacher/practice-flashcard.webp',
-  spelling: '/mascot/teacher/practice-spelling.webp',
+/**
+ * Modes with bespoke poster art. `field` is the colour baked into the image, not a theme token:
+ * the cosy theme remaps the neo accents, and a remapped frame would show a seam around the poster.
+ */
+const POSTER_ART: Record<string, { src: string; field: string }> = {
+  blitz: { src: '/mascot/teacher/practice-blitz-sky.webp', field: '#ff1493' },
+  flashcard: { src: '/mascot/teacher/practice-flashcard-sky.webp', field: '#00ffff' },
+  spelling: { src: '/mascot/teacher/practice-spelling-sky.webp', field: '#ffe135' },
 };
 
 /** Transparent mascot per tile for everything without a poster. */
@@ -55,8 +58,8 @@ const FALLBACK_CHIP = '/mascot/trophy-nobg.webp';
  * A poster works on a tile, where the frame is nearly as tall as it is wide. The
  * hero frame is landscape, so `object-cover` throws away two thirds of the
  * drawing and lands on the mascot's chin — and `object-contain` is worse, since
- * the poster is painted on neo-navy and a navy rectangle sitting on a pink fill
- * reads as a failed image load. The hero therefore always floats a transparent
+ * the poster's own field sitting on a different accent fill reads as a failed
+ * image load. The hero therefore always floats a transparent
  * mascot on the accent, which cannot crop wrong at any size.
  */
 const HERO_CHIP: Record<string, string> = {
@@ -70,12 +73,14 @@ export type PracticeArtKind = 'poster' | 'chip';
 export interface PracticeTileArt {
   src: string;
   kind: PracticeArtKind;
+  /** Poster only: the poster's own field colour, so the frame letterboxes it without a seam. */
+  field?: string;
 }
 
 /** Resolve the art for a picker tile id (`blitz`, `vocab_focus:synonym`, …). */
 export function practiceTileArt(tileId: string): PracticeTileArt {
   const poster = POSTER_ART[tileId];
-  if (poster) return { src: poster, kind: 'poster' };
+  if (poster) return { ...poster, kind: 'poster' };
   return { src: CHIP_ART[tileId] ?? FALLBACK_CHIP, kind: 'chip' };
 }
 

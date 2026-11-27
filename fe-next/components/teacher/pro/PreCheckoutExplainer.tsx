@@ -45,7 +45,7 @@ export function PreCheckoutExplainer({ mode, pending, onConfirm, onBack }: PreCh
       aria-modal="true"
       aria-label={t('eg2Pro.preCheckout.title')}
       data-testid="pre-checkout-explainer"
-      className={cn(NB_OVERLAY_LAYER, 'z-50 items-center bg-neo-navy/60 p-4')}
+      className={cn(NB_OVERLAY_LAYER, 'fixed inset-0 z-50 items-center bg-neo-navy/60 p-4')}
       onClick={pending ? undefined : onBack}
     >
       <div className={cn(NB_OVERLAY_PANEL, 'max-w-md rounded-neo-xl border-b-[3px] shadow-hard-xl')} onClick={(e) => e.stopPropagation()}>
@@ -61,18 +61,18 @@ export function PreCheckoutExplainer({ mode, pending, onConfirm, onBack }: PreCh
         </div>
 
         <div className={NB_DIALOG_BODY}>
-          <p className="font-neo-display text-base font-black text-neo-cream">{t('eg2Pro.preCheckout.includesTitle')}</p>
+          <p className="font-neo-display text-base font-black text-edu-ink">{t('eg2Pro.preCheckout.includesTitle')}</p>
           <ul className="mt-2 space-y-2">
             {PRE_CHECKOUT_INCLUDED_KEYS.map((key) => (
               <li key={key} className="flex items-start gap-2">
-                <ShieldCheck className="mt-0.5 size-5 shrink-0 text-neo-lime" strokeWidth={2.5} aria-hidden />
-                <span className="font-neo-body text-sm font-bold leading-snug text-neo-cream">{t(key)}</span>
+                <ShieldCheck className="mt-0.5 size-5 shrink-0 text-edu-lime-ink" strokeWidth={2.5} aria-hidden />
+                <span className="font-neo-body text-sm font-bold leading-snug text-edu-ink">{t(key)}</span>
               </li>
             ))}
           </ul>
-          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 font-neo-body text-xs font-bold text-neo-cream/75">
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 font-neo-body text-xs font-bold text-edu-ink/75">
             <span className="inline-flex items-center gap-1">
-              <ShieldCheck className="size-3.5 text-neo-lime" strokeWidth={2.5} aria-hidden />
+              <ShieldCheck className="size-3.5 text-edu-lime-ink" strokeWidth={2.5} aria-hidden />
               {t('teacher.subscription.trustCancel')}
             </span>
             <span className="inline-flex items-center gap-1">

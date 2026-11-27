@@ -76,13 +76,13 @@ export function CelebrationBeats({ hero, headline, subtitle, chips, cta, skipLab
       data-testid="edu-celebration"
       data-beat={beat}
       onClick={live ? skip : undefined}
-      className={`fixed inset-0 z-50 flex h-dvh flex-col items-center overflow-hidden bg-neo-navy px-4 pt-14 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-neo-cream ${className}`}
+      className={`fixed inset-0 z-50 flex h-dvh flex-col items-center overflow-hidden bg-neo-navy edu-sky:bg-edu-page px-4 pt-14 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-neo-cream edu-sky:text-edu-ink ${className}`}
     >
       {live ? (
         <button
           type="button"
           onClick={skip}
-          className="absolute end-4 top-4 rounded-neo border-2 border-neo-cream px-3 py-1 font-neo-display text-xs font-black uppercase tracking-wide text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+          className="absolute end-4 top-4 rounded-neo border-2 border-neo-cream edu-sky:border-edu-line px-3 py-1 font-neo-display text-xs font-black uppercase tracking-wide text-neo-cream edu-sky:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {skipLabel}
         </button>
@@ -98,12 +98,12 @@ export function CelebrationBeats({ hero, headline, subtitle, chips, cta, skipLab
           {hero}
         </m.div>
         {headline ? (
-          <div data-slot="headline" className={`font-neo-display text-3xl font-black text-neo-yellow ${shown('pullBack')}`}>
+          <div data-slot="headline" className={`font-neo-display text-3xl font-black text-neo-yellow edu-sky:text-edu-yellow-ink ${shown('pullBack')}`}>
             {reached(beat, 'pullBack') ? <Pop>{headline}</Pop> : headline}
           </div>
         ) : null}
         {subtitle ? (
-          <p data-slot="subtitle" className={`text-base font-bold text-neo-cream ${shown('pullBack')}`}>
+          <p data-slot="subtitle" className={`text-base font-bold text-neo-cream edu-sky:text-edu-ink ${shown('pullBack')}`}>
             {subtitle}
           </p>
         ) : null}

@@ -32,7 +32,7 @@ export function FirstGameWords({ text, onTextChange, count, skipped, minWords, e
   return (
     <section data-testid="first-game-panel" aria-labelledby="first-game-title" className={cn(NB_PANEL_POP.cyan, 'flex flex-col gap-2.5 p-3 sm:p-4')}>
       <div className="flex items-center justify-between gap-2">
-        <h2 id="first-game-title" className="inline-flex items-center gap-2 font-neo-display text-lg font-black leading-tight text-neo-cream sm:text-xl">
+        <h2 id="first-game-title" className="inline-flex items-center gap-2 font-neo-display text-lg font-black leading-tight text-edu-ink sm:text-xl">
           <span className={cn(NB_ICON_TILE, NB_BLOCK.cyan)} aria-hidden="true">
             <ClipboardList className="size-5" />
           </span>
@@ -68,16 +68,16 @@ export function FirstGameWords({ text, onTextChange, count, skipped, minWords, e
         </p>
       ) : null}
       {skipped > 0 ? (
-        <p data-testid="first-game-skipped" className="font-neo-body text-sm font-semibold text-neo-cream/80">
+        <p data-testid="first-game-skipped" className="font-neo-body text-sm font-semibold text-edu-ink/80">
           {t('eduShell.setup.words.skipped', { count: skipped })}
         </p>
       ) : null}
       {count === 0 && skipped === 0 && ownListSaved ? (
-        <p data-testid="first-game-own-list" className="font-neo-body text-sm font-semibold text-neo-cream/80">{t('eduShell.setup.words.yours')}</p>
+        <p data-testid="first-game-own-list" className="font-neo-body text-sm font-semibold text-edu-ink/80">{t('eduShell.setup.words.yours')}</p>
       ) : count === 0 && skipped === 0 ? (
         <StarterPackRow packs={packs} selectedKey={packKey} recommendedKey={savedPackKey ?? ''} onSelect={onPackChange} labelKey="eduShell.setup.words.packLabel" hintKey="eduShell.setup.words.packHint" badgeKey="eduShell.setup.words.saved" t={t} />
       ) : count > 0 ? (
-        <p className="font-neo-body text-sm font-semibold text-neo-cream/80">{t('eduShell.setup.words.yours')}</p>
+        <p className="font-neo-body text-sm font-semibold text-edu-ink/80">{t('eduShell.setup.words.yours')}</p>
       ) : null}
     </section>
   );

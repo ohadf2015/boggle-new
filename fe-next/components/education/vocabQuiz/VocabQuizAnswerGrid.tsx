@@ -57,7 +57,7 @@ function ChoiceChip({ kind, reduced }: { kind: ChipKind; reduced: boolean }) {
       initial={reduced ? false : { scale: 0.4, rotate: -12 }}
       animate={{ scale: 1, rotate: 0 }}
       transition={EDU_MOTION.spring.pop}
-      className={cn(CHIP, kind === 'picked' ? 'bg-neo-cyan' : 'bg-neo-white')}
+      className={cn(CHIP, kind === 'picked' ? 'bg-neo-cyan' : 'bg-edu-paper')}
     >
       <Icon className="size-5" strokeWidth={3.5} />
     </m.span>
@@ -120,17 +120,16 @@ export function VocabQuizAnswerGrid({
               // ! beats the unlayered global landscape button padding, which would push the lower row under the footer.
               '[@media(max-height:560px)]:min-h-12 [@media(max-height:560px)]:py-1!',
               'transition motion-reduce:transition-none',
-              'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white focus-visible:ring-offset-2',
+              'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line focus-visible:ring-offset-2',
               // The answer is always green, whatever its family, so "right" reads the same on every tile.
               isCorrect
                 ? 'border-neo-black bg-neo-lime text-neo-black'
                 : faded
-                  ? 'scale-[0.97] border-neo-white/25 bg-neo-navy text-neo-white/70'
-                  : cn('bg-neo-navy-elevated text-neo-white', isWrongPick ? 'border-neo-red' : isSelected ? style.border : 'border-neo-white/20'),
+                  ? 'scale-[0.97] border-edu-line bg-edu-surface text-edu-ink/70'
+                  : cn('bg-edu-surface text-edu-ink', isWrongPick ? 'border-neo-red' : isSelected ? style.border : 'border-edu-line'),
               // A pick sits half pressed in, so it reads as held down until the reveal.
               isSelected && !revealed ? 'translate-y-[3px] shadow-[0_3px_0_0]' : 'shadow-[0_6px_0_0]',
-              // One neutral lip for every resting tile; a black one vanishes on the navy.
-              isCorrect || faded || isWrongPick ? 'shadow-neo-black' : 'shadow-neo-white/15',
+              isCorrect || faded || isWrongPick ? 'shadow-neo-black' : 'shadow-edu-line',
               isSelected && cn('outline outline-4 outline-offset-2', isWrongPick ? 'outline-neo-red' : 'outline-neo-cyan'),
               !disabled && cn(style.hover, style.press, 'active:translate-y-[6px] active:shadow-none'),
               isWrongPick && 'animate-neo-shake motion-reduce:animate-none'

@@ -112,7 +112,7 @@ describe('ListEditorSheet', () => {
     const sheet = screen.getByTestId('list-editor-sheet');
     expect(sheet.className).toMatch(/h-dvh/);
     expect(sheet.className).toMatch(/max-w-none/);
-    expect(sheet.className).toMatch(/bg-neo-navy/);
+    expect(sheet.className).toMatch(/bg-edu-surface/);
   });
 
   it('keeps language, grade, topic and sharing behind one collapsed row', () => {

@@ -10,10 +10,10 @@ import { cn } from '@/lib/utils';
 import type { WordState } from './classInsights';
 
 const STATE_TONE: Record<WordState, string> = {
-  stuck: 'border-neo-pink text-neo-pink',
-  improving: 'border-neo-yellow text-neo-yellow',
-  mastered: 'border-neo-lime text-neo-lime',
-  new: 'border-neo-cream/50 text-neo-cream/80',
+  stuck: 'border-neo-pink text-edu-pink-ink',
+  improving: 'border-neo-yellow text-edu-yellow-ink',
+  mastered: 'border-neo-lime text-edu-lime-ink',
+  new: 'border-edu-line text-edu-ink/80',
 };
 
 function barTone(missRate: number) {
@@ -51,7 +51,7 @@ export function HardestWordsList({
             initial={reduceMotion ? false : { x: -10 }}
             animate={{ x: 0 }}
             transition={{ type: 'spring', stiffness: 500, damping: 30, delay: i * 0.04 }}
-            className="grid grid-cols-[1.75rem_minmax(0,1fr)_auto] items-center gap-x-2.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-2.5 py-1.5"
+            className="grid grid-cols-[1.75rem_minmax(0,1fr)_auto] items-center gap-x-2.5 rounded-neo border-2 border-edu-line bg-edu-surface px-2.5 py-1.5"
           >
             <span
               aria-hidden="true"
@@ -64,7 +64,7 @@ export function HardestWordsList({
             </span>
             <span className="min-w-0">
               <span className="flex min-w-0 items-center gap-1.5">
-                <span className="truncate font-neo-display text-base font-bold text-neo-white" dir="auto">
+                <span className="truncate font-neo-display text-base font-bold text-edu-ink" dir="auto">
                   {w.display}
                 </span>
                 {states?.[w.word] && (
@@ -76,7 +76,7 @@ export function HardestWordsList({
                   </span>
                 )}
               </span>
-              <span className="relative mt-0.5 block h-1.5 overflow-hidden rounded-full bg-neo-white/10">
+              <span className="relative mt-0.5 block h-1.5 overflow-hidden rounded-full bg-edu-ink/10">
                 <m.span
                   aria-hidden="true"
                   className={cn('absolute inset-y-0 start-0 rounded-full', barTone(w.missRate))}
@@ -85,7 +85,7 @@ export function HardestWordsList({
                   transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.1 + i * 0.05 }}
                 />
               </span>
-              <span className="mt-0.5 block truncate text-[11px] font-bold text-neo-cream/70 tabular-nums">
+              <span className="mt-0.5 block truncate text-[11px] font-bold text-edu-ink/70 tabular-nums">
                 {t(notFound ? 'eduPro.mastery.notFound.of' : 'eduPro.mastery.missedOf', { missed: w.missed, attempts: w.attempts })}
                 {' · '}
                 {t(pluralKeyOf('eduPro.mastery.studentsMissing', w.studentsAsked, language), { count: w.studentsMissing, total: w.studentsAsked })}
@@ -93,7 +93,7 @@ export function HardestWordsList({
             </span>
             <span
               data-testid="report-word-missrate"
-              className="text-end font-neo-display text-sm font-black leading-tight text-neo-white tabular-nums"
+              className="text-end font-neo-display text-sm font-black leading-tight text-edu-ink tabular-nums"
             >
               {t(notFound ? 'eduPro.mastery.notFound.rate' : 'eg2Polish.words.missRate', { pct: w.missRate })}
             </span>
@@ -107,7 +107,7 @@ export function HardestWordsList({
           onClick={() => setShowAll((v) => !v)}
           aria-expanded={showAll}
           data-print-hide
-          className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-neo px-2 text-sm font-black text-neo-cyan underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+          className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-neo px-2 text-sm font-black text-edu-cyan-ink underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
         >
           {showAll ? t('eduPro.mastery.showFewer') : t('eduPro.mastery.showAll', { count: words.length })}
           <ChevronDown className={cn('size-4 transition-transform motion-reduce:transition-none', showAll && 'rotate-180')} aria-hidden="true" />

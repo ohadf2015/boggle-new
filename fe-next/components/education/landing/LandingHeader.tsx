@@ -17,7 +17,7 @@ export function LandingHeader({ showStart = true }: { showStart?: boolean }) {
   const [signInOpen, setSignInOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-neo-cream bg-neo-navy">
+    <header className="sticky top-0 z-40 border-b-2 border-edu-line bg-edu-surface">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 sm:h-16 sm:gap-3 sm:px-6 lg:px-8">
         <Link
           href={educationHomeFor(language, null)}
@@ -25,7 +25,7 @@ export function LandingHeader({ showStart = true }: { showStart?: boolean }) {
           aria-label={t('eg2Land.header.home')}
           className="flex min-w-0 shrink items-center gap-1.5 rounded-sm focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
         >
-          <span className="truncate font-neo-display text-base font-black uppercase tracking-tight text-neo-cream min-[400px]:text-lg sm:text-xl">
+          <span className="truncate font-neo-display text-base font-black uppercase tracking-tight text-edu-ink min-[400px]:text-lg sm:text-xl">
             LexiClash
           </span>
           <span className="hidden shrink-0 -rotate-2 rounded-neo-sm border-2 border-neo-black bg-neo-lime px-1.5 py-0.5 font-neo-display text-xs font-black uppercase leading-none text-neo-navy shadow-hard-sm min-[400px]:inline-block">
@@ -37,7 +37,7 @@ export function LandingHeader({ showStart = true }: { showStart?: boolean }) {
           <QuickLanguageSwitcher compact />
           <ForSchoolsLink
             placement="education_header"
-            className="hidden min-h-11 items-center gap-1.5 px-1 font-neo-display text-sm font-bold text-neo-cream underline-offset-4 hover:underline focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan md:inline-flex"
+            className="hidden min-h-11 items-center gap-1.5 px-1 font-neo-display text-sm font-bold text-edu-ink underline-offset-4 hover:underline focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan md:inline-flex"
           />
           {!isAuthenticated && (
             <button
@@ -47,7 +47,7 @@ export function LandingHeader({ showStart = true }: { showStart?: boolean }) {
                 trackGrowthEvent('landing_cta_clicked', { cta: 'education_sign_in' });
                 setSignInOpen(true);
               }}
-              className="min-h-11 px-1 font-neo-display text-sm font-bold text-neo-cream underline-offset-4 hover:underline focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
+              className="min-h-11 px-1 font-neo-display text-sm font-bold text-edu-ink underline-offset-4 hover:underline focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
             >
               {t('auth.signIn')}
             </button>
@@ -57,7 +57,7 @@ export function LandingHeader({ showStart = true }: { showStart?: boolean }) {
               href={`/${language}/education/access`}
               data-testid="landing-header-start"
               onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'education_header_start' })}
-              className="inline-flex min-h-11 items-center whitespace-nowrap rounded-neo border-2 border-neo-cream bg-transparent px-2.5 font-neo-display text-sm font-bold text-neo-cream transition-colors duration-150 hover:bg-neo-cream/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan motion-reduce:transition-none sm:px-4"
+              className="inline-flex min-h-11 items-center whitespace-nowrap rounded-neo border-2 border-edu-line bg-transparent px-2.5 font-neo-display text-sm font-bold text-edu-ink transition-colors duration-150 hover:bg-edu-ink/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan motion-reduce:transition-none sm:px-4"
             >
               {t('eg2Land.header.start')}
             </Link>

@@ -173,7 +173,7 @@ export default function FlashcardReview({
     const correctCount = results.filter(Boolean).length;
 
     return (
-      <div dir={isRTL ? 'rtl' : 'ltr'} className="flex min-h-full items-center justify-center bg-neo-navy p-4">
+      <div dir={isRTL ? 'rtl' : 'ltr'} className="flex min-h-full items-center justify-center bg-neo-navy edu-sky:bg-edu-page p-4">
         <div className="w-full max-w-sm space-y-3">
           <PracticeCompletionMoment
             correct={correctCount}
@@ -192,11 +192,11 @@ export default function FlashcardReview({
                 key={`word-${idx}-${word.word}`}
                 className="flex items-center justify-between py-1 text-sm"
               >
-                <span className="font-neo-body text-neo-white">{word.word}</span>
+                <span className="font-neo-body text-neo-white edu-sky:text-edu-ink">{word.word}</span>
                 {results[idx] ? (
-                  <Check className="h-4 w-4 text-neo-lime" aria-hidden="true" />
+                  <Check className="h-4 w-4 text-neo-lime edu-sky:text-edu-lime-ink" aria-hidden="true" />
                 ) : (
-                  <X className="h-4 w-4 text-neo-pink" aria-hidden="true" />
+                  <X className="h-4 w-4 text-neo-pink edu-sky:text-edu-pink-ink" aria-hidden="true" />
                 )}
               </div>
             ))}
@@ -209,7 +209,7 @@ export default function FlashcardReview({
   // Render swipe mode
   if (reviewMode === 'swipe' && enrichedWords.length > 0) {
     return (
-      <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-full bg-neo-navy p-4 sm:p-6">
+      <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-full bg-neo-navy edu-sky:bg-edu-page p-4 sm:p-6">
         <div className="max-w-lg mx-auto">
           {/* Header with mode toggle */}
           <div className="flex items-center gap-4 mb-6">
@@ -218,15 +218,15 @@ export default function FlashcardReview({
               size="sm"
               onClick={onBack}
               aria-label={t('common.back')}
-              className="text-neo-cream hover:text-neo-white"
+              className="edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:shadow-edu-lip-sm text-neo-cream edu-sky:text-edu-ink hover:text-neo-white edu-sky:hover:text-edu-ink"
             >
               <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
             </Button>
             <div className="flex-1">
-              <h1 className="text-xl font-neo-display text-neo-white">
+              <h1 className="text-xl font-neo-display text-neo-white edu-sky:text-edu-ink">
                 {t('education.practice.flashcards')}
               </h1>
-              <p className="text-sm text-neo-cream">
+              <p className="text-sm text-neo-cream edu-sky:text-edu-ink">
                 {currentIndex + 1} / {usable.length}
               </p>
             </div>
@@ -236,7 +236,7 @@ export default function FlashcardReview({
                 variant="ghost"
                 size="sm"
                 onClick={() => setReviewMode('classic')}
-                className="text-neo-cyan hover:bg-neo-cyan/20"
+                className="edu-sky:border-edu-line text-neo-cyan edu-sky:text-edu-cyan-ink hover:bg-neo-cyan/20"
                 title={t('education.lesson.classicMode')}
               >
                 <MousePointer2 className="w-4 h-4" />
@@ -245,7 +245,7 @@ export default function FlashcardReview({
                 variant="ghost"
                 size="sm"
                 onClick={() => setReviewMode('swipe')}
-                className="text-neo-pink hover:bg-neo-pink/20 bg-neo-pink/20"
+                className="edu-sky:border-edu-line text-neo-pink edu-sky:text-edu-pink-ink hover:bg-neo-pink/20 bg-neo-pink/20"
                 title={t('education.lesson.swipeMode')}
               >
                 <Layers className="w-4 h-4" />
@@ -284,7 +284,7 @@ export default function FlashcardReview({
 
   // Classic mode (existing tap-to-flip)
   return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-full bg-neo-navy p-4 sm:p-6">
+    <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-full bg-neo-navy edu-sky:bg-edu-page p-4 sm:p-6">
       <div className="max-w-lg mx-auto">
         {/* Header with mode toggle */}
         <div className="flex items-center gap-4 mb-6">
@@ -293,15 +293,15 @@ export default function FlashcardReview({
             size="sm"
             onClick={onBack}
             aria-label={t('common.back')}
-            className="text-neo-cream hover:text-neo-white"
+            className="edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:shadow-edu-lip-sm text-neo-cream edu-sky:text-edu-ink hover:text-neo-white edu-sky:hover:text-edu-ink"
           >
             <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-xl font-neo-display text-neo-white">
+            <h1 className="text-xl font-neo-display text-neo-white edu-sky:text-edu-ink">
               {t('education.practice.flashcards')}
             </h1>
-            <p className="text-sm text-neo-cream">
+            <p className="text-sm text-neo-cream edu-sky:text-edu-ink">
               {currentIndex + 1} / {usable.length}
             </p>
           </div>
@@ -312,7 +312,7 @@ export default function FlashcardReview({
                 variant="ghost"
                 size="sm"
                 onClick={() => setReviewMode('classic')}
-                className="text-neo-cyan hover:bg-neo-cyan/20 bg-neo-cyan/20"
+                className="edu-sky:border-edu-line text-neo-cyan edu-sky:text-edu-cyan-ink hover:bg-neo-cyan/20 bg-neo-cyan/20"
                 title={t('education.lesson.classicMode')}
               >
                 <MousePointer2 className="w-4 h-4" />
@@ -321,7 +321,7 @@ export default function FlashcardReview({
                 variant="ghost"
                 size="sm"
                 onClick={() => setReviewMode('swipe')}
-                className="text-neo-pink hover:bg-neo-pink/20"
+                className="edu-sky:border-edu-line text-neo-pink edu-sky:text-edu-pink-ink hover:bg-neo-pink/20"
                 title={t('education.lesson.swipeMode')}
               >
                 <Layers className="w-4 h-4" />
@@ -366,7 +366,7 @@ export default function FlashcardReview({
             />
             <label
               htmlFor="auto-pronounce"
-              className="text-sm text-neo-cream font-neo-body cursor-pointer select-none"
+              className="text-sm text-neo-cream edu-sky:text-edu-ink font-neo-body cursor-pointer select-none"
             >
               {t('education.lesson.autoPronounce')}
             </label>
@@ -394,14 +394,14 @@ export default function FlashcardReview({
                 className={cn(
                   'h-full rounded-neo border-[3px] border-black shadow-hard-lg',
                   'flex items-center justify-center',
-                  isFlipped ? 'bg-neo-cyan/15' : 'bg-neo-navy/80'
+                  isFlipped ? 'bg-neo-cyan/15' : 'bg-neo-navy/80 edu-sky:bg-edu-surface'
                 )}
               >
                 <div className="p-6 text-center">
                   {isFlipped ? (
                     <div>
                       <div className="flex items-center justify-center gap-3 mb-3">
-                        <span className="px-2 py-0.5 bg-neo-cyan/20 border-[2px] border-neo-cyan/40 rounded-neo text-xs font-black text-neo-cyan uppercase">
+                        <span className="px-2 py-0.5 bg-neo-cyan/20 border-[2px] border-neo-cyan/40 rounded-neo text-xs font-black text-neo-cyan edu-sky:text-edu-cyan-ink uppercase">
                           {t('education.practice.definition')}
                         </span>
                         <PronunciationButton
@@ -410,23 +410,23 @@ export default function FlashcardReview({
                           size="sm"
                         />
                       </div>
-                      <p className="text-xl sm:text-2xl font-neo-body text-neo-white">
+                      <p className="text-xl sm:text-2xl font-neo-body text-neo-white edu-sky:text-edu-ink">
                         {currentWord.definition || t('education.practice.noDefinition')}
                       </p>
                     </div>
                   ) : (
                     <div>
-                      <span className="inline-block px-2 py-0.5 bg-neo-yellow/20 border-[2px] border-neo-yellow/40 rounded-neo text-xs font-black text-neo-yellow uppercase mb-3">
+                      <span className="inline-block px-2 py-0.5 bg-neo-yellow/20 border-[2px] border-neo-yellow/40 rounded-neo text-xs font-black text-neo-yellow edu-sky:text-edu-yellow-ink uppercase mb-3">
                         {t('education.practice.word')}
                       </span>
-                      <p className="text-3xl sm:text-4xl font-neo-display font-black text-neo-white">
+                      <p className="text-3xl sm:text-4xl font-neo-display font-black text-neo-white edu-sky:text-edu-ink">
                         {currentWord.word}
                       </p>
                       <WordContextRow
                         partOfSpeech={enrichedWords[currentIndex]?.partOfSpeech}
                         example={enrichedWords[currentIndex]?.examples?.[0]?.text}
                       />
-                      <p className="text-sm text-neo-white mt-4 font-neo-body">
+                      <p className="text-sm text-neo-white edu-sky:text-edu-ink mt-4 font-neo-body">
                         {t('education.practice.tapToFlip')}
                       </p>
                     </div>
@@ -474,7 +474,7 @@ export default function FlashcardReview({
         </div>
 
         {/* Navigation hint */}
-        <p className="text-center text-xs text-neo-white font-neo-body mt-4">
+        <p className="text-center text-xs text-neo-white edu-sky:text-edu-ink font-neo-body mt-4">
           {isFlipped
             ? t('education.practice.chooseAnswer')
             : t('education.practice.tapCard')}

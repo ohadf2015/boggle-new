@@ -72,7 +72,7 @@ export function TeacherAccessCTA() {
         data-lc-cta="pro_trial"
         href={`/${language}/teacher/upgrade`}
         onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_pro_trial' })}
-        className="inline-block rounded-neo border-neo-thick border-neo-navy bg-neo-navy px-6 py-3 font-bold text-neo-cream shadow-hard-lg transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+        className="inline-block rounded-neo border-neo-thick border-neo-navy bg-neo-navy edu-sky:bg-edu-surface px-6 py-3 font-bold text-neo-cream edu-sky:text-edu-ink shadow-hard-lg transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         {t('teacher.subscription.startTrial')}
       </Link>

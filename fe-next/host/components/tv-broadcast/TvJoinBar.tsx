@@ -7,6 +7,7 @@ import { m } from 'framer-motion';
 import { AnimatedCounter } from '../../../components/ui/AnimatedCounter';
 import { roomJoinPath, tvJoinAddress } from '../../../lib/education/tvJoinAddress';
 import { cn } from '../../../lib/utils';
+import { TvClassroomJoinCards } from './TvClassroomJoinCards';
 
 interface TvJoinBarProps {
   gameCode: string;
@@ -42,6 +43,28 @@ const TvJoinBar = memo<TvJoinBarProps>(({
   const joinUrl = useMemo(() => {
     return `${baseUrl}${roomJoinPath(language, gameCode, classroom)}`;
   }, [baseUrl, gameCode, language, classroom]);
+
+  if (classroom) {
+    return (
+      <m.div
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        className={cn('relative z-40 w-full bg-edu-page', dense ? 'px-2 pt-2 md:px-4 md:pt-3 md:medium-short:pt-2' : 'px-4 pt-4')}
+      >
+        <TvClassroomJoinCards
+          address={tvJoinAddress(baseUrl, language, gameCode, classroom)}
+          joinUrl={joinUrl}
+          gameCode={gameCode}
+          playerCount={playerCount}
+          dense={dense}
+          trailing={trailing}
+          t={t}
+        />
+        {roomName && <p className="mt-2 text-center font-bold text-edu-ink">&ldquo;{roomName}&rdquo;</p>}
+      </m.div>
+    );
+  }
 
   return (
     <m.div

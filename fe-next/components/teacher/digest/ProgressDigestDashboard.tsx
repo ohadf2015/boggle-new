@@ -72,22 +72,22 @@ export function ProgressDigestDashboard({
       className="space-y-4"
     >
       <header>
-        <h2 className="font-neo-display text-2xl font-bold text-neo-white">{t('teacher.digest.title')}</h2>
-        <p className="mt-1 text-sm font-bold text-neo-cream/75">{t('teacher.digest.subtitle')}</p>
+        <h2 className="font-neo-display text-2xl font-bold text-edu-ink">{t('teacher.digest.title')}</h2>
+        <p className="mt-1 text-sm font-bold text-edu-ink/75">{t('teacher.digest.subtitle')}</p>
       </header>
 
       {showLoading ? (
         <div
           data-testid="progress-digest-loading"
           aria-busy="true"
-          className="flex min-h-24 items-center justify-center gap-2 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light text-neo-cream/80"
+          className="flex min-h-24 items-center justify-center gap-2 rounded-neo border-2 border-edu-line bg-edu-surface text-edu-ink/80"
         >
           <Loader2 className="size-5 animate-spin" aria-hidden="true" />
           <span>{t('teacher.reports.loading')}</span>
         </div>
       ) : digest.state === 'unknown' ? (
         <NeoPanel tone="navy" className="p-5 text-center" data-testid="progress-digest-error">
-          <p className="font-bold text-neo-white">{t('teacher.digest.loadError')}</p>
+          <p className="font-bold text-edu-ink">{t('teacher.digest.loadError')}</p>
           <button
             type="button"
             onClick={() => void refresh()}
@@ -97,11 +97,11 @@ export function ProgressDigestDashboard({
           </button>
         </NeoPanel>
       ) : digest.state === 'noRoster' ? (
-        <p data-testid="progress-digest-empty" className="rounded-neo border-2 border-dashed border-neo-cream/50 p-6 text-center text-neo-cream/80">
+        <p data-testid="progress-digest-empty" className="rounded-neo border-2 border-dashed border-edu-line p-6 text-center text-edu-ink/80">
           {t('teacher.digest.emptyNoRoster')}
         </p>
       ) : digest.state === 'neverPlayed' ? (
-        <p data-testid="progress-digest-empty" className="rounded-neo border-2 border-dashed border-neo-cream/50 p-6 text-center text-neo-cream/80">
+        <p data-testid="progress-digest-empty" className="rounded-neo border-2 border-dashed border-edu-line p-6 text-center text-edu-ink/80">
           {t('teacher.digest.emptyNeverPlayed')}
         </p>
       ) : (
@@ -135,14 +135,14 @@ export function ProgressDigestDashboard({
 
           {digest.topMissedWords.length > 0 && (
             <div>
-              <p className="mb-2 text-sm font-black uppercase tracking-wide text-neo-cream/70">
+              <p className="mb-2 text-sm font-black uppercase tracking-wide text-edu-ink/70">
                 {t('teacher.digest.missedWords')}
               </p>
               <ul className="flex flex-wrap gap-2">
                 {digest.topMissedWords.map((word) => (
                   <li
                     key={word}
-                    className="rounded-neo border-2 border-neo-pink bg-neo-pink/15 px-3 py-1 font-neo-display text-sm font-bold text-neo-white"
+                    className="rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-1 font-neo-display text-sm font-bold text-neo-black"
                   >
                     {word}
                   </li>
@@ -165,7 +165,7 @@ export function ProgressDigestDashboard({
           )}
 
           {digest.struggling.length > 0 && (
-            <p className="text-sm font-bold text-neo-white/85">
+            <p className="text-sm font-bold text-edu-ink/85">
               {t('teacher.digest.struggling', {
                 names: digest.struggling.map((s) => s.name).join(', '),
               })}
@@ -177,7 +177,7 @@ export function ProgressDigestDashboard({
               data-testid="progress-digest-mood"
               data-mood={mood.mood}
               data-count={mood.count}
-              className="text-sm font-bold text-neo-white/85"
+              className="text-sm font-bold text-edu-ink/85"
             >
               {t(pluralKeyOf(moodCopyKey(mood.mood), mood.count, language), { count: mood.count })}
             </p>
@@ -188,10 +188,10 @@ export function ProgressDigestDashboard({
       {!proLoading && !hasPro && (
         <div
           data-testid="progress-digest-pro-cta"
-          className="rounded-neo border-neo border-neo-lime bg-neo-navy-light p-5 text-center shadow-hard"
+          className="rounded-neo border-neo border-neo-lime bg-edu-surface p-5 text-center shadow-hard"
         >
-          <Lock className="mx-auto mb-2 h-5 w-5 text-neo-lime" aria-hidden="true" />
-          <p className="mb-3 text-sm font-bold text-neo-white/85">{t('teacher.digest.proCtaHint')}</p>
+          <Lock className="mx-auto mb-2 h-5 w-5 text-edu-lime-ink" aria-hidden="true" />
+          <p className="mb-3 text-sm font-bold text-edu-ink/85">{t('teacher.digest.proCtaHint')}</p>
           <Link
             href={`/${language}/teacher/upgrade`}
             data-testid="progress-digest-pro-link"

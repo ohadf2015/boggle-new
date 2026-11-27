@@ -62,7 +62,8 @@ import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces'
 import { useMpExit } from '@/hooks/useMpExit';
 import { MpRoundShell, isRoundFrameMode } from '@/components/multiplayer/round/MpRoundShell';
 import { MpBlastCanvas } from '@/components/multiplayer/round/MpBlastCanvas';
-import { MP_ROUND_CONTAINER_CLASS } from '@/components/multiplayer/round/roundContainer';
+import { MP_ROUND_CONTAINER_CLASS, MP_ROUND_CONTAINER_CLASSROOM_CLASS } from '@/components/multiplayer/round/roundContainer';
+import { ClassroomBoardProvider } from '@/components/education/live/classroomBoard';
 
 type HintsState = PlayerHintsState;
 type FoundWord = PlayerFoundWord;
@@ -70,6 +71,8 @@ type LeaderboardEntry = PlayerLeaderboardEntry;
 type TournamentData = PlayerTournamentData;
 
 interface PlayerInGameViewProps {
+  /** A classroom round: the shared board takes the sky skin. */
+  classroom?: boolean;
   // Core props
   username: string;
   gameCode: string;
@@ -146,7 +149,7 @@ interface PlayerInGameViewProps {
  * Uses shared InGameScreen for the game UI with player-specific modals
  */
 const PlayerInGameView = memo<PlayerInGameViewProps>(({
-  username, gameCode, t, dir, socket, letterGrid, shufflingGrid, gameActive, showStartAnimation,
+  classroom = false, username, gameCode, t, dir, socket, letterGrid, shufflingGrid, gameActive, showStartAnimation,
   gameLanguage, minWordLength, comboLevel, comboLevelRef, lastWordTime, foundWords,
   leaderboard, rosterUsers, totalBoardWords, tournamentData, tournamentStandings, showTournamentStandings,
   setShowTournamentStandings, showExitConfirm, setShowExitConfirm, onExitRoom, onConfirmExit, onWordSubmit,
@@ -267,8 +270,8 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     );
     if (shellEnabled) {
       return (
-        <>
-          <div className={getMpInGameContainerClass(gameMode)}>
+        <ClassroomBoardProvider value={classroom}>
+          <div className={getMpInGameContainerClass(gameMode, { classroom })}>
             <RoundClock>{(remainingTime) => (
               <MpDesktopShellFrame
                 gameMode={gameMode}
@@ -285,32 +288,36 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             )}</RoundClock>
           </div>
           {roundDialogs}
-        </>
+        </ClassroomBoardProvider>
       );
     }
     return (
-      <>
+      <ClassroomBoardProvider value={classroom}>
         {wheelCanvas}
         {roundDialogs}
-      </>
+      </ClassroomBoardProvider>
     );
   }
 
   // Gridless versus modes — per-player towers / crossword race.
   if (gameMode === 'word-tower' || gameMode === 'crossword') {
     return (
-      <>
+      <ClassroomBoardProvider value={classroom}>
         <RoundClock>{(remainingTime) => (gameMode === 'word-tower'
           ? <WordTowerVersus socket={socket} username={username} onQuit={onExitRoom} remainingTime={remainingTime} />
           : <CrosswordVersus socket={socket} username={username} onQuit={onExitRoom} remainingTime={remainingTime} />)}</RoundClock>
         {roundDialogs}
-      </>
+      </ClassroomBoardProvider>
     );
   }
 
   // Wordcraft — lesson-dealt solo race vs the Baron, no shared grid
   if (gameMode === 'wordcraft') {
-    return <RoundClock>{(remainingTime) => <WordcraftLiveView socket={socket} username={username} t={t} remainingTime={remainingTime} />}</RoundClock>;
+    return (
+      <ClassroomBoardProvider value={classroom}>
+        <RoundClock>{(remainingTime) => <WordcraftLiveView socket={socket} username={username} t={t} remainingTime={remainingTime} />}</RoundClock>
+      </ClassroomBoardProvider>
+    );
   }
 
   // Use letterGrid or shufflingGrid
@@ -320,7 +327,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // rage-click inert tiles while startGame is in flight.
   if (!effectiveGrid) {
     return (
-      <div className={getMpInGamePlaceholderClass()}>
+      <div className={getMpInGamePlaceholderClass({ classroom })}>
         <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-3 p-4 pointer-events-none" aria-label="Loading board">
           {Array.from({ length: 16 }).map((_, i) => (
             <div
@@ -429,7 +436,8 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   const roundFrame = isRoundFrameMode(gameMode);
 
   return (
-    <div className={roundFrame ? MP_ROUND_CONTAINER_CLASS : getMpInGameContainerClass(gameMode)}>
+    <ClassroomBoardProvider value={classroom}>
+    <div className={roundFrame ? (classroom ? MP_ROUND_CONTAINER_CLASSROOM_CLASS : MP_ROUND_CONTAINER_CLASS) : getMpInGameContainerClass(gameMode, { classroom })}>
       {/* Classic, word-hunt and blast: the one round frame (HUD / roster /
           board, phone and desktop). */}
       {roundFrame ? (
@@ -464,6 +472,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
       {roundDialogs}
     </div>
+    </ClassroomBoardProvider>
   );
 });
 

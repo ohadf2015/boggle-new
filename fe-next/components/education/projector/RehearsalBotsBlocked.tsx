@@ -52,7 +52,7 @@ export function RehearsalBotsBlocked({ gameCode, currentMode, t, onApplied, onRe
         {t('education.projectorLobby.rehearseUseClassic')}
       </button>
       {showNote && (
-        <p role="status" className="font-neo-body leading-snug text-neo-cream/75 text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]">
+        <p role="status" className="font-neo-body leading-snug text-neo-cream/75 edu-sky:text-edu-ink/75 text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]">
           {t('education.projectorLobby.rehearseBotsBlocked')}
         </p>
       )}

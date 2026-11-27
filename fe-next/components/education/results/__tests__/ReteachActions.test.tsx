@@ -37,7 +37,7 @@ describe('ReteachActions', () => {
     render(<ReteachActions links={links} t={t} />);
     const summary = screen.getByTestId('reteach-more-actions');
     // A 2px cream edge on a navy card: ~15:1, far past the 3:1 the audit wants.
-    expect(summary.className).toMatch(/border-neo-cream/);
+    expect(summary.className).toMatch(/border-edu-line/);
     expect(summary.className).toMatch(/border-2/);
   });
 

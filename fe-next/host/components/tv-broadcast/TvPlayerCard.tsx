@@ -9,6 +9,7 @@ import { AnimatedCounter } from '../../../components/ui/AnimatedCounter';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { cn } from '../../../lib/utils';
 import { teamFillClass } from '@/lib/education/teamColors';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 // Illustrated rank badge images
 const RANK_BADGE_IMAGES: Record<number, string> = {
@@ -83,6 +84,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
 }) => {
   const rankConfig = RANK_CONFIGS[rank as keyof typeof RANK_CONFIGS];
   const isTopThree = rank <= 3;
+  const classroom = useClassroomBoard();
 
   // Score bar
   const barPercentage = leaderScore > 0 ? Math.round((score / leaderScore) * 100) : 0;
@@ -144,11 +146,12 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
       className={cn(
         'relative flex items-center gap-3 p-3 2xl:gap-4 2xl:p-4 rounded-neo border-3 border-neo-black transition-colors overflow-hidden',
         isEliminated && 'opacity-50',
+        classroom && 'shrink-0',
         isTopThree && !isEliminated
           ? `${rankConfig?.bgColor} shadow-hard`
           : isTopThree && isEliminated
-            ? 'bg-neo-navy shadow-hard-sm'
-            : 'bg-neo-navy shadow-hard-sm',
+            ? (classroom ? 'bg-edu-surface shadow-hard-sm' : 'bg-neo-navy shadow-hard-sm')
+            : (classroom ? 'bg-edu-surface shadow-hard-sm' : 'bg-neo-navy shadow-hard-sm'),
         isFlashing && !isEliminated && 'ring-2 ring-neo-yellow'
       )}
     >
@@ -157,7 +160,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
         <div
           className={cn(
             'w-10 h-10 flex items-center justify-center rounded-neo border-2 border-neo-black font-black text-lg relative overflow-hidden',
-            isTopThree ? 'bg-neo-black text-neo-cream' : 'bg-neo-white text-neo-black'
+            isTopThree ? 'bg-neo-black text-neo-cream' : classroom ? 'bg-edu-tile text-neo-black' : 'bg-neo-white text-neo-black'
           )}
         >
           {isTopThree && RANK_BADGE_IMAGES[rank] ? (
@@ -248,7 +251,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
               'font-neo-display font-black text-lg 2xl:text-2xl uppercase',
               singleLineName ? 'truncate' : 'line-clamp-2 leading-tight [overflow-wrap:anywhere]',
               isEliminated && 'line-through',
-              isTopThree ? rankConfig?.textColor : 'text-neo-cream'
+              isTopThree ? rankConfig?.textColor : classroom ? 'text-edu-ink' : 'text-neo-cream'
             )}
           >
             {username}
@@ -280,7 +283,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
           <p
             className={cn(
               'text-sm 2xl:text-base font-bold',
-              isTopThree ? `${rankConfig?.textColor} opacity-80` : 'text-neo-cream/60'
+              isTopThree ? `${rankConfig?.textColor} opacity-80` : classroom ? 'text-edu-ink/70' : 'text-neo-cream/60'
             )}
           >
             {wordCount} {t('tvResults.words')}
@@ -355,7 +358,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
             value={score}
             className={cn(
               'font-neo-display font-black text-2xl 2xl:text-4xl tabular-nums',
-              isTopThree ? rankConfig?.textColor : 'text-neo-cream'
+              isTopThree ? rankConfig?.textColor : classroom ? 'text-edu-ink' : 'text-neo-cream'
             )}
             size="xl"
             formatValue={(v) => Math.round(v).toLocaleString()}
@@ -363,7 +366,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
           <p
             className={cn(
               'text-xs font-bold uppercase',
-              isTopThree ? `${rankConfig?.textColor} opacity-70` : 'text-neo-cream/50'
+              isTopThree ? `${rankConfig?.textColor} opacity-70` : classroom ? 'text-edu-ink/60' : 'text-neo-cream/50'
             )}
           >
             {t('tvResults.pts')}

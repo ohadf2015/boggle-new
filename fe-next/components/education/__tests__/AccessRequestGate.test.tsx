@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 let mockAuth: { user: any; profile?: any; loading: boolean } = { user: null, loading: false };
@@ -77,6 +77,15 @@ describe('<AccessRequestGate>', () => {
       surface: 'edu_access',
       source: 'edu_access',
     });
+  });
+
+  it('marks the email sign-up button with a yellow envelope square, like the Google mark beside it', () => {
+    render(<AccessRequestGate />);
+    const cta = screen.getByRole('button', { name: /auth_required_cta/i });
+    const square = within(cta).getByTestId('access-email-icon');
+    expect(square.className).toMatch(/(^|\s)bg-neo-yellow(\s|$)/);
+    expect(square.className).toMatch(/(^|\s)border-neo-black(\s|$)/);
+    expect(square.querySelector('svg')).not.toBeNull();
   });
 
   it('puts Google first for a signed-out visitor and reports the tap', async () => {

@@ -51,28 +51,28 @@ export function StudentExitDialog({ open, onOpenChange, onConfirm, t, analyticsI
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="max-w-sm rounded-neo border-[3px] border-neo-cream bg-neo-navy-light text-neo-white shadow-hard-lg">
+      <AlertDialogContent className="max-w-sm rounded-neo border-[3px] border-edu-line bg-edu-surface text-edu-ink shadow-edu-lip">
         <AlertDialogHeader className="items-center text-center">
           <span
             aria-hidden="true"
-            className="mb-1 flex size-12 -rotate-6 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-red shadow-hard-sm"
+            className="mb-1 flex size-12 -rotate-6 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-red shadow-edu-lip-sm"
           >
             <DirectionalIcon icon={LogOut} mirror className="size-6 text-neo-black" />
           </span>
-          <AlertDialogTitle className="font-neo-display text-xl font-black text-neo-white">
+          <AlertDialogTitle className="font-neo-display text-xl font-black text-edu-ink">
             {t('eduStudent.exit.title')}
           </AlertDialogTitle>
-          <AlertDialogDescription className="font-neo-body font-bold text-neo-white/75">
+          <AlertDialogDescription className="font-neo-body font-bold text-edu-ink/75">
             {t('eduStudent.exit.body')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col gap-2 sm:flex-col sm:space-x-0">
-          <AlertDialogCancel className="m-0 h-12 w-full rounded-neo border-[3px] border-neo-black bg-neo-lime font-neo-display text-lg font-black uppercase text-neo-black shadow-hard hover:bg-neo-lime active:translate-y-0.5 active:shadow-none">
+          <AlertDialogCancel className="m-0 h-12 w-full rounded-neo border-[3px] border-neo-black bg-neo-lime font-neo-display text-lg font-black uppercase text-neo-black shadow-edu-lip hover:bg-neo-lime active:translate-y-0.5 active:shadow-none">
             {t('eduStudent.exit.stay')}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
-            className="m-0 h-11 w-full rounded-neo border-[3px] border-neo-black bg-neo-red font-neo-display font-black uppercase text-neo-cream shadow-hard-sm hover:bg-neo-red active:translate-y-0.5 active:shadow-none"
+            className="m-0 h-11 w-full rounded-neo border-[3px] border-neo-black bg-neo-red font-neo-display font-black uppercase text-neo-black shadow-edu-lip-sm hover:bg-neo-red active:translate-y-0.5 active:shadow-none"
           >
             {t('eduStudent.exit.leave')}
           </AlertDialogAction>

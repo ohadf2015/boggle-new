@@ -46,10 +46,10 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
     <section data-testid="home-session-rail" aria-labelledby={headingId} className={cn('@container flex min-w-0 flex-col gap-2 max-sm:gap-1', className)}>
       <div className="flex items-center justify-between gap-x-3">
         <div className="min-w-0 flex-1">
-          <h2 id={headingId} className="font-neo-display text-lg font-bold text-neo-cream">
+          <h2 id={headingId} className="font-neo-display text-lg font-bold text-edu-ink">
             {t('education.starterPacks.sessions.title')}
           </h2>
-          <p className={cn('font-neo-body text-sm text-neo-cream/75 [@media(max-height:960px),(max-width:639px)]:sr-only', compact && 'sr-only')}>{t('eduShell.home.flow.subtitle')}</p>
+          <p className={cn('font-neo-body text-sm text-edu-ink/75 [@media(max-height:960px),(max-width:639px)]:sr-only', compact && 'sr-only')}>{t('eduShell.home.flow.subtitle')}</p>
         </div>
         <button type="button" data-testid="home-session-see-all" onClick={() => setAllOpen(true)} className={cn(QUIET_LINK, 'shrink-0')}>
           {t('eduShell.home.rail.seeAll')}
@@ -66,8 +66,8 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
               aria-checked={code === language}
               onClick={() => setPicked(code)}
               className={cn(
-                'inline-flex min-h-11 items-center gap-1 rounded-neo border-2 px-3 font-neo-body text-sm font-bold text-neo-cream transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream',
-                code === language ? 'border-neo-lime' : 'border-neo-cream/30 hover:border-neo-cream',
+                'inline-flex min-h-11 items-center gap-1 rounded-neo border-2 px-3 font-neo-body text-sm font-bold text-edu-ink transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line',
+                code === language ? 'border-neo-lime' : 'border-edu-line hover:border-edu-line',
               )}
             >
               {code === language ? <Check className="size-4" aria-hidden="true" /> : null}
@@ -83,11 +83,11 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
               <Link
                 href={railRunHref(locale, item, classroomId)}
                 data-testid="home-session-chip"
-                className={cn(GAME_CARD, GAME_CARD_HOVER, 'flex min-h-12 items-center gap-2.5 px-3 py-2 text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream')}
+                className={cn(GAME_CARD, GAME_CARD_HOVER, 'flex min-h-12 items-center gap-2.5 px-3 py-2 text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line')}
               >
-                <Play className="size-4 shrink-0 fill-current text-neo-cyan" aria-hidden="true" />
+                <Play className="size-4 shrink-0 fill-current text-edu-cyan-ink" aria-hidden="true" />
                 <span className="min-w-0 flex-1 truncate font-neo-display text-sm font-black">{t(item.session.nameKey)}</span>
-                <span className="shrink-0 font-neo-body text-xs font-bold text-neo-cream/70">{t('education.modePicker.minutes', { count: item.minutes })}</span>
+                <span className="shrink-0 font-neo-body text-xs font-bold text-edu-ink/70">{t('education.modePicker.minutes', { count: item.minutes })}</span>
               </Link>
             </li>
           ))}

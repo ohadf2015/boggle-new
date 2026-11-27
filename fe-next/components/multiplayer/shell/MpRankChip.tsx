@@ -3,6 +3,7 @@
 import { memo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 export interface MpRankChipProps {
   /** 1-based; 0 = not ranked yet. */
@@ -14,13 +15,14 @@ export interface MpRankChipProps {
 }
 
 function MpRankChipImpl({ rank, total, flipKey, className }: MpRankChipProps) {
+  const classroom = useClassroomBoard();
   const { t } = useLanguage();
   return (
     <div
       data-testid="mp-rank-chip"
       aria-label={rank > 0 ? t('mpUi.shell.rankOf', { rank, total }) : undefined}
       className={cn(
-        'inline-flex items-baseline rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-2 h-10 font-neo-display font-bold tabular-nums text-neo-white [perspective:400px]',
+        (classroom ? 'inline-flex items-baseline rounded-neo border-2 border-neo-black bg-edu-surface px-2 h-10 font-neo-display font-bold tabular-nums text-edu-ink [perspective:400px]' : 'inline-flex items-baseline rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-2 h-10 font-neo-display font-bold tabular-nums text-neo-white [perspective:400px]'),
         className,
       )}
     >

@@ -29,21 +29,21 @@ export function VocabQuizMissedSheet({ missed, onClose, t }: VocabQuizMissedShee
       aria-modal="true"
       aria-labelledby="vocab-quiz-missed-title"
       data-testid="vocab-quiz-missed-sheet"
-      className="fixed inset-0 z-40 flex flex-col gap-4 bg-neo-navy px-4 pt-5 pb-6 text-neo-white"
+      className="fixed inset-0 z-40 flex flex-col gap-4 bg-neo-navy edu-sky:bg-edu-page px-4 pt-5 pb-6 text-neo-white edu-sky:text-edu-ink"
     >
       <div className="shrink-0 flex items-center justify-between gap-3">
         <h2
           id="vocab-quiz-missed-title"
           className="flex items-center gap-2 font-neo-display font-bold text-2xl"
         >
-          <BookOpen className="w-6 h-6 text-neo-cyan" aria-hidden />
+          <BookOpen className="w-6 h-6 text-neo-cyan edu-sky:text-edu-cyan-ink" aria-hidden />
           {t('vocabQuiz.practice.title')}
         </h2>
         <button
           type="button"
           onClick={onClose}
           aria-label={t('vocabQuiz.practice.close')}
-          className="shrink-0 w-11 h-11 flex items-center justify-center rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+          className="shrink-0 w-11 h-11 flex items-center justify-center rounded-neo border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           <X className="w-5 h-5" aria-hidden />
         </button>
@@ -60,13 +60,13 @@ export function VocabQuizMissedSheet({ missed, onClose, t }: VocabQuizMissedShee
         {missed.map((m) => (
           <li
             key={m.index}
-            className="rounded-neo border-[2px] border-neo-cyan bg-neo-navy-elevated p-4 shadow-hard"
+            className="rounded-neo border-[2px] border-neo-cyan bg-neo-navy-elevated edu-sky:bg-edu-surface p-4 shadow-hard"
           >
             <p className="font-neo-display font-bold text-xl leading-tight" dir="auto">
               {m.word}
             </p>
             {m.meaning && m.meaning !== m.word && (
-              <p className="mt-1 font-neo-body text-base text-neo-white/85" dir="auto">
+              <p className="mt-1 font-neo-body text-base text-neo-white/85 edu-sky:text-edu-ink/85" dir="auto">
                 {m.meaning}
               </p>
             )}

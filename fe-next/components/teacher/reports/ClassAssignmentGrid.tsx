@@ -28,7 +28,7 @@ import { ReportEmpty, ReportError, ReportSkeleton, SectionTitle, useReportData }
 
 const ROW_H = 64;
 const PAGER_RESERVE = 168;
-const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-neo-cream/60 px-3 text-sm font-bold text-neo-cream hover:border-neo-cream disabled:opacity-40';
+const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-edu-line px-3 text-sm font-bold text-edu-ink hover:border-edu-line disabled:opacity-40';
 
 export interface ClassAssignmentGridProps {
   classroomId: string;
@@ -133,15 +133,15 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
   return (
     <section
       data-testid="class-assignment-grid"
-      className="space-y-4 rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 shadow-hard sm:p-5"
+      className="space-y-4 rounded-neo-lg border-2 border-edu-line bg-edu-surface/95 p-4 shadow-hard sm:p-5"
     >
       <SectionTitle>{t('teacher.reports.classGrid.title')}</SectionTitle>
 
       {hasGrid ? (
-        <div className="overflow-x-auto rounded-neo border-2 border-neo-cream/40 bg-neo-navy">
+        <div className="overflow-x-auto rounded-neo border-2 border-edu-line bg-edu-surface">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-neo-navy text-neo-cream/80">
+              <tr className="bg-edu-surface text-edu-ink/80">
                 <th scope="col" className="p-3 text-start font-bold">
                   {t('teacher.reports.columns.student')}
                 </th>
@@ -156,8 +156,8 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
               {grid.students.slice(first, first + pageSize).map((student, rowIndex) => {
                 const studentIndex = first + rowIndex;
                 return (
-                <tr key={student.id} className="border-t border-neo-cream/20">
-                  <th scope="row" className="px-3 py-2 text-start font-bold text-neo-white">
+                <tr key={student.id} className="border-t border-edu-line/20">
+                  <th scope="row" className="px-3 py-2 text-start font-bold text-edu-ink">
                     {student.name}
                   </th>
                   {grid.assignments.map((assignment, assignmentIndex) => {
@@ -171,7 +171,7 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
                         data-student={student.id}
                         data-assignment={assignment.id}
                         className={cn(
-                          'px-3 py-2 align-top text-neo-white',
+                          'px-3 py-2 align-top text-edu-ink',
                           completed ? 'bg-neo-lime/10' : 'bg-neo-pink/10',
                         )}
                       >
@@ -201,7 +201,7 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
           <button type="button" disabled={shownPage === 0} onClick={() => setPage(shownPage - 1)} className={PAGER_BUTTON}>
             {t('eduLibrary.pager.prev')}
           </button>
-          <span className="text-sm font-bold text-neo-cream/80">{t('eduLibrary.pager.status', { page: shownPage + 1, total: pageCount })}</span>
+          <span className="text-sm font-bold text-edu-ink/80">{t('eduLibrary.pager.status', { page: shownPage + 1, total: pageCount })}</span>
           <button type="button" disabled={shownPage >= pageCount - 1} onClick={() => setPage(shownPage + 1)} className={PAGER_BUTTON}>
             {t('eduLibrary.pager.next')}
           </button>
@@ -210,41 +210,41 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
       {hasGrid ? null : (
         <>
           <ReportEmpty />
-          <p className="text-center text-sm text-neo-cream/70">{t('teacher.reports.classGrid.empty')}</p>
+          <p className="text-center text-sm text-edu-ink/70">{t('teacher.reports.classGrid.empty')}</p>
         </>
       )}
 
-      <div className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-3">
+      <div className="rounded-neo border-2 border-edu-line bg-edu-surface p-3">
         <div className="flex flex-wrap items-start gap-3">
           <button
             type="button"
             data-testid="weekly-summary-copy"
             onClick={copySummary}
-            className="inline-flex min-h-10 shrink-0 items-center rounded-neo border-2 border-neo-cream/60 px-3 py-1.5 text-sm font-bold text-neo-cream transition-colors hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime"
+            className="inline-flex min-h-10 shrink-0 items-center rounded-neo border-2 border-edu-line px-3 py-1.5 text-sm font-bold text-edu-ink transition-colors hover:bg-edu-ink/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime"
           >
             {copyState === 'copied'
               ? t('teacher.reports.classGrid.copied')
               : t('teacher.reports.classGrid.copySummary')}
           </button>
           <details className="min-w-0 flex-1 basis-48">
-            <summary className="flex min-h-10 cursor-pointer items-center text-sm font-bold text-neo-cream/85 hover:text-neo-cream">
+            <summary className="flex min-h-10 cursor-pointer items-center text-sm font-bold text-edu-ink/85 hover:text-edu-ink">
               {t('teacher.reports.classGrid.summaryPreview')}
             </summary>
             <pre
               data-testid="weekly-summary"
-              className="mt-2 whitespace-pre-wrap break-words font-sans text-sm text-neo-white"
+              className="mt-2 whitespace-pre-wrap break-words font-sans text-sm text-edu-ink"
             >{summaryText}</pre>
           </details>
-          <span role="status" className={cn('text-xs font-bold text-neo-pink', copyState !== 'failed' && 'sr-only')}>
+          <span role="status" className={cn('text-xs font-bold text-edu-pink-ink', copyState !== 'failed' && 'sr-only')}>
             {copyState === 'failed' ? t('teacher.reports.classGrid.copyFailed') : ''}
           </span>
         </div>
         {!proLoading && !hasPro ? (
-          <p className="mt-3 text-xs text-neo-cream/70">
+          <p className="mt-3 text-xs text-edu-ink/70">
             <Link
               href={`/${language}/teacher/upgrade`}
               data-testid="class-grid-pro-nudge"
-              className="font-bold text-neo-cyan underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+              className="font-bold text-edu-cyan-ink underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
             >
               {t('teacher.reports.classGrid.proNudge')}
             </Link>

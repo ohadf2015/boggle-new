@@ -157,7 +157,7 @@ export function DuelRevealScreen({
        * result screen sandwiched between them loses its banner to one and its
        * REMATCH button to the other. A game surface owns the whole screen.
        */
-      className="fixed inset-0 z-[100] flex flex-col overflow-hidden bg-neo-navy"
+      className="fixed inset-0 z-[100] flex flex-col overflow-hidden bg-edu-page"
     >
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2.5 overflow-y-auto px-4 py-3">
         {/* Result banner, with the still-frame burst behind it on a win */}
@@ -196,7 +196,7 @@ export function DuelRevealScreen({
               {myScore}
             </p>
           </div>
-          <div className="flex items-center font-neo-display text-sm font-black uppercase text-neo-cream/80">
+          <div className="flex items-center font-neo-display text-sm font-black uppercase text-edu-ink/80">
             {t('education.duels.vs')}
           </div>
           <div className="flex-1 rounded-neo border-[2px] border-neo-black bg-neo-pink px-3 py-2 text-center shadow-hard-sm">
@@ -232,13 +232,13 @@ export function DuelRevealScreen({
       </div>
 
       {/* Docked actions — always reachable, never scrolled away */}
-      <div className="shrink-0 border-t-4 border-neo-cream bg-neo-navy px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3">
+      <div className="shrink-0 border-t-4 border-edu-line bg-edu-surface px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3">
         <div className="mx-auto flex max-w-md items-end gap-2">
           <button
             type="button"
             data-testid="duel-back-btn"
             onClick={onBackToLobby}
-            className="inline-flex items-center gap-1.5 rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 py-3 font-neo-body text-sm font-black text-neo-cream shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+            className="inline-flex items-center gap-1.5 rounded-neo border-[3px] border-edu-line bg-edu-surface px-4 py-3 font-neo-body text-sm font-black text-edu-ink shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             <DirectionalIcon icon={ArrowLeft} className="h-4 w-4" />
             {t('education.duels.backToLobby')}

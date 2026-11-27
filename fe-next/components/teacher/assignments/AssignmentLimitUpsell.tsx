@@ -28,30 +28,30 @@ export function AssignmentLimitUpsell({ currentCount, onClose }: AssignmentLimit
 
   return (
     <div data-testid="assignment-limit-upsell" className="space-y-4">
-      <div className="rounded-neo border-2 border-neo-cream/40 bg-neo-cream/10 p-4">
+      <div className="rounded-neo border-2 border-edu-line bg-edu-ink/10 p-4">
         <div className="mb-2 flex items-center gap-3">
-          <Zap className="h-5 w-5 shrink-0 text-neo-lime" aria-hidden="true" />
-          <p className="font-bold text-neo-white">
+          <Zap className="h-5 w-5 shrink-0 text-edu-lime-ink" aria-hidden="true" />
+          <p className="font-bold text-edu-ink">
             {t('teacher.subscription.assignmentLimitMessage', {
               current: currentCount,
               limit: FREE_TIER_LIMITS.assignmentsPerClass,
             })}
           </p>
         </div>
-        <p className="text-sm font-bold leading-relaxed text-neo-white/70">
+        <p className="text-sm font-bold leading-relaxed text-edu-ink/70">
           {t('teacher.subscription.upgradeProDescription')}
         </p>
       </div>
 
-      <div className="rounded-neo border-2 border-neo-cream/40 bg-neo-cream/10 p-4">
-        <p className="text-sm font-bold text-neo-white/70">{t('teacher.subscription.priceUSD')}</p>
-        <p className="font-neo-display text-3xl font-black text-neo-lime">
+      <div className="rounded-neo border-2 border-edu-line bg-edu-ink/10 p-4">
+        <p className="text-sm font-bold text-edu-ink/70">{t('teacher.subscription.priceUSD')}</p>
+        <p className="font-neo-display text-3xl font-black text-edu-lime-ink">
           ${TEACHER_PRO_PRICE_USD}{' '}
-          <span className="text-lg font-bold text-neo-white/60">
+          <span className="text-lg font-bold text-edu-ink/60">
             {t('teacher.subscription.perMonth')}
           </span>
         </p>
-        <p className="mt-2 text-xs font-bold text-neo-white/50">
+        <p className="mt-2 text-xs font-bold text-edu-ink/50">
           {t('teacher.subscription.autoRenew')}
         </p>
       </div>
@@ -76,7 +76,7 @@ export function AssignmentLimitUpsell({ currentCount, onClose }: AssignmentLimit
         <Button
           onClick={onClose}
           variant="outline"
-          className="flex-1 border-2 border-neo-cream/40 bg-transparent font-black text-neo-white hover:bg-neo-cream/10"
+          className="flex-1 border-2 border-edu-line bg-transparent font-black text-edu-ink hover:bg-edu-ink/10"
         >
           {t('teacher.subscription.continueFree')}
         </Button>

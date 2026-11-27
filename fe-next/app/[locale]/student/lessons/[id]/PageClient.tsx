@@ -100,7 +100,7 @@ export default function LessonPracticePageClient() {
   if (!lesson) {
     return (
       <EducationShell title={t('education.practicePicker.title')} contentClassName="flex items-center justify-center px-4">
-        <div className="w-full max-w-sm rounded-neo border-[3px] border-black bg-neo-lime p-6 text-neo-black shadow-hard">
+        <div className="w-full max-w-sm rounded-neo border-[3px] border-black bg-neo-lime p-6 text-neo-black shadow-edu-lip">
           <h1 className="mb-2 font-neo-display text-xl font-black">
             {t('education.practice.lessonUnavailable')}
           </h1>
@@ -113,7 +113,7 @@ export default function LessonPracticePageClient() {
               data-primary="true"
               data-testid="practice-lesson-retry"
               onClick={() => window.location.reload()}
-              className="min-h-[52px] w-full rounded-neo border-[3px] border-black bg-neo-black px-6 py-3 font-neo-display text-lg font-black uppercase text-neo-lime shadow-hard-sm"
+              className="min-h-[52px] w-full rounded-neo border-[3px] border-black bg-neo-black px-6 py-3 font-neo-display text-lg font-black uppercase text-neo-lime shadow-edu-lip-sm"
             >
               {t('student.practiceFun.tryAgain')}
             </button>
@@ -125,7 +125,7 @@ export default function LessonPracticePageClient() {
             onClick={() => router.push(`/${language}/student`)}
             className={
               isDeadLink
-                ? 'min-h-[52px] w-full rounded-neo border-[3px] border-black bg-neo-black px-6 py-3 font-neo-display text-lg font-black uppercase text-neo-lime shadow-hard-sm'
+                ? 'min-h-[52px] w-full rounded-neo border-[3px] border-black bg-neo-black px-6 py-3 font-neo-display text-lg font-black uppercase text-neo-lime shadow-edu-lip-sm'
                 : 'mx-auto mt-2 block min-h-[40px] w-3/5 rounded-neo border-[2px] border-black bg-neo-cream px-4 font-neo-body text-xs font-bold uppercase text-neo-black'
             }
           >

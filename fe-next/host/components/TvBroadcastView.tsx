@@ -12,6 +12,8 @@ import TvGameHeader from './tv-broadcast/TvGameHeader';
 import TvBattleBar, { TvFormatChip, TvRoundLabel } from './tv-broadcast/TvBattleBar';
 import type { ClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
 import TvLeaderboard from './tv-broadcast/TvLeaderboard';
+import { CLASSROOM_WALL } from './tv-broadcast/classroomWallSkin';
+import { ClassroomBoardProvider } from '@/components/education/live/classroomBoard';
 import TvActivityPanel from './tv-broadcast/TvActivityPanel';
 import TvMomentumTicker from './tv-broadcast/TvMomentumTicker';
 import TvNotificationQueue from './tv-broadcast/TvNotificationQueue';
@@ -264,7 +266,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
 
   if (isVocabQuizRoom) {
     return (
-      <div className="flex-1 flex flex-col min-h-0 bg-neo-navy" style={TEACHER_CONTROLS_INSET}>
+      <div className="flex-1 flex flex-col min-h-0 bg-edu-page" style={TEACHER_CONTROLS_INSET}>
         <VocabQuizHostView
           socket={socket}
           joinCode={gameCode}
@@ -301,7 +303,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       whileTap={{ scale: 0.95 }}
       onClick={toggleFullscreen}
       data-testid="tv-fullscreen-toggle"
-      className="bg-neo-black/80 hover:bg-neo-black text-neo-cream p-3 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm transition-colors"
+      className={isClassroom ? CLASSROOM_WALL.iconButton : 'bg-neo-black/80 hover:bg-neo-black text-neo-cream p-3 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm transition-colors'}
       title={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
       aria-label={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
     >
@@ -316,7 +318,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       data-testid="tv-classroom-exit"
       aria-label={t('eduLive.live.exitLabel')}
       title={t('eduLive.live.exitLabel')}
-      className="bg-neo-black/80 hover:bg-neo-pink hover:text-neo-black text-neo-cream p-3 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm transition-colors active:translate-y-0.5 active:shadow-none focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+      className={CLASSROOM_WALL.iconButton}
     >
       <DirectionalIcon icon={LogOut} mirror className="w-6 h-6" />
     </button>
@@ -346,12 +348,13 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   }
 
   return (
+    <ClassroomBoardProvider value={isClassroom}>
     <div
-      className="flex-1 flex flex-col min-h-0 bg-neo-navy overflow-hidden relative isolate"
+      className={`flex-1 flex flex-col min-h-0 ${isClassroom ? CLASSROOM_WALL.root : 'bg-neo-navy'} overflow-hidden relative isolate`}
       style={TEACHER_CONTROLS_INSET}
     >
       {/* Mode art at -z-10 inside an isolated root: under the board, never a 60% navy veil over it. */}
-      {gameMode && MODE_BACKGROUNDS[gameMode] && (
+      {!isClassroom && gameMode && MODE_BACKGROUNDS[gameMode] && (
         <div data-testid="tv-mode-backdrop" className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
           <Image
             src={MODE_BACKGROUNDS[gameMode]}
@@ -395,6 +398,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       {/* Game Header with Timer - Always visible */}
       <TvGameHeader
         compact={isClassroom}
+        classroom={isClassroom}
         leading={isClassroom ? <TvRoundLabel classroom={classroomLive} t={t} /> : undefined}
         toastSlot={isClassroom ? (
           <div data-testid="tv-classroom-header-end" className="flex min-w-0 flex-col items-end gap-2">
@@ -443,7 +447,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         </div>
         <div
           data-testid="tv-leaderboard-card"
-          className={`min-h-[120px] md:min-h-0 bg-neo-navy-light text-neo-cream rounded-neo border-3 md:border-4 border-neo-black shadow-hard-lg ${isClassroom ? 'md:overflow-auto' : 'overflow-auto'}`}
+          className={`min-h-[120px] md:min-h-0 rounded-neo ${isClassroom ? `${CLASSROOM_WALL.leaderboardCard} md:overflow-auto` : 'bg-neo-navy-light text-neo-cream border-3 md:border-4 border-neo-black shadow-hard-lg overflow-auto'}`}
         >
           <TvLeaderboard
             players={leaderboardData}
@@ -487,6 +491,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         forceShow={showTutorial}
       />
     </div>
+    </ClassroomBoardProvider>
   );
 });
 

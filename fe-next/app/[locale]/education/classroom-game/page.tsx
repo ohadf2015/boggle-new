@@ -67,8 +67,8 @@ export default async function ClassroomGamePage({ params }: { params: Promise<{ 
         asH1
       />
       <section className="mx-auto max-w-3xl px-4 pb-12 text-center">
-        <div className="rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light px-6 py-6 shadow-hard-lg">
-          <p className="text-base text-neo-white/90">{FOR_SCHOOLS_FOOTER[locale] ?? FOR_SCHOOLS_FOOTER.en}</p>
+        <div className="rounded-neo border-neo-thick border-edu-line bg-edu-surface px-6 py-6 shadow-hard-lg">
+          <p className="text-base text-edu-ink/90">{FOR_SCHOOLS_FOOTER[locale] ?? FOR_SCHOOLS_FOOTER.en}</p>
           <Link
             href={`/${locale}/education/for-schools`}
             data-ph-capture-attribute-cta="classroom_for_schools"

@@ -117,7 +117,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
         <div data-testid="class-arc-loading" aria-busy="true" className="space-y-2">
           <span className="sr-only" role="status">{t('teacher.reports.loading')}</span>
           {[0, 1, 2].map((i) => (
-            <div key={i} aria-hidden="true" className="h-12 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
+            <div key={i} aria-hidden="true" className="h-12 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
           ))}
         </div>
       </Shell>
@@ -127,7 +127,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
   if (error) {
     return (
       <Shell embedded={embedded} title={t('teacher.reports.arc.title')} subtitle={t('teacher.reports.arc.subtitle')}>
-        <p role="alert" className="rounded-neo border-2 border-neo-pink bg-neo-pink/15 px-3 py-2 text-sm font-bold text-neo-white">
+        <p role="alert" className="rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-2 text-sm font-bold text-neo-black">
           {t('teacher.reports.error')}
         </p>
       </Shell>
@@ -137,7 +137,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
   if (!mastery || mastery.sessionsAnalyzed === 0) {
     return (
       <Shell embedded={embedded} title={t('teacher.reports.arc.title')} subtitle={t('teacher.reports.arc.subtitle')}>
-        <p data-testid="class-arc-empty" className="rounded-neo border-2 border-dashed border-neo-cream/30 p-6 text-center text-sm text-neo-cream/80">
+        <p data-testid="class-arc-empty" className="rounded-neo border-2 border-dashed border-edu-line p-6 text-center text-sm text-edu-ink/80">
           {t('teacher.reports.arc.noEvidenceClass')}
         </p>
       </Shell>
@@ -148,30 +148,30 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
     <Shell embedded={embedded} title={t('teacher.reports.arc.title')} subtitle={t('teacher.reports.arc.subtitle')}>
       {mastery.classStuckWords.length > 0 && (
         <div className="mb-5">
-          <h3 className="mb-2 text-sm font-bold text-neo-cream/80">{t('teacher.reports.arc.wordsClassMisses')}</h3>
+          <h3 className="mb-2 text-sm font-bold text-edu-ink/80">{t('teacher.reports.arc.wordsClassMisses')}</h3>
           <ul className="mb-3 flex flex-wrap gap-2">
             {mastery.classStuckWords.slice(0, 6).map((w) => (
               <li
                 key={w.word}
                 data-testid="class-arc-stuck-chip"
-                className="inline-flex items-baseline gap-2 rounded-neo border-2 border-neo-pink bg-neo-pink/15 px-3 py-1.5"
+                className="inline-flex items-baseline gap-2 rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-1.5"
               >
-                <span className="font-bold text-neo-white" dir="auto">{w.display}</span>
-                <span className="text-xs font-bold text-neo-cream/70 tabular-nums">
+                <span className="font-bold text-edu-ink" dir="auto">{w.display}</span>
+                <span className="text-xs font-bold text-edu-ink/70 tabular-nums">
                   {t('teacher.reports.arc.studentsStuck', { stuck: w.studentsStuck, total: w.studentsWithEvidence })}
                 </span>
               </li>
             ))}
           </ul>
-          <p data-testid="class-arc-requeue-note" className="mb-3 text-xs font-bold text-neo-cream/60">
+          <p data-testid="class-arc-requeue-note" className="mb-3 text-xs font-bold text-edu-ink/60">
             {t('teacher.reports.arc.requeueNote')}
           </p>
           {status === 'done' ? (
             <p
               data-testid="class-arc-assigned"
-              className="inline-flex items-center gap-2 rounded-neo border-2 border-neo-lime bg-neo-lime/15 px-3 py-2 text-sm font-black text-neo-white"
+              className="inline-flex items-center gap-2 rounded-neo border-2 border-neo-black bg-neo-lime px-3 py-2 text-sm font-black text-neo-black"
             >
-              <Check className="size-4 shrink-0 text-neo-lime" aria-hidden="true" />
+              <Check className="size-4 shrink-0 text-edu-lime-ink" aria-hidden="true" />
               {t('teacher.reports.arc.followUpDone')}
             </p>
           ) : (
@@ -184,7 +184,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
                 'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-black bg-neo-lime px-4 py-2',
                 'font-neo-display text-sm font-black text-neo-black shadow-hard',
                 'transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-none',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white disabled:opacity-70',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edu-line disabled:opacity-70',
                 'motion-reduce:transition-none motion-reduce:hover:translate-y-0'
               )}
             >
@@ -197,7 +197,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
             </button>
           )}
           {status === 'failed' && (
-            <p role="alert" className="mt-2 text-sm font-black text-neo-pink">
+            <p role="alert" className="mt-2 text-sm font-black text-edu-pink-ink">
               {t('teacher.reports.arc.followUpFailed')}
             </p>
           )}
@@ -206,19 +206,19 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
 
       {/* Legend: the pills pair colour with counts, so the meaning of each
           tone is spelled out once here rather than guessed per row. */}
-      <p className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold text-neo-cream/70">
+      <p className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold text-edu-ink/70">
         <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="size-2.5 rounded-full bg-neo-pink" />{t('teacher.reports.arc.trend.stuck')}</span>
         <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="size-2.5 rounded-full bg-neo-cyan" />{t('teacher.reports.arc.trend.improving')}</span>
         <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="size-2.5 rounded-full bg-neo-lime" />{t('teacher.reports.arc.trend.mastered')}</span>
       </p>
-      <ul className="divide-y divide-neo-cream/15">
+      <ul className="divide-y divide-edu-line/15">
         {rows.map((row) => (          <li key={row.studentId} data-testid="class-arc-student" data-student={row.studentId}>
             <div data-testid={`class-arc-student-${row.studentId}`} className="flex items-center gap-3 py-2">
               <button
                 type="button"
                 onClick={() => onStudentClick(row.studentId, row.name)}
                 aria-label={t('teacher.reports.arc.viewStudent', { name: row.name })}
-                className="group inline-flex min-h-11 min-w-0 flex-1 items-center gap-2 text-start font-bold text-neo-white underline-offset-4 transition-colors hover:text-neo-cyan hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+                className="group inline-flex min-h-11 min-w-0 flex-1 items-center gap-2 text-start font-bold text-edu-ink underline-offset-4 transition-colors hover:text-edu-cyan-ink hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
               >
                 <span className="break-words">{row.name}</span>
                 <DirectionalIcon
@@ -233,7 +233,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
                   {row.mastered > 0 && <TrendPill tone="lime" count={row.mastered} label={t('teacher.reports.arc.trend.mastered')} />}
                 </span>
               ) : (
-                <span className="shrink-0 text-xs font-bold text-neo-cream/50">
+                <span className="shrink-0 text-xs font-bold text-edu-ink/50">
                   {t('teacher.reports.arc.noEvidenceStudent')}
                 </span>
               )}
@@ -248,9 +248,9 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
 /** Colour + count + word: the pill never relies on colour alone. */
 function TrendPill({ tone, count, label }: { tone: 'lime' | 'cyan' | 'pink'; count: number; label: string }) {
   const tones = {
-    lime: 'border-neo-lime bg-neo-lime/15 text-neo-lime',
-    cyan: 'border-neo-cyan bg-neo-cyan/15 text-neo-cyan',
-    pink: 'border-neo-pink bg-neo-pink/15 text-neo-pink',
+    lime: 'border-neo-black bg-neo-lime text-neo-black',
+    cyan: 'border-neo-black bg-neo-cyan text-neo-black',
+    pink: 'border-neo-black bg-neo-pink text-neo-black',
   } as const;
   return (
     <span title={label} className={cn('inline-flex items-center gap-1 rounded-neo border-2 px-1.5 py-0.5', tones[tone])}>
@@ -265,17 +265,17 @@ function Shell({ embedded, title, subtitle, children }: { embedded: boolean; tit
     <section
       data-testid="class-arc-panel"
       aria-label={title}
-      className={embedded ? undefined : 'rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 shadow-hard sm:p-6'}
+      className={embedded ? undefined : 'rounded-neo-lg border-2 border-edu-line bg-edu-surface/95 p-4 shadow-hard sm:p-6'}
     >
-      <h2 className={embedded ? 'sr-only' : 'flex items-center gap-2 font-neo-display text-xl font-bold text-neo-white'}>
+      <h2 className={embedded ? 'sr-only' : 'flex items-center gap-2 font-neo-display text-xl font-bold text-edu-ink'}>
         {!embedded && (
-          <span className="grid size-8 shrink-0 place-items-center rounded-neo border-2 border-neo-cyan bg-neo-cyan/15">
-            <BookMarked className="size-4 text-neo-cyan" aria-hidden="true" />
+          <span className="grid size-8 shrink-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-cyan">
+            <BookMarked className="size-4 text-edu-cyan-ink" aria-hidden="true" />
           </span>
         )}
         {title}
       </h2>
-      <p className={cn('mb-4 text-sm text-neo-cream/70', !embedded && 'mt-1')}>{subtitle}</p>
+      <p className={cn('mb-4 text-sm text-edu-ink/70', !embedded && 'mt-1')}>{subtitle}</p>
       {children}
     </section>
   );

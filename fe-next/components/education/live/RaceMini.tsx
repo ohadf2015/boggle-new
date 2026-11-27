@@ -42,7 +42,7 @@ export function RaceMini({ slots, t, dir, className }: { slots: StripSlot[]; t: 
     <div
       data-testid="race-mini"
       dir={dir}
-      className={cn('pointer-events-none flex min-h-9 min-w-0 items-center gap-1.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-1.5 text-neo-cream shadow-hard-sm', className)}
+      className={cn('pointer-events-none flex min-h-9 min-w-0 items-center gap-1.5 rounded-neo border-2 border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-page px-1.5 text-neo-cream edu-sky:text-edu-ink shadow-hard-sm', className)}
     >
       <Pop pulseKey={done} className="shrink-0">
         <span data-testid="lesson-target-count" dir="ltr" aria-hidden="true" className="inline-block rounded-full border-2 border-neo-black bg-neo-cyan px-1.5 py-0.5 font-neo-display text-[13px] font-black leading-none text-neo-black tabular-nums">

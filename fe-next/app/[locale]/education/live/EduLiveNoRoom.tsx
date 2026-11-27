@@ -13,11 +13,11 @@ interface EduLiveNoRoomProps {
 }
 
 const SECONDARY_LINK =
-  'inline-flex min-h-11 items-center rounded-neo px-3 font-neo-display text-base font-bold text-neo-cyan underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan tv:text-xl';
+  'inline-flex min-h-11 items-center rounded-neo px-3 font-neo-display text-base font-bold text-edu-cyan-ink underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan tv:text-xl';
 
 export function EduLiveNoRoom({ isHost, language, t }: EduLiveNoRoomProps) {
   return (
-    <div data-testid="edu-live-no-room" className="relative flex min-h-[calc(100dvh-1rem)] flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream lg:justify-center">
+    <div data-testid="edu-live-no-room" className="relative flex min-h-[calc(100dvh-1rem)] flex-1 flex-col overflow-hidden bg-edu-page text-edu-ink lg:justify-center">
       <style>{LIVE_KEYFRAMES}</style>
 
       {/* A phone keeps the action in thumb reach at the bottom; a wide screen centres
@@ -41,10 +41,10 @@ export function EduLiveNoRoom({ isHost, language, t }: EduLiveNoRoomProps) {
             aria-hidden="true"
             className="relative z-10 size-[min(13rem,30dvh)] select-none object-contain motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite] tv:size-[min(20rem,34dvh)]"
           />
-          <span aria-hidden="true" className="-mt-5 h-6 w-40 rounded-[50%] bg-neo-navy-light tv:w-60" />
+          <span aria-hidden="true" className="-mt-5 h-6 w-40 rounded-[50%] bg-edu-surface tv:w-60" />
         </div>
 
-        <p className="max-w-xs font-neo-body text-lg font-bold text-neo-cream/85 tv:max-w-lg tv:text-2xl">
+        <p className="max-w-xs font-neo-body text-lg font-bold text-edu-ink/85 tv:max-w-lg tv:text-2xl">
           {t(isHost ? 'eduLiveRoom.entry.noRoomHost' : 'education.student.deadEnd.noRoomLine')}
         </p>
       </main>

@@ -3,6 +3,7 @@
 import { memo, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 import { toMpRoster, rankOf, type MpRosterPlayer, type MpRosterScoreLike, type MpRosterUserLike } from '@/lib/multiplayer/roster';
 import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
@@ -98,6 +99,7 @@ function MpRoundLayoutImpl({
 }: MpRoundLayoutProps) {
   const wide = useMediaQuery('(min-width: 1024px)');
   const { t } = useLanguage();
+  const classroom = useClassroomBoard();
   const reduceMotion = useShouldReduceMotion();
   const mode = roundModeMeta(gameMode);
   const ModeIcon = MODE_ICONS[mode.icon] ?? FALLBACK_MODE_ICON;
@@ -159,7 +161,7 @@ function MpRoundLayoutImpl({
 
   return (
     <MpRoundTrayContext.Provider value={trayValue}>
-    <div data-testid="mp-round-layout" data-mode={mode.slug} className={cn(styles.layout, 'relative flex-1 min-h-0 w-full h-full bg-neo-navy')}>
+    <div data-testid="mp-round-layout" data-mode={mode.slug} className={cn(styles.layout, (classroom ? 'relative flex-1 min-h-0 w-full h-full bg-edu-page' : 'relative flex-1 min-h-0 w-full h-full bg-neo-navy'))}>
       <div className={cn(styles.areaHud, 'relative z-20 min-w-0')}>
         <MpRoundHud
           remainingTime={Math.max(0, remainingTime ?? 0)}
@@ -195,9 +197,9 @@ function MpRoundLayoutImpl({
       {/* Desktop: roster rail */}
       <aside className={cn(styles.areaLeft, 'min-h-0 flex-col gap-2 pt-3')} aria-label={t('mpUi.round.players')}>
         {bossStrip && wide && <div className="-mx-2 mb-6">{bossStrip}</div>}
-        <h2 className="font-neo-display font-bold uppercase tracking-wider text-xs tv:text-lg text-neo-white/60 px-1">{t('mpUi.round.players')}</h2>
+        <h2 className={classroom ? 'font-neo-display font-bold uppercase tracking-wider text-xs tv:text-lg text-edu-ink/60 px-1' : 'font-neo-display font-bold uppercase tracking-wider text-xs tv:text-lg text-neo-white/60 px-1'}>{t('mpUi.round.players')}</h2>
         {/* Full height, like YOUR WORDS opposite: the column is framed, never a void under a short roster. */}
-        <div data-testid="mp-rail-roster" className="flex-1 min-h-0 overflow-y-auto rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard p-3 tv:p-4">
+        <div data-testid="mp-rail-roster" className={classroom ? 'flex-1 min-h-0 overflow-y-auto rounded-neo border-3 border-neo-black bg-edu-surface shadow-hard p-3 tv:p-4' : 'flex-1 min-h-0 overflow-y-auto rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard p-3 tv:p-4'}>
           <MpRosterStrip
             players={displayRoster}
             meId={meId}
@@ -216,13 +218,13 @@ function MpRoundLayoutImpl({
         {/* The mode, anchoring the column's foot: what everyone is playing, for the room. */}
         <div
           data-testid="mp-rail-mode"
-          className="mt-auto shrink-0 rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard p-3 tv:p-5"
+          className={classroom ? 'mt-auto shrink-0 rounded-neo border-3 border-neo-black bg-edu-surface shadow-hard p-3 tv:p-5' : 'mt-auto shrink-0 rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard p-3 tv:p-5'}
         >
           <p className={cn('flex items-center gap-2 font-neo-display font-bold uppercase tracking-wide text-base tv:text-3xl', MODE_TEXT[mode.color])}>
             <ModeIcon aria-hidden="true" className="shrink-0 w-5 h-5 tv:w-8 tv:h-8" />
             <span dir="auto">{t(mode.nameKey)}</span>
           </p>
-          <p dir="auto" className="mt-1 tv:mt-2 text-sm tv:text-xl font-bold leading-snug text-neo-white/70 text-balance">
+          <p dir="auto" className={classroom ? 'mt-1 tv:mt-2 text-sm tv:text-xl font-bold leading-snug text-edu-ink/70 text-balance' : 'mt-1 tv:mt-2 text-sm tv:text-xl font-bold leading-snug text-neo-white/70 text-balance'}>
             {t(mode.ruleKey)}
           </p>
         </div>
@@ -248,7 +250,7 @@ function MpRoundLayoutImpl({
         {!isBlast && !inTray && (
           <span
             data-testid="mp-found-pill"
-            className="lg:hidden pointer-events-none absolute bottom-1 end-2 z-10 rounded-full border-2 border-neo-black bg-neo-navy-light px-2.5 py-0.5 text-xs font-bold text-neo-white/80 shadow-hard-sm tabular-nums"
+            className={classroom ? 'lg:hidden pointer-events-none absolute bottom-1 end-2 z-10 rounded-full border-2 border-neo-black bg-edu-surface px-2.5 py-0.5 text-xs font-bold text-edu-ink/80 shadow-hard-sm tabular-nums' : 'lg:hidden pointer-events-none absolute bottom-1 end-2 z-10 rounded-full border-2 border-neo-black bg-neo-navy-light px-2.5 py-0.5 text-xs font-bold text-neo-white/80 shadow-hard-sm tabular-nums'}
           >
             {t('mpUi.round.found', { count: ladder.length })}
           </span>
@@ -257,22 +259,22 @@ function MpRoundLayoutImpl({
 
       {/* Desktop: my words */}
       <aside className={cn(styles.areaRight, 'min-h-0 flex-col gap-2 pt-3')} aria-label={t('mpUi.round.yourWords')}>
-        <h2 className="flex items-baseline justify-between gap-2 font-neo-display font-bold uppercase tracking-wider text-xs tv:text-lg text-neo-white/60 px-1">
+        <h2 className={classroom ? 'flex items-baseline justify-between gap-2 font-neo-display font-bold uppercase tracking-wider text-xs tv:text-lg text-edu-ink/60 px-1' : 'flex items-baseline justify-between gap-2 font-neo-display font-bold uppercase tracking-wider text-xs tv:text-lg text-neo-white/60 px-1'}>
           {t('mpUi.round.yourWords')}
           <span data-testid="mp-words-count" className="rounded-full bg-neo-lime px-2 text-neo-black tabular-nums">{ladder.length}</span>
         </h2>
-        <div className="flex-1 min-h-0 overflow-hidden rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard flex flex-col">
+        <div className={classroom ? 'flex-1 min-h-0 overflow-hidden rounded-neo border-3 border-neo-black bg-edu-surface shadow-hard flex flex-col' : 'flex-1 min-h-0 overflow-hidden rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard flex flex-col'}>
           {ladder.length > 0 ? (
             <WordsLadder words={ladder} meId={meId} />
           ) : (
             <div data-testid="mp-words-empty" className="m-auto flex flex-col items-center gap-3 tv:gap-5 p-6 text-center">
               {/* A ghost of the first ladder row: shows WHAT lands here, not "nothing". */}
-              <div aria-hidden="true" className="flex w-40 tv:w-64 items-center justify-between rounded-neo border-2 border-dashed border-neo-white/30 px-3 py-1.5 tv:py-3 font-neo-display font-bold uppercase text-neo-white/40 text-sm tv:text-2xl">
+              <div aria-hidden="true" className={classroom ? 'flex w-40 tv:w-64 items-center justify-between rounded-neo border-2 border-dashed border-edu-line/30 px-3 py-1.5 tv:py-3 font-neo-display font-bold uppercase text-edu-ink/40 text-sm tv:text-2xl' : 'flex w-40 tv:w-64 items-center justify-between rounded-neo border-2 border-dashed border-neo-white/30 px-3 py-1.5 tv:py-3 font-neo-display font-bold uppercase text-neo-white/40 text-sm tv:text-2xl'}>
                 <span>• • •</span>
                 <span dir="ltr" className="tabular-nums">+?</span>
               </div>
-              <p dir="auto" className="font-neo-display font-bold uppercase tracking-wide text-base tv:text-3xl text-neo-white text-balance [overflow-wrap:anywhere]">{t('mpUi.round.wordsEmpty.title')}</p>
-              <p dir="auto" className="max-w-[16rem] tv:max-w-[22rem] text-sm tv:text-xl font-bold leading-snug text-neo-white/60 text-balance">{t('mpUi.round.wordsEmpty.body')}</p>
+              <p dir="auto" className={classroom ? 'font-neo-display font-bold uppercase tracking-wide text-base tv:text-3xl text-edu-ink text-balance [overflow-wrap:anywhere]' : 'font-neo-display font-bold uppercase tracking-wide text-base tv:text-3xl text-neo-white text-balance [overflow-wrap:anywhere]'}>{t('mpUi.round.wordsEmpty.title')}</p>
+              <p dir="auto" className={classroom ? 'max-w-[16rem] tv:max-w-[22rem] text-sm tv:text-xl font-bold leading-snug text-edu-ink/60 text-balance' : 'max-w-[16rem] tv:max-w-[22rem] text-sm tv:text-xl font-bold leading-snug text-neo-white/60 text-balance'}>{t('mpUi.round.wordsEmpty.body')}</p>
             </div>
           )}
         </div>
@@ -313,7 +315,7 @@ function MpRoundLayoutImpl({
           <div ref={setLeadNode} data-testid="mp-round-tray-lead" className="shrink-0 empty:hidden" />
           {/* Short tray: the pills fold to the count line before anything touches the grid. */}
           <div data-testid="mp-callout-stage" className="min-h-0 flex-1 overflow-hidden [container-type:size]">
-            <p className="flex items-center justify-between px-3 font-neo-display text-[11px] font-bold uppercase leading-[14px] tracking-wider text-neo-white/50">
+            <p className={classroom ? 'flex items-center justify-between px-3 font-neo-display text-[11px] font-bold uppercase leading-[14px] tracking-wider text-edu-ink/50' : 'flex items-center justify-between px-3 font-neo-display text-[11px] font-bold uppercase leading-[14px] tracking-wider text-neo-white/50'}>
               <span dir="auto">{t('mpUi.round.yourWords')}</span>
               <span className="tabular-nums">{t('mpUi.round.found', { count: ladder.length })}</span>
             </p>

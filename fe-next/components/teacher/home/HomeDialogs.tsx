@@ -25,10 +25,10 @@ export function HomeReportsDialog({ classroom, open, onOpenChange, overFreeTierC
         closeButtonLabel={t('common.close')}
         closeButtonVariant="minimal"
         style={{ backgroundImage: 'none' }}
-        className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-auto border-2 border-neo-cream/40 bg-neo-navy p-5 text-neo-cream dark:border-neo-cream/40 dark:bg-neo-navy sm:max-w-3xl lg:max-w-5xl"
+        className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-auto border-2 border-edu-line bg-edu-surface p-5 text-edu-ink dark:border-edu-line dark:bg-edu-surface sm:max-w-3xl lg:max-w-5xl"
       >
-        <DialogTitle className="pe-12 font-neo-display text-xl font-black normal-case tracking-normal text-neo-cream">{t('eduShell.home.weeklyReports')}</DialogTitle>
-        <DialogDescription className="mb-4 font-neo-body text-sm text-neo-cream/70">
+        <DialogTitle className="pe-12 font-neo-display text-xl font-black normal-case tracking-normal text-edu-ink">{t('eduShell.home.weeklyReports')}</DialogTitle>
+        <DialogDescription className="mb-4 font-neo-body text-sm text-edu-ink/70">
           {classroom.name} · {t('eduShell.home.weeklyReportsHint')}
         </DialogDescription>
         <div data-testid="home-weekly-reports-grid" className="grid items-start gap-4 lg:grid-cols-2">
@@ -53,8 +53,8 @@ interface HomeReviewDialogProps {
 export function HomeReviewDialog({ open, onOpenChange, reviewWords, t }: HomeReviewDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90dvh] overflow-auto border-[3px] border-neo-cream bg-neo-navy sm:max-w-3xl">
-        <DialogTitle className="font-neo-display text-xl font-black text-neo-cream">{t('eduShell.home.reviewTitle')}</DialogTitle>
+      <DialogContent className="max-h-[90dvh] overflow-auto border-[3px] border-edu-line bg-edu-surface sm:max-w-3xl">
+        <DialogTitle className="font-neo-display text-xl font-black text-edu-ink">{t('eduShell.home.reviewTitle')}</DialogTitle>
         {open ? <LessonBuilder initialReviewWords={reviewWords} /> : null}
       </DialogContent>
     </Dialog>

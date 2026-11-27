@@ -44,7 +44,7 @@ function gapLine(gap: RivalGap, t: Translate): string {
   return gap.kind === 'ahead' ? t('mpUi.results.ahead', { points: gap.points, name: gap.name }) : t('mpUi.results.behind', { points: gap.points, name: gap.name });
 }
 
-function VerdictIcon({ rival, gap }: { rival: RivalOutcome | null; gap: RivalGap | null }) {
+function VerdictGlyph({ rival, gap }: { rival: RivalOutcome | null; gap: RivalGap | null }) {
   const cls = 'size-6 shrink-0';
   if (rival) return rival.won ? <Crown className={cls} aria-hidden="true" /> : <Swords className={cls} aria-hidden="true" />;
   if (gap?.kind === 'behind') return <TrendingUp className={cls} aria-hidden="true" />;
@@ -65,11 +65,19 @@ export function StudentRevealHero({ rank, total, score, verdict, beat, rival, ga
       data-testid={rival ? 'edu-student-rival' : 'edu-student-gap'}
       dir="auto"
       className={cn(
-        'relative flex items-start gap-2 font-neo-display text-xl font-black leading-tight text-balance sm:text-2xl',
+        'relative flex items-center gap-2.5 font-neo-display text-xl font-black leading-tight text-balance sm:text-2xl',
         judged ? 'motion-safe:animate-[edu-live-pop_320ms_cubic-bezier(0.34,1.56,0.64,1)_both]' : 'invisible'
       )}
     >
-      <VerdictIcon rival={rival} gap={gap} />
+      <span
+        data-testid="edu-student-verdict-icon"
+        className={cn(
+          'grid size-11 shrink-0 place-items-center rounded-neo border-[3px] border-neo-black text-neo-black shadow-edu-lip-sm transition-colors duration-300 motion-reduce:transition-none',
+          judged ? look.surface : 'bg-edu-tile'
+        )}
+      >
+        <VerdictGlyph rival={rival} gap={gap} />
+      </span>
       <span className="min-w-0">{line}</span>
     </p>
   ) : null;
@@ -79,17 +87,14 @@ export function StudentRevealHero({ rank, total, score, verdict, beat, rival, ga
     <section
       data-testid="edu-student-hero"
       data-verdict={judged ? verdict : 'pending'}
-      className={cn(
-        'relative flex w-full flex-col gap-2.5 overflow-hidden rounded-neo-lg border-4 border-neo-black p-3 text-neo-black shadow-hard-lg transition-colors duration-300 motion-reduce:transition-none sm:p-4',
-        judged ? look.surface : 'bg-neo-cream'
-      )}
+      className="relative flex w-full flex-col gap-2.5 overflow-hidden rounded-neo-lg border-[3px] border-neo-black bg-edu-surface p-3 text-neo-black shadow-edu-lip sm:p-4"
     >
       <CelebrationLoop active={judged && verdict === 'won'} />
       <div className="relative flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <p
             data-testid="edu-student-headline"
-            className="inline-flex -rotate-2 rounded-neo bg-neo-navy px-2.5 py-1 font-neo-display text-sm font-black uppercase tracking-wide text-neo-lime shadow-hard-sm"
+            className="inline-flex -rotate-2 rounded-neo border-2 border-neo-black bg-neo-pink px-2.5 py-1 font-neo-display text-sm font-black uppercase tracking-wide text-neo-black shadow-edu-lip-sm"
           >
             {t(headlineKey(rank, total, score))}
           </p>

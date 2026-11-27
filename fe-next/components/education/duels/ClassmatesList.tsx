@@ -64,7 +64,7 @@ export function ClassmatesList({
   // Empty state
   if (displayClassmates.length === 0) {
     return (
-      <div className="p-6 text-center text-neo-white">
+      <div className="p-6 text-center text-edu-ink">
         {t('noClassmatesFound')}
       </div>
     );
@@ -75,7 +75,7 @@ export function ClassmatesList({
   // ============================================
 
   return (
-    <div className="border-2 border-neo-cream/40 rounded-neo bg-neo-navy/30 p-3 space-y-2">
+    <div className="border-2 border-edu-line rounded-neo bg-edu-surface/30 p-3 space-y-2">
       {displayClassmates.map((classmate) => {
         // Extract profile data (Supabase returns array, normalize)
         const profile = Array.isArray(classmate.profiles)
@@ -91,12 +91,12 @@ export function ClassmatesList({
         return (
           <div
             key={classmate.id}
-            className="flex items-center justify-between p-3 rounded-neo bg-neo-navy/50 border-2 border-neo-cream/40"
+            className="flex items-center justify-between p-3 rounded-neo bg-edu-surface/50 border-2 border-edu-line"
           >
             {/* Avatar + Name */}
             <div className="flex items-center gap-3">
               <Avatar customAvatar={profile?.avatar_config} userId={classmate.student_id} size="md" />
-              <div className="font-neo-body font-bold text-neo-white">
+              <div className="font-neo-body font-bold text-edu-ink">
                 {displayName}
               </div>
             </div>

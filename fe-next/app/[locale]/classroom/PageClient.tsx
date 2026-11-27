@@ -22,7 +22,7 @@ export default function ClassroomHubClient() {
   }, [href, router]);
 
   return (
-    <div data-testid="classroom-hub" aria-busy="true" className="flex h-dvh w-full flex-1 items-center justify-center bg-neo-navy">
+    <div data-testid="classroom-hub" aria-busy="true" className="flex h-dvh w-full flex-1 items-center justify-center bg-edu-page">
       <PageLoader size="lg" priority={false} />
     </div>
   );

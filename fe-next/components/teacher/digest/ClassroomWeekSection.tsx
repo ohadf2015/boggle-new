@@ -43,22 +43,22 @@ export function ClassroomWeekSection({
       className={cn(GAME_CARD, 'space-y-3 p-4')}
     >
       <header>
-        <h2 className="font-neo-display text-xl font-black text-neo-white">{t('teacher.digest.classroomWeekTitle')}</h2>
-        <p className="mt-1 text-sm font-bold text-neo-cream/75">{t('teacher.digest.classroomWeekSubtitle')}</p>
+        <h2 className="font-neo-display text-xl font-black text-edu-ink">{t('teacher.digest.classroomWeekTitle')}</h2>
+        <p className="mt-1 text-sm font-bold text-edu-ink/75">{t('teacher.digest.classroomWeekSubtitle')}</p>
       </header>
 
       {status === 'loading' ? (
         <div
           data-testid="classroom-week-loading"
           aria-busy="true"
-          className="flex min-h-20 items-center justify-center gap-2 text-neo-cream/80"
+          className="flex min-h-20 items-center justify-center gap-2 text-edu-ink/80"
         >
           <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
           <span>{t('teacher.digest.classroomWeekLoading')}</span>
         </div>
       ) : status === 'error' || !digest ? (
         <div className="p-2 text-center" data-testid="classroom-week-error">
-          <p className="font-bold text-neo-white">{t('teacher.digest.classroomWeekError')}</p>
+          <p className="font-bold text-edu-ink">{t('teacher.digest.classroomWeekError')}</p>
           <button
             type="button"
             data-testid="classroom-week-retry"
@@ -82,7 +82,7 @@ export function ClassroomWeekSection({
             </div>
           </div>
           {!digest.practicedThisWeek ? (
-            <p data-testid="classroom-week-empty" className="text-sm font-bold text-neo-cream/80">
+            <p data-testid="classroom-week-empty" className="text-sm font-bold text-edu-ink/80">
               {t('teacher.digest.classroomWeekEmpty')}
             </p>
           ) : null}

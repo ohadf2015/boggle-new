@@ -44,17 +44,17 @@ export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLan
         onClick={() => setOpened((v) => !v)}
         className={cn(
           'flex min-h-12 w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-neo border-2 px-3 py-1.5 text-start font-neo-body text-sm font-bold transition-colors',
-          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface',
           missing
-            ? 'border-neo-pink bg-neo-navy-light text-neo-white'
-            : 'border-neo-cream/35 bg-neo-navy-light text-neo-cream hover:border-neo-cream/50',
+            ? 'border-neo-pink bg-edu-surface text-edu-ink'
+            : 'border-edu-line bg-edu-surface text-edu-ink hover:border-edu-line',
           'border-s-[6px] border-s-neo-cyan hover:border-s-neo-cyan'
         )}
       >
         {missing ? (
-          <TriangleAlert className="size-4 shrink-0 text-neo-pink" strokeWidth={3} aria-hidden="true" />
+          <TriangleAlert className="size-4 shrink-0 text-edu-pink-ink" strokeWidth={3} aria-hidden="true" />
         ) : (
-          <BookOpen className="size-4 shrink-0 text-neo-cream/70" strokeWidth={2.5} aria-hidden="true" />
+          <BookOpen className="size-4 shrink-0 text-edu-ink/70" strokeWidth={2.5} aria-hidden="true" />
         )}
         <span
           {...(missing ? { 'data-testid': 'mode-picker-blocked', role: 'alert' } : {})}
@@ -64,13 +64,13 @@ export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLan
           {missing ? t('education.modePicker.needsLesson') : classroomName ? `${classroomName} · ${names}` : names}
         </span>
         {!missing && (
-          <span className="shrink-0 font-normal text-neo-cream/70">{t(pluralKeyOf('education.classroomGame.words', wordCount, language), { count: wordCount })}</span>
+          <span className="shrink-0 font-normal text-edu-ink/70">{t(pluralKeyOf('education.classroomGame.words', wordCount, language), { count: wordCount })}</span>
         )}
         {boardLanguage && !missing && (
-          <BoardLanguageChip language={boardLanguage} className="rounded-full border border-neo-cream/35 bg-transparent font-normal text-neo-cream/80" />
+          <BoardLanguageChip language={boardLanguage} className="rounded-full border border-edu-line bg-transparent font-normal text-edu-ink/80" />
         )}
         {!missing && (
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-neo border-2 border-neo-cream/50 px-2.5 py-1 font-neo-body text-xs font-bold text-neo-cream">
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-neo border-2 border-edu-line px-2.5 py-1 font-neo-body text-xs font-bold text-edu-ink">
             {t(open ? 'eduShell.host.listDone' : classPicker ? 'eduShell.host.gameOptionsChange' : 'eduShell.host.changeList')}
             <ChevronDown className={cn('size-3.5 transition-transform duration-200 motion-reduce:transition-none', open && 'rotate-180')} strokeWidth={3} aria-hidden="true" />
           </span>
@@ -78,7 +78,7 @@ export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLan
       </button>
 
       {open && (
-        <div data-testid="lobby-lesson-body" className="flex flex-col gap-3 rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light p-3">
+        <div data-testid="lobby-lesson-body" className="flex flex-col gap-3 rounded-neo border-2 border-edu-line bg-edu-surface p-3">
           {classPicker}
           <LessonPicker
             mode="multi"
@@ -92,7 +92,7 @@ export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLan
             createHref={createHref}
           />
           {activePreset === 'sped' && wordCount > SPED_VOCAB_CAP && (
-            <p className="mt-2 font-neo-body text-xs text-neo-white/60" data-testid="sped-vocab-cap-note">
+            <p className="mt-2 font-neo-body text-xs text-edu-ink/60" data-testid="sped-vocab-cap-note">
               {t('teacher.classroom.support.vocabCapNote', { count: SPED_VOCAB_CAP })}
             </p>
           )}

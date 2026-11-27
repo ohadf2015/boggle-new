@@ -31,6 +31,14 @@ describe('<HomeShareSheet>', () => {
     expect(screen.getByTestId('projector-sheet')).toBeInTheDocument();
   });
 
+  it('Then Show on board is a white outlined button on the sky skin, never the navy shared one', () => {
+    render(<HomeShareSheet classroom={CLASS} open onOpenChange={vi.fn()} uiLanguage="en" t={t} />);
+    const board = screen.getByTestId('home-share-board');
+    expect(board.className).toContain('bg-edu-surface');
+    expect(board.className).toContain('border-edu-line');
+    expect(board.className).not.toMatch(/neo-navy/);
+  });
+
   it('Given a class, Then the sheet links to printable join slips for it, opened in a new tab', () => {
     render(<HomeShareSheet classroom={CLASS} open onOpenChange={vi.fn()} uiLanguage="en" t={t} />);
     const link = screen.getByTestId('home-share-print');

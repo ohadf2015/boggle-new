@@ -23,7 +23,7 @@ export function ClassSwitcher({ classrooms, activeId, onSelect }: Props) {
             role="radio"
             aria-checked={active}
             onClick={() => !active && onSelect(c.id)}
-            className={`min-h-[44px] max-w-full truncate rounded-neo border-2 border-neo-black px-3 font-neo-display text-sm font-black text-neo-black shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan ${active ? 'bg-neo-lime' : 'bg-neo-white'}`}
+            className={`min-h-[44px] max-w-full truncate rounded-neo border-2 border-neo-black px-3 font-neo-display text-sm font-black text-neo-black shadow-edu-lip-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan ${active ? 'bg-neo-lime' : 'bg-edu-paper'}`}
           >
             {c.name}
           </button>

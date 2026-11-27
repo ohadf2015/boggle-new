@@ -19,21 +19,21 @@ export function LobbyQuickSummary({ classroomName, lessons, wordCount, boardLang
   const { t, language } = useLanguage();
   return (
     <section data-testid="lobby-quick-summary" className="flex flex-col gap-2 @2xl/lobby:flex-row @2xl/lobby:items-center">
-      <p className="flex min-h-12 min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 rounded-neo border-2 border-s-[6px] border-neo-cream/35 border-s-neo-cyan bg-neo-navy-light px-3 py-1.5 font-neo-body text-sm font-bold text-neo-cream">
-        <Users className="size-4 shrink-0 text-neo-cream/70" strokeWidth={3} aria-hidden="true" />
+      <p className="flex min-h-12 min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 rounded-neo border-2 border-s-[6px] border-edu-line border-s-neo-cyan bg-edu-surface px-3 py-1.5 font-neo-body text-sm font-bold text-edu-ink">
+        <Users className="size-4 shrink-0 text-edu-ink/70" strokeWidth={3} aria-hidden="true" />
         <span className="min-w-0 truncate" dir="auto">{classroomName}</span>
-        <BookOpen className="size-4 shrink-0 text-neo-cream/70" strokeWidth={3} aria-hidden="true" />
+        <BookOpen className="size-4 shrink-0 text-edu-ink/70" strokeWidth={3} aria-hidden="true" />
         <span className="flex min-w-0 flex-wrap gap-x-2" dir="auto">
           {lessons.map((l) => <ListNameButton key={l.id} lessonId={l.id} name={l.name} />)}
         </span>
-        <span className="shrink-0 font-normal text-neo-cream/70">· {t(pluralKeyOf('education.classroomGame.words', wordCount, language), { count: wordCount })}</span>
-        {boardLanguage && <BoardLanguageChip language={boardLanguage} className="rounded-full border border-neo-cream/35 bg-transparent font-normal text-neo-cream/80" />}
+        <span className="shrink-0 font-normal text-edu-ink/70">· {t(pluralKeyOf('education.classroomGame.words', wordCount, language), { count: wordCount })}</span>
+        {boardLanguage && <BoardLanguageChip language={boardLanguage} className="rounded-full border border-edu-line bg-transparent font-normal text-edu-ink/80" />}
       </p>
       <button
         type="button"
         data-testid="lobby-more-options"
         onClick={onMoreOptions}
-        className="inline-flex min-h-12 shrink-0 items-center gap-2 rounded-neo-lg border-[3px] border-dashed border-neo-cream/45 px-4 font-neo-body text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream/80 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy"
+        className="inline-flex min-h-12 shrink-0 items-center gap-2 rounded-neo-lg border-[3px] border-dashed border-edu-line px-4 font-neo-body text-sm font-bold text-edu-ink transition-colors hover:border-edu-line focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface"
       >
         <SlidersHorizontal className="size-4" strokeWidth={3} aria-hidden="true" />
         {t('eduShell.host.moreOptions')}

@@ -12,6 +12,7 @@ type Translate = (key: string, params?: Record<string, string | number>) => stri
 interface CellProps {
   testId: string;
   icon: typeof Users;
+  fill: string;
   value: number;
   label: string;
   index: number;
@@ -19,27 +20,33 @@ interface CellProps {
   projector: boolean;
 }
 
-const Cell = memo(function Cell({ testId, icon: Icon, value, label, index, active, projector }: CellProps) {
+const Cell = memo(function Cell({ testId, icon: Icon, fill, value, label, index, active, projector }: CellProps) {
   const reduce = !!useReducedMotion();
   const shown = useCountUp({ target: value, duration: 900, startDelay: 300 + index * 160, immediate: reduce });
   return (
     <m.div
       data-testid={testId}
       className={cn(
-        'flex min-w-0 justify-center rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light text-neo-cream shadow-hard-lg',
-        projector ? 'flex-col gap-0.5 px-3 py-2 @5xl/results:px-4 @[96rem]/results:py-3' : 'flex-row items-center gap-2 px-2.5 py-1.5'
+        'flex min-w-0 flex-row items-center rounded-neo-xl border-[3px] border-edu-line bg-edu-surface text-edu-ink shadow-edu-lip',
+        projector ? 'gap-3 px-3 py-2 @5xl/results:px-4 @[96rem]/results:gap-4 @[96rem]/results:py-3' : 'gap-2 px-2.5 py-1.5'
       )}
       initial={false}
       animate={active && !reduce ? { scale: [1, 1.06, 1] } : { scale: 1 }}
       transition={{ duration: 0.45, delay: 0.16 * index, ease: 'easeOut' }}
     >
-      <span className={cn('font-neo-display font-black leading-none tabular-nums', projector ? 'text-3xl @[96rem]/results:text-5xl @[137.5rem]/results:text-7xl' : 'text-xl')}>
-        <span aria-hidden="true">{shown}</span>
-        <span className="sr-only">{value}</span>
+      <span
+        data-testid="edu-stat-icon"
+        aria-hidden="true"
+        className={cn('grid shrink-0 place-items-center rounded-neo border-[3px] border-neo-black text-neo-black', fill, projector ? 'size-12 @[96rem]/results:size-16 @[137.5rem]/results:size-20' : 'size-8')}
+      >
+        <Icon className={projector ? 'size-6 @[96rem]/results:size-8 @[137.5rem]/results:size-10' : 'size-4'} strokeWidth={2.5} />
       </span>
-      <span className={cn('flex min-w-0 items-center gap-1.5 font-neo-body font-black', projector ? 'text-sm @[96rem]/results:text-base @[137.5rem]/results:text-2xl' : 'text-xs')}>
-        <Icon className="size-4 shrink-0 @[96rem]/results:size-5" aria-hidden="true" />
-        <span className={projector ? 'truncate' : 'leading-tight'}>{label}</span>
+      <span className="flex min-w-0 flex-col gap-0.5">
+        <span className={cn('font-neo-display font-black leading-none tabular-nums', projector ? 'text-3xl @[96rem]/results:text-5xl @[137.5rem]/results:text-7xl' : 'text-xl')}>
+          <span aria-hidden="true">{shown}</span>
+          <span className="sr-only">{value}</span>
+        </span>
+        <span className={cn('min-w-0 font-neo-body font-black', projector ? 'truncate text-sm @[96rem]/results:text-base @[137.5rem]/results:text-2xl' : 'text-xs leading-tight')}>{label}</span>
       </span>
     </m.div>
   );
@@ -57,9 +64,9 @@ export interface ClassPulseProps {
 export function ClassPulse({ stats, active, size = 'projector', t }: ClassPulseProps) {
   const projector = size === 'projector';
   const cells = [
-    { testId: 'edu-stat-students', icon: Users, value: stats.students, label: t('eduLiveRoom.hostResults.statStudents') },
-    { testId: 'edu-stat-words', icon: BookOpenCheck, value: stats.words, label: t('eduLiveRoom.hostResults.statWords') },
-    { testId: 'edu-stat-avg', icon: Gauge, value: stats.avgScore, label: t('eduLiveRoom.hostResults.statAvg') },
+    { testId: 'edu-stat-students', icon: Users, fill: 'bg-neo-pink', value: stats.students, label: t('eduLiveRoom.hostResults.statStudents') },
+    { testId: 'edu-stat-words', icon: BookOpenCheck, fill: 'bg-neo-cyan', value: stats.words, label: t('eduLiveRoom.hostResults.statWords') },
+    { testId: 'edu-stat-avg', icon: Gauge, fill: 'bg-neo-yellow', value: stats.avgScore, label: t('eduLiveRoom.hostResults.statAvg') },
   ];
   return (
     <div

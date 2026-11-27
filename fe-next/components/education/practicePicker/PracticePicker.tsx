@@ -112,7 +112,7 @@ export default function PracticePicker({
       {/* Header: ONE line. The lesson's name is the page title in the bar above
           this (see the route's PageClient), so repeating it here spent a second
           row of a 390x844 phone on the same six words. */}
-      <h1 className="shrink-0 pb-2 font-neo-display text-lg font-black uppercase leading-none text-neo-white text-balance">
+      <h1 className="shrink-0 pb-2 font-neo-display text-lg font-black uppercase leading-none text-edu-ink text-balance">
         {t('education.practicePicker.title')}
       </h1>
 
@@ -146,7 +146,7 @@ export default function PracticePicker({
               data-testid="practice-picker-more"
               aria-expanded={showAll}
               onClick={() => setShowAll((open) => !open)}
-              className="flex min-h-[46px] w-full shrink-0 items-center justify-center gap-2 rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 font-neo-display text-sm font-black uppercase text-neo-cream transition-colors hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+              className="flex min-h-[46px] w-full shrink-0 items-center justify-center gap-2 rounded-neo border-[3px] border-edu-line bg-edu-page px-4 font-neo-display text-sm font-black uppercase text-edu-ink transition-colors hover:bg-edu-surface focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {showAll
                 ? t('student.practiceFun.fewerGames')
@@ -173,7 +173,7 @@ export default function PracticePicker({
         )}
 
         {readiness.ready === 0 && (
-          <p role="status" className="shrink-0 font-neo-body text-sm text-neo-cream text-pretty">
+          <p role="status" className="shrink-0 font-neo-body text-sm text-edu-ink text-pretty">
             {t('education.practicePicker.nothingReady')}
           </p>
         )}

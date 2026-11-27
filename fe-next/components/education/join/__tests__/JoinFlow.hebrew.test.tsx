@@ -66,7 +66,8 @@ describe('<JoinFlow> in Hebrew', () => {
 
   it('shows the confirmed code in typing order on the nickname step', () => {
     render(<JoinFlow initialCode="P45KRT" />);
-    const shown = screen.getByText('P45KRT');
+    const shown = screen.getByTestId('join-code-chip');
+    expect(shown).toHaveTextContent('P45KRT');
     expect(shown).toHaveAttribute('dir', 'ltr');
   });
 

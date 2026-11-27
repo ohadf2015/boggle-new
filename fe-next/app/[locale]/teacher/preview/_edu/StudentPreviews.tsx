@@ -190,7 +190,7 @@ export function JoinRefusalPreview() {
     canSubmit: true,
   } as unknown as JoinFlowState;
   return (
-    <div className="min-h-dvh bg-neo-navy">
+    <div className="min-h-dvh bg-edu-page">
       <main className="mx-auto w-full max-w-md px-4 py-5">
         <JoinNameStep flow={flow} nameRef={{ current: null }} goRef={{ current: null }} />
       </main>
