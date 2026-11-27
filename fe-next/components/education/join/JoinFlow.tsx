@@ -148,7 +148,7 @@ export function JoinFlow({
       <div
         data-testid="join-root"
         dir={dir}
-        className="fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] isolate flex flex-col overflow-hidden text-neo-white"
+        className="fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] isolate flex flex-col overflow-hidden text-edu-ink"
       >
         <AcademyBackdrop art="arena" />
 
@@ -161,7 +161,7 @@ export function JoinFlow({
           className={cn(
             'mx-auto flex w-full max-w-md flex-col justify-center short:justify-start sm:max-w-lg [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:max-w-3xl [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:justify-center',
             // The arena art is loud: a solid panel keeps the subtitle and helper text readable and lets the form own the screen.
-            'my-auto w-[calc(100%-1.5rem)] flex-none rounded-neo border-3 border-neo-cream/50 bg-neo-navy px-5 py-6 shadow-hard-lg short:py-3 lg:max-w-2xl lg:px-12 lg:py-10 tv:max-w-4xl'
+            'my-auto w-[calc(100%-1.5rem)] flex-none rounded-neo border-3 border-edu-line bg-edu-surface px-5 py-6 shadow-hard-lg short:py-3 lg:max-w-2xl lg:px-12 lg:py-10 tv:max-w-4xl'
           )}
         >
           <header className="mb-5 flex items-center justify-between gap-3 short:mb-3 lg:mb-8">
@@ -177,7 +177,7 @@ export function JoinFlow({
                     aria-current={flow.step === s ? 'step' : undefined}
                     className={cn(
                       'h-2.5 rounded-full border-2 border-neo-black transition-[width,height,background-color,border-color] lg:h-3',
-                      flow.step === s ? 'w-8 bg-neo-cyan lg:w-10' : 'w-2.5 bg-neo-white/30 lg:w-3'
+                      flow.step === s ? 'w-8 bg-neo-cyan lg:w-10' : 'w-2.5 bg-edu-ink/30 lg:w-3'
                     )}
                   >
                     {flow.step === s && (
@@ -225,12 +225,12 @@ export function JoinFlow({
             </>
           )}
         </main>
-        <nav className="relative z-10 flex justify-center gap-4 px-4 pb-3 text-xs text-neo-white/60">
-          <Link prefetch={false} href={`/${language}/legal/privacy`} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:text-neo-white hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
+        <nav className="relative z-10 flex justify-center gap-4 px-4 pb-3 text-xs text-edu-ink/60">
+          <Link prefetch={false} href={`/${language}/legal/privacy`} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:text-edu-ink hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
             {t('legal.privacyPolicy')}
             <span className="sr-only"> ({t('common.opensInNewTab')})</span>
           </Link>
-          <Link prefetch={false} href={`/${language}/legal/terms`} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:text-neo-white hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
+          <Link prefetch={false} href={`/${language}/legal/terms`} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:text-edu-ink hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black">
             {t('legal.termsOfService')}
             <span className="sr-only"> ({t('common.opensInNewTab')})</span>
           </Link>

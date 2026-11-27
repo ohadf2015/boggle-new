@@ -79,7 +79,7 @@ export function StudentCapMeter({
 
   if (pro.loading || hasPro) return null;
 
-  const ctaClass = 'inline-flex min-h-11 items-center text-start font-neo-body text-sm font-bold text-neo-cream underline decoration-2 underline-offset-4 hover:text-neo-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream';
+  const ctaClass = 'inline-flex min-h-11 items-center text-start font-neo-body text-sm font-bold text-edu-ink underline decoration-2 underline-offset-4 hover:text-edu-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edu-line';
   const ctaLabel = atCap
     ? t('academy.classes.proCta', 'Get Pro: {{price}}/mo', { price: `$${TEACHER_PRO_PRICE_USD}` })
     : t('academy.classes.proUnlocks', 'Pro adds class analytics + printable reports');
@@ -88,11 +88,11 @@ export function StudentCapMeter({
     <div
       data-testid="student-cap-meter"
       data-at-cap={atCap ? 'true' : 'false'}
-      className={cn('flex min-h-11 flex-wrap items-center justify-between gap-x-3 gap-y-1 text-neo-cream', className)}
+      className={cn('flex min-h-11 flex-wrap items-center justify-between gap-x-3 gap-y-1 text-edu-ink', className)}
     >
-        <p data-testid="student-cap-count" className="font-neo-body text-sm font-bold tabular-nums text-neo-cream/85">
+        <p data-testid="student-cap-count" className="font-neo-body text-sm font-bold tabular-nums text-edu-ink/85">
           {classroomName ? (
-            <span data-testid="student-cap-class-name" className="font-neo-display font-black text-neo-cream me-2">
+            <span data-testid="student-cap-class-name" className="font-neo-display font-black text-edu-ink me-2">
               {classroomName}
             </span>
           ) : null}

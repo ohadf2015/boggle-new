@@ -52,7 +52,7 @@ export default function MyListCard({
       : t('eduLibrary.remixedFromNoAuthor', { title: lesson.remixed_from_title })
     : null;
   const menuHeader = (
-    <div role="none" data-testid={`lesson-menu-header-${lesson.id}`} className="space-y-0.5 px-3 pb-2 pt-1.5 font-neo-body text-xs font-bold text-neo-cream/70">
+    <div role="none" data-testid={`lesson-menu-header-${lesson.id}`} className="space-y-0.5 px-3 pb-2 pt-1.5 font-neo-body text-xs font-bold text-edu-ink/70">
       <p>{t('teacher.lesson.definitionCoverage', { count: defCount, total })}</p>
       {remix ? <p className="[overflow-wrap:anywhere]">{remix}</p> : null}
     </div>
@@ -118,7 +118,7 @@ export default function MyListCard({
           </li>
         ))}
         {total > CHIPS ? (
-          <li className="rounded-neo border-2 border-dashed border-neo-cream/50 px-2 py-0.5 font-neo-display text-sm font-black text-neo-cream/70">
+          <li className="rounded-neo border-2 border-dashed border-edu-line px-2 py-0.5 font-neo-display text-sm font-black text-edu-ink/70">
             +{total - CHIPS}
           </li>
         ) : null}

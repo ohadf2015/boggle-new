@@ -73,11 +73,11 @@ export function DuelPlayPanel({
   const isUrgent = timeRemaining <= 10;
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col gap-2 bg-neo-navy">
+    <div className="flex h-full min-h-0 w-full flex-col gap-2 bg-edu-page">
       {/* Timer + live scores */}
-      <div className="flex shrink-0 items-center justify-between gap-2 rounded-neo border-[3px] border-neo-cream/70 bg-neo-navy px-3 py-2 shadow-hard">
-        <div className="text-neo-white">
-          <p className="font-neo-body text-xs font-black uppercase tracking-widest text-neo-cream/80">
+      <div className="flex shrink-0 items-center justify-between gap-2 rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 py-2 shadow-hard">
+        <div className="text-edu-ink">
+          <p className="font-neo-body text-xs font-black uppercase tracking-widest text-edu-ink/80">
             {t('duels.you')}
           </p>
           <p className="font-neo-display text-xl font-black tabular-nums" data-testid="my-score">
@@ -90,15 +90,15 @@ export function DuelPlayPanel({
           className={cn(
             'rounded-neo border-[3px] px-3 py-1 font-neo-display text-2xl font-black tabular-nums shadow-hard-sm',
             isUrgent
-              ? 'border-neo-cream bg-neo-pink text-neo-white'
-              : 'border-neo-cream/70 bg-neo-navy text-neo-white'
+              ? 'border-edu-line bg-neo-pink text-edu-ink'
+              : 'border-edu-line bg-edu-surface text-edu-ink'
           )}
         >
           {formatTime(timeRemaining)}
         </div>
 
-        <div className="text-end text-neo-white">
-          <p className="truncate font-neo-body text-xs font-black uppercase tracking-widest text-neo-cream/80">
+        <div className="text-end text-edu-ink">
+          <p className="truncate font-neo-body text-xs font-black uppercase tracking-widest text-edu-ink/80">
             {opponentName}
           </p>
           <p
@@ -125,7 +125,7 @@ export function DuelPlayPanel({
       <DuelComboMeter className="shrink-0" streak={comboStreak} bonus={comboBonus} />
 
       {/* Board */}
-      <div className="mx-auto grid w-full max-w-[min(92vw,360px)] shrink-0 grid-cols-4 gap-1.5 rounded-neo border-[3px] border-neo-cream bg-neo-navy p-2 shadow-hard">
+      <div className="mx-auto grid w-full max-w-[min(92vw,360px)] shrink-0 grid-cols-4 gap-1.5 rounded-neo border-[3px] border-edu-line bg-edu-surface p-2 shadow-hard">
         {boardState.flat().map((letter, idx) => (
           <div
             key={`cell-${idx}-${letter}`}
@@ -144,7 +144,7 @@ export function DuelPlayPanel({
           onKeyDown={onKeyDown}
           placeholder={t('duels.typeWord')}
           data-testid="word-input"
-          className="min-w-0 flex-1 rounded-neo border-[3px] border-neo-cream bg-neo-navy px-3 py-2.5 font-neo-body font-bold text-neo-white placeholder:text-neo-cream/80 shadow-hard focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
+          className="min-w-0 flex-1 rounded-neo border-[3px] border-edu-line bg-edu-page px-3 py-2.5 font-neo-body font-bold text-edu-ink placeholder:text-edu-ink/80 shadow-hard focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
         />
         <button
           type="button"
@@ -161,9 +161,9 @@ export function DuelPlayPanel({
       </div>
 
       {/* The ONE scrolling region on this surface */}
-      <div className="min-h-0 flex-1 overflow-y-auto rounded-neo border-[3px] border-neo-cream/70 bg-neo-navy p-2 shadow-hard">
+      <div className="min-h-0 flex-1 overflow-y-auto rounded-neo border-[3px] border-edu-line bg-edu-page p-2 shadow-hard">
         {words.length === 0 ? (
-          <p className="py-6 text-center font-neo-body text-sm text-neo-cream/80">
+          <p className="py-6 text-center font-neo-body text-sm text-edu-ink/80">
             {t('duels.findWords')}
           </p>
         ) : (
@@ -176,8 +176,8 @@ export function DuelPlayPanel({
                 className={cn(
                   'rounded-neo border-[2px] border-neo-black px-2 py-0.5 font-neo-body text-sm font-black shadow-hard-sm',
                   wordStatus.status === 'accepted' && 'bg-neo-lime text-neo-black',
-                  wordStatus.status === 'rejected' && 'bg-neo-pink text-neo-white',
-                  wordStatus.status === 'pending' && 'border-neo-cream bg-neo-navy text-neo-white'
+                  wordStatus.status === 'rejected' && 'bg-neo-pink text-edu-ink',
+                  wordStatus.status === 'pending' && 'border-edu-line bg-edu-surface text-edu-ink'
                 )}
               >
                 {wordStatus.word}
@@ -192,7 +192,7 @@ export function DuelPlayPanel({
         type="button"
         onClick={onForfeit}
         data-testid="forfeit-btn"
-        className="mx-auto shrink-0 rounded-neo border-[3px] border-neo-cream bg-transparent px-4 py-1.5 font-neo-body text-xs font-black uppercase tracking-wide text-neo-cream transition hover:bg-neo-cream hover:text-neo-navy active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+        className="mx-auto shrink-0 rounded-neo border-[3px] border-edu-line bg-transparent px-4 py-1.5 font-neo-body text-xs font-black uppercase tracking-wide text-edu-ink transition hover:bg-neo-cream hover:text-neo-navy active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         {t('duels.forfeitConfirm')}
       </button>

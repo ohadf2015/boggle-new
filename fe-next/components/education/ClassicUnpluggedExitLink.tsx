@@ -14,7 +14,7 @@ export function ClassicUnpluggedExitLink({ href, label, className }: { href: str
       data-testid="unplugged-exit"
       // Cream edge: a black border on navy scores ~1.2:1 and the control disappears.
       className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
-        'shrink-0 grid place-items-center w-11 h-11 rounded-neo border-[3px] border-neo-cream bg-neo-navy text-neo-cream shadow-hard-sm',
+        'shrink-0 grid place-items-center w-11 h-11 rounded-neo border-[3px] border-edu-line bg-edu-surface text-edu-ink shadow-hard-sm',
         className,
       )}
     >

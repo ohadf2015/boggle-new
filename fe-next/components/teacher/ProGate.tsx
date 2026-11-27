@@ -102,7 +102,7 @@ interface ProGateProps {
 const OpenGate = createContext(false);
 
 const QUIET_CTA =
-  'inline-flex min-h-11 items-center px-1 font-bold text-neo-cream underline decoration-2 underline-offset-4 hover:text-neo-white disabled:opacity-60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
+  'inline-flex min-h-11 items-center px-1 font-bold text-edu-ink underline decoration-2 underline-offset-4 hover:text-edu-ink disabled:opacity-60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
 export function ProGate({ feature, children, active = true, whileChecking = null, lockedTitle = null, ctaKey = 'teacher.proGate.cta', polarTrialPlacement, tone = 'default', quiet = false }: ProGateProps) {
   const arcade = tone === 'arcade';
@@ -155,7 +155,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
           className="mb-4 flex flex-col gap-x-3 sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="min-w-0">
-            <p className="text-sm font-bold text-neo-white">{t('teacher.proGate.trialPreview', { days: previewDaysLeft })}</p>
+            <p className="text-sm font-bold text-edu-ink">{t('teacher.proGate.trialPreview', { days: previewDaysLeft })}</p>
             <TrialStripRecap />
           </div>
           {blockedInApp ? null : <button
@@ -183,7 +183,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
       data-testid="pro-gate-lock"
       className={cn(
         arcade ? cn(GAME_CARD, 'p-4 sm:p-6') : 'rounded-neo p-4 sm:p-5',
-        !arcade && 'rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-xl',
+        !arcade && 'rounded-neo-xl border-[3px] border-edu-line bg-edu-surface shadow-hard-xl',
       )}
     >
       <div className="grid items-center gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-6">
@@ -197,7 +197,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
         {/* Phones: the pitch and its button lead, the sample sits under them instead of pushing the button off screen. */}
         <div data-testid="pro-gate-pitch" className="text-center max-md:order-first md:text-start">
           <div className="mb-2 flex flex-wrap items-center justify-center gap-2 md:justify-start">
-            <h3 className={cn('font-neo-display font-black text-neo-white', arcade ? 'text-xl sm:text-2xl' : 'text-xl')}>
+            <h3 className={cn('font-neo-display font-black text-edu-ink', arcade ? 'text-xl sm:text-2xl' : 'text-xl')}>
               {t(`teacher.proGate.${feature}.title`)}
             </h3>
             <ProBadge
@@ -207,11 +207,11 @@ export function ProGate({ feature, children, active = true, whileChecking = null
               className={cn(arcade && 'sm:-rotate-2')}
             />
           </div>
-          <p className="mb-4 text-sm font-bold leading-relaxed text-neo-white/80">
+          <p className="mb-4 text-sm font-bold leading-relaxed text-edu-ink/80">
             {t(`teacher.proGate.${feature}.body`)}
           </p>
           {blockedInApp ? (
-            <p data-testid="pro-gate-not-in-app" className="text-sm font-bold text-neo-white/80">{t('teacher.subscription.notInApp')}</p>
+            <p data-testid="pro-gate-not-in-app" className="text-sm font-bold text-edu-ink/80">{t('teacher.subscription.notInApp')}</p>
           ) : (<>
           <button
             type="button"
@@ -233,13 +233,13 @@ export function ProGate({ feature, children, active = true, whileChecking = null
               ? t(calm ? 'eduPlans.reports.startTrialCta' : 'eduPlans.reports.trialCta', { days: TEACHER_PRO_TRIAL_DAYS })
               : t(ctaKey, { price: `$${TEACHER_PRO_PRICE_USD}` })}
           </button>
-          <p className="mt-2 text-xs font-bold text-neo-white/60">
+          <p className="mt-2 text-xs font-bold text-edu-ink/60">
             {offerTrial
               ? t('eduPlans.reports.trialFine', { days: TEACHER_PRO_TRIAL_DAYS, price: `$${TEACHER_PRO_PRICE_USD}` })
               : t('teacher.subscription.trustCancel')}
           </p>
           </>)}
-          <p data-testid="pro-gate-honest-line" className="mt-2 text-xs font-bold text-neo-cream/80">
+          <p data-testid="pro-gate-honest-line" className="mt-2 text-xs font-bold text-edu-ink/80">
             {trialOver ? t('teacher.proGate.trialEnded') : t('teacher.proGate.freeKeeps', { modes: PRO_COPY_PARAMS.modes })}
           </p>
         </div>

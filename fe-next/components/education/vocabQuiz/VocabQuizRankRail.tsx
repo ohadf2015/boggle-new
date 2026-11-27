@@ -63,10 +63,10 @@ export function VocabQuizRankRail({ previous, standings, t, className }: VocabQu
     <section
       data-testid="vq-rank-rail"
       aria-label={t('results.standings')}
-      className={cn('flex min-h-0 flex-col gap-2 rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy-elevated p-3 shadow-hard md:gap-3 md:p-4', className)}
+      className={cn('flex min-h-0 flex-col gap-2 rounded-neo border-[3px] border-edu-line bg-edu-surface p-3 shadow-hard md:gap-3 md:p-4', className)}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-neo-display text-lg font-black uppercase tracking-wide text-neo-cream md:text-2xl">{t('results.standings')}</h2>
+        <h2 className="font-neo-display text-lg font-black uppercase tracking-wide text-edu-ink md:text-2xl">{t('results.standings')}</h2>
         {close && (
           <span
             data-testid="vq-rail-close"
@@ -89,7 +89,7 @@ export function VocabQuizRankRail({ previous, standings, t, className }: VocabQu
               data-username={p.username}
               className={cn(
                 'flex items-center gap-2 rounded-neo border-2 border-neo-black px-2 py-1.5 font-neo-display font-black md:gap-3 md:px-3 md:py-2',
-                i === 0 ? 'bg-neo-yellow text-neo-black' : 'bg-neo-navy text-neo-white'
+                i === 0 ? 'bg-neo-yellow text-neo-black' : 'bg-edu-surface text-edu-ink'
               )}
             >
               <span className="w-6 shrink-0 text-center tabular-nums md:w-8 md:text-xl">{i + 1}</span>

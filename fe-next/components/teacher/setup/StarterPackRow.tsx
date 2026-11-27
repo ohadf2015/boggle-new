@@ -21,10 +21,10 @@ export interface StarterPackRowProps {
 export function StarterPackRow({ packs, selectedKey, recommendedKey, onSelect, labelKey = 'eduShell.setup.packLabel', hintKey = 'eduShell.setup.packHint', badgeKey = 'eduShell.setup.packRecommended', t }: StarterPackRowProps) {
   return (
     <div role="radiogroup" aria-labelledby="setup-pack-label" aria-describedby="setup-pack-hint" className="@container flex flex-col gap-1.5">
-      <span id="setup-pack-label" className="font-neo-body text-sm font-bold text-neo-cream">
+      <span id="setup-pack-label" className="font-neo-body text-sm font-bold text-edu-ink">
         {t(labelKey)}
       </span>
-      <p id="setup-pack-hint" className="-mt-1 font-neo-body text-xs text-neo-cream/75 max-sm:sr-only">
+      <p id="setup-pack-hint" className="-mt-1 font-neo-body text-xs text-edu-ink/75 max-sm:sr-only">
         {t(hintKey)}
       </p>
       <div className="grid grid-cols-2 gap-2">
@@ -34,9 +34,9 @@ export function StarterPackRow({ packs, selectedKey, recommendedKey, onSelect, l
             <label
               key={pack.nameKey}
               className={cn(
-                'relative flex min-h-[52px] cursor-pointer items-center gap-2 rounded-neo border-2 px-2.5 py-1.5 text-neo-cream transition-[transform,colors] duration-150 active:scale-[0.98] motion-reduce:transition-none',
-                'has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-neo-cream',
-                on ? 'border-neo-lime ring-2 ring-neo-lime' : 'border-neo-cream/50 hover:border-neo-cream',
+                'relative flex min-h-[52px] cursor-pointer items-center gap-2 rounded-neo border-2 px-2.5 py-1.5 text-edu-ink transition-[transform,colors] duration-150 active:scale-[0.98] motion-reduce:transition-none',
+                'has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-edu-line',
+                on ? 'border-neo-lime ring-2 ring-neo-lime' : 'border-edu-line hover:border-edu-line',
                 pack.nameKey === recommendedKey && 'pt-3',
               )}
             >
@@ -50,18 +50,18 @@ export function StarterPackRow({ packs, selectedKey, recommendedKey, onSelect, l
                 className="sr-only"
               />
               {on ? (
-                <Check className="size-5 shrink-0 text-neo-lime" strokeWidth={3} aria-hidden="true" />
+                <Check className="size-5 shrink-0 text-edu-lime-ink" strokeWidth={3} aria-hidden="true" />
               ) : (
                 <BookOpen className="size-5 shrink-0" aria-hidden="true" />
               )}
               <span className="flex min-w-0 flex-1 flex-col">
                 <span className="font-neo-display text-sm font-bold leading-tight sm:text-base">{t(pack.nameKey)}</span>
-                <span className="font-neo-body text-xs font-semibold text-neo-cream/70">
+                <span className="font-neo-body text-xs font-semibold text-edu-ink/70">
                   {t('eduShell.setup.packWords', { count: pack.words.length })}
                 </span>
               </span>
               {pack.nameKey === recommendedKey ? (
-                <span className="absolute -top-2 end-2 rounded-full border border-neo-cream/50 bg-neo-navy-light px-1.5 font-neo-body text-[0.65rem] font-bold leading-4 text-neo-cream">
+                <span className="absolute -top-2 end-2 rounded-full border border-edu-line bg-edu-surface px-1.5 font-neo-body text-[0.65rem] font-bold leading-4 text-edu-ink">
                   {t(badgeKey)}
                 </span>
               ) : null}

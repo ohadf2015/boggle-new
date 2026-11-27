@@ -89,7 +89,7 @@ export function ClassStrip({ classroomId, reducedMotion }: Props) {
       )}
 
       {askFailed && (
-        <p role="alert" className="font-neo-body text-xs font-bold text-neo-pink">
+        <p role="alert" className="font-neo-body text-xs font-bold text-edu-pink-ink">
           {t('student.classStrip.askFailed')}
         </p>
       )}

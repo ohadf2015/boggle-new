@@ -28,7 +28,7 @@ export function HelpFeedback({
   return (
     <div className="mt-10 flex min-h-16 flex-wrap items-center gap-3 border-t-4 border-neo-black pt-6" aria-live="polite">
       {answer ? (
-        <p className="font-bold text-neo-lime">{answer === 'yes' ? thanks : thanksNo}</p>
+        <p className="font-bold text-edu-lime-ink">{answer === 'yes' ? thanks : thanksNo}</p>
       ) : (
         <>
           <p className="me-2 font-neo-display text-lg font-black">{question}</p>
@@ -43,7 +43,7 @@ export function HelpFeedback({
           <button
             type="button"
             onClick={() => vote('no')}
-            className="inline-flex items-center gap-2 rounded-neo border-3 border-neo-cream/50 bg-neo-navy-light px-4 py-2 font-bold text-neo-white shadow-hard hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+            className="inline-flex items-center gap-2 rounded-neo border-3 border-edu-line bg-edu-surface px-4 py-2 font-bold text-edu-ink shadow-hard hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             <ThumbsDown aria-hidden="true" className="size-4" />
             {no}

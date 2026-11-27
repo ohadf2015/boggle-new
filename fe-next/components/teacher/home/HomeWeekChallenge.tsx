@@ -26,7 +26,7 @@ type T = (key: string, params?: Record<string, string | number>) => string;
 const K = 'eduShell.home.challenge';
 
 const PILL =
-  'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo-lg border-[3px] border-neo-black px-3 font-neo-body text-sm font-black leading-tight shadow-hard transition-transform duration-150 hover:-translate-y-px active:translate-y-px active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream disabled:opacity-70 motion-reduce:transition-none';
+  'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo-lg border-[3px] border-neo-black px-3 font-neo-body text-sm font-black leading-tight shadow-hard transition-transform duration-150 hover:-translate-y-px active:translate-y-px active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line disabled:opacity-70 motion-reduce:transition-none';
 
 export interface HomeWeekChallengeProps {
   classroomId: string;
@@ -79,17 +79,17 @@ export function HomeWeekChallenge({ classroomId, classLanguage, lessons, preferr
 
   const busyIcon = <Loader2 className="size-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" />;
   const noteLine = note ? (
-    <p data-testid="home-challenge-note" role="alert" className="font-neo-body text-xs font-bold text-neo-pink">{t(`${K}.${note}`)}</p>
+    <p data-testid="home-challenge-note" role="alert" className="font-neo-body text-xs font-bold text-edu-pink-ink">{t(`${K}.${note}`)}</p>
   ) : null;
 
   if (!challenge) {
     return (
       <section data-testid="home-challenge" data-state="none" aria-labelledby="home-challenge-title" className={cn(NB_PANEL, 'flex flex-col gap-2 p-4')}>
         <h2 id="home-challenge-title" className="flex items-center gap-2 font-neo-display text-base font-black">
-          <CalendarCheck className="size-5 shrink-0 text-neo-cyan" aria-hidden="true" />
+          <CalendarCheck className="size-5 shrink-0 text-edu-cyan-ink" aria-hidden="true" />
           {t(`${K}.title`)}
         </h2>
-        <p className="font-neo-body text-sm font-semibold text-neo-cream/85">{t(`${K}.emptyHint`)}</p>
+        <p className="font-neo-body text-sm font-semibold text-edu-ink/85">{t(`${K}.emptyHint`)}</p>
         <button type="button" data-testid="home-challenge-start" disabled={saving} aria-busy={saving} onClick={start} className={cn(PILL, NB_BLOCK.cyan, 'self-start')}>
           {saving ? busyIcon : <CalendarCheck className="size-4 shrink-0" aria-hidden="true" />}
           {first ? t(`${K}.start`, { list: first.name }) : t(`${K}.pick`)}
@@ -108,16 +108,16 @@ export function HomeWeekChallenge({ classroomId, classLanguage, lessons, preferr
     <section data-testid="home-challenge" data-state={challenge.state} aria-labelledby="home-challenge-title" className={cn(NB_PANEL, 'flex flex-col gap-3 p-4')}>
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 id="home-challenge-title" className="flex items-center gap-2 font-neo-display text-base font-black">
-          <Trophy className="size-5 shrink-0 text-neo-yellow" aria-hidden="true" />
+          <Trophy className="size-5 shrink-0 text-edu-yellow-ink" aria-hidden="true" />
           {challenge.state === 'ended' ? t(`${K}.lastTitle`) : t(`${K}.title`)}
         </h2>
-        <span className="font-neo-body text-xs font-bold text-neo-cream/80">{status}</span>
+        <span className="font-neo-body text-xs font-bold text-edu-ink/80">{status}</span>
       </div>
       <p data-testid="home-challenge-list" className="font-neo-display text-lg font-black leading-tight">
         <ListNameButton lessonId={challenge.lessonId} name={name} />
       </p>
       {challenge.students > 0 ? (<div>
-        <SpringProgress value={challenge.finished} max={challenge.students} label={t(`${K}.finished`, { done: challenge.finished, total: challenge.students })} animateOnMount className="h-3 rounded-full border-neo-cream/60 bg-neo-navy" />
+        <SpringProgress value={challenge.finished} max={challenge.students} label={t(`${K}.finished`, { done: challenge.finished, total: challenge.students })} animateOnMount className="h-3 rounded-full border-edu-line bg-edu-surface" />
         <p data-testid="home-challenge-finished" className="mt-1 font-neo-body text-sm font-bold">
           {t(`${K}.finished`, { done: challenge.finished, total: challenge.students })}
         </p>

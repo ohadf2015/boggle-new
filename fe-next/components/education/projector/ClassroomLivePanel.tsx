@@ -59,7 +59,7 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
     <section
       data-testid="classroom-live-panel"
       aria-label={t('eduLive.live.panelTitle')}
-      className="flex h-full min-h-0 flex-col gap-[clamp(8px,1.4cqh,18px)] overflow-hidden rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-elevated md:[container-type:size] p-[clamp(10px,1.8cqh,24px)] text-neo-cream shadow-hard-lg"
+      className="flex h-full min-h-0 flex-col gap-[clamp(8px,1.4cqh,18px)] overflow-hidden rounded-neo-lg border-[3px] border-edu-line bg-edu-surface md:[container-type:size] p-[clamp(10px,1.8cqh,24px)] text-edu-ink shadow-hard-lg"
     >
       <div className="flex shrink-0 items-center justify-between gap-3">
         <div className="flex min-w-0 items-baseline gap-2 max-md:flex-col max-md:items-start max-md:gap-1 md:flex-col md:items-start md:gap-0">
@@ -69,7 +69,7 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
             initial={reduceMotion ? false : { scale: 1.25 }}
             animate={{ scale: 1 }}
             transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 16 }}
-            className="inline-block origin-[0%_80%] font-neo-display font-black leading-none tabular-nums text-neo-lime text-[44px] md:text-[clamp(36px,min(11cqh,24cqw),120px)]"
+            className="inline-block origin-[0%_80%] font-neo-display font-black leading-none tabular-nums text-edu-lime-ink text-[44px] md:text-[clamp(36px,min(11cqh,24cqw),120px)]"
           >
             {shownTotal}
           </m.span>

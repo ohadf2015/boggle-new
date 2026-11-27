@@ -201,10 +201,10 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   if (!selectedClassroomId) {
     view = (
       <>
-        <h1 data-wipe className="mb-2 font-neo-display text-3xl font-bold leading-tight text-neo-white sm:text-4xl">
+        <h1 data-wipe className="mb-2 font-neo-display text-3xl font-bold leading-tight text-edu-ink sm:text-4xl">
           {t('teacher.reports.title')}
         </h1>
-        <p data-testid="reports-value-line" dir="auto" className="mb-5 max-w-prose text-base leading-snug text-neo-cream/85 max-sm:hidden">
+        <p data-testid="reports-value-line" dir="auto" className="mb-5 max-w-prose text-base leading-snug text-edu-ink/85 max-sm:hidden">
           {t('teacher.reports.valueLine', 'After every game, see which words each class missed, who needs help, and what to practice next.')}
         </p>
 
@@ -214,7 +214,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
           <ReportsReteachPanel classrooms={classrooms} onShown={setShownClassId} />
         ) : null}
 
-        <h2 className="mb-3 text-base font-bold text-neo-cream">{t('teacher.reports.selectClassroom')}</h2>
+        <h2 className="mb-3 text-base font-bold text-edu-ink">{t('teacher.reports.selectClassroom')}</h2>
 
         {classroomsLoading ? (
           <div aria-busy="true" className="grid gap-3 sm:grid-cols-2">
@@ -222,7 +222,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
               {t('teacher.reports.loadingClassrooms')}
             </span>
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} aria-hidden="true" className="h-20 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
+              <div key={i} aria-hidden="true" className="h-20 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
             ))}
           </div>
         ) : classrooms && classrooms.length > 0 ? (

@@ -112,7 +112,7 @@ export function TeacherTrialEndingCard({ trial }: { trial?: TrialStatus | null }
         body={
           <>
             <span>{copy.body}</span>
-            {copy.note ? <span className="mt-1 block font-semibold text-neo-cream/70">{copy.note}</span> : null}
+            {copy.note ? <span className="mt-1 block font-semibold text-edu-ink/70">{copy.note}</span> : null}
             {!waiting ? <TrialUsageRecap trialExpires={expiresAt} /> : null}
           </>
         }

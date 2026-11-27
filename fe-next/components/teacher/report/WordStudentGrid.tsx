@@ -110,7 +110,7 @@ export function WordStudentGrid({
                       'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
                       selectedStudentId === col.studentId
                         ? 'bg-neo-lime text-black'
-                        : 'text-neo-cream',
+                        : 'text-edu-ink',
                       !col.played && 'italic opacity-70'
                     )}
                   >

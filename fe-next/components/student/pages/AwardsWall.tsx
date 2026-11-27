@@ -51,7 +51,7 @@ export function AwardsFilterBar({ active, onChange, compact }: { active: AwardsF
             className={cn(
               "relative shrink-0 whitespace-nowrap rounded-full border-2 border-neo-black font-neo-display font-black outline-none transition-transform after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[''] active:translate-y-[2px] focus-visible:ring-2 focus-visible:ring-neo-yellow",
               compact ? 'h-8 px-2.5 text-xs' : 'h-9 px-2.5 text-xs sm:h-10 sm:px-3 sm:text-sm',
-              on ? 'text-neo-black' : 'text-neo-white',
+              on ? 'text-neo-black' : 'text-edu-ink',
             )}
             style={on ? toneStyle('lime', { shadow: 2, trim: 1 }) : { background: 'rgba(255,255,255,0.08)', boxShadow: 'inset 0 0 0 1.5px rgba(245,197,66,0.55)' }}
           >
@@ -86,11 +86,11 @@ function AwardCard({ id, a, t, fresh = false }: { id: string; a: Achievement; t:
           {a.isSecret && !earned ? '?' : a.icon}
         </span>
       </Medallion>
-      <span dir="auto" className={cn('line-clamp-2 min-h-[2.4em] font-neo-display text-sm font-black leading-tight text-neo-white', INK_TEXT)}>
+      <span dir="auto" className={cn('line-clamp-2 min-h-[2.4em] font-neo-display text-sm font-black leading-tight text-edu-ink', INK_TEXT)}>
         {name}
       </span>
       {!earned && (
-        <span data-testid="award-how" dir="auto" className="line-clamp-3 font-neo-body text-xs font-bold leading-snug text-neo-white/85">
+        <span data-testid="award-how" dir="auto" className="line-clamp-3 font-neo-body text-xs font-bold leading-snug text-edu-ink/85">
           {t(a.descriptionKey)}
         </span>
       )}
@@ -106,7 +106,7 @@ function AwardCard({ id, a, t, fresh = false }: { id: string; a: Achievement; t:
           {display?.icon} {tier.currentTier}
         </span>
       ) : (
-        <span className="inline-flex items-center gap-1 font-neo-display text-xs font-black text-neo-white/80">
+        <span className="inline-flex items-center gap-1 font-neo-display text-xs font-black text-edu-ink/80">
           <Lock className="h-3 w-3" aria-hidden="true" />
           {t('education.achievements.locked')}
         </span>
@@ -119,7 +119,7 @@ function AwardCard({ id, a, t, fresh = false }: { id: string; a: Achievement; t:
               style={{ transform: `scaleX(${Math.max(0, Math.min(100, tier.progress)) / 100})`, backgroundImage: 'linear-gradient(90deg,color-mix(in srgb,var(--neo-yellow) 55%,var(--neo-cream)),color-mix(in srgb,var(--neo-yellow) 85%,var(--neo-orange)))' }}
             />
           </span>
-          <span className="shrink-0 font-neo-body text-xs font-bold text-neo-white/85">
+          <span className="shrink-0 font-neo-body text-xs font-bold text-edu-ink/85">
             {a.count}/{tier.nextThreshold}
           </span>
         </span>
@@ -134,7 +134,7 @@ export function AwardsGrid({ achievements, filter, fresh }: { achievements: Reco
   const entries = orderAwards(Object.entries(achievements).filter(([id, a]) => isEarnableAward(id, a.count) && (filter === 'all' || a.category === filter)));
   if (entries.length === 0) {
     return (
-      <p dir="auto" className="py-10 text-center font-neo-body text-sm font-bold text-neo-white/85">
+      <p dir="auto" className="py-10 text-center font-neo-body text-sm font-bold text-edu-ink/85">
         {t('academy.pages.noAwards', 'Play a lesson to start earning awards.')}
       </p>
     );

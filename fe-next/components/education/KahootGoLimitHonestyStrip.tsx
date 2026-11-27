@@ -31,11 +31,11 @@ export function KahootGoLimitHonestyStrip({
       data-testid="kahoot-go-limit-honesty-strip"
       aria-labelledby="kahoot-go-limit-honesty-heading"
       className={cn(
-        'mb-12 rounded-neo border-3 border-neo-cyan/50 bg-neo-navy/60 p-5 shadow-hard sm:p-6',
+        'mb-12 rounded-neo border-3 border-neo-cyan/50 bg-edu-surface/60 p-5 shadow-hard sm:p-6',
         className,
       )}
     >
-      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-neo-cyan">
+      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-edu-cyan-ink">
         {t('education.vsKahoot.goLimit.eyebrow')}
       </p>
       <h2
@@ -44,19 +44,19 @@ export function KahootGoLimitHonestyStrip({
       >
         {t('education.vsKahoot.goLimit.title')}
       </h2>
-      <p className="mb-5 text-sm leading-relaxed text-neo-gray-200 sm:text-base">
+      <p className="mb-5 text-sm leading-relaxed text-edu-ink/80 sm:text-base">
         {t('education.vsKahoot.goLimit.lede')}
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <article
           data-testid="kahoot-go-limit-ambiguous-card"
-          className="rounded-neo border-3 border-neo-gray-400/50 bg-neo-navy/40 p-4"
+          className="rounded-neo border-3 border-edu-line/30 bg-edu-surface/40 p-4"
         >
-          <h3 className="mb-2 font-bold text-neo-gray-300">
+          <h3 className="mb-2 font-bold text-edu-ink/70">
             {t('education.vsKahoot.goLimit.kahootTitle')}
           </h3>
-          <p className="text-sm text-neo-gray-200">
+          <p className="text-sm text-edu-ink/80">
             {t('education.vsKahoot.goLimit.kahootBody')}
           </p>
         </article>
@@ -64,22 +64,22 @@ export function KahootGoLimitHonestyStrip({
           data-testid="lexiclash-clear-limit-card"
           className="rounded-neo border-3 border-neo-lime/50 bg-neo-lime/10 p-4"
         >
-          <h3 className="mb-2 font-bold text-neo-lime">
+          <h3 className="mb-2 font-bold text-edu-lime-ink">
             {t('education.vsKahoot.goLimit.lexiTitle')}
           </h3>
-          <p className="text-sm text-neo-gray-200">
+          <p className="text-sm text-edu-ink/80">
             {t('education.vsKahoot.goLimit.lexiBody')}
           </p>
         </article>
       </div>
 
-      <p className="mt-4 text-xs text-neo-gray-300">
+      <p className="mt-4 text-xs text-edu-ink/70">
         {t('education.vsKahoot.goLimit.citePrefix')}{' '}
         <a
           href={EVIDENCE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-edu-cyan-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           data-testid="kahoot-go-limit-evidence-link"
         >
           {t('education.vsKahoot.goLimit.citeLabel')}

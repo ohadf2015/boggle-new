@@ -33,10 +33,10 @@ export interface StudentArcViewProps {
 const TREND_ORDER: Record<WordTrend, number> = { stuck: 0, improving: 1, insufficient: 2, mastered: 3 };
 
 const TREND_CHIP: Record<WordTrend, string> = {
-  mastered: 'border-neo-lime bg-neo-lime/15 text-neo-lime',
-  improving: 'border-neo-cyan bg-neo-cyan/15 text-neo-cyan',
-  stuck: 'border-neo-pink bg-neo-pink/15 text-neo-pink',
-  insufficient: 'border-neo-cream/40 bg-neo-cream/10 text-neo-cream/70',
+  mastered: 'border-neo-lime bg-neo-lime/15 text-edu-lime-ink',
+  improving: 'border-neo-cyan bg-neo-cyan/15 text-edu-cyan-ink',
+  stuck: 'border-neo-pink bg-neo-pink/15 text-edu-pink-ink',
+  insufficient: 'border-edu-line bg-edu-ink/10 text-edu-ink/70',
 };
 
 const MAX_DOTS = 8;
@@ -62,9 +62,9 @@ export function StudentArcView({ studentId, classroomId, studentName }: StudentA
       <section data-testid="student-arc-loading" aria-busy="true" className={PANEL}>
         <span className="sr-only" role="status">{t('teacher.reports.loading')}</span>
         <div aria-hidden="true" className="space-y-3">
-          <div className="h-24 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
+          <div className="h-24 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-11 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
+            <div key={i} className="h-11 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
           ))}
         </div>
       </section>
@@ -74,7 +74,7 @@ export function StudentArcView({ studentId, classroomId, studentName }: StudentA
   if (error) {
     return (
       <section className={PANEL}>
-        <p role="alert" className="rounded-neo border-2 border-neo-pink bg-neo-pink/15 px-3 py-2 text-sm font-bold text-neo-white">
+        <p role="alert" className="rounded-neo border-2 border-neo-pink bg-neo-pink/15 px-3 py-2 text-sm font-bold text-edu-ink">
           {t('teacher.reports.error')}
         </p>
       </section>
@@ -85,7 +85,7 @@ export function StudentArcView({ studentId, classroomId, studentName }: StudentA
     return (
       <section className={PANEL}>
         <ArcHeader t={t} name={studentName} />
-        <p data-testid="student-arc-empty" className="rounded-neo border-2 border-dashed border-neo-cream/30 p-6 text-center text-sm text-neo-cream/80">
+        <p data-testid="student-arc-empty" className="rounded-neo border-2 border-dashed border-edu-line p-6 text-center text-sm text-edu-ink/80">
           {t('teacher.reports.arc.emptyStudent', { name: studentName ?? '' })}
         </p>
       </section>
@@ -103,9 +103,9 @@ export function StudentArcView({ studentId, classroomId, studentName }: StudentA
       {points.length > 0 && (
         <div className="mb-5">
           <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="text-sm font-bold text-neo-cream/80">{t('teacher.reports.arc.accuracyOverTime')}</h3>
-            <p data-testid="student-arc-growth" className="flex items-center gap-1.5 text-sm font-black text-neo-white tabular-nums">
-              <TrendingUp className="size-4 text-neo-lime" aria-hidden="true" />
+            <h3 className="text-sm font-bold text-edu-ink/80">{t('teacher.reports.arc.accuracyOverTime')}</h3>
+            <p data-testid="student-arc-growth" className="flex items-center gap-1.5 text-sm font-black text-edu-ink tabular-nums">
+              <TrendingUp className="size-4 text-edu-lime-ink" aria-hidden="true" />
               {t('teacher.reports.arc.growth', { first, last })}
             </p>
           </div>
@@ -122,7 +122,7 @@ export function StudentArcView({ studentId, classroomId, studentName }: StudentA
       {arc.mastery.stuckWords.length > 0 && (
         <p
           data-testid="student-arc-requeue"
-          className="mb-4 rounded-neo border-2 border-neo-cyan bg-neo-cyan/10 px-3 py-2 text-xs font-bold text-neo-cream/90"
+          className="mb-4 rounded-neo border-2 border-neo-cyan bg-neo-cyan/10 px-3 py-2 text-xs font-bold text-edu-ink/90"
         >
           {t('teacher.reports.arc.requeueStudent', { name: studentName ?? '' })}
         </p>
@@ -132,7 +132,7 @@ export function StudentArcView({ studentId, classroomId, studentName }: StudentA
         <StudentPracticeAction classroomId={classroomId} studentName={studentName ?? ''} words={practiceWords} />
       </div>
 
-      <ul className="divide-y divide-neo-cream/15">
+      <ul className="divide-y divide-edu-line/15">
         {words.map((word) => (
           <WordRow key={word.word} word={word} t={t} language={language} />
         ))}
@@ -141,15 +141,15 @@ export function StudentArcView({ studentId, classroomId, studentName }: StudentA
   );
 }
 
-const PANEL = 'rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 shadow-hard sm:p-6';
+const PANEL = 'rounded-neo-lg border-2 border-edu-line bg-edu-surface/95 p-4 shadow-hard sm:p-6';
 
 type T = ReturnType<typeof useLanguage>['t'];
 
 function ArcHeader({ t, name }: { t: T; name?: string }) {
   return (
     <header className="mb-4">
-      <h2 className="font-neo-display text-xl font-bold text-neo-white">{t('teacher.reports.arc.title')}</h2>
-      <p className="mt-0.5 text-sm text-neo-cream/70">
+      <h2 className="font-neo-display text-xl font-bold text-edu-ink">{t('teacher.reports.arc.title')}</h2>
+      <p className="mt-0.5 text-sm text-edu-ink/70">
         {name ? t('teacher.reports.arc.studentSubtitle', { name }) : t('teacher.reports.arc.subtitle')}
       </p>
     </header>
@@ -161,13 +161,13 @@ function WordRow({ word, t, language }: { word: WordTrajectory; t: T; language: 
   return (
     <li data-testid="student-arc-word" className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5">
       <span className="min-w-0 flex-1 basis-32">
-        <span className="block break-words font-bold text-neo-white" dir="auto">
+        <span className="block break-words font-bold text-edu-ink" dir="auto">
           {word.display}
         </span>
-        <span className="block text-xs font-bold text-neo-cream/70">
+        <span className="block text-xs font-bold text-edu-ink/70">
           {t('eg2Polish.arc.word.attempts', { count: word.attempts, correct: word.correct })}
           {' · '}
-          <span className={word.lastCorrect ? 'text-neo-lime' : 'text-neo-pink'}>
+          <span className={word.lastCorrect ? 'text-edu-lime-ink' : 'text-edu-pink-ink'}>
             {t(word.lastCorrect ? 'eg2Polish.arc.word.lastCorrect' : 'eg2Polish.arc.word.lastMissed')}
           </span>
           {' · '}
@@ -188,7 +188,7 @@ function WordRow({ word, t, language }: { word: WordTrajectory; t: T; language: 
             title={t(ok ? 'teacher.reports.arc.outcomeCorrect' : 'teacher.reports.arc.outcomeMissed')}
             className={cn(
               'size-2.5 rounded-full border-2',
-              ok ? 'border-neo-lime bg-neo-lime' : 'border-neo-cream/50 bg-transparent'
+              ok ? 'border-neo-lime bg-neo-lime' : 'border-edu-line bg-transparent'
             )}
           />
         ))}

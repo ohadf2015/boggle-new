@@ -65,7 +65,7 @@ export function ShareParentReportButton({ classroomId, studentId }: ShareParentR
           e.stopPropagation();
           e.currentTarget.select();
         }}
-        className="w-40 rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-2 py-1 text-xs text-neo-white"
+        className="w-40 rounded-neo border-2 border-edu-line bg-edu-surface px-2 py-1 text-xs text-edu-ink"
       />
     );
   }
@@ -75,7 +75,7 @@ export function ShareParentReportButton({ classroomId, studentId }: ShareParentR
       type="button"
       onClick={handleClick}
       disabled={loading}
-      className="px-2 py-1 rounded-neo border-3 border-neo-cream/40 bg-neo-navy text-neo-white text-xs font-neo-body hover:bg-neo-cyan/10 disabled:opacity-50"
+      className="px-2 py-1 rounded-neo border-3 border-edu-line bg-edu-surface text-edu-ink text-xs font-neo-body hover:bg-neo-cyan/10 disabled:opacity-50"
     >
       {t('education.analytics.shareParentReport')}
     </button>

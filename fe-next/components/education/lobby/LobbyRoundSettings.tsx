@@ -151,13 +151,13 @@ export function LobbyRoundSettings({
         <div>
           <div
             id="lobby-hunt-label"
-            className="mb-2 flex items-center gap-1.5 font-neo-display text-sm font-bold text-neo-cream"
+            className="mb-2 flex items-center gap-1.5 font-neo-display text-sm font-bold text-edu-ink"
           >
-            <Crosshair className="size-4 text-neo-cream/70" strokeWidth={3} aria-hidden="true" />
+            <Crosshair className="size-4 text-edu-ink/70" strokeWidth={3} aria-hidden="true" />
             {t('teacher.classroom.huntTarget.title')}
           </div>
           {huntTargets.length === 0 ? (
-            <p className="rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light px-3 py-2 font-neo-body text-xs font-bold text-neo-cream/85">
+            <p className="rounded-neo border-2 border-edu-line bg-edu-surface px-3 py-2 font-neo-body text-xs font-bold text-edu-ink/85">
               {t('teacher.classroom.huntTarget.noneEligible', {
                 min: HUNT_TARGET_MIN_LENGTH,
                 max: CLASSROOM_HUNT_TARGET_MAX_LENGTH,

@@ -200,7 +200,7 @@ export default function WordListEditor({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <label className="text-sm font-neo-body text-neo-white">
+        <label className="text-sm font-neo-body text-edu-ink">
           {t(pluralKeyOf('teacher.lesson.words', words.length, uiLanguage), { count: words.length })}
         </label>
         {showBulkImport && (
@@ -209,7 +209,7 @@ export default function WordListEditor({
             size="sm"
             variant="outline"
             onClick={onBulkImportOpen}
-            className="text-neo-cyan border-neo-cyan hover:bg-neo-cyan/20 text-xs"
+            className="text-edu-cyan-ink border-neo-cyan hover:bg-neo-cyan/20 text-xs"
           >
             <Upload className="w-3 h-3 me-1" />
             {t('teacher.lesson.bulkImport')}
@@ -244,14 +244,14 @@ export default function WordListEditor({
         </div>
       )}
       {showAddInput && addError && (
-        <p id="word-add-error" data-testid="word-add-error" role="alert" className="-mt-2 mb-3 text-xs font-bold text-neo-pink">
+        <p id="word-add-error" data-testid="word-add-error" role="alert" className="-mt-2 mb-3 text-xs font-bold text-edu-pink-ink">
           {addError}
         </p>
       )}
 
       {words.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <p data-testid="word-list-summary" className="text-xs text-neo-white/80 font-neo-body tabular-nums">
+          <p data-testid="word-list-summary" className="text-xs text-edu-ink/80 font-neo-body tabular-nums">
             {t('teacher.wordDetails.summary', {
               count: stats.total,
               definitions: stats.withDefinitions,
@@ -267,7 +267,7 @@ export default function WordListEditor({
               variant="outline"
               onClick={handleAiFill}
               disabled={aiState === 'loading'}
-              className="text-neo-yellow border-neo-yellow hover:bg-neo-yellow/20 text-xs"
+              className="text-edu-yellow-ink border-neo-yellow hover:bg-neo-yellow/20 text-xs"
             >
               {aiState === 'loading' ? (
                 <Loader2 className="w-3 h-3 me-1 animate-spin" />
@@ -281,7 +281,7 @@ export default function WordListEditor({
       )}
 
       {words.length > 0 && (
-        <p data-testid="word-list-skill-summary" className="text-xs text-neo-white/70 font-neo-body tabular-nums mb-2">
+        <p data-testid="word-list-skill-summary" className="text-xs text-edu-ink/70 font-neo-body tabular-nums mb-2">
           {t('teacher.wordDetails.summarySkills', {
             meanings: stats.withMeanings,
             morphology: stats.withMorphology,
@@ -290,12 +290,12 @@ export default function WordListEditor({
       )}
 
       {aiState === 'error' && (
-        <p role="alert" className="text-xs text-neo-pink font-neo-body mb-2">
+        <p role="alert" className="text-xs text-edu-pink-ink font-neo-body mb-2">
           {t('teacher.wordDetails.aiError')}
         </p>
       )}
       {Object.keys(aiFilled).length > 0 && (
-        <p className="text-xs text-neo-yellow font-neo-body mb-2 flex items-center gap-1">
+        <p className="text-xs text-edu-yellow-ink font-neo-body mb-2 flex items-center gap-1">
           <Sparkles className="w-3 h-3" />
           {t('teacher.wordDetails.aiFilledNote')}
         </p>
@@ -310,22 +310,22 @@ export default function WordListEditor({
               return (
                 <div
                   key={`word-${idx}-${word.word}`}
-                  className="bg-neo-navy/50 p-2 rounded border border-neo-cream/40"
+                  className="bg-edu-surface/50 p-2 rounded border border-edu-line"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       {word.canIntegrate ? (
-                        <div className="flex items-center gap-1 text-neo-cyan">
+                        <div className="flex items-center gap-1 text-edu-cyan-ink">
                           <CheckCircle className="w-4 h-4" />
                           <span className="text-xs">{t('teacher.lesson.canIntegrate')}</span>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-1 text-neo-lime">
+                        <div className="flex items-center gap-1 text-edu-lime-ink">
                           <AlertCircle className="w-4 h-4" />
                           <span className="text-xs">{t('teacher.lesson.cannotIntegrate')}</span>
                         </div>
                       )}
-                      <span className="text-neo-white font-neo-body ms-2 truncate">{word.word}</span>
+                      <span className="text-edu-ink font-neo-body ms-2 truncate">{word.word}</span>
                       {isMultiWordTerm(word.word) && (
                         <span
                           data-testid="word-multi-word-flag"
@@ -335,7 +335,7 @@ export default function WordListEditor({
                         </span>
                       )}
                       {word.level && word.level !== 'core' && (
-                        <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-neo-black/40 text-neo-white/80">
+                        <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-neo-black/40 text-edu-ink/80">
                           {t(LEVELS.find((l) => l.value === word.level)?.key ?? 'teacher.wordDetails.levelCore')}
                         </span>
                       )}
@@ -346,7 +346,7 @@ export default function WordListEditor({
                       onClick={() => toggleExpanded(idx)}
                       aria-expanded={isOpen}
                       aria-controls={`word-details-${idx}`}
-                      className="text-neo-cyan hover:bg-neo-cyan/20 text-xs"
+                      className="text-edu-cyan-ink hover:bg-neo-cyan/20 text-xs"
                     >
                       {isOpen ? <ChevronUp className="w-4 h-4 me-1" /> : <ChevronDown className="w-4 h-4 me-1" />}
                       {t('teacher.wordDetails.more')}
@@ -355,7 +355,7 @@ export default function WordListEditor({
                       size="sm"
                       variant="ghost"
                       onClick={() => handleRemoveWord(idx)}
-                      className="text-neo-pink hover:bg-neo-pink/20"
+                      className="text-edu-pink-ink hover:bg-neo-pink/20"
                       aria-label={t('teacher.lesson.removeWord')}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -367,7 +367,7 @@ export default function WordListEditor({
                     placeholder={t('teacher.lesson.definitionPlaceholder')}
                     data-ai-filled={isAiFilled(word, 'definition') ? 'true' : undefined}
                     className={cn(
-                      'mt-1 text-xs h-8 bg-neo-navy border-neo-cream/40 text-neo-white',
+                      'mt-1 text-xs h-8 bg-edu-surface border-edu-line text-edu-ink',
                       isAiFilled(word, 'definition') && aiHighlight
                     )}
                   />
@@ -376,7 +376,7 @@ export default function WordListEditor({
                     <div
                       id={`word-details-${idx}`}
                       data-testid={`word-details-${idx}`}
-                      className="mt-2 space-y-2 border-t border-neo-cream/20 pt-2"
+                      className="mt-2 space-y-2 border-t border-edu-line/20 pt-2"
                     >
                       {/* Level */}
                       <div
@@ -384,7 +384,7 @@ export default function WordListEditor({
                         aria-label={t('teacher.wordDetails.level')}
                         className="flex items-center gap-2 flex-wrap"
                       >
-                        <span className="text-xs text-neo-white/80 font-neo-body me-1">
+                        <span className="text-xs text-edu-ink/80 font-neo-body me-1">
                           {t('teacher.wordDetails.level')}
                         </span>
                         {LEVELS.map((option) => {
@@ -397,8 +397,8 @@ export default function WordListEditor({
                               aria-checked={active}
                               onClick={() => updateWord(idx, { level: option.value })}
                               className={cn(
-                                'min-h-9 px-3 rounded-neo border-2 border-neo-cream text-xs font-bold transition',
-                                active ? cn(option.activeClass, 'shadow-hard-sm') : 'bg-neo-black/30 text-neo-white hover:bg-neo-black/50'
+                                'min-h-9 px-3 rounded-neo border-2 border-edu-line text-xs font-bold transition',
+                                active ? cn(option.activeClass, 'shadow-hard-sm') : 'bg-neo-black/30 text-edu-ink hover:bg-neo-black/50'
                               )}
                             >
                               {t(option.key)}
@@ -411,7 +411,7 @@ export default function WordListEditor({
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {(['synonyms', 'antonyms'] as const).map((field) => (
                           <label key={field} className="block">
-                            <span className="text-xs text-neo-white/80 font-neo-body">
+                            <span className="text-xs text-edu-ink/80 font-neo-body">
                               {t(`teacher.wordDetails.${field}`)}
                             </span>
                             <Input
@@ -421,7 +421,7 @@ export default function WordListEditor({
                               placeholder={t(`teacher.wordDetails.${field}Placeholder`)}
                               data-ai-filled={isAiFilled(word, field) ? 'true' : undefined}
                               className={cn(
-                                'mt-1 text-xs h-9 bg-neo-navy border-neo-cream/40 text-neo-white',
+                                'mt-1 text-xs h-9 bg-edu-surface border-edu-line text-edu-ink',
                                 isAiFilled(word, field) && aiHighlight
                               )}
                             />
@@ -431,7 +431,7 @@ export default function WordListEditor({
 
                       {/* Example sentence */}
                       <label className="block">
-                        <span className="text-xs text-neo-white/80 font-neo-body">
+                        <span className="text-xs text-edu-ink/80 font-neo-body">
                           {t('teacher.wordDetails.example')}
                         </span>
                         <Input
@@ -441,11 +441,11 @@ export default function WordListEditor({
                           placeholder={t('teacher.wordDetails.examplePlaceholder')}
                           data-ai-filled={isAiFilled(word, 'example') ? 'true' : undefined}
                           className={cn(
-                            'mt-1 text-xs h-9 bg-neo-navy border-neo-cream/40 text-neo-white',
+                            'mt-1 text-xs h-9 bg-edu-surface border-edu-line text-edu-ink',
                             isAiFilled(word, 'example') && aiHighlight
                           )}
                         />
-                        <span className="block mt-1 text-[11px] text-neo-white/60 font-neo-body">
+                        <span className="block mt-1 text-[11px] text-edu-ink/60 font-neo-body">
                           {t('teacher.wordDetails.exampleHelp')}
                         </span>
                       </label>
@@ -468,7 +468,7 @@ export default function WordListEditor({
           </div>
         </div>
       ) : (
-        <p className="text-sm text-neo-white text-center py-4">
+        <p className="text-sm text-edu-ink text-center py-4">
           {t('teacher.lesson.noWords')}
         </p>
       )}

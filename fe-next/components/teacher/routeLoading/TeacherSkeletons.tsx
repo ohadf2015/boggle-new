@@ -31,7 +31,7 @@ export function ClassGridSkeleton({ columns }: { columns: number }) {
       {Array.from({ length: columns }, (_, i) => (
         <li key={i} className="flex">
           <div className={cn(GAME_CARD, 'flex h-[16.5rem] w-full flex-col overflow-hidden')}>
-            <span className="h-14 shrink-0 bg-neo-cream/10" />
+            <span className="h-14 shrink-0 bg-edu-ink/10" />
             <div className="flex flex-1 flex-col gap-3 p-3.5">
               <span className={cn(SKELETON, 'h-4 w-1/2')} />
               <span className={cn(SKELETON, 'h-16 w-full')} />
@@ -92,12 +92,12 @@ export function LibrarySkeleton() {
           <span className={cn(SKELETON, 'block h-8 w-40 sm:h-9')} />
           <ListGridSkeleton />
         </section>
-        <section className="space-y-3 border-t-[3px] border-dashed border-neo-cream/20 pt-6" aria-hidden="true">
+        <section className="space-y-3 border-t-[3px] border-dashed border-edu-line/20 pt-6" aria-hidden="true">
           <span className={cn(SKELETON, 'block h-7 w-32 sm:h-8')} />
           <span className={cn(SKELETON, 'block h-11 w-full')} />
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 8 }, (_, i) => (
-              <span key={i} className="h-[104px] animate-pulse rounded-neo-lg border-[3px] border-neo-cream/40 bg-neo-navy-light sm:h-[144px]" />
+              <span key={i} className="h-[104px] animate-pulse rounded-neo-lg border-[3px] border-edu-line bg-edu-surface sm:h-[144px]" />
             ))}
           </div>
         </section>
@@ -117,7 +117,7 @@ export function ReportsSkeleton() {
       <span className={cn(SKELETON, 'mb-3 block h-5 w-40')} />
       <div className="grid gap-3 sm:grid-cols-2">
         {[0, 1, 2, 3].map((i) => (
-          <span key={i} className="h-20 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
+          <span key={i} className="h-20 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
         ))}
       </div>
     </div>

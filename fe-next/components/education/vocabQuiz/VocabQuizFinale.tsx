@@ -97,19 +97,19 @@ function RunnersUp({ players, hidden, t }: { players: VocabQuizStanding[]; hidde
       {players.map((player, index) => (
         <li
           key={player.username}
-          className="flex items-center gap-2 md:gap-3 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated px-3 py-1.5 md:px-4 md:py-2 text-neo-white shadow-hard-sm"
+          className="flex items-center gap-2 md:gap-3 rounded-neo border-[2px] border-edu-line bg-edu-surface px-3 py-1.5 md:px-4 md:py-2 text-edu-ink shadow-hard-sm"
         >
           <span className="grid size-7 md:size-9 shrink-0 place-items-center rounded-full border-[2px] border-neo-black bg-neo-cream font-neo-display font-black text-sm md:text-lg text-neo-black tabular-nums">
             {index + 4}
           </span>
           <bdi className="max-w-[12rem] truncate font-neo-display font-bold text-base md:text-2xl">{player.username}</bdi>
           {player.streak > 1 && (
-            <span className="flex items-center gap-1 text-neo-orange text-sm md:text-lg" aria-label={t('vocabQuiz.streak.label', { count: player.streak })}>
+            <span className="flex items-center gap-1 text-edu-orange-ink text-sm md:text-lg" aria-label={t('vocabQuiz.streak.label', { count: player.streak })}>
               <Flame className="size-4 md:size-5" aria-hidden />
               {player.streak}
             </span>
           )}
-          <span className="font-neo-display font-black text-lg md:text-2xl tabular-nums text-neo-cyan">{player.score}</span>
+          <span className="font-neo-display font-black text-lg md:text-2xl tabular-nums text-edu-cyan-ink">{player.score}</span>
         </li>
       ))}
     </ol>
@@ -140,9 +140,9 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBack
   return (
     <section
       data-testid="vocab-quiz-finale"
-      className="flex flex-col gap-3 md:gap-4 md:flex-1 md:min-h-fit bg-neo-navy"
+      className="flex flex-col gap-3 md:gap-4 md:flex-1 md:min-h-fit bg-edu-page"
     >
-      <div className="shrink-0 flex items-center gap-3 md:gap-6 flex-wrap rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated p-3 md:px-5 md:py-3 shadow-hard">
+      <div className="shrink-0 flex items-center gap-3 md:gap-6 flex-wrap rounded-neo border-[3px] border-edu-line bg-edu-surface p-3 md:px-5 md:py-3 shadow-hard">
         <div data-testid="quiz-finale-mascot" className="shrink-0">
           <VocabQuizMascotFace
             face="trophy"
@@ -154,11 +154,11 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBack
         </div>
 
         <div className="min-w-0">
-          <h2 className="flex items-center gap-3 font-neo-display font-black text-3xl md:text-5xl leading-none text-neo-white">
-            <Trophy className="w-8 h-8 md:w-11 md:h-11 shrink-0 text-neo-yellow" aria-hidden />
+          <h2 className="flex items-center gap-3 font-neo-display font-black text-3xl md:text-5xl leading-none text-edu-ink">
+            <Trophy className="w-8 h-8 md:w-11 md:h-11 shrink-0 text-edu-yellow-ink" aria-hidden />
             {t('vocabQuiz.finished.title')}
           </h2>
-          <p className="mt-2 font-neo-body font-bold text-base md:text-xl text-neo-cream">
+          <p className="mt-2 font-neo-body font-bold text-base md:text-xl text-edu-ink">
             {t('vocabQuiz.finished.subtitle', {
               questions: totalQuestions,
               players: stats.players,
@@ -235,7 +235,7 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBack
             type="button"
             data-testid="quiz-finale-back-to-class"
             onClick={onBackToClass}
-            className="shrink-0 self-center lg:self-stretch flex items-center gap-2 px-4 py-2 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated text-neo-cream font-neo-display font-black uppercase shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+            className="shrink-0 self-center lg:self-stretch flex items-center gap-2 px-4 py-2 rounded-neo border-[3px] border-edu-line bg-edu-surface text-edu-ink font-neo-display font-black uppercase shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             <SchoolGlyph className="size-5 shrink-0" />
             {t('eduLive.results.backToClass')}

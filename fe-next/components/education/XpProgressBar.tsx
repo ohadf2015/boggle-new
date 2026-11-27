@@ -107,13 +107,13 @@ const XpProgressBar = memo<XpProgressBarProps>(({
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <span className={cn(
-              'font-neo-display font-black text-neo-white',
+              'font-neo-display font-black text-edu-ink',
               sizeConfig.levelText
             )}>
               {t('education.xp.level')}
             </span>
             <span className={cn(
-              'font-neo-display font-black text-neo-lime',
+              'font-neo-display font-black text-edu-lime-ink',
               sizeConfig.levelText
             )}>
               {progress.currentLevel}
@@ -124,25 +124,25 @@ const XpProgressBar = memo<XpProgressBarProps>(({
           {!progress.isMaxLevel && (
             <div className="flex items-center gap-1">
               <span className={cn(
-                'font-neo-body font-bold text-neo-white tabular-nums',
+                'font-neo-body font-bold text-edu-ink tabular-nums',
                 sizeConfig.xpText
               )}>
                 {progress.xpInCurrentLevel}
               </span>
               <span className={cn(
-                'font-neo-body text-neo-white/70',
+                'font-neo-body text-edu-ink/70',
                 sizeConfig.xpText
               )}>
                 /
               </span>
               <span className={cn(
-                'font-neo-body font-bold text-neo-white tabular-nums',
+                'font-neo-body font-bold text-edu-ink tabular-nums',
                 sizeConfig.xpText
               )}>
                 {progress.xpNeededForNextLevel}
               </span>
               <span className={cn(
-                'font-neo-body text-neo-white/70',
+                'font-neo-body text-edu-ink/70',
                 sizeConfig.xpText
               )}>
                 {t('education.xp.xpLabel')}
@@ -164,7 +164,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
               animate={{ opacity: 0, scale: 1 }}
               transition={{ duration: 1.2 }}
               className={cn(
-                'font-neo-body font-black text-neo-lime tabular-nums',
+                'font-neo-body font-black text-edu-lime-ink tabular-nums',
                 sizeConfig.xpText
               )}
             >
@@ -181,7 +181,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
           label={t('common.aria.levelProgress')}
           tone="lime"
           animateOnMount={!prefersReducedMotion}
-          className="h-full border-[3px] border-neo-cream bg-neo-navy"
+          className="h-full border-[3px] border-edu-line bg-edu-surface"
         />
       </div>
 
@@ -189,13 +189,13 @@ const XpProgressBar = memo<XpProgressBarProps>(({
       {showNextLevel && !progress.isMaxLevel && (
         <div className="flex items-center justify-between mt-2">
           <span className={cn(
-            'font-neo-body text-neo-white/70',
+            'font-neo-body text-edu-ink/70',
             sizeConfig.xpText
           )}>
             {t('education.xp.nextLevel')}: {progress.currentLevel + 1}
           </span>
           <span className={cn(
-            'font-neo-body text-neo-white/70',
+            'font-neo-body text-edu-ink/70',
             sizeConfig.xpText
           )}>
             {t('education.xp.keepGoing')}
@@ -207,7 +207,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
       {progress.isMaxLevel && (
         <div className="flex items-center justify-center mt-2">
           <span className={cn(
-            'font-neo-display font-black text-neo-pink',
+            'font-neo-display font-black text-edu-pink-ink',
             sizeConfig.levelText
           )}>
             {t('education.xp.maxLevel')}

@@ -32,23 +32,23 @@ export function JoinEndedPanel({ code, label, classroomId: enrolledIn, onNewCode
       <div className="flex items-center gap-3">
         <span
           dir="ltr"
-          className="rounded-neo border-3 border-neo-cream/50 bg-neo-navy-light px-3 py-1 font-neo-display text-xl font-black tracking-[0.2em] text-neo-white/60 line-through decoration-neo-pink decoration-4"
+          className="rounded-neo border-3 border-edu-line bg-edu-surface px-3 py-1 font-neo-display text-xl font-black tracking-[0.2em] text-edu-ink/60 line-through decoration-neo-pink decoration-4"
         >
           {code}
         </span>
-        <Hourglass aria-hidden="true" className="size-7 shrink-0 text-neo-pink" strokeWidth={2.75} />
+        <Hourglass aria-hidden="true" className="size-7 shrink-0 text-edu-pink-ink" strokeWidth={2.75} />
       </div>
       <div>
         <h1
           id="join-ended-title"
           ref={headingRef}
           tabIndex={-1}
-          className="font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-neo-white outline-none! [overflow-wrap:anywhere] sm:text-5xl lg:text-6xl"
+          className="font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-edu-ink outline-none! [overflow-wrap:anywhere] sm:text-5xl lg:text-6xl"
         >
           {t('education.student.gameEnded.title')}
         </h1>
-        {label && <p className="mt-2 font-neo-display text-lg font-black text-neo-lime lg:text-xl">{label}</p>}
-        <p data-testid="join-ended-practice-line" className="mt-3 font-neo-body text-base font-bold text-neo-cyan lg:text-lg">
+        {label && <p className="mt-2 font-neo-display text-lg font-black text-edu-lime-ink lg:text-xl">{label}</p>}
+        <p data-testid="join-ended-practice-line" className="mt-3 font-neo-body text-base font-bold text-edu-cyan-ink lg:text-lg">
           {t('education.student.deadEnd.endedLine')}
         </p>
       </div>

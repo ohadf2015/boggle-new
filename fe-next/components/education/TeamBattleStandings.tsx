@@ -32,11 +32,11 @@ export function TeamBattleStandings({ teams, scores }: TeamBattleStandingsProps)
   return (
     <div
       data-testid="team-battle-standings"
-      className="p-5 rounded-neo border-neo border-neo-cream/40 bg-neo-navy shadow-hard"
+      className="p-5 rounded-neo border-neo border-edu-line bg-edu-surface shadow-hard"
     >
       <div className="flex items-center gap-3 mb-4">
-        <Trophy className="w-6 h-6 text-neo-yellow shrink-0" />
-        <h3 className="text-neo-white font-neo-display font-bold text-lg leading-tight">
+        <Trophy className="w-6 h-6 text-edu-yellow-ink shrink-0" />
+        <h3 className="text-edu-ink font-neo-display font-bold text-lg leading-tight">
           {t('education.results.teamBattle.title')}
         </h3>
       </div>

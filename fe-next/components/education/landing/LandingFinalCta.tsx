@@ -27,7 +27,7 @@ export function LandingFinalCta({ setupPending = false }: { setupPending?: boole
             data-testid="landing-final-start"
             data-lc-cta="signup"
             onClick={() => trackLandingCtaClick(setupPending ? 'education_final_finish_setup' : 'education_final')}
-            className="inline-flex min-h-14 items-center justify-center rounded-neo bg-neo-navy px-6 py-3 text-center font-neo-display text-base sm:px-8 sm:text-lg font-black uppercase tracking-wide text-neo-cream shadow-hard transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-navy focus-visible:ring-offset-2 focus-visible:ring-offset-neo-lime"
+            className="inline-flex min-h-14 items-center justify-center rounded-neo bg-edu-page px-6 py-3 text-center font-neo-display text-base sm:px-8 sm:text-lg font-black uppercase tracking-wide text-edu-ink shadow-hard transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-navy focus-visible:ring-offset-2 focus-visible:ring-offset-neo-lime"
           >
             {t(setupPending ? 'eg2Land.hero.ctaFinishSetup' : 'eg2Land.hero.ctaPrimary')}
           </Link>

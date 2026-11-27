@@ -108,7 +108,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
           'flex items-center gap-2.5 sm:gap-4',
           isCurrentUser
             ? 'bg-neo-cyan/20 border-neo-cyan'
-            : 'bg-neo-navy border-neo-black',
+            : 'bg-edu-surface border-neo-black',
           isInactive && 'opacity-50'
         )}
       >
@@ -118,8 +118,8 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
         )}
 
         {/* Rank Number */}
-        <div className="shrink-0 w-8 h-8 rounded-neo border-neo bg-neo-navy border-neo-cream/40 flex items-center justify-center">
-          <span className="font-neo-display font-black text-sm text-neo-white">
+        <div className="shrink-0 w-8 h-8 rounded-neo border-neo bg-edu-surface border-edu-line flex items-center justify-center">
+          <span className="font-neo-display font-black text-sm text-edu-ink">
             {rank}
           </span>
         </div>
@@ -130,11 +130,11 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <p className="font-neo-display font-bold text-neo-white truncate">
+            <p className="font-neo-display font-bold text-edu-ink truncate">
               {displayName}
             </p>
             {isInactive && (
-              <span className="px-2 py-0.5 text-xs font-neo-body bg-neo-black/50 text-neo-white rounded">
+              <span className="px-2 py-0.5 text-xs font-neo-body bg-neo-black/50 text-edu-ink rounded">
                 {t('education.leaderboard.inactive')}
               </span>
             )}
@@ -142,7 +142,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
 
           <div data-testid="leaderboard-row-badges" className="flex flex-wrap items-center gap-x-2 gap-y-1">
             {/* XP */}
-            <span className="whitespace-nowrap font-neo-body font-bold text-neo-lime text-sm tabular-nums">
+            <span className="whitespace-nowrap font-neo-body font-bold text-edu-lime-ink text-sm tabular-nums">
               {t('education.leaderboard.xp', { xp: animatedXp })}
             </span>
 
@@ -188,7 +188,7 @@ LeaderboardEntryRow.displayName = 'LeaderboardEntryRow';
 const SeparatorRow = memo(() => (
   <div
     data-testid="leaderboard-separator"
-    className="flex items-center justify-center py-2 text-neo-white font-neo-body font-bold text-lg tracking-widest"
+    className="flex items-center justify-center py-2 text-edu-ink font-neo-body font-bold text-lg tracking-widest"
   >
     ...
   </div>
@@ -264,7 +264,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
           data-testid="leaderboard-error"
           onClick={() => void refresh()}
           className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
-            'w-full rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-4 py-3 text-start font-neo-body text-sm font-bold text-neo-white',
+            'w-full rounded-neo border-neo border-edu-line bg-edu-surface px-4 py-3 text-start font-neo-body text-sm font-bold text-edu-ink',
             className
           )}
         >
@@ -280,7 +280,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
           data-testid="classroom-leaderboard"
           dir={isRTL ? 'rtl' : 'ltr'}
           className={cn(
-            'w-full rounded-neo border-neo border-neo-cream shadow-hard bg-neo-navy',
+            'w-full rounded-neo border-neo border-edu-line shadow-hard bg-edu-surface',
             className
           )}
         >
@@ -308,7 +308,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
           transition={{ type: 'spring', stiffness: 400, damping: 22 }}
         >
           <Trophy className="w-5 h-5" />
-          <h2 className="font-neo-display font-black text-2xl text-neo-white">
+          <h2 className="font-neo-display font-black text-2xl text-edu-ink">
             {t('education.leaderboard.title')}
           </h2>
         </AdaptiveMotion.div>
@@ -317,7 +317,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
         <TimeScopeTabs timeScope={timeScope} onScopeChange={setTimeScope} />
 
         {visibility !== 'full' && (
-          <p data-testid="leaderboard-scope-note" className="font-neo-body text-sm font-bold text-neo-cream/85">
+          <p data-testid="leaderboard-scope-note" className="font-neo-body text-sm font-bold text-edu-ink/85">
             {t(visibility === 'top3' ? 'education.leaderboard.scopeTop3' : 'education.leaderboard.scopePersonal')}
           </p>
         )}
@@ -351,7 +351,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
 
         {/* Footer: Total students */}
         <div className="text-center pt-2">
-          <p className="font-neo-body text-sm text-neo-white">
+          <p className="font-neo-body text-sm text-edu-ink">
             {t('education.leaderboard.studentsInClass', { count: totalStudents })}
           </p>
         </div>

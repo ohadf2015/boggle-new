@@ -68,17 +68,17 @@ export function TeacherOwnClassPanel({ classroomId, liveGameCode, joinCode }: Te
 
   return (
     <section data-testid="join-own-class-panel" aria-labelledby="join-own-class-title" className="flex flex-col gap-5">
-      <Presentation aria-hidden="true" className="size-10 text-neo-lime" strokeWidth={2.5} />
+      <Presentation aria-hidden="true" className="size-10 text-edu-lime-ink" strokeWidth={2.5} />
       <div>
         <h1
           id="join-own-class-title"
           ref={headingRef}
           tabIndex={-1}
-          className="font-neo-display text-3xl font-black uppercase leading-[0.95] tracking-tight text-neo-white outline-none! [overflow-wrap:anywhere] sm:text-4xl"
+          className="font-neo-display text-3xl font-black uppercase leading-[0.95] tracking-tight text-edu-ink outline-none! [overflow-wrap:anywhere] sm:text-4xl"
         >
           {t('education.student.join.ownClass.title')}
         </h1>
-        <p className="mt-3 font-neo-body text-base font-bold text-neo-cream lg:text-lg">
+        <p className="mt-3 font-neo-body text-base font-bold text-edu-ink lg:text-lg">
           {t(live ? 'education.student.join.ownClass.liveHint' : 'education.student.join.ownClass.hint')}
         </p>
       </div>
@@ -105,7 +105,7 @@ export function TeacherOwnClassPanel({ classroomId, liveGameCode, joinCode }: Te
           </button>
         ) : null}
         {joinCode ? (
-          <p className="font-neo-body text-sm font-bold text-neo-cream/80">
+          <p className="font-neo-body text-sm font-bold text-edu-ink/80">
             {t('education.student.join.ownClass.joinAsStudentHint', 'This signs the teacher out so a student can join from here.')}
           </p>
         ) : null}

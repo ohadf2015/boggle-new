@@ -37,7 +37,7 @@ export function CrosswordPreview({ surface }: { surface: 'wall' | 'phone' }) {
 
   if (surface === 'phone') return <CrosswordVersus socket={socket as never} username="Maya" remainingTime={312} onQuit={() => undefined} />;
   return (
-    <div className="flex h-dvh min-h-0 flex-col bg-neo-navy">
+    <div className="flex h-dvh min-h-0 flex-col bg-edu-page">
       <ProjectorCrosswordStage socket={socket} remainingTime={312} t={t} />
     </div>
   );

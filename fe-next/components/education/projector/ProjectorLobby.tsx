@@ -117,7 +117,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   }, [gameCode, onStartPracticeRound]);
 
   return (
-    <div data-testid="projector-lobby" className="fixed inset-0 z-[65] isolate overflow-hidden bg-neo-navy [container-type:size]">
+    <div data-testid="projector-lobby" className="fixed inset-0 z-[65] isolate overflow-hidden bg-edu-page [container-type:size]">
       <AmbientBackdrop theme="teacher" density="calm" />
       <style>{LIVE_KEYFRAMES}</style>
 
@@ -147,7 +147,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             )}
             {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
             <img src={EDU_MASCOT.welcome} alt="" aria-hidden="true" className="size-[2.6em] shrink-0 select-none drop-shadow-[3px_3px_0_rgb(var(--neo-black))] @max-5xl:hidden motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite]" />
-            <h1 className="whitespace-nowrap font-neo-display text-[1.6em] font-black leading-none text-neo-cream @max-5xl:text-[1.25em]">
+            <h1 className="whitespace-nowrap font-neo-display text-[1.6em] font-black leading-none text-edu-ink @max-5xl:text-[1.25em]">
               {t('eduLiveRoom.lobby.joinTitle')}
             </h1>
             <span data-testid="projector-session-chip" className={CHIP}>
@@ -158,7 +158,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
               <span data-testid="projector-session-chip" className={CHIP}>
                 <BookOpen className="size-[1em] shrink-0 @max-5xl:hidden" aria-hidden="true" />
                 <span dir="auto" className="min-w-0 break-words">{lesson}</span>
-                {wordCount > 0 && <span className="shrink-0 font-neo-body font-bold text-neo-cream/75 @max-5xl:hidden">· {t(pluralKeyOf('education.classroomGame.words', wordCount, language), { count: wordCount })}</span>}
+                {wordCount > 0 && <span className="shrink-0 font-neo-body font-bold text-edu-ink/75 @max-5xl:hidden">· {t(pluralKeyOf('education.classroomGame.words', wordCount, language), { count: wordCount })}</span>}
               </span>
             )}
             {/* The padlock sits up here with the room's name, out of the Start row: Start is the one thing to press. */}

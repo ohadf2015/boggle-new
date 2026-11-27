@@ -117,7 +117,7 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
       <header className="flex items-center gap-3 lg:col-span-2">
         <EduMascot moment="success" size={96} className="size-16 shrink-0 drop-shadow-[3px_3px_0_rgb(var(--neo-black))] sm:size-24" />
         <div className="min-w-0">
-          <h1 id="setup-ready-title" tabIndex={-1} style={{ outline: 'none' }} className="font-neo-display text-3xl font-black leading-tight text-neo-cream sm:text-5xl">
+          <h1 id="setup-ready-title" tabIndex={-1} style={{ outline: 'none' }} className="font-neo-display text-3xl font-black leading-tight text-edu-ink sm:text-5xl">
             {t('eduShell.setup.readyTitle')}
           </h1>
           <p dir="auto" className={cn(NB_STICKER, NB_BLOCK.yellow, 'mt-1.5 max-w-full -rotate-2 truncate px-3 py-1 text-sm sm:text-base')}>
@@ -130,13 +130,13 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
 
       <div className="flex min-w-0 flex-col gap-3">
         {focused ? null : <div data-testid="invite-roster" className={cn(NB_PANEL_POP.pink, 'relative flex flex-col gap-2 p-3 sm:gap-3 sm:p-4', play && 'max-sm:hidden')}>
-          <p data-testid="setup-joined-count" aria-live="polite" className="inline-flex items-center gap-2 font-neo-display text-lg font-bold text-neo-cream">
-            <UsersRound className={cn('size-5 shrink-0', studentsIn ? 'text-neo-lime' : 'text-neo-cream/70')} aria-hidden="true" />
+          <p data-testid="setup-joined-count" aria-live="polite" className="inline-flex items-center gap-2 font-neo-display text-lg font-bold text-edu-ink">
+            <UsersRound className={cn('size-5 shrink-0', studentsIn ? 'text-edu-lime-ink' : 'text-edu-ink/70')} aria-hidden="true" />
             <span key={joined ?? 'loading'} className={cn('inline-block tabular-nums', !reduced && studentsIn && 'motion-safe:animate-neo-pop')}>{joinedText(joined, t)}</span>
           </p>
           {joined === 0 ? null : <RosterSeats students={roster.students} arrivals={roster.arrivals} seats={seats} size={40} reduced={reduced} showNames className="min-h-[56px]" />}
           {newest && !reduced ? <CelebrationBurst playing burstKey={newest} variant="sparkle" /> : null}
-          <p className="font-neo-body text-sm text-neo-cream/75">{t('eduShell.setup.noAccount')}</p>
+          <p className="font-neo-body text-sm text-edu-ink/75">{t('eduShell.setup.noAccount')}</p>
         </div>}
 
         {focused || !words ? null : (
@@ -175,23 +175,23 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
 
         {asking || actionsHidden ? null : <div
           data-testid="setup-actions"
-          className="sticky bottom-0 z-10 -mx-3 flex flex-col gap-3 border-t-[3px] border-neo-cream/50 bg-neo-navy px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:-mx-4 sm:px-4 lg:static lg:mx-0 lg:border-t-0 lg:bg-transparent lg:px-0"
+          className="sticky bottom-0 z-10 -mx-3 flex flex-col gap-3 border-t-[3px] border-edu-line bg-edu-surface px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:-mx-4 sm:px-4 lg:static lg:mx-0 lg:border-t-0 lg:bg-transparent lg:px-0"
         >
           {play ? (
-            <p data-testid="setup-joined-line" className="flex min-w-0 flex-col font-neo-body text-sm font-bold text-neo-cream sm:hidden">
+            <p data-testid="setup-joined-line" className="flex min-w-0 flex-col font-neo-body text-sm font-bold text-edu-ink sm:hidden">
               <span className="inline-flex min-w-0 items-center gap-2">
-                <UsersRound className={cn('size-4 shrink-0', studentsIn ? 'text-neo-lime' : 'text-neo-cream/70')} aria-hidden="true" />
+                <UsersRound className={cn('size-4 shrink-0', studentsIn ? 'text-edu-lime-ink' : 'text-edu-ink/70')} aria-hidden="true" />
                 <span aria-live="polite" className="shrink-0">{joinedText(joined, t)}</span>
                 {studentsIn ? (
-                  <span dir="auto" className="truncate font-semibold text-neo-cream/80">
+                  <span dir="auto" className="truncate font-semibold text-edu-ink/80">
                     {roster.students.map((s) => s.name).join(', ')}
                   </span>
                 ) : null}
               </span>
-              {studentsIn ? null : <span className="ps-6 text-xs font-semibold text-neo-cream/70">{t('eduShell.setup.noAccount')}</span>}
+              {studentsIn ? null : <span className="ps-6 text-xs font-semibold text-edu-ink/70">{t('eduShell.setup.noAccount')}</span>}
             </p>
           ) : null}
-          {waiting ? <p data-testid="setup-waiting-note" className="font-neo-body text-sm font-semibold text-neo-cream/85">{t('eduShell.setup.guide.waitingBody')}</p> : null}
+          {waiting ? <p data-testid="setup-waiting-note" className="font-neo-body text-sm font-semibold text-edu-ink/85">{t('eduShell.setup.guide.waitingBody')}</p> : null}
           {showPlay ? projector : null}
           <div data-testid="setup-hero-slot">{hero}</div>
           {waiting ? (

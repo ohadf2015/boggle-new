@@ -52,8 +52,8 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row', plan
           aria-label={t('eduShell.account.menuLabel')}
           className={cn(
             'flex items-center gap-2.5 rounded-neo text-start transition-[colors,transform] duration-150 active:scale-[0.97]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-            variant === 'row' ? 'min-h-[48px] w-full px-2 py-1.5 hover:bg-neo-navy-light' : 'size-11 justify-center',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface',
+            variant === 'row' ? 'min-h-[48px] w-full px-2 py-1.5 hover:bg-edu-surface' : 'size-11 justify-center',
           )}
         >
           <AvatarLite
@@ -63,7 +63,7 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row', plan
           />
           {variant === 'row' ? (
             <>
-              <span dir="auto" className="min-w-0 flex-1 truncate font-neo-body text-sm font-bold text-neo-cream">
+              <span dir="auto" className="min-w-0 flex-1 truncate font-neo-body text-sm font-bold text-edu-ink">
                 {name || t('eduShell.account.fallbackName')}
               </span>
               {plan === 'pro' || plan === 'trial' ? (
@@ -75,7 +75,7 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row', plan
                   label={t(plan === 'pro' ? 'eduShell.nav.pro' : 'teacher.plan.trialActive')}
                 />
               ) : null}
-              <ChevronsUpDown className="size-4 shrink-0 text-neo-cream/70" aria-hidden="true" />
+              <ChevronsUpDown className="size-4 shrink-0 text-edu-ink/70" aria-hidden="true" />
             </>
           ) : null}
         </DropdownMenuTrigger>
@@ -106,7 +106,7 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row', plan
             <Sparkles className="size-4" aria-hidden="true" />
             {t('eduShell.account.whatsNew')}
           </DropdownMenuItem>
-          <DropdownMenuSeparator className="my-1 h-0.5 bg-neo-cream/25" />
+          <DropdownMenuSeparator className="my-1 h-0.5 bg-edu-ink/25" />
           <DropdownMenuItem className={ITEM} onSelect={() => void handleSignOut()}>
             <LogOut className="size-4" aria-hidden="true" />
             {t('auth.signOut')}

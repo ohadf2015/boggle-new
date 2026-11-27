@@ -28,9 +28,9 @@ const ICONS: Record<PowerUpId, { Icon: LucideIcon; tile: string }> = {
 
 const PILL: Record<PowerUpStatus['kind'], string> = {
   ready: 'bg-neo-lime text-neo-navy',
-  short: 'bg-neo-navy-light text-neo-cream',
+  short: 'bg-edu-surface text-edu-ink',
   owned: 'bg-neo-cyan text-neo-navy',
-  roundOnly: 'bg-neo-navy-light text-neo-cream',
+  roundOnly: 'bg-edu-surface text-edu-ink',
 };
 
 /**

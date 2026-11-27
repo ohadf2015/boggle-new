@@ -166,7 +166,7 @@ function TeacherReportPdfExport({ language, summary, players, proLabel = 'Pro', 
           disabled={busy}
           aria-busy={busy}
           onClick={() => void exportPdf()}
-          className={cn(BUTTON, 'border-neo-cream/50 bg-neo-navy-light text-neo-cream')}
+          className={cn(BUTTON, 'border-edu-line bg-edu-surface text-edu-ink')}
         >
           {busy ? <Loader2 className="size-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Download className="size-4 shrink-0" aria-hidden="true" />}
           {busy ? copy.preparing : copy.button}
@@ -191,15 +191,15 @@ function TeacherReportPdfExport({ language, summary, players, proLabel = 'Pro', 
         aria-busy={busy}
         aria-label={copy.lockedLabel}
         onClick={() => void startCheckout()}
-        className={cn(BUTTON, 'border-dashed border-neo-cream/50 bg-neo-navy-light text-neo-cream')}
+        className={cn(BUTTON, 'border-dashed border-edu-line bg-edu-surface text-edu-ink')}
       >
         {busy ? <Loader2 className="size-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Lock className="size-4 shrink-0" aria-hidden="true" />}
         <span className="min-w-0">{copy.button}</span>
         <ProPill label={proLabel} />
       </button>
       {!hideOffer && (
-        <p data-testid="report-pdf-offer" className="text-center text-xs font-semibold text-neo-cream/80 @[96rem]/results:text-sm">
-          <span className="font-bold text-neo-cream">{proOffer.label}</span>
+        <p data-testid="report-pdf-offer" className="text-center text-xs font-semibold text-edu-ink/80 @[96rem]/results:text-sm">
+          <span className="font-bold text-edu-ink">{proOffer.label}</span>
           {' · '}
           {proOffer.note}
         </p>

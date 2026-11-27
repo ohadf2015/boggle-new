@@ -24,7 +24,7 @@ export function JoinNextAssignmentCta({ classroomId }: { classroomId: string }) 
 
   if (isLoading) {
     return (
-      <p role="status" className="text-center font-neo-body text-sm font-bold text-neo-lime">
+      <p role="status" className="text-center font-neo-body text-sm font-bold text-edu-lime-ink">
         {t(`${K}.flow.findingAssignment`)}
       </p>
     );

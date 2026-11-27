@@ -50,7 +50,7 @@ export function DuelRevealMascot({ src, poster, label, className }: DuelRevealMa
       data-testid="duel-reveal-mascot"
       data-clip-state={clipState}
       className={cn(
-        'relative isolate aspect-square w-full overflow-hidden rounded-neo border-[3px] border-neo-cream bg-neo-navy shadow-hard',
+        'relative isolate aspect-square w-full overflow-hidden rounded-neo border-[3px] border-edu-line bg-edu-surface shadow-hard',
         className
       )}
     >

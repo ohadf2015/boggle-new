@@ -41,9 +41,9 @@ export default function ProjectorWheel({ puzzle, label }: { puzzle: WheelPuzzle;
       aria-label={label}
       data-testid="projector-wheel"
       dir="ltr"
-      className="relative hidden aspect-square h-full max-h-full shrink-0 rounded-full [container-type:size] border-4 border-neo-cream bg-neo-navy-light shadow-hard-lg md:block"
+      className="relative hidden aspect-square h-full max-h-full shrink-0 rounded-full [container-type:size] border-4 border-edu-line bg-edu-surface shadow-hard-lg md:block"
     >
-      <span aria-hidden="true" className="absolute inset-[12%] rounded-full border-[3px] border-dashed border-neo-cream/50" />
+      <span aria-hidden="true" className="absolute inset-[12%] rounded-full border-[3px] border-dashed border-edu-line" />
       <span
         data-testid="projector-wheel-center"
         className={`${TILE} left-1/2 top-1/2 size-[30%] -translate-x-1/2 -translate-y-1/2 bg-neo-lime text-[13cqw] text-neo-black`}

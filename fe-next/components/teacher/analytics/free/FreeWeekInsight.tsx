@@ -54,14 +54,14 @@ export function FreeWeekInsight({ classroomId, locale, onStatus, proLine = true 
 
   if (!free || state.kind === 'idle') return null;
   if (state.kind === 'loading') {
-    return <div aria-busy="true" className="h-40 rounded-neo-xl bg-neo-cream/10 motion-safe:animate-pulse" />;
+    return <div aria-busy="true" className="h-40 rounded-neo-xl bg-edu-ink/10 motion-safe:animate-pulse" />;
   }
   if (state.kind === 'locked') return <FreeGameHeadlineCard classroomId={classroomId} />;
   if (state.kind === 'error') {
     return (
       <div className={PANEL} role="alert">
-        <p className="font-neo-body font-bold text-neo-cream">{t('education.analytics.error')}</p>
-        <button type="button" onClick={() => void state.retry()} className="mt-2 min-h-11 rounded-neo border-2 border-neo-cream/60 px-4 font-neo-body font-bold text-neo-cream">
+        <p className="font-neo-body font-bold text-edu-ink">{t('education.analytics.error')}</p>
+        <button type="button" onClick={() => void state.retry()} className="mt-2 min-h-11 rounded-neo border-2 border-edu-line px-4 font-neo-body font-bold text-edu-ink">
           {t('education.analytics.retry')}
         </button>
       </div>
@@ -82,8 +82,8 @@ export function FreeWeekCard({ classroomId, locale, insight, names, t, proLine =
     return (
       <section data-testid="free-week-insight" data-state="empty" aria-labelledby="free-week-title" className={`${PANEL} grid items-center gap-4 md:grid-cols-2`}>
         <div className="flex min-w-0 flex-col gap-2">
-          <h2 id="free-week-title" className="break-words font-neo-display text-xl font-black leading-tight text-neo-cream sm:text-2xl">{t('teacher.weekInsight.emptyHeadline')}</h2>
-          <p className="font-neo-body text-sm text-neo-cream/90">{t('teacher.weekInsight.emptyBody')}</p>
+          <h2 id="free-week-title" className="break-words font-neo-display text-xl font-black leading-tight text-edu-ink sm:text-2xl">{t('teacher.weekInsight.emptyHeadline')}</h2>
+          <p className="font-neo-body text-sm text-edu-ink/90">{t('teacher.weekInsight.emptyBody')}</p>
           <Link href={teacherHostHref(locale, { classroomId })} data-testid="free-week-start-game" className={`${START_BUTTON} mt-1 max-sm:w-full max-sm:justify-center`}>
             <Play className="size-4" aria-hidden="true" />
             {t('teacher.weekInsight.startGame')}
@@ -102,7 +102,7 @@ export function FreeWeekCard({ classroomId, locale, insight, names, t, proLine =
         <div>
           <h2 id="free-week-title" className={PANEL_TITLE}>{t('teacher.weekInsight.title')}</h2>
           {needsHelp.length === 0 ? (
-            <p className="mt-2 font-neo-body text-sm text-neo-cream/90">{t('teacher.weekInsight.nobodyStuck')}</p>
+            <p className="mt-2 font-neo-body text-sm text-edu-ink/90">{t('teacher.weekInsight.nobodyStuck')}</p>
           ) : (
             <ul className="mt-2 space-y-1.5">
               {needsHelp.slice(0, NEEDS_HELP_SHOWN).map((s) => {
@@ -110,7 +110,7 @@ export function FreeWeekCard({ classroomId, locale, insight, names, t, proLine =
                 const Icon = view.icon;
                 return (
                   <li key={s.id} data-testid="free-week-needs-help-row" className={`flex items-center justify-between gap-2 rounded-neo border-2 px-2.5 py-1.5 ${view.chip}`}>
-                    <bdi className="min-w-0 truncate font-neo-body font-bold text-neo-cream">{names.get(s.id) || t('education.analytics.overview.unnamed')}</bdi>
+                    <bdi className="min-w-0 truncate font-neo-body font-bold text-edu-ink">{names.get(s.id) || t('education.analytics.overview.unnamed')}</bdi>
                     <span className={`inline-flex shrink-0 items-center gap-1 font-neo-body text-xs font-bold ${view.text}`}>
                       <Icon className="size-3.5" aria-hidden="true" />
                       {t(`education.analytics.overview.status.${s.status}`)}
@@ -119,7 +119,7 @@ export function FreeWeekCard({ classroomId, locale, insight, names, t, proLine =
                 );
               })}
               {needsHelp.length > NEEDS_HELP_SHOWN ? (
-                <li className="font-neo-body text-xs font-bold text-neo-cream/80">{t('teacher.weekInsight.more', { count: needsHelp.length - NEEDS_HELP_SHOWN })}</li>
+                <li className="font-neo-body text-xs font-bold text-edu-ink/80">{t('teacher.weekInsight.more', { count: needsHelp.length - NEEDS_HELP_SHOWN })}</li>
               ) : null}
             </ul>
           )}
@@ -127,13 +127,13 @@ export function FreeWeekCard({ classroomId, locale, insight, names, t, proLine =
         <div>
           <h3 className={PANEL_TITLE}>{t('teacher.weekInsight.hardestTitle')}</h3>
           {insight.hardestWords.length === 0 ? (
-            <p className="mt-2 font-neo-body text-sm text-neo-cream/90">{t('education.analytics.overview.hardWordsEmpty')}</p>
+            <p className="mt-2 font-neo-body text-sm text-edu-ink/90">{t('education.analytics.overview.hardWordsEmpty')}</p>
           ) : (
             <ul className="mt-2 space-y-1.5">
               {insight.hardestWords.slice(0, FREE_PREVIEW_WORDS).map((w) => (
-                <li key={w.word} data-testid="free-week-hard-word" className="flex items-center justify-between gap-2 rounded-neo border-2 border-neo-cream/40 px-2.5 py-1.5">
-                  <bdi className="font-neo-display font-bold text-neo-cream">{w.display}</bdi>
-                  <span className={`font-neo-body text-xs ${w.missed >= w.attempts ? 'font-bold text-neo-pink' : 'text-neo-cream/80'}`}>
+                <li key={w.word} data-testid="free-week-hard-word" className="flex items-center justify-between gap-2 rounded-neo border-2 border-edu-line px-2.5 py-1.5">
+                  <bdi className="font-neo-display font-bold text-edu-ink">{w.display}</bdi>
+                  <span className={`font-neo-body text-xs ${w.missed >= w.attempts ? 'font-bold text-edu-pink-ink' : 'text-edu-ink/80'}`}>
                     {w.missed >= w.attempts ? t('teacher.classReport.notes.nobodyFound') : t('teacher.weekInsight.missed', { pct: w.missRate })}
                   </span>
                 </li>

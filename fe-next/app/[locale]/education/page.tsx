@@ -93,7 +93,7 @@ const GUIDE_CARDS: GuideCard[] = [
   { slug: 'games-for-teachers', tone: 'bg-neo-purple text-neo-black', dark: true, badgeKey: 'eg6Land.guides.teachersBadge', titleKey: 'eg6Land.guides.teachersTitle', descKey: 'eg6Land.guides.teachersDesc' },
   { slug: 'spelling-bee-practice', tone: 'bg-neo-pink text-neo-black', dark: true, badgeKey: 'eg6Land.guides.spellingBadge', titleKey: 'eg6Land.guides.spellingTitle', descKey: 'eg6Land.guides.spellingDesc' },
   { slug: 'sight-words-practice', tone: 'bg-neo-lime text-neo-navy', dark: true, badgeKey: 'eg6Land.guides.sightBadge', titleKey: 'eg6Land.guides.sightTitle', descKey: 'eg6Land.guides.sightDesc' },
-  { slug: 'for-schools', tone: 'bg-neo-navy text-neo-lime', dark: false, badgeKey: 'eg6Land.guides.schoolsBadge', titleKey: 'eg6Land.guides.schoolsTitle', descKey: 'eg6Land.guides.schoolsDesc' },
+  { slug: 'for-schools', tone: 'bg-edu-surface text-edu-lime-ink', dark: false, badgeKey: 'eg6Land.guides.schoolsBadge', titleKey: 'eg6Land.guides.schoolsTitle', descKey: 'eg6Land.guides.schoolsDesc' },
   { slug: 'lists', tone: 'bg-neo-cyan text-neo-navy', dark: true, badgeKey: 'eg6Land.guides.listsBadge', titleKey: 'eg6Land.guides.listsTitle', descKey: 'eg6Land.guides.listsDesc' },
 ];
 
@@ -101,19 +101,19 @@ function EducationResourceLinks({ locale }: { locale: string }) {
   const resourcesAriaLabel = translateKey('education.landing.resourcesAriaLabel', locale, 'Education resources');
 
   return (
-    <section aria-label={resourcesAriaLabel} className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8 border-t-2 border-neo-cream/25">
+    <section aria-label={resourcesAriaLabel} className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8 border-t-2 border-edu-line">
       {/* ~19 SEO cards under three headings were 5-6 of the landing's 17+
           screens at 390px, standing between a first-time teacher and the FAQ.
           A native <details> collapses them to one row while every link still
           ships in the server HTML for crawlers (the EducationFAQ precedent). */}
       <details data-testid="education-resources" className="group">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
-          <h2 className="font-neo-display text-2xl sm:text-3xl font-black uppercase text-neo-white">
+          <h2 className="font-neo-display text-2xl sm:text-3xl font-black uppercase text-edu-ink">
             {translateKey('eg6Land.resources.heading', locale)}
           </h2>
-          <span aria-hidden className="shrink-0 text-3xl font-black text-neo-lime transition-transform duration-150 group-open:rotate-45 motion-reduce:transition-none">+</span>
+          <span aria-hidden className="shrink-0 text-3xl font-black text-edu-lime-ink transition-transform duration-150 group-open:rotate-45 motion-reduce:transition-none">+</span>
         </summary>
-        <p className="mt-2 max-w-2xl text-sm sm:text-base text-neo-gray-200">{translateKey('eg6Land.resources.subhead', locale)}</p>
+        <p className="mt-2 max-w-2xl text-sm sm:text-base text-edu-ink/80">{translateKey('eg6Land.resources.subhead', locale)}</p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <Link
@@ -134,10 +134,10 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           </Link>
         </div>
 
-        <h2 className="mt-12 font-neo-display text-2xl sm:text-3xl font-black uppercase text-neo-white">
+        <h2 className="mt-12 font-neo-display text-2xl sm:text-3xl font-black uppercase text-edu-ink">
           {translateKey('eg6Land.guides.heading', locale)}
         </h2>
-        <p className="mt-2 max-w-2xl text-sm sm:text-base text-neo-gray-200">{translateKey('eg6Land.guides.subhead', locale)}</p>
+        <p className="mt-2 max-w-2xl text-sm sm:text-base text-edu-ink/80">{translateKey('eg6Land.guides.subhead', locale)}</p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {GUIDE_CARDS.map((card) => (
             <Link
@@ -145,7 +145,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
               href={`/${locale}/education/${card.slug}`}
               className={
                 card.dark
-                  ? 'rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg'
+                  ? 'rounded-neo border-3 border-edu-line bg-edu-surface p-5 shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg'
                   : 'rounded-neo border-3 border-neo-black bg-neo-lime p-5 shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg'
               }
               {...(card.slug === 'for-schools' ? { 'data-ph-capture-attribute-source': 'edu_hub_for_schools_card' } : {})}
@@ -153,10 +153,10 @@ function EducationResourceLinks({ locale }: { locale: string }) {
               <span className={`inline-block border-2 border-neo-black px-2 py-0.5 font-neo-display text-xs font-black uppercase tracking-widest ${card.tone}`}>
                 {translateKey(card.badgeKey, locale)}
               </span>
-              <h3 className={`mt-3 font-neo-display text-base font-black uppercase ${card.dark ? 'text-neo-white' : 'text-neo-black'}`}>
+              <h3 className={`mt-3 font-neo-display text-base font-black uppercase ${card.dark ? 'text-edu-ink' : 'text-neo-black'}`}>
                 {translateKey(card.titleKey, locale)}
               </h3>
-              <p className={`mt-2 text-xs ${card.dark ? 'text-neo-gray-200' : 'text-neo-black/70'}`}>{translateKey(card.descKey, locale)}</p>
+              <p className={`mt-2 text-xs ${card.dark ? 'text-edu-ink/80' : 'text-neo-black/70'}`}>{translateKey(card.descKey, locale)}</p>
             </Link>
           ))}
         </div>
@@ -167,9 +167,9 @@ function EducationResourceLinks({ locale }: { locale: string }) {
         {/* Comparison page earns organic traffic for "LexiClash vs Kahoot" but is under-linked
             from high-authority education hub — text link adds PageRank flow with zero layout change.
             Three keys, not a split on the anchor: a reworded anchor must not silently drop the link. */}
-        <p className="mt-6 text-sm text-neo-gray-300">
+        <p className="mt-6 text-sm text-edu-ink/70">
           {translateKey('eg6Land.compare.before', locale)}
-          <Link href={`/${locale}/lexiclash-vs-kahoot`} className="underline underline-offset-2 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
+          <Link href={`/${locale}/lexiclash-vs-kahoot`} className="underline underline-offset-2 hover:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
             {translateKey('eg6Land.compare.anchor', locale)}
           </Link>
           {translateKey('eg6Land.compare.after', locale)}
@@ -186,13 +186,13 @@ function EducationResourceLinks({ locale }: { locale: string }) {
 // translation block, so there is exactly one place the copy lives.
 // Accent colours are per-slug CSS classes, not copy, so they stay out of t().
 const MOMENT_ACCENT: Record<string, string> = {
-  'brain-breaks-word-games': 'text-neo-lime',
-  'indoor-recess-games': 'text-neo-cyan',
+  'brain-breaks-word-games': 'text-edu-lime-ink',
+  'indoor-recess-games': 'text-edu-cyan-ink',
   'end-of-year-classroom-activities': 'text-neo-pink-light',
   'first-day-of-school-icebreakers': 'text-neo-purple-light',
-  'early-finishers-activities': 'text-neo-lime',
+  'early-finishers-activities': 'text-edu-lime-ink',
   'middle-school-word-games': 'text-neo-pink-light',
-  'boggle-for-the-classroom': 'text-neo-cyan',
+  'boggle-for-the-classroom': 'text-edu-cyan-ink',
   'boggle-for-kids': 'text-neo-pink-light',
 };
 
@@ -210,16 +210,16 @@ function TeacherMomentLinks({ locale }: { locale: string }) {
 
   return (
     <>
-      <h2 className="mt-12 font-neo-display text-2xl font-black uppercase text-neo-white sm:text-3xl">
+      <h2 className="mt-12 font-neo-display text-2xl font-black uppercase text-edu-ink sm:text-3xl">
         {translateKey('eg6Land.moments.heading', locale)}
       </h2>
-      <p className="mt-2 max-w-2xl text-sm text-neo-gray-200 sm:text-base">{translateKey('eg6Land.moments.subhead', locale)}</p>
+      <p className="mt-2 max-w-2xl text-sm text-edu-ink/80 sm:text-base">{translateKey('eg6Land.moments.subhead', locale)}</p>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {moments.map(({ slug, c }) => (
           <Link
             key={slug}
             href={`/${locale}/education/${slug}`}
-            className="rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="rounded-neo border-3 border-edu-line bg-edu-surface p-5 shadow-hard transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             <h3 className={`font-neo-display text-base font-black uppercase ${MOMENT_ACCENT[slug]}`}>
               {c.breadcrumb.current}
@@ -228,7 +228,7 @@ function TeacherMomentLinks({ locale }: { locale: string }) {
                 six teacher-moment landings feed this rail, and every one of them
                 has an answer block — the guard is for the type, not for them. */}
             {c.answer && (
-              <p className="mt-2 text-xs leading-relaxed text-neo-gray-200">{c.answer.question}</p>
+              <p className="mt-2 text-xs leading-relaxed text-edu-ink/80">{c.answer.question}</p>
             )}
           </Link>
         ))}
@@ -246,26 +246,26 @@ const LEARNER_SLUGS = [
 ] as const;
 
 const LEARNER_ACCENT: Record<(typeof LEARNER_SLUGS)[number], string> = {
-  'english-games-elementary': 'text-neo-lime',
+  'english-games-elementary': 'text-edu-lime-ink',
   'english-games-middle-school': 'text-neo-pink-light',
   'english-games-adults': 'text-neo-purple-light',
-  'irregular-verbs-games': 'text-neo-cyan',
-  'english-vocabulary-topics': 'text-neo-lime',
+  'irregular-verbs-games': 'text-edu-cyan-ink',
+  'english-vocabulary-topics': 'text-edu-lime-ink',
 };
 
 function EnglishLearnerLinks({ locale }: { locale: string }) {
   return (
     <>
-      <h2 className="mt-12 font-neo-display text-2xl font-black uppercase text-neo-white sm:text-3xl">
+      <h2 className="mt-12 font-neo-display text-2xl font-black uppercase text-edu-ink sm:text-3xl">
         {translateKey('eg6Land.learner.heading', locale)}
       </h2>
-      <p className="mt-2 max-w-2xl text-sm text-neo-gray-200 sm:text-base">{translateKey('eg6Land.learner.subhead', locale)}</p>
+      <p className="mt-2 max-w-2xl text-sm text-edu-ink/80 sm:text-base">{translateKey('eg6Land.learner.subhead', locale)}</p>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {LEARNER_SLUGS.map((slug) => (
           <Link
             key={slug}
             href={`/${locale}/education/${slug}`}
-            className="rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="rounded-neo border-3 border-edu-line bg-edu-surface p-5 shadow-hard transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             <h3 className={`font-neo-display text-base font-black uppercase ${LEARNER_ACCENT[slug]}`}>
               {educationPageLabel(slug, locale)}

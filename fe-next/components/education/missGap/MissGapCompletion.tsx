@@ -85,33 +85,33 @@ export function MissGapCompletion({
                 'w-10 h-10 stroke-[2.5]',
                 n <= score.stars
                   ? 'fill-neo-yellow text-neo-black'
-                  : 'fill-transparent text-neo-cream/60',
+                  : 'fill-transparent text-edu-ink/60',
               )}
             />
           ))}
         </div>
         <p className="sr-only">{t('education.homework.starsEarned', { stars: score.stars })}</p>
 
-        <h2 className="font-neo-display font-bold text-2xl text-neo-white leading-tight">
+        <h2 className="font-neo-display font-bold text-2xl text-edu-ink leading-tight">
           {score.stars >= 3
             ? t('education.homework.finishTitlePerfect')
             : t('education.homework.finishTitle')}
         </h2>
 
         <div className="grid grid-cols-2 gap-2 w-full">
-          <p className="rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-3 py-2">
-            <span className="block font-neo-display font-bold text-2xl text-neo-cyan">
+          <p className="rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 py-2">
+            <span className="block font-neo-display font-bold text-2xl text-edu-cyan-ink">
               {score.correct}/{score.total}
             </span>
-            <span className="block font-neo-body text-xs uppercase tracking-wider text-neo-cream">
+            <span className="block font-neo-body text-xs uppercase tracking-wider text-edu-ink">
               {t('education.homework.wordsRight')}
             </span>
           </p>
-          <p className="rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-3 py-2">
-            <span className="block font-neo-display font-bold text-2xl text-neo-lime">
+          <p className="rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 py-2">
+            <span className="block font-neo-display font-bold text-2xl text-edu-lime-ink">
               {score.bestStreak}
             </span>
-            <span className="block font-neo-body text-xs uppercase tracking-wider text-neo-cream">
+            <span className="block font-neo-body text-xs uppercase tracking-wider text-edu-ink">
               {t('education.homework.bestRun')}
             </span>
           </p>
@@ -137,7 +137,7 @@ export function MissGapCompletion({
             {classmates > 0 ? (
               <p
                 data-testid="miss-gap-classmates"
-                className="font-neo-body text-sm text-neo-cream"
+                className="font-neo-body text-sm text-edu-ink"
               >
                 {classmates === 1
                   ? t('education.homework.classmatesOne')
@@ -147,7 +147,7 @@ export function MissGapCompletion({
               // First one in gets the bragging rights, not an empty "0 others".
               <p
                 data-testid="miss-gap-classmates-first"
-                className="font-neo-body text-sm text-neo-lime"
+                className="font-neo-body text-sm text-edu-lime-ink"
               >
                 {t('education.homework.classmatesFirst')}
               </p>
@@ -166,7 +166,7 @@ export function MissGapCompletion({
           onClick={onReplay}
           className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold',
-            'bg-neo-navy text-neo-cream border-[3px] border-neo-cream rounded-neo',
+            'bg-edu-surface text-edu-ink border-[3px] border-edu-line rounded-neo',
             'transition-transform active:translate-x-[2px] active:translate-y-[2px]',
           )}
         >

@@ -81,7 +81,7 @@ function ProjectorRoundPreview({ v }: { v: string }) {
 
   if (!ready) return null;
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-neo-navy text-neo-cream">
+    <div className="flex h-dvh flex-col overflow-hidden bg-edu-page text-edu-ink">
       <TvJoinBar gameCode="S32RH6" playerCount={players.length} language={language} t={t} dense />
       <TvGameHeader
         compact
@@ -114,7 +114,7 @@ function ProjectorRoundPreview({ v }: { v: string }) {
             t={t}
           />
         </div>
-        <div data-testid="tv-leaderboard-card" className="min-h-[120px] rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light text-neo-cream shadow-hard-lg md:min-h-0 md:overflow-auto md:border-4">
+        <div data-testid="tv-leaderboard-card" className="min-h-[120px] rounded-neo border-3 border-edu-line bg-edu-surface text-edu-ink shadow-hard-lg md:min-h-0 md:overflow-auto md:border-4">
           <TvLeaderboard players={players as never} classroom hostUsername="Teacher" gameMode="classic" t={t} />
         </div>
       </div>

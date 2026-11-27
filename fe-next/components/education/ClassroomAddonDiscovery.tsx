@@ -109,23 +109,23 @@ export function ClassroomAddonDiscovery({
 
   return (
     <div
-      className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light shadow-hard"
+      className="w-full max-w-xl p-6 rounded-neo border-neo border-edu-line bg-edu-surface shadow-hard"
       data-testid="classroom-addon-discovery"
       data-in-classroom={String(inClassroom)}
     >
-      <p className="text-neo-pink font-bold text-xs uppercase tracking-widest mb-2">
+      <p className="text-edu-pink-ink font-bold text-xs uppercase tracking-widest mb-2">
         {t('education.classroomAddon.eyebrow')}
       </p>
-      <h1 className="text-neo-white font-neo-display font-bold text-2xl leading-tight flex items-center gap-2">
-        <GraduationCap className="w-6 h-6 text-neo-lime shrink-0" aria-hidden />
+      <h1 className="text-edu-ink font-neo-display font-bold text-2xl leading-tight flex items-center gap-2">
+        <GraduationCap className="w-6 h-6 text-edu-lime-ink shrink-0" aria-hidden />
         {t('education.classroomAddon.title')}
       </h1>
-      <p className="text-neo-white/70 font-neo-body text-sm mt-2">
+      <p className="text-edu-ink/70 font-neo-body text-sm mt-2">
         {t('education.classroomAddon.subtitle')}
       </p>
 
       <label className="block mt-5">
-        <span className="text-neo-white font-bold text-sm">
+        <span className="text-edu-ink font-bold text-sm">
           {t('education.classroomAddon.lessonLabel')}
         </span>
         <input
@@ -133,13 +133,13 @@ export function ClassroomAddonDiscovery({
           value={lesson}
           onChange={(e) => setLesson(e.target.value)}
           data-testid="classroom-addon-lesson"
-          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body text-sm"
+          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-edu-line bg-edu-surface text-edu-ink font-neo-body text-sm"
           autoComplete="off"
         />
       </label>
 
       <label className="block mt-4">
-        <span className="text-neo-white font-bold text-sm">
+        <span className="text-edu-ink font-bold text-sm">
           {t('education.classroomAddon.missedWordsLabel')}
         </span>
         <textarea
@@ -147,18 +147,18 @@ export function ClassroomAddonDiscovery({
           onChange={(e) => setMissedText(e.target.value)}
           data-testid="classroom-addon-missed-words"
           rows={3}
-          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body text-sm"
+          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-edu-line bg-edu-surface text-edu-ink font-neo-body text-sm"
         />
       </label>
 
-      <p className="text-neo-white/50 font-neo-body text-xs mt-2">
+      <p className="text-edu-ink/50 font-neo-body text-xs mt-2">
         {t('education.classroomAddon.privacyNote')}
       </p>
 
       <a
         href={`/${locale}/education/classroom-addon/planner`}
         data-testid="classroom-addon-open-planner"
-        className="mt-3 inline-flex text-neo-lime font-bold text-xs underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+        className="mt-3 inline-flex text-edu-lime-ink font-bold text-xs underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         {t('education.classroomAddon.planner.title')}
       </a>
@@ -182,7 +182,7 @@ export function ClassroomAddonDiscovery({
         <NeoNote
           tone="alert"
           data-testid="classroom-addon-need-words"
-          className="mt-5 text-neo-white font-neo-body text-sm"
+          className="mt-5 text-edu-ink font-neo-body text-sm"
         >
           {t('education.classroomAddon.needMissedWords')}
         </NeoNote>
@@ -190,7 +190,7 @@ export function ClassroomAddonDiscovery({
 
       {liveStreamHref && (
         <p
-          className="mt-2 text-neo-lime/90 font-neo-body text-xs"
+          className="mt-2 text-edu-lime-ink/90 font-neo-body text-xs"
           data-testid="classroom-addon-free-workspace-foil"
         >
           {t('education.classroomAddon.freeWorkspaceFoil')}

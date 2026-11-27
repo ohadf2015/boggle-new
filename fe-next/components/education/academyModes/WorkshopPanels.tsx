@@ -33,10 +33,10 @@ export function LessonWordTile({ word, found, size = 'md' }: { word: string; fou
 export function WorkshopWordsPanel({ player, chips, found, stars }: { player?: AcademyPlayer; chips: string[]; found: Set<string>; stars: number }) {
   const { t } = useLanguage();
   return (
-    <aside className="flex w-full flex-col gap-4 rounded-neo border-[3px] border-neo-yellow bg-neo-navy-elevated p-5 shadow-hard-lg">
+    <aside className="flex w-full flex-col gap-4 rounded-neo border-[3px] border-neo-yellow bg-edu-surface p-5 shadow-hard-lg">
       {player && <AcademyPlayerChip player={player} className="self-start" />}
       <div className="flex items-center justify-between gap-2">
-        <h2 className="font-neo-display text-2xl font-black uppercase text-neo-yellow">{t('academy.modes.workshop.lessonWords', 'Lesson words')}</h2>
+        <h2 className="font-neo-display text-2xl font-black uppercase text-edu-yellow-ink">{t('academy.modes.workshop.lessonWords', 'Lesson words')}</h2>
         <span className="rounded-full border-[3px] border-neo-black bg-neo-yellow px-3 py-0.5 font-neo-display text-xl font-black text-neo-black shadow-hard">
           {t('academy.modes.workshop.stars', '★ {count}', { count: stars })}
         </span>
@@ -46,7 +46,7 @@ export function WorkshopWordsPanel({ player, chips, found, stars }: { player?: A
           <LessonWordTile key={w} word={w} found={found.has(w)} size="lg" />
         ))}
       </ul>
-      <p className="font-neo-body text-base text-neo-cream">{t('academy.modes.workshop.panelHint', 'Build one of these (or a word hiding one) for a golden bonus.')}</p>
+      <p className="font-neo-body text-base text-edu-ink">{t('academy.modes.workshop.panelHint', 'Build one of these (or a word hiding one) for a golden bonus.')}</p>
     </aside>
   );
 }

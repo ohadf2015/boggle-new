@@ -94,7 +94,7 @@ export function StudentQuizPreview() {
   const host = params?.get('host') === '1';
   const socket = useMemo(() => scriptedSocket(state), [state]);
   return (
-    <div className="fixed inset-0 z-[80] flex flex-col bg-neo-navy" style={host ? TEACHER_CONTROLS_INSET : undefined}>
+    <div className="fixed inset-0 z-[80] flex flex-col bg-edu-page" style={host ? TEACHER_CONTROLS_INSET : undefined}>
       {host ? (
         <>
           <VocabQuizHostView socket={socket} joinCode="YHNCF4" playerCount={STANDINGS.length} t={t} />

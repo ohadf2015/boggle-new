@@ -36,8 +36,8 @@ const EDGE: Record<NbColor, string> = {
   yellow: 'border-s-neo-yellow',
   purple: 'border-s-neo-purple',
   orange: 'border-s-neo-orange',
-  cream: 'border-s-neo-cream',
-  navy: 'border-s-neo-cream/40',
+  cream: 'border-s-edu-line',
+  navy: 'border-s-edu-line',
 };
 import { CardMenuAction, CardMenuControl, CardMenuDivider, CardMenuLink, CardOverflowMenu } from '../CardOverflowMenu';
 import { pluralKeyOf } from '@/lib/i18n/pluralKey';
@@ -135,16 +135,16 @@ export function ClassCard({
     );
 
   const round = 'grid size-12 shrink-0 place-items-center rounded-full border-[3px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
-  const roundTone = (main: boolean) => (main ? 'border-neo-black bg-neo-lime text-neo-black' : 'border-neo-cream/50 bg-neo-navy text-neo-cream shadow-neo-cream/40');
+  const roundTone = (main: boolean) => (main ? 'border-neo-black bg-neo-lime text-neo-black' : 'border-edu-line bg-edu-surface text-edu-ink shadow-edu-line');
 
   return (
     <article
       data-testid="classroom-card"
       data-color={color}
-      className={cn('relative flex min-h-[72px] w-full min-w-0 items-center gap-2.5 rounded-neo-lg border-2 border-s-[6px] border-neo-cream/40 bg-neo-navy-light py-1.5 pe-2 ps-3 shadow-hard', EDGE[color])}
+      className={cn('relative flex min-h-[72px] w-full min-w-0 items-center gap-2.5 rounded-neo-lg border-2 border-s-[6px] border-edu-line bg-edu-surface py-1.5 pe-2 ps-3 shadow-hard', EDGE[color])}
     >
       <div className="min-w-0 flex-1">
-        <h3 title={classroom.name} className="line-clamp-1 font-neo-display text-lg font-black leading-tight text-neo-cream [overflow-wrap:anywhere]">
+        <h3 title={classroom.name} className="line-clamp-1 font-neo-display text-lg font-black leading-tight text-edu-ink [overflow-wrap:anywhere]">
           {classHref ? (
             <Link href={classHref} data-testid="classroom-card-open" className={cn(LIST_CARD_TITLE, 'line-clamp-1')}>
               <bdi>{classroom.name}</bdi>
@@ -154,16 +154,16 @@ export function ClassCard({
           )}
         </h3>
         <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5">
-          <div data-testid="classroom-card-fact" className="flex min-w-0 items-center gap-x-2 font-neo-body text-xs font-bold text-neo-cream/75">
+          <div data-testid="classroom-card-fact" className="flex min-w-0 items-center gap-x-2 font-neo-body text-xs font-bold text-edu-ink/75">
             {fact}
-            <span data-testid="classroom-card-language" className="text-neo-cream/60">· {languageKey ? t(languageKey) : classroom.language}</span>
+            <span data-testid="classroom-card-language" className="text-edu-ink/60">· {languageKey ? t(languageKey) : classroom.language}</span>
           </div>
           <button
             type="button"
             data-testid="join-code-plate"
             aria-label={`${t('teacher.classroom.copyCode')}: ${classroom.join_code}`}
             onClick={() => void copyFromPlate()}
-            className="inline-flex min-h-7 items-center gap-1.5 rounded-neo-pill border-2 border-neo-cream/40 px-2 text-neo-cream hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="inline-flex min-h-7 items-center gap-1.5 rounded-neo-pill border-2 border-edu-line px-2 text-edu-ink hover:bg-edu-ink/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             <code data-testid="classroom-join-code" dir="ltr" className="font-neo-display text-sm font-black tracking-wider">
               {classroom.join_code}

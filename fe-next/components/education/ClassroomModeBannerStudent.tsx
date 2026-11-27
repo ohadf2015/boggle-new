@@ -95,7 +95,7 @@ export function StudentModeStrip({
       className="mx-auto w-full max-w-xl px-3 pt-2"
     >
       <h2 className="sr-only">{t('education.classroomGame.gameSettings')}</h2>
-      <div className="flex items-center gap-3 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-3 py-1.5 shadow-hard">
+      <div className="flex items-center gap-3 rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 py-1.5 shadow-hard">
         <span
           aria-hidden="true"
           className={cn(
@@ -106,10 +106,10 @@ export function StudentModeStrip({
           <Icon className="size-6 text-neo-black" strokeWidth={2.75} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate font-neo-display text-lg font-black uppercase leading-tight tracking-tight text-neo-cream">
+          <p className="truncate font-neo-display text-lg font-black uppercase leading-tight tracking-tight text-edu-ink">
             {t(copy.nameKey)}
           </p>
-          <p dir="auto" className="line-clamp-2 font-neo-body text-[13px] font-bold leading-snug text-neo-cream/85">
+          <p dir="auto" className="line-clamp-2 font-neo-body text-[13px] font-bold leading-snug text-edu-ink/85">
             {t(copy.ruleKey)}
           </p>
           <ul className="mt-1 flex flex-wrap items-center gap-1">
@@ -138,7 +138,7 @@ export function StudentModeStrip({
           </>
         )}
         {lessonName && (
-          <li className="inline-flex min-w-0 max-w-full items-center gap-1 rounded-full border-2 border-neo-pink bg-neo-navy px-1.5 py-px font-neo-body text-xs font-bold text-neo-pink">
+          <li className="inline-flex min-w-0 max-w-full items-center gap-1 rounded-full border-2 border-neo-pink bg-edu-surface px-1.5 py-px font-neo-body text-xs font-bold text-edu-pink-ink">
             <BookOpen aria-hidden="true" className="size-3.5 shrink-0" />
             <span className="truncate">{lessonName}</span>
           </li>
@@ -156,9 +156,9 @@ function Chip({ icon: Icon, label, value, testId }: { icon: LucideIcon; label: s
     <li
       data-testid={testId}
       title={label}
-      className="inline-flex items-center gap-1 rounded-full border-2 border-neo-cream/60 bg-neo-navy px-1.5 py-px font-neo-body text-xs font-bold text-neo-cream"
+      className="inline-flex items-center gap-1 rounded-full border-2 border-edu-line bg-edu-surface px-1.5 py-px font-neo-body text-xs font-bold text-edu-ink"
     >
-      <Icon aria-hidden="true" className="size-3.5 text-neo-cyan" />
+      <Icon aria-hidden="true" className="size-3.5 text-edu-cyan-ink" />
       <span className="sr-only">{label}</span>
       <span>{value}</span>
     </li>

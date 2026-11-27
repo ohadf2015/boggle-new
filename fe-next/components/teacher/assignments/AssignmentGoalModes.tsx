@@ -35,7 +35,7 @@ export function AssignmentGoalModes({
             'px-4 py-3 rounded-neo border-neo transition font-bold',
             selectedType === 'word_count'
               ? 'bg-neo-yellow border-neo-yellow text-neo-black shadow-hard-sm'
-              : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
+              : 'bg-edu-surface/50 border-neo-black text-edu-ink hover:bg-edu-surface/80'
           )}
         >
           {t('teacher.assignment.wordCountGoal')}
@@ -48,7 +48,7 @@ export function AssignmentGoalModes({
             'px-4 py-3 rounded-neo border-neo transition font-bold',
             selectedType === 'word_list'
               ? 'bg-neo-yellow border-neo-yellow text-neo-black shadow-hard-sm'
-              : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
+              : 'bg-edu-surface/50 border-neo-black text-edu-ink hover:bg-edu-surface/80'
           )}
         >
           {t('teacher.assignment.wordListGoal')}

@@ -21,8 +21,8 @@ export function TeacherHelpButton() {
         className={cn(
           'flex items-center justify-center shrink-0',
           'h-10 w-10 min-w-[40px] min-h-[40px]',
-          'bg-neo-navy-light text-neo-cream',
-          'border-2 border-neo-cream/40',
+          'bg-edu-surface text-edu-ink',
+          'border-2 border-edu-line',
           'rounded-neo shadow-hard-sm',
           'hover:-translate-y-px hover:bg-neo-cyan hover:text-neo-black hover:shadow-hard',
           'active:translate-y-px active:shadow-none',

@@ -26,7 +26,7 @@ function Payout({ reveal, t }: { reveal: ClassroomChestReveal; t: Translate }) {
   const chips = useChestChips(reveal, useStudentAvatar());
   return (
     <div data-testid="edu-student-chest-payout" className="flex flex-col items-center gap-1.5 motion-safe:animate-[edu-live-pop_280ms_cubic-bezier(0.34,1.56,0.64,1)_both]">
-      <p className="font-neo-display text-2xl font-black uppercase leading-none text-neo-yellow">{t(chestHeadlineKey(reveal.rarity))}</p>
+      <p className="font-neo-display text-2xl font-black uppercase leading-none text-edu-yellow-ink">{t(chestHeadlineKey(reveal.rarity))}</p>
       <ul aria-label={t('economy.chest.chip.label')} className="flex flex-wrap justify-center gap-1.5">
         {chips.map((chip) => (
           <li key={chip.id} className="inline-flex items-baseline gap-1 rounded-full border-2 border-neo-black bg-neo-cream px-2.5 py-0.5 font-neo-display text-sm font-black text-neo-black shadow-hard-sm">
@@ -68,7 +68,7 @@ export function StudentChestBeat({ reveal, beat, reduceMotion, t }: StudentChest
     <div
       data-testid="edu-student-chest"
       data-phase={phase}
-      className="relative flex flex-col items-center gap-1 overflow-hidden rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy px-2 pb-2.5 pt-2 text-neo-cream shadow-hard"
+      className="relative flex flex-col items-center gap-1 overflow-hidden rounded-neo-lg border-[3px] border-edu-line bg-edu-surface px-2 pb-2.5 pt-2 text-edu-ink shadow-hard"
     >
       {reveal.underdog && (
         <p data-testid="chest-comeback" className="relative z-10 rounded-full border-2 border-neo-black bg-neo-pink px-3 py-0.5 text-center font-neo-display text-sm font-black text-neo-black shadow-hard-sm">

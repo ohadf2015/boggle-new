@@ -59,12 +59,12 @@ export function HqLaunchStage({ modeLabel, listTitle, poster, className }: HqLau
       role="status"
       aria-live="polite"
       className={cn(
-        'fixed inset-0 z-[130] flex items-center justify-center bg-neo-navy px-4',
+        'fixed inset-0 z-[130] flex items-center justify-center bg-edu-page px-4',
         'bg-[radial-gradient(90%_60%_at_50%_0%,rgba(204,255,0,0.12),transparent_65%)]',
         className,
       )}
     >
-      <div className="relative w-full max-w-md 2xl:max-w-xl rounded-neo-xl border-3 border-neo-cream bg-neo-navy-light p-5 shadow-hard-2xl sm:p-7">
+      <div className="relative w-full max-w-md 2xl:max-w-xl rounded-neo-xl border-3 border-edu-line bg-edu-surface p-5 shadow-hard-2xl sm:p-7">
         <div className="relative mx-auto -mt-16 mb-3 flex size-32 items-center justify-center rounded-full border-3 border-neo-black bg-neo-lime shadow-hard-lg sm:-mt-20 sm:size-36">
           {poster ? (
             <m.span
@@ -87,16 +87,16 @@ export function HqLaunchStage({ modeLabel, listTitle, poster, className }: HqLau
           </m.span>
         </div>
 
-        <h2 className="text-center font-neo-display text-2xl font-black uppercase leading-tight tracking-tight text-neo-white text-balance sm:text-3xl">
+        <h2 className="text-center font-neo-display text-2xl font-black uppercase leading-tight tracking-tight text-edu-ink text-balance sm:text-3xl">
           {modeLabel ? t('eduHq.launch.titleMode', { mode: modeLabel }) : t('eduHq.launch.generic')}
         </h2>
         {listTitle ? (
-          <p dir="auto" className="mt-1 truncate text-center font-neo-body text-sm font-bold text-neo-white/70">
+          <p dir="auto" className="mt-1 truncate text-center font-neo-body text-sm font-bold text-edu-ink/70">
             {listTitle}
           </p>
         ) : null}
 
-        <p className="mt-5 text-center font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-neo-white/60">
+        <p className="mt-5 text-center font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-edu-ink/60">
           {t('eduHq.launch.codeLabel')}
         </p>
         <div data-testid="hq-launch-slots" dir="ltr" aria-hidden="true" className="mt-1.5 flex justify-center gap-1.5 sm:gap-2">
@@ -121,16 +121,16 @@ export function HqLaunchStage({ modeLabel, listTitle, poster, className }: HqLau
                 data-state={shown}
                 className={cn(
                   'flex items-center gap-2.5 rounded-neo border-2 px-3 py-1.5 font-neo-body text-sm font-bold',
-                  shown === 'done' && 'border-neo-lime/70 text-neo-white',
-                  shown === 'active' && 'border-neo-cyan text-neo-white',
-                  shown === 'pending' && 'border-neo-cream/25 text-neo-white/50',
+                  shown === 'done' && 'border-neo-lime/70 text-edu-ink',
+                  shown === 'active' && 'border-neo-cyan text-edu-ink',
+                  shown === 'pending' && 'border-edu-line text-edu-ink/50',
                 )}
               >
                 <span
                   aria-hidden="true"
                   className={cn(
                     'flex size-6 shrink-0 items-center justify-center rounded-full border-2',
-                    shown === 'done' ? 'border-neo-black bg-neo-lime text-black' : shown === 'active' ? 'border-neo-black bg-neo-cyan text-black' : 'border-neo-cream/40 bg-neo-navy',
+                    shown === 'done' ? 'border-neo-black bg-neo-lime text-black' : shown === 'active' ? 'border-neo-black bg-neo-cyan text-black' : 'border-edu-line bg-edu-surface',
                   )}
                 >
                   {shown === 'done' ? (

@@ -23,7 +23,7 @@ export function TodayCard({ items, warmup }: { items: TodayItem[]; warmup: Stude
     <section
       data-testid="academy-today"
       aria-label={t('student.today.title', 'Today')}
-      className="pointer-events-auto flex flex-col gap-1.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy/90 p-1.5 text-neo-white shadow-hard-sm"
+      className="pointer-events-auto flex flex-col gap-1.5 rounded-neo border-2 border-edu-line bg-edu-surface/90 p-1.5 text-edu-ink shadow-hard-sm"
     >
       {warmup && <WarmupCta warmup={warmup} />}
       <ul className="grid grid-cols-3 gap-1">
@@ -36,7 +36,7 @@ export function TodayCard({ items, warmup }: { items: TodayItem[]; warmup: Stude
               data-done={item.done ? 'true' : 'false'}
               className={cn(
                 'flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-neo border-2 border-neo-black px-1 py-1 text-center font-neo-body text-xs font-bold leading-tight',
-                item.done ? 'bg-neo-lime text-neo-black' : 'bg-neo-white/10 text-neo-white'
+                item.done ? 'bg-neo-lime text-neo-black' : 'bg-edu-ink/10 text-edu-ink'
               )}
             >
               <Icon aria-hidden="true" className="size-3.5 shrink-0" strokeWidth={3} />

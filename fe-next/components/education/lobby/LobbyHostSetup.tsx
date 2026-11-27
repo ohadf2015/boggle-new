@@ -50,9 +50,9 @@ export function LobbyHostSetup({ flowStrip, lessonStep, activePreset, onApplyPre
           aria-controls="lobby-more-games-panel"
           onClick={() => onGamesOpenChange(!gamesOpen)}
           className={cn(
-            'flex min-h-12 shrink-0 items-center justify-between gap-3 rounded-neo-lg border-[3px] border-dashed border-neo-cream/45 px-3 py-1.5 text-start',
-            'font-neo-body text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream/80 motion-reduce:transition-none',
-            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+            'flex min-h-12 shrink-0 items-center justify-between gap-3 rounded-neo-lg border-[3px] border-dashed border-edu-line px-3 py-1.5 text-start',
+            'font-neo-body text-sm font-bold text-edu-ink transition-colors hover:border-edu-line motion-reduce:transition-none',
+            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface',
           )}
         >
           <span className="inline-flex items-center gap-3">

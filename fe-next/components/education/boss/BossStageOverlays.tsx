@@ -93,7 +93,7 @@ export const BossStageOverlays = memo(function BossStageOverlays({ view, cue, bo
               {view.status === 'defeated' ? t('classroomBoss.defeated', { name: bossName }) : t('classroomBoss.escaped', { name: bossName })}
             </p>
           </div>
-          <p className={cn('rounded-[0.5cqw] border-[0.25cqw] border-neo-black bg-neo-navy-light px-[1.6cqw] py-[0.6cqw] text-[2.4cqw] font-black text-neo-white shadow-hard-lg', styles.slideIn)}>
+          <p className={cn('rounded-[0.5cqw] border-[0.25cqw] border-neo-black bg-edu-surface px-[1.6cqw] py-[0.6cqw] text-[2.4cqw] font-black text-edu-ink shadow-hard-lg', styles.slideIn)}>
             {t('classroomBoss.dealtPct', { pct: view.pctDealt })}
           </p>
         </div>

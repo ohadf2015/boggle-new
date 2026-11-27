@@ -92,18 +92,18 @@ export function AssignmentDueCard({
       data-testid="assignment-due-card"
       data-kind={kind}
       aria-label={`${title}: ${t(time.key, time.fallback, time.params)}`}
-      className={`pointer-events-auto flex min-h-11 items-center gap-2 rounded-neo border-2 p-1.5 text-neo-white shadow-hard-sm ${tone} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan`}
+      className={`pointer-events-auto flex min-h-11 items-center gap-2 rounded-neo border-2 p-1.5 text-edu-ink shadow-hard-sm ${tone} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan`}
     >
       <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black ${kind === 'overdue' ? 'bg-neo-red text-neo-white' : 'bg-neo-yellow text-neo-black'}`}>
         <Icon className="h-5 w-5" aria-hidden="true" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block truncate font-neo-body text-xs font-bold leading-tight">{title}</span>
-        <span className={`block font-neo-body text-xs font-bold uppercase tracking-wide ${kind === 'overdue' ? 'text-neo-red' : 'text-neo-yellow'}`}>
+        <span className={`block font-neo-body text-xs font-bold uppercase tracking-wide ${kind === 'overdue' ? 'text-neo-red' : 'text-edu-yellow-ink'}`}>
           {t(time.key, time.fallback, time.params)}
         </span>
       </span>
-      <span data-testid="assignment-due-go" aria-hidden="true" className={`shrink-0 ${kind === 'overdue' ? 'text-neo-red' : 'text-neo-yellow'}`}>
+      <span data-testid="assignment-due-go" aria-hidden="true" className={`shrink-0 ${kind === 'overdue' ? 'text-neo-red' : 'text-edu-yellow-ink'}`}>
         <DirectionalIcon icon={ChevronRight} className="size-6" />
       </span>
     </Link>

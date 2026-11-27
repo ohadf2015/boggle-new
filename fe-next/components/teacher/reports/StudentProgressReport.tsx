@@ -97,8 +97,8 @@ export function StudentProgressReport({ studentId, classroomId, dateRange }: Stu
             [t('teacher.reports.metrics.longestStreak'), t(pluralKeyOf('teacher.reports.streakDays', metrics.longestStreak, language), { count: metrics.longestStreak })],
           ].map(([label, value]) => (
             <div key={String(label)} className="flex items-baseline gap-2">
-              <dt className="text-neo-cream/75">{label}</dt>
-              <dd className="font-bold text-neo-white tabular-nums">{value}</dd>
+              <dt className="text-edu-ink/75">{label}</dt>
+              <dd className="font-bold text-edu-ink tabular-nums">{value}</dd>
             </div>
           ))}
         </dl>
@@ -107,14 +107,14 @@ export function StudentProgressReport({ studentId, classroomId, dateRange }: Stu
       <section>
         <SectionTitle>{t('teacher.reports.sections.wordMastery')}</SectionTitle>
         {data.wordMastery.length === 0 ? (
-          <p className="rounded-neo border-2 border-dashed border-neo-cream/40 p-6 text-center text-neo-cream/80">
+          <p className="rounded-neo border-2 border-dashed border-edu-line p-6 text-center text-edu-ink/80">
             {t('teacher.reports.noWordsYet')}
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-neo border-2 border-neo-cream/40 bg-neo-navy">
+          <div className="overflow-x-auto rounded-neo border-2 border-edu-line bg-edu-surface">
             <table className="w-full border-collapse text-sm">
               <thead>
-                <tr className="bg-neo-navy text-neo-cream/80">
+                <tr className="bg-edu-surface text-edu-ink/80">
                   <th scope="col" className="p-3 text-start font-bold">{t('teacher.reports.columns.word')}</th>
                   <th scope="col" className="p-3 text-start font-bold">{t('teacher.reports.columns.status')}</th>
                   <th scope="col" className="p-3 text-start font-bold">{t('teacher.reports.columns.accuracy')}</th>
@@ -123,8 +123,8 @@ export function StudentProgressReport({ studentId, classroomId, dateRange }: Stu
               </thead>
               <tbody>
                 {data.wordMastery.map((word) => (
-                  <tr key={word.word} className="border-t border-neo-cream/40 transition-colors hover:bg-neo-cream/5">
-                    <td className="p-3 font-bold text-neo-white">{word.word}</td>
+                  <tr key={word.word} className="border-t border-edu-line transition-colors hover:bg-edu-ink/5">
+                    <td className="p-3 font-bold text-edu-ink">{word.word}</td>
                     <td className="p-3">
                       <span
                         className={cn(
@@ -135,10 +135,10 @@ export function StudentProgressReport({ studentId, classroomId, dateRange }: Stu
                         {word.mastered ? t('teacher.reports.mastery.mastered') : t('teacher.reports.mastery.practicing')}
                       </span>
                     </td>
-                    <td className="p-3 text-neo-white">
+                    <td className="p-3 text-edu-ink">
                       <AccuracyBar value={word.accuracy} />
                     </td>
-                    <td className="p-3 text-end text-neo-white tabular-nums">{word.attempts}</td>
+                    <td className="p-3 text-end text-edu-ink tabular-nums">{word.attempts}</td>
                   </tr>
                 ))}
               </tbody>
@@ -154,10 +154,10 @@ export function StudentProgressReport({ studentId, classroomId, dateRange }: Stu
             {data.recommendations.map((recommendation) => (
               <li
                 key={recommendation}
-                className="flex items-start gap-3 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-4"
+                className="flex items-start gap-3 rounded-neo border-2 border-edu-line bg-edu-surface p-4"
               >
                 <span aria-hidden="true" className="mt-1.5 size-2.5 shrink-0 border-2 border-black bg-neo-lime" />
-                <span className="text-neo-white">{t(RECOMMENDATION_LABEL_KEY[recommendation])}</span>
+                <span className="text-edu-ink">{t(RECOMMENDATION_LABEL_KEY[recommendation])}</span>
               </li>
             ))}
           </ul>

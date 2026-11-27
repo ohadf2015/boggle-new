@@ -36,9 +36,9 @@ export function MissedWordsList({ words, maxChips = 8, title, t, children, fill 
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2
           id="edu-reteach-words-title"
-          className="inline-flex items-center gap-2 font-neo-display text-lg font-black text-neo-cream @5xl/results:text-2xl @[96rem]/results:text-4xl"
+          className="inline-flex items-center gap-2 font-neo-display text-lg font-black text-edu-ink @5xl/results:text-2xl @[96rem]/results:text-4xl"
         >
-          <Target className="size-[1em] shrink-0 text-neo-pink" aria-hidden="true" />
+          <Target className="size-[1em] shrink-0 text-edu-pink-ink" aria-hidden="true" />
           {title}
         </h2>
       </div>
@@ -67,7 +67,7 @@ export function MissedWordsList({ words, maxChips = 8, title, t, children, fill 
         {rest > 0 && (
           <li
             data-testid="edu-most-missed-more"
-            className="inline-flex items-center rounded-full border-2 border-dashed border-neo-cream/70 px-2.5 py-0.5 font-neo-body text-sm font-bold text-neo-cream @5xl/results:text-lg @[96rem]/results:text-xl"
+            className="inline-flex items-center rounded-full border-2 border-dashed border-edu-line px-2.5 py-0.5 font-neo-body text-sm font-bold text-edu-ink @5xl/results:text-lg @[96rem]/results:text-xl"
           >
             {t('eduLiveRoom.hostResults.moreWords', { count: rest })}
           </li>

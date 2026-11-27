@@ -20,7 +20,7 @@ export function LobbyClassPicker({ classrooms, selectedId, onSelect, label }: Lo
   if (classrooms.length < 2) return null;
   return (
     <div className="flex min-w-0 items-center gap-2">
-      <span className="inline-flex shrink-0 items-center gap-1 font-neo-body text-xs font-bold text-neo-cream/70 lg:text-sm">
+      <span className="inline-flex shrink-0 items-center gap-1 font-neo-body text-xs font-bold text-edu-ink/70 lg:text-sm">
         <Users className="size-4" aria-hidden="true" />
         {label}
       </span>
@@ -43,8 +43,8 @@ export function LobbyClassPicker({ classrooms, selectedId, onSelect, label }: Lo
               className={cn(
                 'min-h-11 max-w-[12rem] shrink-0 truncate rounded-full border-[2px] px-4 font-neo-body text-sm font-bold',
                 'transition-[transform,colors] duration-150 active:scale-[0.97] motion-reduce:transition-none',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-                on ? 'border-neo-lime bg-neo-navy-light text-neo-cream ring-2 ring-neo-lime' : 'border-neo-cream/35 bg-neo-navy-light text-neo-cream/85 hover:border-neo-cream/50',
+                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface',
+                on ? 'border-neo-lime bg-edu-surface text-edu-ink ring-2 ring-neo-lime' : 'border-edu-line bg-edu-surface text-edu-ink/85 hover:border-edu-line',
               )}
             >
               <span dir="auto">{c.name}</span>

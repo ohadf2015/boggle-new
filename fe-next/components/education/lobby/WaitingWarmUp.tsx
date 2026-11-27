@@ -64,11 +64,11 @@ function NameTapWarmUp({ username, t }: { username: string; t: EduT }) {
       data-testid="waiting-warmup"
       data-kind="tap"
       aria-label={tr(t, 'academy.live.warmUpTitle', 'Warm-up')}
-      className="w-full max-w-sm rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy/90 p-2 shadow-hard"
+      className="w-full max-w-sm rounded-neo-lg border-[3px] border-edu-line bg-edu-surface/90 p-2 shadow-hard"
     >
       <style>{WARM_UP_KEYFRAMES}</style>
       <div className="mb-1.5 flex items-center justify-between gap-2">
-        <p className="min-w-0 truncate font-neo-display text-xs font-black uppercase tracking-wide text-neo-cream lg:text-sm">
+        <p className="min-w-0 truncate font-neo-display text-xs font-black uppercase tracking-wide text-edu-ink lg:text-sm">
           {tr(t, 'academy.live.warmUpHint', 'Warm-up: tap the glowing letter!')}
         </p>
         <div className="flex shrink-0 items-center gap-1.5">
@@ -106,7 +106,7 @@ function NameTapWarmUp({ username, t }: { username: string; t: EduT }) {
                 'motion-safe:active:scale-90',
                 hot
                   ? 'z-10 scale-110 border-neo-black bg-neo-lime text-neo-black shadow-hard-sm motion-safe:animate-[lc-tile-glow_900ms_ease-in-out_infinite]'
-                  : 'border-neo-cream bg-neo-navy-light text-neo-cream'
+                  : 'border-edu-line bg-edu-surface text-edu-ink'
               )}
             >
               {letter}

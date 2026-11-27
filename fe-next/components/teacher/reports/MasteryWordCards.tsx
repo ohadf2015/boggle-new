@@ -28,7 +28,7 @@ export function MasteryWordCards({ view, open }: { view: HeatmapView; open: bool
   return (
     <div data-testid="mastery-word-cards" className="space-y-3 sm:hidden">
       <div className="rounded-neo border-2 border-neo-pink bg-neo-pink/10 p-2.5">
-        <h4 className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-neo-cream/85">
+        <h4 className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-edu-ink/85">
           <LifeBuoy className="size-3.5" aria-hidden="true" />
           {t('eduPro.mastery.needsHelpTitle')}
         </h4>
@@ -39,14 +39,14 @@ export function MasteryWordCards({ view, open }: { view: HeatmapView; open: bool
                 key={s.id}
                 title={s.fullName}
                 dir="auto"
-                className="rounded-full border-2 border-neo-pink bg-neo-navy px-2.5 py-0.5 text-xs font-black text-neo-white shadow-hard-sm tabular-nums"
+                className="rounded-full border-2 border-neo-pink bg-edu-surface px-2.5 py-0.5 text-xs font-black text-edu-ink shadow-hard-sm tabular-nums"
               >
                 {t('eduPro.mastery.needsHelpChip', { name: s.name, count: s.needsHelp })}
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-xs font-bold text-neo-cream/80">{t('eduPro.mastery.allClear')}</p>
+          <p className="text-xs font-bold text-edu-ink/80">{t('eduPro.mastery.allClear')}</p>
         )}
       </div>
 
@@ -62,12 +62,12 @@ export function MasteryWordCards({ view, open }: { view: HeatmapView; open: bool
               animate={{ y: 0, scale: 1 }}
               transition={{ type: 'spring', stiffness: 480, damping: 28, delay: Math.min(0.5, i * 0.05) }}
               className={cn(
-                'relative overflow-hidden rounded-neo border-2 bg-neo-navy-light px-2.5 pb-2.5 pt-2',
-                w.struggled > 0 ? 'border-neo-pink shadow-hard-sm' : 'border-neo-cream/40',
+                'relative overflow-hidden rounded-neo border-2 bg-edu-surface px-2.5 pb-2.5 pt-2',
+                w.struggled > 0 ? 'border-neo-pink shadow-hard-sm' : 'border-edu-line',
               )}
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="min-w-0 truncate font-neo-display text-base font-bold text-neo-white" dir="auto">
+                <span className="min-w-0 truncate font-neo-display text-base font-bold text-edu-ink" dir="auto">
                   {w.display}
                 </span>
                 <span
@@ -90,19 +90,19 @@ export function MasteryWordCards({ view, open }: { view: HeatmapView; open: bool
               </div>
               <div className="mt-1 space-y-0.5 text-xs font-bold">
                 {w.missedBy.length > 0 && (
-                  <p className="flex items-start gap-1.5 text-neo-white" dir="auto">
-                    <ToneIcon tone="missed" className="mt-0.5 size-3.5 shrink-0 text-neo-pink" />
+                  <p className="flex items-start gap-1.5 text-edu-ink" dir="auto">
+                    <ToneIcon tone="missed" className="mt-0.5 size-3.5 shrink-0 text-edu-pink-ink" />
                     <span>{t('eduPro.mastery.missedNames', { names: joinNames(w.missedBy, language) })}</span>
                   </p>
                 )}
                 {w.shakyBy.length > 0 && (
-                  <p className="flex items-start gap-1.5 text-neo-cream/80" dir="auto">
-                    <ToneIcon tone="shaky" className="mt-0.5 size-3.5 shrink-0 text-neo-cyan" />
+                  <p className="flex items-start gap-1.5 text-edu-ink/80" dir="auto">
+                    <ToneIcon tone="shaky" className="mt-0.5 size-3.5 shrink-0 text-edu-cyan-ink" />
                     <span>{t('eduPro.mastery.shakyNames', { names: joinNames(w.shakyBy, language) })}</span>
                   </p>
                 )}
                 {w.missedBy.length === 0 && w.shakyBy.length === 0 && (
-                  <p className="flex items-center gap-1.5 text-neo-lime">
+                  <p className="flex items-center gap-1.5 text-edu-lime-ink">
                     <ToneIcon tone="solid" className="size-3.5" />
                     <span>{t('eduPro.mastery.everyoneGotIt')}</span>
                   </p>

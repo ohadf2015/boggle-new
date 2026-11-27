@@ -20,7 +20,7 @@ import { NB_PRIMARY_FACE, NB_STICKER, NB_BLOCK } from '../nb/nbStyles';
 import { HERO_CHIP } from './homeStyles';
 
 const PRIMARY_PRESS = cn(NB_PRIMARY_FACE, 'min-h-[72px] w-full whitespace-nowrap text-2xl sm:min-h-[84px] sm:max-w-md sm:text-3xl');
-const MENU_ROW = 'min-h-[44px] font-neo-body font-semibold text-neo-cream';
+const MENU_ROW = 'min-h-[44px] font-neo-body font-semibold text-edu-ink';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -85,7 +85,7 @@ export function HomeHero({
 
   const heading = createElement(
     `h${titleLevel}`,
-    { id: 'home-hero-title', className: 'min-w-0 font-neo-display text-3xl font-black leading-tight text-neo-white sm:text-5xl' },
+    { id: 'home-hero-title', className: 'min-w-0 font-neo-display text-3xl font-black leading-tight text-edu-ink sm:text-5xl' },
     <ClassMenu classrooms={classrooms} selected={selected} onSelect={onSelect} capLabel={capLabel} newClassHref={newClassHref} classesHref={classesHref} classPageHref={classPageLink && selected ? `/${language}/teacher/classroom/${selected.id}` : undefined} t={t} />,
   );
   const playIcon = pending
@@ -172,8 +172,8 @@ function CodeChip({ code, onShare, t, testIds }: { code: string; onShare: () => 
         onClick={onShare}
         className={cn(HERO_CHIP, 'gap-2')}
       >
-        <span className="font-neo-body text-xs font-bold text-neo-cream/75">{t('academy.hq.classCode')}</span>
-        <code data-testid={testIds?.code ?? 'home-desk-code'} dir="ltr" className="font-neo-display text-base font-black tracking-wider text-neo-cream">{code}</code>
+        <span className="font-neo-body text-xs font-bold text-edu-ink/75">{t('academy.hq.classCode')}</span>
+        <code data-testid={testIds?.code ?? 'home-desk-code'} dir="ltr" className="font-neo-display text-base font-black tracking-wider text-edu-ink">{code}</code>
         <Share2 className="size-4 shrink-0" aria-hidden="true" />
       </PressSurface>
     </div>
@@ -200,19 +200,19 @@ function ClassMenu({ classrooms, selected, onSelect, capLabel, newClassHref, cla
       <DropdownMenuTrigger
         data-testid="home-class-switcher"
         aria-label={several ? t('eduShell.home.switchClass') : undefined}
-        className="inline-flex min-h-[44px] min-w-0 max-w-full items-center gap-1 rounded-neo text-start transition-colors duration-150 hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream"
+        className="inline-flex min-h-[44px] min-w-0 max-w-full items-center gap-1 rounded-neo text-start transition-colors duration-150 hover:bg-edu-ink/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line"
       >
         {label}
         <ChevronDown className="size-6 shrink-0 sm:size-8" aria-hidden="true" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="max-h-80 w-64 overflow-y-auto rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-1 shadow-hard">
+      <DropdownMenuContent align="start" className="max-h-80 w-64 overflow-y-auto rounded-neo border-2 border-edu-line bg-edu-surface p-1 shadow-hard">
         {several ? classrooms.map((c) => (
           <DropdownMenuItem key={c.id} data-testid="home-class-option" onSelect={() => onSelect(c.id)} className={MENU_ROW}>
             <Check className={cn('size-4 shrink-0', c.id === selected?.id ? 'opacity-100' : 'opacity-0')} aria-hidden="true" />
             <span dir="auto" className="truncate">{c.name}</span>
           </DropdownMenuItem>
         )) : null}
-        {several && (classPageHref || newClassHref || classesHref) ? <DropdownMenuSeparator className="bg-neo-cream/10" /> : null}
+        {several && (classPageHref || newClassHref || classesHref) ? <DropdownMenuSeparator className="bg-edu-ink/10" /> : null}
         {classPageHref ? (
           <DropdownMenuItem asChild className={MENU_ROW}>
             <Link href={classPageHref} data-testid="home-class-page">
@@ -238,7 +238,7 @@ function ClassMenu({ classrooms, selected, onSelect, capLabel, newClassHref, cla
           </DropdownMenuItem>
         ) : null}
         {capLabel ? (
-          <p data-testid="home-class-menu-cap" className="mt-1 border-t-2 border-neo-cream/10 px-2 pb-1 pt-2 font-neo-body text-xs font-bold text-neo-cream/70">
+          <p data-testid="home-class-menu-cap" className="mt-1 border-t-2 border-edu-line/10 px-2 pb-1 pt-2 font-neo-body text-xs font-bold text-edu-ink/70">
             {capLabel}
           </p>
         ) : null}

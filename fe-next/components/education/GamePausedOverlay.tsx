@@ -32,7 +32,7 @@ export function GamePausedOverlay({ isHost = false }: GamePausedOverlayProps) {
       className={cn(
         // Below TeacherLiveControls (z-[70]) so the host can still hit Resume.
         'fixed inset-0 z-[60] flex items-center justify-center p-6',
-        'pointer-events-auto bg-neo-navy/90',
+        'pointer-events-auto bg-edu-surface/90',
       )}
     >
       <Reveal className="w-full max-w-sm">

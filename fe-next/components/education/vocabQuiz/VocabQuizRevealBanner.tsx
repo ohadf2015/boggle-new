@@ -182,7 +182,7 @@ export function VocabQuizRevealBanner({
                 <span className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs font-black uppercase tracking-wider sm:text-sm">
                   {correct && streak >= 2 && (
                     <span data-testid="vocab-quiz-verdict-streak" className="flex items-center gap-1">
-                      <Flame className="w-4 h-4 shrink-0 text-neo-orange" aria-hidden />
+                      <Flame className="w-4 h-4 shrink-0 text-edu-orange-ink" aria-hidden />
                       {t('eg2Modes.feedback.streak', { count: streak })}
                     </span>
                   )}

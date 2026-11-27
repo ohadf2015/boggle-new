@@ -73,13 +73,13 @@ export default function LessonPracticeError({
   }
 
   return (
-    <div className="flex h-dvh flex-1 items-center justify-center overflow-y-auto bg-neo-navy px-4 py-8">
-      <div className="w-full max-w-sm rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy-light p-5 text-center shadow-hard-lg">
+    <div className="flex h-dvh flex-1 items-center justify-center overflow-y-auto bg-edu-page px-4 py-8">
+      <div className="w-full max-w-sm rounded-neo border-[3px] border-edu-line bg-edu-surface p-5 text-center shadow-hard-lg">
         <Mascot variant="oops" size="sm" animated={false} className="mx-auto mb-3" />
-        <h1 className="mb-2 font-neo-display text-xl font-black uppercase text-neo-white">
+        <h1 className="mb-2 font-neo-display text-xl font-black uppercase text-edu-ink">
           {t('education.practice.lessonUnavailable', "Can't open this lesson")}
         </h1>
-        <p className="mb-5 font-neo-body text-sm font-bold text-neo-cream">
+        <p className="mb-5 font-neo-body text-sm font-bold text-edu-ink">
           {t('education.practice.lessonUnavailableBody', 'The link may be out of date, or the lesson was removed. Ask your teacher for a new one.')}
         </p>
         <button
@@ -87,7 +87,7 @@ export default function LessonPracticeError({
           data-primary="true"
           data-testid="practice-error-retry"
           onClick={reset}
-          className="flex min-h-[56px] w-full items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 font-neo-display text-lg font-black uppercase text-neo-black shadow-hard active:translate-y-[2px] active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy-light"
+          className="flex min-h-[56px] w-full items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 font-neo-display text-lg font-black uppercase text-neo-black shadow-hard active:translate-y-[2px] active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface"
         >
           {t('student.practiceFun.tryAgain', 'Try again')}
         </button>
@@ -95,7 +95,7 @@ export default function LessonPracticeError({
           type="button"
           data-testid="practice-error-exit"
           onClick={goToLessons}
-          className="mt-3 flex min-h-[48px] w-full items-center justify-center rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 font-neo-display text-base font-bold text-neo-cream focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy-light"
+          className="mt-3 flex min-h-[48px] w-full items-center justify-center rounded-neo border-[3px] border-edu-line bg-edu-page px-4 font-neo-display text-base font-bold text-edu-ink focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface"
         >
           {t('student.practiceFun.myLessons', 'My lessons')}
         </button>

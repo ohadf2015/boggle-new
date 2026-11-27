@@ -34,7 +34,7 @@ export function PhoneGamePreview() {
   }, [board, language, foundWords]);
 
   return (
-    <div className="flex h-dvh min-h-0 flex-col bg-neo-navy">
+    <div className="flex h-dvh min-h-0 flex-col bg-edu-page">
       <InGameScreen
         username="Maya"
         gameCode="YHNCF4"

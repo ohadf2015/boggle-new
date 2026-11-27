@@ -188,8 +188,8 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
 
   return (
     <div className="space-y-2" dir={isRTL ? 'rtl' : 'ltr'}>
-      <details className="group px-1 text-neo-cream/75 text-xs font-bold leading-snug">
-        <summary className="inline-flex min-h-8 cursor-pointer list-none items-center gap-1.5 text-neo-cream hover:text-neo-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan rounded-sm">
+      <details className="group px-1 text-edu-ink/75 text-xs font-bold leading-snug">
+        <summary className="inline-flex min-h-8 cursor-pointer list-none items-center gap-1.5 text-edu-ink hover:text-edu-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan rounded-sm">
           <SlidersHorizontal className="w-4 h-4 shrink-0" aria-hidden="true" />
           {t('teacher.levels.label')}
           <ChevronDown className="w-3.5 h-3.5 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />

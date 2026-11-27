@@ -17,11 +17,11 @@ export function JoinWrongCodeHelp({ code }: { code: string }) {
   return (
     <>
       {LOOKALIKE.test(code) && (
-        <p className="font-neo-body text-sm font-bold text-neo-yellow lg:text-base">{t(`${K}.noLookalikes`)}</p>
+        <p className="font-neo-body text-sm font-bold text-edu-yellow-ink lg:text-base">{t(`${K}.noLookalikes`)}</p>
       )}
       {!isLoading && classroomId && (
         <div className="flex flex-col gap-2">
-          <p className="font-neo-body text-sm text-neo-white/85 lg:text-base">{t(`${K}.wrongCodeClassLine`)}</p>
+          <p className="font-neo-body text-sm text-edu-ink/85 lg:text-base">{t(`${K}.wrongCodeClassLine`)}</p>
           <Link
             data-testid="wrong-code-to-class"
             href={joinClassHref(language)}

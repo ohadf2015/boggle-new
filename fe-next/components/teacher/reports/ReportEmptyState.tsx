@@ -12,9 +12,9 @@ const PRESS =
 export function ReportEmptyState({ classroomId }: { classroomId: string }) {
   const { t, language } = useLanguage();
   return (
-    <div className="rounded-neo border-2 border-dashed border-neo-cream/30 p-5 text-center">
-      <p className="font-neo-display text-lg font-bold text-neo-white text-balance">{t('eg2Rep.report.empty.title')}</p>
-      <p className="mx-auto mt-1 max-w-md text-sm font-bold text-neo-cream/80 text-pretty">{t('eduPro.mastery.empty')}</p>
+    <div className="rounded-neo border-2 border-dashed border-edu-line p-5 text-center">
+      <p className="font-neo-display text-lg font-bold text-edu-ink text-balance">{t('eg2Rep.report.empty.title')}</p>
+      <p className="mx-auto mt-1 max-w-md text-sm font-bold text-edu-ink/80 text-pretty">{t('eduPro.mastery.empty')}</p>
       <div className="mt-4 flex flex-wrap justify-center gap-2">
         <Link
           href={`/${language}/teacher?classroomId=${classroomId}`}
@@ -29,7 +29,7 @@ export function ReportEmptyState({ classroomId }: { classroomId: string }) {
         <Link
           href={teacherAssignHref(language, classroomId)}
           className={cn(
-            'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream/60 bg-neo-navy px-4 font-neo-display text-sm font-bold text-neo-cream',
+            'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-edu-line bg-edu-page px-4 font-neo-display text-sm font-bold text-edu-ink',
             PRESS,
           )}
         >

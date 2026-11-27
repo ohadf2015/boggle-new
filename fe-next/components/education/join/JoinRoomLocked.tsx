@@ -21,7 +21,7 @@ export function JoinRoomLocked({ onRetry, busy }: { onRetry: () => void; busy: b
         type="button"
         onClick={onRetry}
         disabled={busy}
-        className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-neo border-3 border-neo-cream bg-neo-navy px-4 py-2 font-neo-display text-sm font-black uppercase text-neo-lime shadow-hard-sm transition-transform duration-100 motion-safe:active:translate-x-0.5 motion-safe:active:translate-y-0.5 active:shadow-hard-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan disabled:opacity-60"
+        className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-neo border-3 border-edu-line bg-edu-page px-4 py-2 font-neo-display text-sm font-black uppercase text-edu-lime-ink shadow-hard-sm transition-transform duration-100 motion-safe:active:translate-x-0.5 motion-safe:active:translate-y-0.5 active:shadow-hard-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan disabled:opacity-60"
       >
         <RotateCw aria-hidden="true" className="size-4" strokeWidth={2.75} />
         {t('education.student.join.roomLocked.retry')}

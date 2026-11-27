@@ -101,9 +101,9 @@ export function ScheduleReteachLiveButton({
       <p
         data-testid="schedule-reteach-live-confirm"
         role="status"
-        className="flex items-center gap-2 rounded-neo border-2 border-neo-lime bg-neo-lime/15 px-4 py-3 text-sm font-bold text-neo-white"
+        className="flex items-center gap-2 rounded-neo border-2 border-neo-lime bg-neo-lime/15 px-4 py-3 text-sm font-bold text-edu-ink"
       >
-        <Check className="size-4 shrink-0 text-neo-lime" aria-hidden="true" />
+        <Check className="size-4 shrink-0 text-edu-lime-ink" aria-hidden="true" />
         {t('teacher.digest.scheduleReteachConfirm', {
           date: dateLabel,
           days: String(RETEACH_LIVE_DELAY_DAYS),

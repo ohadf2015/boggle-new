@@ -12,7 +12,7 @@ export function BoardLanguageChip({ language, className }: { language: string; c
     <span
       data-testid="board-language-chip"
       className={cn(
-        'inline-flex shrink-0 items-center gap-1 rounded-neo border-2 border-neo-lime bg-neo-navy-light px-2 py-0.5 font-neo-body text-xs font-bold text-neo-lime',
+        'inline-flex shrink-0 items-center gap-1 rounded-neo border-2 border-neo-lime bg-edu-surface px-2 py-0.5 font-neo-body text-xs font-bold text-edu-lime-ink',
         className
       )}
     >

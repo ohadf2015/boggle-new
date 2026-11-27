@@ -26,7 +26,7 @@ export default function ProjectorBoard({ grid, label, className }: { grid: Lette
       aria-label={label}
       data-testid="projector-board"
       dir="ltr"
-      className="grid size-[min(100cqw,100cqh)] gap-[1.2cqmin] rounded-neo-lg border-4 border-neo-cream bg-neo-navy-light p-[1.6cqmin] shadow-hard-lg"
+      className="grid size-[min(100cqw,100cqh)] gap-[1.2cqmin] rounded-neo-lg border-4 border-edu-line bg-edu-surface p-[1.6cqmin] shadow-hard-lg"
       style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, '--cols': Math.max(cols, 1) } as CSSProperties}
     >
       {grid.flat().map((letter, i) => (

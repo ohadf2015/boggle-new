@@ -317,7 +317,7 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
         {node.badge != null && (
           <span className="absolute -top-1 -end-1" aria-label={t('academy.student.reviewDueAria', '{count} words to review', { count: node.badge })}>
             <Medallion tone="pink" size={26} shadow={1}>
-              <span className="font-neo-display text-xs font-black leading-none text-neo-white [text-shadow:0_1px_0_#000]">{node.badge}</span>
+              <span className="font-neo-display text-xs font-black leading-none text-edu-ink [text-shadow:0_1px_0_#000]">{node.badge}</span>
             </Medallion>
           </span>
         )}
@@ -340,7 +340,7 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
               <span
                 aria-hidden="true"
                 className={cn(
-                  'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-neo-yellow bg-neo-black/80 px-1.5 font-neo-display font-black leading-tight tabular-nums text-neo-yellow',
+                  'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-neo-yellow bg-neo-black/80 px-1.5 font-neo-display font-black leading-tight tabular-nums text-edu-yellow-ink',
                   big ? 'text-xl' : 'text-sm',
                 )}
                 dir="ltr"
@@ -352,7 +352,7 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
         )}
         {node.state === 'live' && (
           <span
-            className="absolute -top-2 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full border-2 border-neo-black px-2 font-neo-display text-xs font-black uppercase tracking-widest text-neo-white"
+            className="absolute -top-2 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full border-2 border-neo-black px-2 font-neo-display text-xs font-black uppercase tracking-widest text-edu-ink"
             style={toneStyle('pink', { shadow: 2, trim: 1 })}
           >
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-neo-white" aria-hidden="true" />
@@ -393,13 +393,13 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
           'relative -mt-1 flex items-center gap-1.5 whitespace-nowrap rounded-[10px] border-2 border-neo-black px-2 py-0.5 font-neo-display font-black leading-tight',
           plaqueSize,
           locked && 'opacity-90',
-          dark ? `text-neo-white ${INK_TEXT}` : 'text-neo-black',
+          dark ? `text-edu-ink ${INK_TEXT}` : 'text-neo-black',
         )}
         style={toneStyle(plaqueTone, { shadow: 2, trim: 1.5 })}
       >
         <span className={isBoss ? 'shrink-0' : 'truncate'}>{label}</span>
         {chip && (
-          <span className={cn('rounded-full px-1.5 tabular-nums', locked ? 'bg-neo-black/60 text-neo-yellow' : 'bg-neo-black text-neo-lime')}>
+          <span className={cn('rounded-full px-1.5 tabular-nums', locked ? 'bg-neo-black/60 text-edu-yellow-ink' : 'bg-neo-black text-neo-lime')}>
             {chip}
           </span>
         )}

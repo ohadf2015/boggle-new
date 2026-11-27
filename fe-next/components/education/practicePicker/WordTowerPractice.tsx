@@ -220,11 +220,11 @@ function WordTowerRun({
           size="sm"
           onClick={onBack}
           aria-label={t('common.back')}
-          className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
+          className="text-edu-ink hover:text-edu-ink hover:bg-edu-ink/10"
         >
           <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
         </Button>
-        <h1 className="flex-1 min-w-0 text-xl font-neo-display text-neo-white text-balance">
+        <h1 className="flex-1 min-w-0 text-xl font-neo-display text-edu-ink text-balance">
           {t('education.practicePicker.name.word_tower')}
         </h1>
         <button
@@ -241,7 +241,7 @@ function WordTowerRun({
       <p
         data-testid="word-tower-practice-hits"
         data-count={hits.length}
-        className="text-xs font-neo-body font-bold uppercase text-neo-cream tabular-nums mb-2"
+        className="text-xs font-neo-body font-bold uppercase text-edu-ink tabular-nums mb-2"
       >
         {t('education.wordTowerPractice.progress', {
           found: hits.length,
@@ -262,7 +262,7 @@ function WordTowerRun({
                   ? 'bg-neo-lime text-neo-black'
                   : target === next
                     ? 'bg-neo-yellow text-neo-black'
-                    : 'bg-neo-white/15 text-neo-white/80'
+                    : 'bg-edu-ink/15 text-edu-ink/80'
               )}
             >
               {isHit && <Check className="w-3.5 h-3.5" aria-hidden="true" />}
@@ -277,7 +277,7 @@ function WordTowerRun({
       <p
         data-testid="word-tower-practice-floors"
         data-floors={game.floors.length}
-        className="flex items-center gap-2 text-sm font-neo-body text-neo-white/85 mb-3 tabular-nums"
+        className="flex items-center gap-2 text-sm font-neo-body text-edu-ink/85 mb-3 tabular-nums"
       >
         <Blocks className="w-4 h-4" aria-hidden="true" />
         {t('education.wordTowerPractice.height', {

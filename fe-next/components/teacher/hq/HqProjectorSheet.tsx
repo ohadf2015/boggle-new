@@ -62,7 +62,7 @@ export function HqProjectorSheet({
       aria-modal="true"
       aria-labelledby="hq-projector-title"
       data-hq-sheet="projector"
-      className="fixed inset-0 z-[120] flex flex-col overflow-hidden bg-neo-navy"
+      className="fixed inset-0 z-[120] flex flex-col overflow-hidden bg-edu-page"
     >
       <Image
         src="/images/education/arena-lobby-bg.webp"
@@ -72,7 +72,7 @@ export function HqProjectorSheet({
         sizes="100vw"
         className="pointer-events-none select-none object-cover opacity-70"
       />
-      <div className="absolute inset-0 bg-neo-navy/40" aria-hidden="true" />
+      <div className="absolute inset-0 bg-edu-surface/40" aria-hidden="true" />
 
       <button
         type="button"
@@ -92,7 +92,7 @@ export function HqProjectorSheet({
       >
         <h2
           id="hq-projector-title"
-          className="font-neo-display text-2xl font-black uppercase tracking-tight text-neo-white drop-shadow-[0_3px_0_#000] sm:text-4xl"
+          className="font-neo-display text-2xl font-black uppercase tracking-tight text-edu-ink drop-shadow-[0_3px_0_#000] sm:text-4xl"
         >
           {t("academy.hq.projectorTitle", "Join {name}", {
             name: classroom.name,
@@ -129,7 +129,7 @@ export function HqProjectorSheet({
         <p
           data-testid="hq-projector-address"
           dir="ltr"
-          className="rounded-neo border-3 border-neo-cream bg-neo-navy-light px-4 py-2 font-neo-body text-base font-black text-neo-white shadow-hard sm:text-2xl"
+          className="rounded-neo border-3 border-edu-line bg-edu-surface px-4 py-2 font-neo-body text-base font-black text-edu-ink shadow-hard sm:text-2xl"
         >
           {address}
         </p>
@@ -142,7 +142,7 @@ export function HqProjectorSheet({
             seats={10}
             size={52}
           />
-          <p className="font-neo-display text-lg font-black uppercase text-neo-lime sm:text-2xl">
+          <p className="font-neo-display text-lg font-black uppercase text-edu-lime-ink sm:text-2xl">
             {students.length > 0
               ? `${students.length} ${t("academy.hq.joinedLabel", "joined")}`
               : t("academy.hq.nobodyYet", "No one yet — share the code")}

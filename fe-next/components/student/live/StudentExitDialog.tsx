@@ -51,7 +51,7 @@ export function StudentExitDialog({ open, onOpenChange, onConfirm, t, analyticsI
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="max-w-sm rounded-neo border-[3px] border-neo-cream bg-neo-navy-light text-neo-white shadow-hard-lg">
+      <AlertDialogContent className="max-w-sm rounded-neo border-[3px] border-edu-line bg-edu-surface text-edu-ink shadow-hard-lg">
         <AlertDialogHeader className="items-center text-center">
           <span
             aria-hidden="true"
@@ -59,10 +59,10 @@ export function StudentExitDialog({ open, onOpenChange, onConfirm, t, analyticsI
           >
             <DirectionalIcon icon={LogOut} mirror className="size-6 text-neo-black" />
           </span>
-          <AlertDialogTitle className="font-neo-display text-xl font-black text-neo-white">
+          <AlertDialogTitle className="font-neo-display text-xl font-black text-edu-ink">
             {t('eduStudent.exit.title')}
           </AlertDialogTitle>
-          <AlertDialogDescription className="font-neo-body font-bold text-neo-white/75">
+          <AlertDialogDescription className="font-neo-body font-bold text-edu-ink/75">
             {t('eduStudent.exit.body')}
           </AlertDialogDescription>
         </AlertDialogHeader>

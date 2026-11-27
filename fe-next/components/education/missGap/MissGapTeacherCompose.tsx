@@ -84,7 +84,7 @@ export function MissGapTeacherCompose({
   return (
     <div className="mt-5 space-y-3">
       <label className="block">
-        <span className="flex items-center gap-2 text-neo-white font-bold text-sm mb-2">
+        <span className="flex items-center gap-2 text-edu-ink font-bold text-sm mb-2">
           <Calendar className="w-4 h-4" aria-hidden />
           {t('education.results.assignMissGapAsyncDueLabel')}
         </span>
@@ -93,7 +93,7 @@ export function MissGapTeacherCompose({
           data-testid="miss-gap-async-due-date"
           value={dueDate}
           onChange={(e) => onDueDateChange(e.target.value)}
-          className="w-full px-3 py-2 rounded-neo border-[3px] border-neo-cream bg-neo-navy text-neo-white font-neo-body"
+          className="w-full px-3 py-2 rounded-neo border-[3px] border-edu-line bg-edu-surface text-edu-ink font-neo-body"
         />
       </label>
 
@@ -124,7 +124,7 @@ export function MissGapTeacherCompose({
       </button>
 
       {classToken === '' ? (
-        <p data-testid="miss-gap-async-untracked" className="text-neo-cream font-neo-body text-sm">
+        <p data-testid="miss-gap-async-untracked" className="text-edu-ink font-neo-body text-sm">
           {t('education.results.assignMissGapAsyncUntracked')}
         </p>
       ) : null}

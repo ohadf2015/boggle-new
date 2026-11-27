@@ -14,12 +14,12 @@ interface Piece {
 
 // Pinned to the edges and corners so the busiest text column in the middle stays clear.
 const PIECES: Piece[] = [
-  { shape: 'circle', color: 'text-neo-cyan', pos: '-top-10 start-[6%]', size: 'size-44', dur: 34, delay: 0 },
-  { shape: 'triangle', color: 'text-neo-pink', pos: 'top-[18%] -end-8', size: 'size-40', dur: 28, delay: -9 },
-  { shape: 'diamond', color: 'text-neo-yellow', pos: 'bottom-[8%] start-[2%]', size: 'size-32', dur: 24, delay: -4 },
-  { shape: 'square', color: 'text-neo-purple', pos: '-bottom-12 end-[14%]', size: 'size-48', dur: 38, delay: -16 },
-  { shape: 'plus', color: 'text-neo-orange', pos: 'bottom-[38%] -start-6', size: 'size-20', dur: 22, delay: -7 },
-  { shape: 'circle', color: 'text-neo-pink', pos: 'top-[6%] end-[34%]', size: 'size-16', dur: 26, delay: -12 },
+  { shape: 'circle', color: 'text-edu-cyan-ink', pos: '-top-10 start-[6%]', size: 'size-44', dur: 34, delay: 0 },
+  { shape: 'triangle', color: 'text-edu-pink-ink', pos: 'top-[18%] -end-8', size: 'size-40', dur: 28, delay: -9 },
+  { shape: 'diamond', color: 'text-edu-yellow-ink', pos: 'bottom-[8%] start-[2%]', size: 'size-32', dur: 24, delay: -4 },
+  { shape: 'square', color: 'text-edu-purple-ink', pos: '-bottom-12 end-[14%]', size: 'size-48', dur: 38, delay: -16 },
+  { shape: 'plus', color: 'text-edu-orange-ink', pos: 'bottom-[38%] -start-6', size: 'size-20', dur: 22, delay: -7 },
+  { shape: 'circle', color: 'text-edu-pink-ink', pos: 'top-[6%] end-[34%]', size: 'size-16', dur: 26, delay: -12 },
 ];
 
 function ShapeSvg({ shape }: { shape: Shape }) {

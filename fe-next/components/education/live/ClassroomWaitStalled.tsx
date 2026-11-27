@@ -16,7 +16,7 @@ export default function ClassroomWaitStalled({ language, onRetry, t }: Props) {
   return (
     <div data-testid="classroom-wait-stalled" className="flex w-full flex-col items-center gap-3">
       <h1 role="status" aria-live="polite" className="font-neo-display text-2xl font-black">{t('eduLiveRoom.entry.waitStalledTitle')}</h1>
-      <p className="font-neo-body text-base font-bold text-neo-cream/80">{t('eduLiveRoom.entry.waitStalledHint')}</p>
+      <p className="font-neo-body text-base font-bold text-edu-ink/80">{t('eduLiveRoom.entry.waitStalledHint')}</p>
       <button type="button" data-testid="classroom-wait-retry" onClick={onRetry} className={cn(PRIMARY_BUTTON, PRESS, 'min-h-12 w-full px-5 text-lg')}>
         {t('eduLiveRoom.entry.waitStalledRetry')}
       </button>

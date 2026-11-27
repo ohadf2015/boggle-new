@@ -22,35 +22,35 @@ export function ProFramingSection({ cta }: { cta?: ReactNode } = {}) {
     <section id="pro" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-8 sm:px-6 sm:py-14 lg:px-8">
       <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:gap-10">
         <div className="min-w-0">
-          <h2 className="text-balance font-neo-poster text-2xl font-extrabold leading-tight tracking-[-0.01em] text-neo-white [overflow-wrap:anywhere] sm:text-3xl">
+          <h2 className="text-balance font-neo-poster text-2xl font-extrabold leading-tight tracking-[-0.01em] text-edu-ink [overflow-wrap:anywhere] sm:text-3xl">
             {t('education.landing.pro.title')}
           </h2>
-          <p className="mt-2 max-w-[52ch] text-base text-neo-white/80">{t('education.landing.pro.subtitle')}</p>
-          <p className="mt-5 font-neo-display text-sm font-black text-neo-yellow">{t('eg2Pro.strip.title')}</p>
+          <p className="mt-2 max-w-[52ch] text-base text-edu-ink/80">{t('education.landing.pro.subtitle')}</p>
+          <p className="mt-5 font-neo-display text-sm font-black text-edu-yellow-ink">{t('eg2Pro.strip.title')}</p>
           <div aria-hidden="true" className="pointer-events-none mt-2 select-none">
             <ProFeaturePreview feature="mastery" />
           </div>
-          <p className="mt-2 text-xs font-bold text-neo-white/60">{t('eg2Pro.strip.lead')}</p>
+          <p className="mt-2 text-xs font-bold text-edu-ink/60">{t('eg2Pro.strip.lead')}</p>
         </div>
 
         <div className="flex min-w-0 flex-col gap-4">
           {/* Free Tier */}
-          <div className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-3 text-neo-white sm:p-4">
+          <div className="rounded-neo border-2 border-edu-line bg-edu-surface p-3 text-edu-ink sm:p-4">
             <ProFramingSectionTable rows={PLAN_TABLE_ROWS} />
-            <p className="mt-3 text-xs font-bold text-neo-white">{t('education.landing.pro.freeForever')}</p>
+            <p className="mt-3 text-xs font-bold text-edu-ink">{t('education.landing.pro.freeForever')}</p>
           </div>
 
           {/* Pro Tier */}
-          <div className="rounded-neo border-3 border-neo-yellow bg-neo-navy-elevated p-4 text-neo-white shadow-hard sm:p-5">
+          <div className="rounded-neo border-3 border-neo-yellow bg-edu-surface p-4 text-edu-ink shadow-hard sm:p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="inline-flex items-center gap-1.5 font-neo-display text-xl font-black text-neo-white">
-                  <Crown className="size-5 text-neo-yellow" strokeWidth={2.5} aria-hidden="true" />
+                <p className="inline-flex items-center gap-1.5 font-neo-display text-xl font-black text-edu-ink">
+                  <Crown className="size-5 text-edu-yellow-ink" strokeWidth={2.5} aria-hidden="true" />
                   {t('education.landing.pro.proTier')}
                 </p>
-                <p className="mt-2 font-neo-display font-black leading-none text-neo-white">
+                <p className="mt-2 font-neo-display font-black leading-none text-edu-ink">
                   <bdi dir="ltr" className="text-5xl">{PRO_COPY_PARAMS.price}</bdi>
-                  <span className="ms-2 text-base font-bold text-neo-white">{t('education.landing.pro.perMonth')}</span>
+                  <span className="ms-2 text-base font-bold text-edu-ink">{t('education.landing.pro.perMonth')}</span>
                 </p>
               </div>
               <Image
@@ -62,7 +62,7 @@ export function ProFramingSection({ cta }: { cta?: ReactNode } = {}) {
                 className="w-20 shrink-0 rounded-neo-sm sm:w-24"
               />
             </div>
-            <p className="mt-3 text-sm font-bold text-neo-white">
+            <p className="mt-3 text-sm font-bold text-edu-ink">
               {t('eduPro.trialLine', t('eduPlans.pro.trialLine', { days: PRO_COPY_PARAMS.days }), { days: PRO_COPY_PARAMS.days })}
             </p>
             <div className="mt-4">
@@ -79,7 +79,7 @@ export function ProFramingSection({ cta }: { cta?: ReactNode } = {}) {
           </div>
 
           {/* Why now: the one limit both plans share, said once */}
-          <p className="text-xs font-bold text-neo-white/70">
+          <p className="text-xs font-bold text-edu-ink/70">
             {t('eg6Land.pro.liveCap', undefined, { count: String(MAX_PLAYERS_PER_ROOM) })}
           </p>
         </div>

@@ -45,17 +45,17 @@ export function VocabQuizPromptPanel({ focusLabel, ask, prompt, mascot, revealed
       <div className="flex min-w-0 flex-1 flex-col gap-1 [@media(max-width:639px)_and_(min-height:800px)]:w-full [@media(max-width:639px)_and_(min-height:800px)]:flex-none [@media(max-width:639px)_and_(min-height:800px)]:items-center [@media(max-width:639px)_and_(min-height:800px)]:text-center">
         <p
           data-testid="vocab-quiz-focus"
-          className="flex items-center gap-1.5 [@media(max-height:560px)]:hidden font-neo-display text-xs font-black uppercase tracking-wider text-neo-purple sm:text-sm [@media(max-width:639px)_and_(min-height:800px)]:text-sm"
+          className="flex items-center gap-1.5 [@media(max-height:560px)]:hidden font-neo-display text-xs font-black uppercase tracking-wider text-edu-purple-ink sm:text-sm [@media(max-width:639px)_and_(min-height:800px)]:text-sm"
         >
           <Sparkles className="size-4 shrink-0" strokeWidth={2.5} aria-hidden />
           <span className="min-w-0 break-words">{focusLabel}</span>
         </p>
-        <p data-testid="vocab-quiz-ask" className="font-neo-display text-xl font-bold leading-tight text-neo-cream sm:text-2xl [@media(max-height:560px)]:text-lg">
+        <p data-testid="vocab-quiz-ask" className="font-neo-display text-xl font-bold leading-tight text-edu-ink sm:text-2xl [@media(max-height:560px)]:text-lg">
           {ask}
         </p>
         <p
           data-testid="vocab-quiz-prompt"
-          className={cn('mt-1 font-neo-display font-black break-words text-start text-neo-white [@media(max-width:639px)_and_(min-height:800px)]:text-center', promptSizeClass(prompt), '[@media(max-height:560px)]:text-[2.5rem] [@media(max-height:560px)]:mt-0')}
+          className={cn('mt-1 font-neo-display font-black break-words text-start text-edu-ink [@media(max-width:639px)_and_(min-height:800px)]:text-center', promptSizeClass(prompt), '[@media(max-height:560px)]:text-[2.5rem] [@media(max-height:560px)]:mt-0')}
         >
           {prompt}
         </p>

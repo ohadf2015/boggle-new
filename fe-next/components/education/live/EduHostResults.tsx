@@ -66,7 +66,7 @@ import { LessonPlanPrompt } from '@/components/education/LessonPlanPrompt';
 /** Play again, Next mode and End game: room controls, drawn as a quiet row so they never compete with the one primary. */
 const TERTIARY = cn(
   PRESS,
-  'inline-flex min-h-11 min-w-0 grow basis-32 items-center justify-center gap-1.5 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 text-center font-neo-display text-sm font-black normal-case text-neo-cream shadow-hard transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-x-[2px] active:translate-y-[2px] active:shadow-none motion-reduce:transition-none @5xl/results:text-base @[96rem]/results:min-h-14 @[96rem]/results:text-xl'
+  'inline-flex min-h-11 min-w-0 grow basis-32 items-center justify-center gap-1.5 rounded-neo-lg border-[3px] border-edu-line bg-edu-surface px-3 text-center font-neo-display text-sm font-black normal-case text-edu-ink shadow-hard transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-x-[2px] active:translate-y-[2px] active:shadow-none motion-reduce:transition-none @5xl/results:text-base @[96rem]/results:min-h-14 @[96rem]/results:text-xl'
 );
 
 type FallbackTranslate = (key: string, fallback: string, params?: Record<string, string | number>) => string;
@@ -151,7 +151,7 @@ function ShareClassWinButton({ share, label, copied }: { share: ClassWinShare; l
     posthog.capture('brag_share_tapped', { surface: 'edu_class_win', kind: 'class', result });
   };
   return (
-    <button type="button" data-testid="edu-results-share-class-win" onClick={onShare} className={cn(TERTIARY, 'basis-auto border-neo-lime text-neo-lime')}>
+    <button type="button" data-testid="edu-results-share-class-win" onClick={onShare} className={cn(TERTIARY, 'basis-auto border-neo-lime text-edu-lime-ink')}>
       <PartyPopper className="size-4 shrink-0" aria-hidden="true" />
       {label}
     </button>
@@ -244,9 +244,9 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
       data-testid="edu-host-results"
       data-round-end-stage={stage}
       data-outcome={outcome.kind}
-      className="fixed inset-0 z-[75] flex flex-col gap-2 overflow-hidden bg-neo-navy px-3 pb-3 pt-4 text-neo-cream [container:results_/_size] lg:gap-4 lg:px-8 lg:pb-6 lg:pt-6"
+      className="fixed inset-0 z-[75] flex flex-col gap-2 overflow-hidden bg-edu-page px-3 pb-3 pt-4 text-edu-ink [container:results_/_size] lg:gap-4 lg:px-8 lg:pb-6 lg:pt-6"
     >
-      <BossOutcomeCard size="tv" density="compact" className="shrink-0 rounded-neo-lg border-[3px] border-neo-cream/50 shadow-hard-xl" />
+      <BossOutcomeCard size="tv" density="compact" className="shrink-0 rounded-neo-lg border-[3px] border-edu-line shadow-hard-xl" />
       <TvRecapHeader
         title={
           !hasStage

@@ -50,10 +50,10 @@ export function KeepOpenHomework({ classroomId, lessonId }: { classroomId: strin
 
   if (open) {
     return (
-      <div data-testid="keep-open-done" role="status" className="flex items-start gap-2 rounded-neo-lg border-[3px] border-neo-cyan/60 bg-neo-cyan/10 p-3 text-neo-cream">
-        <CalendarCheck className="mt-0.5 size-5 shrink-0 text-neo-cyan" aria-hidden="true" />
+      <div data-testid="keep-open-done" role="status" className="flex items-start gap-2 rounded-neo-lg border-[3px] border-neo-cyan/60 bg-neo-cyan/10 p-3 text-edu-ink">
+        <CalendarCheck className="mt-0.5 size-5 shrink-0 text-edu-cyan-ink" aria-hidden="true" />
         <p className="font-neo-body text-sm font-bold leading-snug">
-          <span className="block font-neo-display font-black text-neo-cyan">
+          <span className="block font-neo-display font-black text-edu-cyan-ink">
             {open.due ? t(`${K}.done`, { date: dateLabel(open.due) }) : t(`${K}.doneNoDate`)}
           </span>
           {t(`${K}.doneHint`)}
@@ -87,11 +87,11 @@ export function KeepOpenHomework({ classroomId, lessonId }: { classroomId: strin
         {t(`${K}.cta`)}
       </button>
       {note ? (
-        <p data-testid="keep-open-note" role="alert" className="font-neo-body text-xs font-bold text-neo-pink">
+        <p data-testid="keep-open-note" role="alert" className="font-neo-body text-xs font-bold text-edu-pink-ink">
           {t(`${K}.${note}`)}
         </p>
       ) : (
-        <p className="font-neo-body text-xs font-bold text-neo-cream/80">{t(`${K}.hint`, { date: dateLabel(due) })}</p>
+        <p className="font-neo-body text-xs font-bold text-edu-ink/80">{t(`${K}.hint`, { date: dateLabel(due) })}</p>
       )}
     </div>
   );

@@ -36,10 +36,10 @@ function PlayerMedallion({ player, fallbackName }: { player?: AcademyPlayer; fal
   return (
     <div className="flex flex-col items-center">
       <div
-        className="relative grid h-[min(40cqw,34cqh)] w-[min(40cqw,34cqh)] place-items-center overflow-hidden rounded-full border-[clamp(3px,1cqmin,6px)] border-neo-cyan bg-neo-navy-elevated"
+        className="relative grid h-[min(40cqw,34cqh)] w-[min(40cqw,34cqh)] place-items-center overflow-hidden rounded-full border-[clamp(3px,1cqmin,6px)] border-neo-cyan bg-edu-surface"
         style={{ boxShadow: '6px 6px 0 rgb(var(--neo-black)), 0 0 36px rgba(0,255,255,0.55)' }}
       >
-        <span aria-hidden className="absolute font-neo-display text-[min(24cqw,20cqh)] font-black uppercase leading-none text-neo-cyan/50">
+        <span aria-hidden className="absolute font-neo-display text-[min(24cqw,20cqh)] font-black uppercase leading-none text-edu-cyan-ink/50">
           {name.slice(0, 1)}
         </span>
         <Avatar customAvatar={player?.avatarConfig ?? null} userId={player?.userId ?? name} pixelSize={256} disableEffects className="relative !h-full !w-full" />
@@ -163,7 +163,7 @@ export function WorkshopVsIntro({
             }}
           />
           <span
-            className="absolute font-neo-display text-[11cqmin] font-black italic leading-none text-neo-yellow"
+            className="absolute font-neo-display text-[11cqmin] font-black italic leading-none text-edu-yellow-ink"
             style={{ WebkitTextStroke: '3px rgb(var(--neo-black))', textShadow: '4px 4px 0 rgb(var(--neo-black))' }}
           >
             {t('academy.modes.workshop.vs', 'VS')}
@@ -178,7 +178,7 @@ export function WorkshopVsIntro({
         transition={spring(0.15)}
         className={INTRO_COPY}
       >
-        <p className={cn(INTRO_KICKER, 'text-neo-yellow')}>{lessonName}</p>
+        <p className={cn(INTRO_KICKER, 'text-edu-yellow-ink')}>{lessonName}</p>
         <h2 className={cn(INTRO_TITLE, 'lg:text-[clamp(2.5rem,min(5vw,8.5vh),8rem)]')} style={{ textShadow: '3px 3px 0 rgb(var(--neo-black))' }}>
           {t('academy.modes.workshop.introTitleBaron', 'Out-build the Baron')}
         </h2>
@@ -206,7 +206,7 @@ export function WorkshopVsIntro({
           </div>
         )}
         {startFailed && (
-          <p className="mb-2 font-neo-body text-sm text-neo-pink lg:text-[clamp(1rem,1.4vw,1.25rem)]">{t('academy.modes.startFailed', "Couldn't start. Check your connection and try again.")}</p>
+          <p className="mb-2 font-neo-body text-sm text-edu-pink-ink lg:text-[clamp(1rem,1.4vw,1.25rem)]">{t('academy.modes.startFailed', "Couldn't start. Check your connection and try again.")}</p>
         )}
         <m.button
           type="button"

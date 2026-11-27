@@ -25,7 +25,7 @@ export interface ClassroomResultsCardStepsProps {
 }
 
 const BTN = 'flex min-h-12 items-center justify-center rounded-neo border-3 border-neo-black px-5 font-neo-display text-base font-black uppercase tracking-wide';
-const GHOST = 'flex min-h-11 items-center justify-center self-center text-balance text-center rounded-neo px-4 font-neo-display text-sm font-black uppercase tracking-[0.12em] text-neo-white/60 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan [@media(hover:hover)]:hover:text-neo-white sm:min-h-12 sm:border-3 sm:border-neo-white/20 sm:whitespace-nowrap sm:px-5 sm:active:translate-y-[2px]';
+const GHOST = 'flex min-h-11 items-center justify-center self-center text-balance text-center rounded-neo px-4 font-neo-display text-sm font-black uppercase tracking-[0.12em] text-edu-ink/60 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan [@media(hover:hover)]:hover:text-edu-ink sm:min-h-12 sm:border-3 sm:border-edu-line/20 sm:whitespace-nowrap sm:px-5 sm:active:translate-y-[2px]';
 
 /** Student lesson-complete flow: one reward per screen, one CONTINUE in a fixed footer. */
 export function ClassroomResultsCardSteps({
@@ -66,12 +66,12 @@ export function ClassroomResultsCardSteps({
       data-testid="classroom-results-steps"
       data-step={step}
       aria-label={t('education.results.title')}
-      className="flex h-full min-h-0 w-full flex-col bg-neo-navy text-neo-white"
+      className="flex h-full min-h-0 w-full flex-col bg-edu-page text-edu-ink"
     >
       <div className="flex shrink-0 justify-center px-4 pt-4" aria-label={t('education.results.steps.progress', { step: index + 1, total: steps.length })} role="img">
         <div className="flex w-full max-w-md gap-2">
           {steps.map((s, i) => (
-            <span key={s} className="relative h-3 flex-1 overflow-hidden rounded-full border-2 border-neo-cream/60 bg-neo-navy">
+            <span key={s} className="relative h-3 flex-1 overflow-hidden rounded-full border-2 border-edu-line bg-edu-page">
               <m.span
                 className="absolute inset-0 block origin-left rounded-full bg-neo-lime rtl:origin-right"
                 initial={false}
@@ -104,7 +104,7 @@ export function ClassroomResultsCardSteps({
 
       <div
         data-testid="results-steps-footer"
-        className="sticky bottom-0 shrink-0 border-t-[3px] border-neo-cream/50 bg-neo-navy px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-4 sm:p-6"
+        className="sticky bottom-0 shrink-0 border-t-[3px] border-edu-line bg-edu-surface px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-4 sm:p-6"
       >
         <div className="mx-auto flex w-full max-w-md flex-col gap-2 sm:max-w-[58rem] sm:flex-row-reverse sm:items-center sm:justify-between sm:gap-6">
           <m.button

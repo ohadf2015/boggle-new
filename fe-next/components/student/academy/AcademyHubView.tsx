@@ -270,7 +270,7 @@ export function AcademyHubView(props: AcademyHubViewProps) {
       data-chrome={hub.chrome}
       data-scale={hub.scale}
       ref={hubRef}
-      className="fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] overflow-hidden bg-neo-navy text-neo-white [&[data-covered]>main]:[content-visibility:hidden]"
+      className="fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] overflow-hidden bg-edu-surface text-edu-ink [&[data-covered]>main]:[content-visibility:hidden]"
     >
       {/* Inline position: a global landscape-phone rule forces every <main> to relative. */}
       <main className="absolute inset-0" style={{ position: 'absolute', inset: 0 }} aria-label={t('academy.student.mapLabel', 'Academy map')}>
@@ -409,7 +409,7 @@ export function AcademyHubView(props: AcademyHubViewProps) {
                 data-testid="academy-cta-pending"
                 aria-busy="true"
                 className={cn(
-                  'w-full animate-pulse rounded-[20px] border-3 border-neo-cream bg-neo-navy-light',
+                  'w-full animate-pulse rounded-[20px] border-3 border-edu-line bg-edu-surface',
                   rail ? 'h-14' : wide ? 'h-[92px]' : 'h-[68px] sm:h-[76px]',
                 )}
               />

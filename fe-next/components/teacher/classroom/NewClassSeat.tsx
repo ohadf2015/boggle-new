@@ -19,7 +19,7 @@ export function NewClassSeat({ href, label, hint, accent }: { href: string; labe
         'group flex w-full min-w-0 flex-col overflow-hidden',
         GAME_CARD,
         GAME_CARD_HOVER,
-        'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream',
+        'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line',
       )}
     >
       <span data-testid="list-card-band" className={cn(LIST_CARD_BAND, NB_BLOCK[accent], 'font-neo-display text-xl font-black leading-tight')}>
@@ -27,7 +27,7 @@ export function NewClassSeat({ href, label, hint, accent }: { href: string; labe
         {label}
       </span>
       <span className="flex flex-1 items-center gap-3 p-3.5">
-        <span className="min-w-0 flex-1 font-neo-body text-base font-semibold text-neo-cream/80">{hint}</span>
+        <span className="min-w-0 flex-1 font-neo-body text-base font-semibold text-edu-ink/80">{hint}</span>
         <EduMascot moment="firstClass" size={96} className="size-24 shrink-0" />
       </span>
     </Link>

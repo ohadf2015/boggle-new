@@ -38,11 +38,11 @@ export default function ClassModeBridgeStart() {
   if (invalid) {
     const locale = classBridgeLocale(language);
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-neo-navy px-4 text-center">
-        <p className="max-w-sm font-neo-display text-lg font-black text-neo-cream">{INVALID[locale]}</p>
+      <div className="flex min-h-dvh items-center justify-center bg-edu-page px-4 text-center">
+        <p className="max-w-sm font-neo-display text-lg font-black text-edu-ink">{INVALID[locale]}</p>
       </div>
     );
   }
 
-  return <div data-testid="class-mode-bridge-start" aria-busy="true" className="min-h-dvh bg-neo-navy" />;
+  return <div data-testid="class-mode-bridge-start" aria-busy="true" className="min-h-dvh bg-edu-page" />;
 }

@@ -32,7 +32,7 @@ export function ProjectorWordPanel({ cards, t, className, style }: ProjectorWord
         <BookOpen className="size-[1em] shrink-0" aria-hidden="true" />
         {t('education.projectorLobby.wordsTitle')}
         {more > 0 && (
-          <span data-testid="projector-words-more" className="ms-auto font-neo-body text-[0.75em] font-bold text-neo-cream/75">
+          <span data-testid="projector-words-more" className="ms-auto font-neo-body text-[0.75em] font-bold text-edu-ink/75">
             {t('education.projectorLobby.moreWords', { count: more })}
           </span>
         )}
@@ -42,13 +42,13 @@ export function ProjectorWordPanel({ cards, t, className, style }: ProjectorWord
           <li
             key={card.word}
             data-testid="projector-word"
-            className={cn('min-w-0 rounded-neo bg-neo-navy px-[0.6em] py-[0.4em] shadow-hard [@container(max-height:800px)]:px-[0.4em] [@container(max-height:800px)]:py-[0.1em]', WALL_EDGE)}
+            className={cn('min-w-0 rounded-neo bg-edu-surface px-[0.6em] py-[0.4em] shadow-hard [@container(max-height:800px)]:px-[0.4em] [@container(max-height:800px)]:py-[0.1em]', WALL_EDGE)}
           >
-            <p dir="auto" className="truncate font-neo-display font-black leading-tight text-neo-lime text-[clamp(1.125rem,min(2.2cqw,3.6cqh),3.25rem)] [@container(max-height:800px)]:@5xl:text-[clamp(1rem,1.5cqw,1.5rem)]">
+            <p dir="auto" className="truncate font-neo-display font-black leading-tight text-edu-lime-ink text-[clamp(1.125rem,min(2.2cqw,3.6cqh),3.25rem)] [@container(max-height:800px)]:@5xl:text-[clamp(1rem,1.5cqw,1.5rem)]">
               {card.word}
             </p>
             {card.definition && (
-              <p data-testid="projector-word-definition" dir="auto" className="line-clamp-1 [@container(max-height:800px)]:hidden font-neo-body leading-snug text-neo-cream/85 text-[clamp(0.8125rem,min(1.05cqw,1.9cqh),1.625rem)]">
+              <p data-testid="projector-word-definition" dir="auto" className="line-clamp-1 [@container(max-height:800px)]:hidden font-neo-body leading-snug text-edu-ink/85 text-[clamp(0.8125rem,min(1.05cqw,1.9cqh),1.625rem)]">
                 {card.definition}
               </p>
             )}

@@ -40,10 +40,10 @@ export function HomeShareSheet({ classroom, open, onOpenChange, uiLanguage, t }:
           closeButtonLabel={t('common.close')}
           closeButtonVariant="minimal"
           style={{ backgroundImage: 'none' }}
-          className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-auto border-2 border-neo-cream/40 bg-neo-navy p-5 text-neo-cream dark:border-neo-cream/40 dark:bg-neo-navy sm:max-w-lg"
+          className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-auto border-2 border-edu-line bg-edu-surface p-5 text-edu-ink dark:border-edu-line dark:bg-edu-surface sm:max-w-lg"
         >
-          <DialogTitle className="pe-12 font-neo-display text-xl font-black normal-case tracking-normal text-neo-cream">{t('eduShell.home.shareTitle')}</DialogTitle>
-          <DialogDescription dir="auto" className="font-neo-body text-sm text-neo-cream/75">{classroom.name}</DialogDescription>
+          <DialogTitle className="pe-12 font-neo-display text-xl font-black normal-case tracking-normal text-edu-ink">{t('eduShell.home.shareTitle')}</DialogTitle>
+          <DialogDescription dir="auto" className="font-neo-body text-sm text-edu-ink/75">{classroom.name}</DialogDescription>
           {open ? (
             <ClassSetupInviteCode
               code={classroom.join_code}
@@ -63,7 +63,7 @@ export function HomeShareSheet({ classroom, open, onOpenChange, uiLanguage, t }:
             target="_blank"
             rel="noopener"
             data-testid="home-share-print"
-            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo border-2 border-neo-cream/50 px-4 font-neo-body text-sm font-bold text-neo-cream hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo border-2 border-edu-line px-4 font-neo-body text-sm font-bold text-edu-ink hover:bg-edu-surface focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             <Printer className="size-4" aria-hidden="true" />
             {t('teacher.joinSheet.printAria')}

@@ -71,10 +71,10 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
       className="flex flex-col gap-5 short:gap-3 [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:grid [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:grid-cols-2 [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:items-center [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:gap-x-8"
     >
       <div>
-        <h1 className="font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-neo-white short:text-3xl sm:text-5xl lg:text-6xl">
+        <h1 className="font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-edu-ink short:text-3xl sm:text-5xl lg:text-6xl">
           {t(`${K}.flow.codeHeadline`)}
         </h1>
-        <p className="mt-2 font-neo-body text-base font-bold text-neo-cyan short:mt-1 short:text-sm phone-short:hidden lg:text-lg">
+        <p className="mt-2 font-neo-body text-base font-bold text-edu-cyan-ink short:mt-1 short:text-sm phone-short:hidden lg:text-lg">
           {t(`${K}.flow.codeSub`)}
         </p>
       </div>
@@ -104,7 +104,7 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
             // The sub line already says where the code comes from; this region only speaks up when something happened.
             <p
               role="status"
-              className={cn('font-neo-body text-sm font-bold lg:text-base', stripped ? 'text-neo-yellow' : 'text-neo-lime')}
+              className={cn('font-neo-body text-sm font-bold lg:text-base', stripped ? 'text-edu-yellow-ink' : 'text-edu-lime-ink')}
             >
               {stripped ? t(`${K}.codeStripped`) : pasteNoteKey ? t(pasteNoteKey) : null}
             </p>
@@ -121,8 +121,8 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
           </JoinPrimaryButton>
         )}
 
-        <details className="group/where rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light/80">
-          <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-neo px-3 py-2 font-neo-body text-sm font-bold text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-neo-cyan lg:text-base [&::-webkit-details-marker]:hidden">
+        <details className="group/where rounded-neo border-2 border-edu-line bg-edu-surface/80">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-neo px-3 py-2 font-neo-body text-sm font-bold text-edu-cyan-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-neo-cyan lg:text-base [&::-webkit-details-marker]:hidden">
             <HelpCircle aria-hidden="true" className="size-5 shrink-0" />
             <span>{t(`${K}.flow.whereCode`)}</span>
             <ChevronDown
@@ -130,7 +130,7 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
               className="ms-auto size-5 shrink-0 group-open/where:rotate-180 motion-safe:transition-transform"
             />
           </summary>
-          <p className="px-3 pb-3 font-neo-body text-sm leading-snug text-neo-white/85 lg:text-base">
+          <p className="px-3 pb-3 font-neo-body text-sm leading-snug text-edu-ink/85 lg:text-base">
             {t(`${K}.flow.whereCodeAnswer`)}
           </p>
         </details>

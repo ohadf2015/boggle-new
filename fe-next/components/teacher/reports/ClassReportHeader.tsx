@@ -35,12 +35,12 @@ export function ClassReportHeader({ eyebrow, name, onBack, link, memberCount, ch
         <span className="max-sm:sr-only">{backLabel}</span>
       </button>
       <div className="min-w-0 flex-1">
-        <p className="font-neo-body text-sm font-bold text-neo-cream/70">{eyebrow}</p>
-        <h1 data-wipe className="break-words font-neo-display text-2xl font-bold leading-tight text-neo-cream md:text-3xl">
+        <p className="font-neo-body text-sm font-bold text-edu-ink/70">{eyebrow}</p>
+        <h1 data-wipe className="break-words font-neo-display text-2xl font-bold leading-tight text-edu-ink md:text-3xl">
           <bdi>{name}</bdi>
         </h1>
         {typeof memberCount === 'number' ? (
-          <p data-testid="class-report-size" className="font-neo-body text-sm font-bold text-neo-cream/70">
+          <p data-testid="class-report-size" className="font-neo-body text-sm font-bold text-edu-ink/70">
             {t(pluralKeyOf('teacher.classroom.members', memberCount, language), { count: memberCount })}
           </p>
         ) : null}

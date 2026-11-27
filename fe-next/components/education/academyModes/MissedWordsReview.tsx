@@ -120,10 +120,10 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
         <div data-testid="review-empty" className="flex w-full max-w-md flex-col items-center gap-3 text-center lg:max-w-3xl">
           {/* eslint-disable-next-line @next/next/no-img-element -- static art */}
           <img src={REVIEW_MASCOT_ART.cheer} alt="" className="h-40 w-40 object-contain drop-shadow-[5px_5px_0_rgb(var(--neo-black))] lg:h-72 lg:w-72" />
-          <h2 className="font-neo-display text-3xl font-black uppercase text-neo-white lg:text-7xl" style={{ textShadow: '3px 3px 0 rgb(var(--neo-black))' }}>
+          <h2 className="font-neo-display text-3xl font-black uppercase text-edu-ink lg:text-7xl" style={{ textShadow: '3px 3px 0 rgb(var(--neo-black))' }}>
             {t('academy.modes.review.emptyTitle', 'Nothing to review!')}
           </h2>
-          <p className="font-neo-body text-base text-neo-cream lg:text-2xl">
+          <p className="font-neo-body text-base text-edu-ink lg:text-2xl">
             {t('academy.modes.review.emptyBody', 'Play a class game or a lesson, and the words you miss will show up here for a rematch.')}
           </p>
           <button type="button" data-testid="review-back" onClick={onBack} className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', primaryButtonClass, 'w-full lg:max-w-xl')}>
@@ -168,7 +168,7 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
             }
             note={
               recordFailed ? (
-                <p className="font-neo-body text-xs text-neo-pink lg:text-lg">{t('academy.modes.review.xpNotSaved', "Couldn't save XP this time. Your boxes still moved.")}</p>
+                <p className="font-neo-body text-xs text-edu-pink-ink lg:text-lg">{t('academy.modes.review.xpNotSaved', "Couldn't save XP this time. Your boxes still moved.")}</p>
               ) : null
             }
             stats={[
@@ -217,7 +217,7 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
           transition={{ type: 'spring', stiffness: 500, damping: 12 }}
           className={cn(
             'flex items-center gap-1 rounded-neo border-[3px] px-2.5 py-1 font-neo-display text-lg font-black shadow-hard lg:px-4 lg:text-3xl min-[2200px]:px-6 min-[2200px]:text-5xl',
-            streak >= 3 ? 'border-neo-black bg-neo-orange text-neo-black' : streak > 0 ? 'border-neo-black bg-neo-yellow text-neo-black' : 'border-neo-cream bg-neo-navy-elevated text-neo-cream',
+            streak >= 3 ? 'border-neo-black bg-neo-orange text-neo-black' : streak > 0 ? 'border-neo-black bg-neo-yellow text-neo-black' : 'border-edu-line bg-edu-surface text-edu-ink',
           )}
           style={streak >= 3 ? { boxShadow: '3px 3px 0 rgb(var(--neo-black)), 0 0 22px rgba(255,107,53,0.8)' } : undefined}
           aria-label={t('academy.modes.review.streak', 'Streak {count}', { count: streak })}
@@ -240,7 +240,7 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
               chestLabel={chestName(projected)}
               progressLabel={progressText}
             />
-            <span data-testid="review-progress" dir="ltr" className="mt-2 font-neo-display text-base font-black text-neo-cream lg:text-[clamp(1.25rem,2vw,2.5rem)]">
+            <span data-testid="review-progress" dir="ltr" className="mt-2 font-neo-display text-base font-black text-edu-ink lg:text-[clamp(1.25rem,2vw,2.5rem)]">
               {progressText}
             </span>
           </div>

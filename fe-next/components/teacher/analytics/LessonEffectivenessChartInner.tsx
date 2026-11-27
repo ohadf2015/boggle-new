@@ -33,27 +33,27 @@ const CustomTooltip = ({ active, payload, t }: CustomTooltipProps) => {
 
   return (
     <div
-      className="bg-neo-navy border-neo border-neo-cyan shadow-hard p-3 rounded-neo"
+      className="bg-edu-surface border-neo border-neo-cyan shadow-hard p-3 rounded-neo"
       style={{ backgroundColor: CHART_COLORS.tooltip, borderColor: CHART_COLORS.tooltipBorder }}
     >
-      <p className="text-neo-white font-neo-body font-bold mb-2">{data.lessonName}</p>
+      <p className="text-edu-ink font-neo-body font-bold mb-2">{data.lessonName}</p>
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS.avgXpGain }} />
-          <span className="text-neo-cyan text-sm">
+          <span className="text-edu-cyan-ink text-sm">
             {t('education.analytics.avgXpGain')}: {data.averageXpGain}
           </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS.completionRate }} />
-          <span className="text-neo-pink text-sm">
+          <span className="text-edu-pink-ink text-sm">
             {t('education.analytics.completionRate')}: {data.completionRate}%
           </span>
         </div>
-        <div className="text-neo-white text-sm mt-2">
+        <div className="text-edu-ink text-sm mt-2">
           {t('education.analytics.avgAccuracy')}: {data.averageAccuracy}%
         </div>
-        <div className="text-neo-white text-sm">
+        <div className="text-edu-ink text-sm">
           {t('education.analytics.students')}: {data.totalStudents}
         </div>
       </div>
@@ -79,7 +79,7 @@ export function LessonEffectivenessChart({ classroomId }: LessonEffectivenessCha
 
   if (error) {
     return (
-      <Card className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/50">
+      <Card className="border-neo border-edu-line shadow-hard bg-edu-surface/50">
         <CardContent className="py-12 text-center">
           <p className="text-red-400">{t('education.analytics.error')}</p>
         </CardContent>
@@ -89,22 +89,22 @@ export function LessonEffectivenessChart({ classroomId }: LessonEffectivenessCha
 
   if (effectiveness.length === 0) {
     return (
-      <Card className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/50">
+      <Card className="border-neo border-edu-line shadow-hard bg-edu-surface/50">
         <CardContent className="py-12 text-center">
-          <TrendingUp className="w-12 h-12 text-neo-white mx-auto mb-4" />
-          <h3 className="text-xl font-neo-display text-neo-white mb-2">
+          <TrendingUp className="w-12 h-12 text-edu-ink mx-auto mb-4" />
+          <h3 className="text-xl font-neo-display text-edu-ink mb-2">
             {t('education.analytics.noLessons')}
           </h3>
-          <p className="text-neo-white">{t('education.analytics.assignLessonsHint')}</p>
+          <p className="text-edu-ink">{t('education.analytics.assignLessonsHint')}</p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/80">
+    <Card className="border-neo border-edu-line shadow-hard bg-edu-surface/80">
       <CardHeader>
-        <CardTitle className="text-2xl font-neo-display text-neo-white">
+        <CardTitle className="text-2xl font-neo-display text-edu-ink">
           {t('education.analytics.lessonEffectiveness')}
         </CardTitle>
       </CardHeader>

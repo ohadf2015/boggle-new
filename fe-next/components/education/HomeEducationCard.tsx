@@ -80,7 +80,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
       data-edu-role={role}
       className={cn(
         'group relative flex w-full items-center gap-3 sm:gap-4',
-        'rounded-neo border-[3px] bg-neo-navy-light',
+        'rounded-neo border-[3px] bg-edu-surface',
         border,
         'px-3 py-2.5 sm:px-4 sm:py-3',
         shadow,
@@ -113,9 +113,9 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
             data-testid="home-education-card"
             onClick={() => trackLandingCtaClick('education_strip', { role, target: isPromo ? 'education' : role })}
             className={cn(
-              'min-w-0 truncate font-neo-display text-[0.95rem] font-black leading-tight text-neo-white sm:text-base',
+              'min-w-0 truncate font-neo-display text-[0.95rem] font-black leading-tight text-edu-ink sm:text-base',
               'after:absolute after:inset-0 after:rounded-[inherit] after:content-[""]',
-              'focus:outline-hidden focus-visible:after:ring-4 focus-visible:after:ring-offset-2 focus-visible:after:ring-offset-neo-navy',
+              'focus:outline-hidden focus-visible:after:ring-4 focus-visible:after:ring-offset-2 focus-visible:after:ring-offset-edu-surface',
               ring
             )}
           >
@@ -124,7 +124,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
         </div>
         <p
           data-testid="home-education-subtitle"
-          className="mt-0.5 line-clamp-2 font-neo-body text-xs leading-snug text-neo-cream/80 sm:truncate sm:text-sm"
+          className="mt-0.5 line-clamp-2 font-neo-body text-xs leading-snug text-edu-ink/80 sm:truncate sm:text-sm"
         >
           {subtitle}
         </p>
@@ -136,10 +136,10 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
       {/* Ticket tear-line: a dashed rule with two bites out of the border, so the strip reads as a class ticket. */}
       <span
         aria-hidden="true"
-        className="relative mx-1 hidden self-stretch border-s-2 border-dashed border-neo-cream/35 sm:block"
+        className="relative mx-1 hidden self-stretch border-s-2 border-dashed border-edu-line sm:block"
       >
-        <span className="absolute -start-[9px] -top-[23px] h-4 w-4 rounded-full bg-neo-navy" />
-        <span className="absolute -bottom-[23px] -start-[9px] h-4 w-4 rounded-full bg-neo-navy" />
+        <span className="absolute -start-[9px] -top-[23px] h-4 w-4 rounded-full bg-edu-surface" />
+        <span className="absolute -bottom-[23px] -start-[9px] h-4 w-4 rounded-full bg-edu-surface" />
       </span>
 
       {/* Students with a class code skip the teacher pitch (sm and up; on phones
@@ -150,10 +150,10 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
           data-testid="home-education-join"
           onClick={() => trackLandingCtaClick('education_strip', { role, target: 'join' })}
           className={cn(
-            'relative z-10 hidden shrink-0 items-center rounded-neo border-2 border-neo-cream/50 px-3 py-2',
-            'font-neo-display text-sm font-bold text-neo-cream sm:inline-flex',
-            'hover:border-neo-lime hover:text-neo-lime',
-            'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+            'relative z-10 hidden shrink-0 items-center rounded-neo border-2 border-edu-line px-3 py-2',
+            'font-neo-display text-sm font-bold text-edu-ink sm:inline-flex',
+            'hover:border-neo-lime hover:text-edu-lime-ink',
+            'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface'
           )}
         >
           {t('education.home.join_cta')}
@@ -176,7 +176,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
       {/* Mobile: chevron only */}
       <DirectionalIcon
         icon={ArrowRight}
-        className="h-5 w-5 shrink-0 text-neo-cream/70 sm:hidden"
+        className="h-5 w-5 shrink-0 text-edu-ink/70 sm:hidden"
       />
     </div>
   );
@@ -202,7 +202,7 @@ export function TrialPill({ trial, t, language, showOnPhones = false }: TrialPil
       <span
         data-testid="home-education-trial"
         className={cn(
-          'shrink-0 rounded-neo border-neo bg-neo-pink px-2.5 py-1.5 text-center text-xs font-black text-neo-white shadow-hard-sm',
+          'shrink-0 rounded-neo border-neo bg-neo-pink px-2.5 py-1.5 text-center text-xs font-black text-edu-ink shadow-hard-sm',
           showOnPhones ? 'block' : 'hidden sm:block'
         )}
       >
@@ -216,7 +216,7 @@ export function TrialPill({ trial, t, language, showOnPhones = false }: TrialPil
   // hour gets its own unit string (the badge stacks bare number over bare unit,
   // so the unit has to carry its own grammatical number).
   const { key: unitKey, count } = trialCountdownUnit(trial, language);
-  const tone = trial.isUrgent ? 'bg-neo-pink text-neo-white' : 'bg-neo-lime text-neo-navy';
+  const tone = trial.isUrgent ? 'bg-neo-pink text-edu-ink' : 'bg-neo-lime text-neo-navy';
 
   return (
     <span

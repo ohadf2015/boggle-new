@@ -134,14 +134,14 @@ export function VocabQuizView({ socket, username, t, onPlayAgain, onExit }: Voca
     (phase === 'question' || phase === 'reveal') && question ? (
       <div
         data-testid="vocab-quiz-hud-cluster"
-        className="flex shrink-0 items-center gap-2.5 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-elevated px-2.5 py-1.5 sm:gap-3 sm:px-3"
+        className="flex shrink-0 items-center gap-2.5 rounded-neo border-2 border-edu-line bg-edu-surface px-2.5 py-1.5 sm:gap-3 sm:px-3"
       >
         {rank && (
           <>
-            <span className="shrink-0 font-neo-display text-lg font-black tabular-nums text-neo-yellow sm:text-2xl">
+            <span className="shrink-0 font-neo-display text-lg font-black tabular-nums text-edu-yellow-ink sm:text-2xl">
               {t('vocabQuiz.rank', { position: rank.position, total: rank.total })}
             </span>
-            <span aria-hidden className="h-5 w-0.5 shrink-0 rounded-full bg-neo-white/15" />
+            <span aria-hidden className="h-5 w-0.5 shrink-0 rounded-full bg-edu-ink/15" />
           </>
         )}
         <VocabQuizHudScore score={quiz.myScore} pop={pop} t={t} />
@@ -152,7 +152,7 @@ export function VocabQuizView({ socket, username, t, onPlayAgain, onExit }: Voca
   useAnswerKeys(question?.choices.length ?? 0, canAnswer, quiz.answer);
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-neo-navy text-neo-white p-3 gap-4">
+    <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-edu-page text-edu-ink p-3 gap-4">
       {/* One stack: on a tall screen any height the capped answers leave goes around it, never between its parts. */}
       <div data-testid="vocab-quiz-stack" className="flex min-h-0 flex-1 flex-col justify-center gap-4 sm:gap-6 [@media(max-height:560px)]:gap-2">
         <VocabQuizStudentHeader
@@ -245,7 +245,7 @@ export function VocabQuizView({ socket, username, t, onPlayAgain, onExit }: Voca
 
         {/* Waiting for the round to begin */}
         {phase === 'idle' && (
-          <p className="flex-1 grid place-items-center text-center font-neo-body text-neo-white/70">
+          <p className="flex-1 grid place-items-center text-center font-neo-body text-edu-ink/70">
             {t('vocabQuiz.waiting')}
           </p>
         )}
@@ -255,7 +255,7 @@ export function VocabQuizView({ socket, username, t, onPlayAgain, onExit }: Voca
         {phase === 'ended' && (
           <div data-testid="vocab-quiz-ended" className="flex-1 min-h-0 flex flex-col gap-4 overflow-y-auto overscroll-contain">
             <h2 className="shrink-0 flex items-center gap-2 font-neo-display font-bold text-2xl">
-              <Trophy className="w-7 h-7 text-neo-yellow" aria-hidden />
+              <Trophy className="w-7 h-7 text-edu-yellow-ink" aria-hidden />
               {t('vocabQuiz.finished.title')}
             </h2>
 
@@ -284,12 +284,12 @@ export function VocabQuizView({ socket, username, t, onPlayAgain, onExit }: Voca
                  */
                 <div
                   data-testid="vocab-quiz-own-score"
-                  className="rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-4 shadow-hard"
+                  className="rounded-neo border-[2px] border-edu-line bg-edu-surface p-4 shadow-hard"
                 >
-                  <p className="font-neo-body font-bold text-sm uppercase tracking-widest text-neo-cream">
+                  <p className="font-neo-body font-bold text-sm uppercase tracking-widest text-edu-ink">
                     {t('education.results.you.points')}
                   </p>
-                  <p className="font-neo-display font-black text-5xl leading-none tabular-nums text-neo-white">
+                  <p className="font-neo-display font-black text-5xl leading-none tabular-nums text-edu-ink">
                     {quiz.myScore}
                   </p>
                 </div>
@@ -301,7 +301,7 @@ export function VocabQuizView({ socket, username, t, onPlayAgain, onExit }: Voca
               {leaderboardHidden ? (
                 <p
                   data-testid="vocab-quiz-reveal-note"
-                  className="rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-4 text-center font-neo-body font-bold text-neo-cream"
+                  className="rounded-neo border-[2px] border-edu-line bg-edu-surface p-4 text-center font-neo-body font-bold text-edu-ink"
                 >
                   {t('education.classroomGame.pressure.revealAtEnd')}
                 </p>

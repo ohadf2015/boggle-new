@@ -68,7 +68,7 @@ export function ClassStreakCue({ classroomId, revealed, t, className }: ClassStr
       animate={pop.animate}
       transition={pop.transition}
       className={cn(
-        '[@container_results_(height<56.25rem)]:hidden flex min-w-0 items-center justify-center gap-[1cqw] self-start rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light px-[1.6cqw] py-[0.8cqw] font-neo-display font-black leading-tight text-neo-cream shadow-hard',
+        '[@container_results_(height<56.25rem)]:hidden flex min-w-0 items-center justify-center gap-[1cqw] self-start rounded-neo-lg border-[3px] border-edu-line bg-edu-surface px-[1.6cqw] py-[0.8cqw] font-neo-display font-black leading-tight text-edu-ink shadow-hard',
         className
       )}
       style={{ fontSize: 'max(14px, 1.6cqw)', minHeight: 'max(40px, 3.4cqw)' }}

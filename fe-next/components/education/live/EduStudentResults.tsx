@@ -60,10 +60,10 @@ export default function EduStudentResults(props: EduStudentResultsProps) {
 
 function ResultsSkeleton() {
   return (
-    <div data-testid="edu-student-results-skeleton" aria-busy="true" className="flex flex-1 flex-col items-center gap-4 bg-neo-navy p-4">
-      <div className="h-48 w-full max-w-sm animate-pulse rounded-neo-lg border-4 border-neo-cream/50 bg-neo-navy-light motion-reduce:animate-none" />
-      <div className="h-24 w-full max-w-sm animate-pulse rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light motion-reduce:animate-none" />
-      <div className="h-24 w-full max-w-sm animate-pulse rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light motion-reduce:animate-none" />
+    <div data-testid="edu-student-results-skeleton" aria-busy="true" className="flex flex-1 flex-col items-center gap-4 bg-edu-page p-4">
+      <div className="h-48 w-full max-w-sm animate-pulse rounded-neo-lg border-4 border-edu-line bg-edu-surface motion-reduce:animate-none" />
+      <div className="h-24 w-full max-w-sm animate-pulse rounded-neo-lg border-[3px] border-edu-line bg-edu-surface motion-reduce:animate-none" />
+      <div className="h-24 w-full max-w-sm animate-pulse rounded-neo-lg border-[3px] border-edu-line bg-edu-surface motion-reduce:animate-none" />
     </div>
   );
 }
@@ -133,10 +133,10 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [showPractice]);
 
-  if (c.isExiting) return <div data-testid="results-exit-wash" className="fixed inset-0 z-[9999] bg-neo-navy" />;
+  if (c.isExiting) return <div data-testid="results-exit-wash" className="fixed inset-0 z-[9999] bg-edu-page" />;
 
   return (
-    <div data-testid="edu-student-results" className="relative isolate flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream">
+    <div data-testid="edu-student-results" className="relative isolate flex min-h-0 flex-1 flex-col overflow-hidden bg-edu-page text-edu-ink">
       <AcademyBackdrop art="podium" />
       <style>{LIVE_KEYFRAMES}</style>
       <header className="flex shrink-0 items-center justify-end gap-2 pe-16 ps-4 pt-1.5">
@@ -145,7 +145,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
           type="button"
           data-testid="edu-student-results-leave"
           onClick={c.requestExit}
-          className={cn('inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated px-3 font-neo-display text-sm font-black uppercase shadow-hard-sm hover:bg-neo-navy-light', PRESS)}
+          className={cn('inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 font-neo-display text-sm font-black uppercase shadow-hard-sm hover:bg-edu-surface', PRESS)}
         >
           <LogOut className="size-4" aria-hidden="true" />
           {t('eduLiveRoom.studentResults.leave')}
@@ -183,7 +183,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
               </div>
             )}
 
-            <BossOutcomeCard size="phone" density="compact" className={cn(COLUMN, 'rounded-neo-lg border-[3px] border-neo-cream/50 shadow-hard-lg')} />
+            <BossOutcomeCard size="phone" density="compact" className={cn(COLUMN, 'rounded-neo-lg border-[3px] border-edu-line shadow-hard-lg')} />
 
             {(summary?.coverage?.length ?? 0) > 0 && (
               <div className={COLUMN}>
@@ -217,7 +217,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
       )}
 
       {scores.length > 0 && (
-        <footer data-testid="edu-student-results-bar" className="flex shrink-0 justify-center border-t-2 border-neo-cream/50 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2.5">
+        <footer data-testid="edu-student-results-bar" className="flex shrink-0 justify-center border-t-2 border-edu-line px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2.5">
           <div className={COLUMN}>
             <StudentWaitBar onPractice={practiceKind ? (showPractice ? undefined : () => setPractising(true)) : lessonId && missed.length > 0 ? () => openLessonPractice(lessonId) : undefined} t={t} />
           </div>

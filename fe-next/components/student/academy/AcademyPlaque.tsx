@@ -46,7 +46,7 @@ export function AcademyPlaque({ title, art, badge, compact = false, className }:
           <Image src={art} alt="" fill unoptimized sizes="48px" className="object-contain drop-shadow-[2px_2px_0_rgb(var(--neo-black))]" />
         </span>
       )}
-      <h1 dir="auto" title={title} className={cn('min-w-0 flex-1 truncate font-neo-display font-black leading-tight text-neo-white', compact ? 'text-xl' : 'text-2xl sm:text-3xl', INK_TEXT)}>
+      <h1 dir="auto" title={title} className={cn('min-w-0 flex-1 truncate font-neo-display font-black leading-tight text-edu-ink', compact ? 'text-xl' : 'text-2xl sm:text-3xl', INK_TEXT)}>
         {title}
       </h1>
       {badge && <div className="shrink-0">{badge}</div>}

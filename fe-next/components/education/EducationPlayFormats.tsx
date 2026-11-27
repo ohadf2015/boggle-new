@@ -35,19 +35,19 @@ export function EducationPlayFormats({
 
   const group = (label: string, rows: typeof live, accent: string) => (
     <div className="mt-8">
-      <h3 className="mb-3 font-neo-display text-lg font-black uppercase tracking-wide text-neo-white">
+      <h3 className="mb-3 font-neo-display text-lg font-black uppercase tracking-wide text-edu-ink">
         {label}
       </h3>
       <ul className="grid gap-3 sm:grid-cols-2">
         {rows.map((f) => (
           <li
             key={f.id}
-            className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-4 shadow-hard-sm"
+            className="rounded-neo border-2 border-edu-line bg-edu-surface p-4 shadow-hard-sm"
           >
             <span className={`font-neo-display text-sm font-black uppercase ${accent}`}>
               {f.name}
             </span>
-            <p className="mt-1 text-sm text-neo-gray-200">{f.note}</p>
+            <p className="mt-1 text-sm text-edu-ink/80">{f.note}</p>
           </li>
         ))}
       </ul>
@@ -61,18 +61,18 @@ export function EducationPlayFormats({
       </h2>
       <p
         data-answer
-        className="max-w-3xl rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 text-base leading-relaxed text-neo-gray-100 shadow-hard sm:text-lg"
+        className="max-w-3xl rounded-neo border-3 border-edu-line bg-edu-surface p-5 text-base leading-relaxed text-edu-ink/80 shadow-hard sm:text-lg"
       >
         {intro
           .replace('{count}', String(total))
           .replace('{live}', String(LIVE_MODE_COUNT))
           .replace('{practice}', String(PRACTICE_FORMAT_COUNT))}
       </p>
-      {group(liveLabel.replace('{live}', String(LIVE_MODE_COUNT)), live, 'text-neo-lime')}
+      {group(liveLabel.replace('{live}', String(LIVE_MODE_COUNT)), live, 'text-edu-lime-ink')}
       {group(
         practiceLabel.replace('{practice}', String(PRACTICE_FORMAT_COUNT)),
         practice,
-        'text-neo-cyan',
+        'text-edu-cyan-ink',
       )}
     </section>
   );

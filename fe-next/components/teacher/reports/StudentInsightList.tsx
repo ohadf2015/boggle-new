@@ -9,10 +9,10 @@ import { cn } from '@/lib/utils';
 import type { StudentInsight, StudentTrend } from './classInsights';
 
 const TREND: Record<StudentTrend, { icon: LucideIcon; tone: string }> = {
-  up: { icon: TrendingUp, tone: 'text-neo-lime' },
-  down: { icon: TrendingDown, tone: 'text-neo-pink' },
-  steady: { icon: Minus, tone: 'text-neo-cream/70' },
-  new: { icon: Sparkle, tone: 'text-neo-cyan' },
+  up: { icon: TrendingUp, tone: 'text-edu-lime-ink' },
+  down: { icon: TrendingDown, tone: 'text-edu-pink-ink' },
+  steady: { icon: Minus, tone: 'text-edu-ink/70' },
+  new: { icon: Sparkle, tone: 'text-edu-cyan-ink' },
 };
 
 function barTone(accuracy: number, goal: number) {
@@ -50,8 +50,8 @@ function StudentRow({
         {...(onOpen ? { type: 'button' as const, onClick: onOpen } : {})}
         data-testid="report-student-row"
         className={cn(
-          'grid w-full grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-x-2.5 rounded-neo border-2 bg-neo-navy px-2.5 py-2 text-start',
-          student.belowGoal ? 'border-neo-pink' : 'border-neo-cream/50',
+          'grid w-full grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-x-2.5 rounded-neo border-2 bg-edu-surface px-2.5 py-2 text-start',
+          student.belowGoal ? 'border-neo-pink' : 'border-edu-line',
           onOpen &&
             'transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0 motion-reduce:transition-none',
         )}
@@ -59,12 +59,12 @@ function StudentRow({
         <AvatarLite userId={student.studentId} pixelSize={32} />
         <span className="min-w-0">
           <span className="flex min-w-0 items-center gap-1.5">
-            <span dir="auto" className="truncate font-neo-display text-base font-bold text-neo-white">
+            <span dir="auto" className="truncate font-neo-display text-base font-bold text-edu-ink">
               {name}
             </span>
             <TrendIcon className={cn('size-4 shrink-0', trend.tone)} aria-label={t(`eg2Rep.report.trend.${student.trend}`)} />
           </span>
-          <span className="relative mt-1 block h-2 overflow-hidden rounded-full bg-neo-white/10">
+          <span className="relative mt-1 block h-2 overflow-hidden rounded-full bg-edu-ink/10">
             <m.span
               aria-hidden="true"
               className={cn('absolute inset-y-0 start-0 rounded-full', barTone(student.accuracy, goal))}
@@ -82,19 +82,19 @@ function StudentRow({
                   key={w}
                   data-testid="report-student-missed"
                   dir="auto"
-                  className="rounded-neo border border-neo-pink bg-neo-navy-light px-1.5 text-[11px] font-bold text-neo-white"
+                  className="rounded-neo border border-neo-pink bg-edu-surface px-1.5 text-[11px] font-bold text-edu-ink"
                 >
                   {w}
                 </span>
               ))}
             </span>
           ) : (
-            <span className="mt-1 block text-[11px] font-bold text-neo-lime">{t('eg2Rep.report.noMisses')}</span>
+            <span className="mt-1 block text-[11px] font-bold text-edu-lime-ink">{t('eg2Rep.report.noMisses')}</span>
           )}
         </span>
         <span className="flex items-center gap-1">
-          <span className="font-neo-display text-lg font-black text-neo-white tabular-nums">{student.accuracy}%</span>
-          {onOpen && <DirectionalIcon icon={ChevronRight} className="size-4 text-neo-cream/60" />}
+          <span className="font-neo-display text-lg font-black text-edu-ink tabular-nums">{student.accuracy}%</span>
+          {onOpen && <DirectionalIcon icon={ChevronRight} className="size-4 text-edu-ink/60" />}
         </span>
       </Tag>
     </m.li>
@@ -138,7 +138,7 @@ export function StudentInsightList({
     <div data-testid="report-student-list" className="space-y-3">
       {below.length > 0 && (
         <section className="space-y-1.5">
-          <h4 className="text-xs font-bold text-neo-cream/85">
+          <h4 className="text-xs font-bold text-edu-ink/85">
             {t('eg2Rep.report.belowGoal', { goal, count: below.length })}
           </h4>
           {group(below, 0)}
@@ -146,7 +146,7 @@ export function StudentInsightList({
       )}
       {onTrack.length > 0 && (
         <section className="space-y-1.5">
-          <h4 className="text-xs font-bold text-neo-cream/85">
+          <h4 className="text-xs font-bold text-edu-ink/85">
             {t('eg2Rep.report.onTrack', { count: onTrack.length })}
           </h4>
           {group(onTrack, below.length)}

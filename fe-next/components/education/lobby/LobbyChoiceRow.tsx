@@ -13,10 +13,10 @@ import { Check, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /** The house selection style: ring + check, never a colored fill. */
-export const CALM_SELECTED = 'border-neo-lime bg-neo-navy-light text-neo-cream';
-export const CALM_IDLE = 'border-neo-cream/35 bg-transparent text-neo-cream hover:border-neo-cream/60';
+export const CALM_SELECTED = 'border-neo-lime bg-edu-surface text-edu-ink';
+export const CALM_IDLE = 'border-edu-line bg-transparent text-edu-ink hover:border-edu-line';
 export const CALM_FOCUS =
-  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
+  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface';
 
 export interface LobbyChoice<T extends string | number> {
   value: T;
@@ -42,7 +42,7 @@ export function LobbyChoiceRow<T extends string | number>({
   id,
   label,
   icon: Icon,
-  iconClassName = 'text-neo-cream/70',
+  iconClassName = 'text-edu-ink/70',
   choices,
   value,
   onChange,
@@ -53,7 +53,7 @@ export function LobbyChoiceRow<T extends string | number>({
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
       <span
         id={id}
-        className="inline-flex min-w-[7.5rem] items-center gap-1.5 font-neo-display text-sm font-bold text-neo-cream"
+        className="inline-flex min-w-[7.5rem] items-center gap-1.5 font-neo-display text-sm font-bold text-edu-ink"
       >
         <Icon className={cn('size-4 shrink-0', iconClassName)} strokeWidth={3} aria-hidden="true" />
         {label}

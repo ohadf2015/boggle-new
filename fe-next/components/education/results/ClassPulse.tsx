@@ -26,7 +26,7 @@ const Cell = memo(function Cell({ testId, icon: Icon, value, label, index, activ
     <m.div
       data-testid={testId}
       className={cn(
-        'flex min-w-0 justify-center rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light text-neo-cream shadow-hard-lg',
+        'flex min-w-0 justify-center rounded-neo-lg border-[3px] border-edu-line bg-edu-surface text-edu-ink shadow-hard-lg',
         projector ? 'flex-col gap-0.5 px-3 py-2 @5xl/results:px-4 @[96rem]/results:py-3' : 'flex-row items-center gap-2 px-2.5 py-1.5'
       )}
       initial={false}

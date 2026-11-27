@@ -12,7 +12,7 @@ import { rosterCounts, type RosterRow, type RosterStatus } from './rosterModel';
 type T = (key: string, params?: Record<string, string | number>) => string;
 
 const STATUSES: readonly RosterStatus[] = ['done', 'late', 'idle'];
-const STAT_TONE: Record<RosterStatus, string> = { done: 'text-neo-lime', late: 'text-neo-yellow', idle: 'text-neo-cream' };
+const STAT_TONE: Record<RosterStatus, string> = { done: 'text-edu-lime-ink', late: 'text-edu-yellow-ink', idle: 'text-edu-ink' };
 
 export interface HomeDeskBoardProps {
   /** null for a free teacher: per-student rows stay behind Pro. */
@@ -43,9 +43,9 @@ export function HomeDeskBoard({ roster, memberCount, onOpenResults, readyLabel, 
   const counts = !wide && rows && rows.length > 0 ? rosterCounts(rows) : null;
   const split = Boolean(counts) || missedShown;
   const note = readyLabel
-    ? <span data-testid="home-ready-chip" className="truncate font-neo-body text-xs font-bold text-neo-cream/80">{readyLabel}</span>
+    ? <span data-testid="home-ready-chip" className="truncate font-neo-body text-xs font-bold text-edu-ink/80">{readyLabel}</span>
     : readyEmpty
-      ? <span data-testid="home-ready-empty" className="truncate font-neo-body text-xs font-bold text-neo-cream/80">{readyEmpty}</span>
+      ? <span data-testid="home-ready-empty" className="truncate font-neo-body text-xs font-bold text-edu-ink/80">{readyEmpty}</span>
       : null;
 
   const stats = counts ? (
@@ -53,7 +53,7 @@ export function HomeDeskBoard({ roster, memberCount, onOpenResults, readyLabel, 
       {STATUSES.filter((s) => counts[s] > 0).map((s) => (
         <span key={s} data-testid="home-strip-stat" className="flex min-w-0 flex-col items-start leading-none">
           <CountUp value={counts[s]} className={cn('font-neo-display text-2xl font-black tabular-nums', STAT_TONE[s])} />
-          <span className="mt-1 truncate font-neo-body text-xs font-bold text-neo-cream/75">{t(`eduShell.home.roster.statusShort.${s}`)}</span>
+          <span className="mt-1 truncate font-neo-body text-xs font-bold text-edu-ink/75">{t(`eduShell.home.roster.statusShort.${s}`)}</span>
         </span>
       ))}
     </span>
@@ -65,7 +65,7 @@ export function HomeDeskBoard({ roster, memberCount, onOpenResults, readyLabel, 
   return (
     <section data-testid="home-desk-board" aria-label={t('eduShell.home.roster.title')} className="flex min-w-0 flex-col gap-3">
       <div data-testid="home-weekly-reports" className="flex min-w-0 flex-col gap-1.5">
-      <div className={cn('flex min-w-0 items-stretch gap-2', split && 'min-h-[64px] rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/70 p-1.5')}>
+      <div className={cn('flex min-w-0 items-stretch gap-2', split && 'min-h-[64px] rounded-neo-lg border-2 border-edu-line bg-edu-surface/70 p-1.5')}>
         {stats ? (
           <button
             type="button"
@@ -77,16 +77,16 @@ export function HomeDeskBoard({ roster, memberCount, onOpenResults, readyLabel, 
             className="flex min-w-0 flex-1 items-center gap-2 rounded-neo px-2 text-start focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             {stats}
-            <ChevronDown className={cn('size-5 shrink-0 text-neo-cream/80 transition-transform motion-reduce:transition-none', opened && 'rotate-180')} aria-hidden="true" />
+            <ChevronDown className={cn('size-5 shrink-0 text-edu-ink/80 transition-transform motion-reduce:transition-none', opened && 'rotate-180')} aria-hidden="true" />
           </button>
         ) : missedShown && missed ? (
           <button
             type="button"
             data-testid="home-homework"
             onClick={missed.onHomework}
-            className="flex min-w-0 flex-1 items-center gap-2 rounded-neo px-2 text-start text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="flex min-w-0 flex-1 items-center gap-2 rounded-neo px-2 text-start text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
-            <Send className="size-5 shrink-0 text-neo-yellow rtl:-scale-x-100" strokeWidth={2.5} aria-hidden="true" />
+            <Send className="size-5 shrink-0 text-edu-yellow-ink rtl:-scale-x-100" strokeWidth={2.5} aria-hidden="true" />
             <span className="min-w-0 font-neo-body text-sm font-black leading-tight">{t('eduShell.home.loop.missed', { count: missed.count })}</span>
           </button>
         ) : null}
@@ -97,11 +97,11 @@ export function HomeDeskBoard({ roster, memberCount, onOpenResults, readyLabel, 
           aria-label={resultsName}
           onClick={onOpenResults}
           className={cn(
-            'group flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-3 text-start text-neo-cream shadow-neo-cream/30 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
-            split ? 'shrink-0' : 'min-h-[60px] min-w-0 flex-1 bg-neo-navy-light',
+            'group flex min-h-11 items-center gap-2 rounded-neo border-2 border-edu-line bg-edu-page px-3 text-start text-edu-ink shadow-edu-line focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+            split ? 'shrink-0' : 'min-h-[60px] min-w-0 flex-1 bg-edu-surface',
           )}
         >
-          {split ? null : <BarChart3 className="size-6 shrink-0 text-neo-purple" strokeWidth={2.5} aria-hidden="true" />}
+          {split ? null : <BarChart3 className="size-6 shrink-0 text-edu-purple-ink" strokeWidth={2.5} aria-hidden="true" />}
           <span className="flex min-w-0 flex-1 flex-col">
             <span className="font-neo-display text-sm font-black leading-tight">{t('eduShell.home.seeResults')}</span>
             {split ? null : note}

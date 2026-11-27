@@ -47,14 +47,14 @@ export function PhoneBossStrip() {
   return (
     <div data-testid="phone-boss-strip" className="relative z-20 mx-auto w-full max-w-md px-2 pb-1">
       {blurred && <style>{'.game-board-frame{filter:blur(5px) saturate(.6);transition:filter .2s ease-out}'}</style>}
-      <div className={cn('flex items-center gap-2 rounded-neo border-[3px] bg-neo-navy-light p-1.5 shadow-hard-lg transition-colors duration-300', view.exposed ? 'border-neo-yellow' : view.telegraph ? 'border-neo-pink' : 'border-neo-cream/50')}>
+      <div className={cn('flex items-center gap-2 rounded-neo border-[3px] bg-edu-surface p-1.5 shadow-hard-lg transition-colors duration-300', view.exposed ? 'border-neo-yellow' : view.telegraph ? 'border-neo-pink' : 'border-edu-line')}>
         <div className="relative size-12 shrink-0 overflow-hidden rounded-[10px] border-2 border-neo-black bg-neo-purple-dark">
           <Image src={bossImage(view.bossId, bossPose(view, recentlyHit))} alt="" fill sizes="48px" className="object-cover object-top" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-1.5">
-            <p dir="auto" className="truncate font-neo-display text-sm font-black leading-tight text-neo-white">{name}</p>
-            <span className={cn('shrink-0 rounded-full border-2 border-neo-black px-1.5 text-xs font-black uppercase leading-4', view.phase === 3 ? 'bg-neo-red text-neo-white' : 'bg-neo-navy text-neo-white/90')}>
+            <p dir="auto" className="truncate font-neo-display text-sm font-black leading-tight text-edu-ink">{name}</p>
+            <span className={cn('shrink-0 rounded-full border-2 border-neo-black px-1.5 text-xs font-black uppercase leading-4', view.phase === 3 ? 'bg-neo-red text-neo-white' : 'bg-edu-surface text-edu-ink/90')}>
               {t('classroomBoss.phaseShort', { n: view.phase })}
             </span>
           </div>
@@ -63,12 +63,12 @@ export function PhoneBossStrip() {
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-0.5" data-testid="phone-boss-stats">
-          <span className="flex items-center gap-1 text-neo-lime" title={t('classroomBoss.yourDamage')}>
+          <span className="flex items-center gap-1 text-edu-lime-ink" title={t('classroomBoss.yourDamage')}>
             <Swords className="size-3.5" strokeWidth={3} aria-hidden="true" />
             <span className="sr-only">{t('classroomBoss.yourDamage')}</span>
             <span dir="ltr" className="font-neo-display text-base font-black leading-none tabular-nums">{myHit?.totalDmg ?? 0}</span>
           </span>
-          <span className={cn('flex items-center gap-1', view.combo.multiplier > 1 ? 'text-neo-orange' : 'text-neo-white/50')}>
+          <span className={cn('flex items-center gap-1', view.combo.multiplier > 1 ? 'text-edu-orange-ink' : 'text-edu-ink/50')}>
             <Flame className={cn('size-3.5', view.combo.multiplier > 1 && 'fill-current')} aria-hidden="true" />
             <span className="sr-only">{t('classroomBoss.combo')}</span>
             <span dir="ltr" className="font-neo-display text-base font-black leading-none">x{view.combo.multiplier}</span>

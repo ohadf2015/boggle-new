@@ -79,7 +79,7 @@ export function LobbyWarmupButton({ warmup, className }: { warmup: LobbyWarmupSt
   if (!warmup.active || warmup.sent) return null;
   if (warmup.sendState === 'capped') {
     return (
-      <p data-testid="lobby-warmup-capped" className={cn('font-neo-body text-xs font-bold text-neo-cream/75', className)}>
+      <p data-testid="lobby-warmup-capped" className={cn('font-neo-body text-xs font-bold text-edu-ink/75', className)}>
         {t('eduShell.warmup.capped', 'Free plan homework limit reached. Pro sends unlimited warm-ups.')}
       </p>
     );
@@ -91,8 +91,8 @@ export function LobbyWarmupButton({ warmup, className }: { warmup: LobbyWarmupSt
       disabled={warmup.sendState === 'sending'}
       onClick={() => void warmup.send()}
       className={cn(
-        'inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-neo border-2 border-neo-cream/35 px-3 font-neo-body text-sm font-bold text-neo-cream/85',
-        'transition-colors hover:border-neo-cream/60 hover:text-neo-cream disabled:opacity-60',
+        'inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-neo border-2 border-edu-line px-3 font-neo-body text-sm font-bold text-edu-ink/85',
+        'transition-colors hover:border-edu-line hover:text-edu-ink disabled:opacity-60',
         'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
         className
       )}
@@ -115,7 +115,7 @@ export function LobbyWarmupStatus({ warmup, className }: { warmup: LobbyWarmupSt
     <p
       data-testid="lobby-warmup-status"
       role="status"
-      className={cn('flex items-center gap-1.5 font-neo-body text-sm font-bold text-neo-cream/85', className)}
+      className={cn('flex items-center gap-1.5 font-neo-body text-sm font-bold text-edu-ink/85', className)}
     >
       {all ? <Check className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" /> : <Zap className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />}
       {total === 0

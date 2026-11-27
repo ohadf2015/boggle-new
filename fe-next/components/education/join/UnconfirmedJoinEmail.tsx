@@ -100,7 +100,7 @@ export function UnconfirmedJoinEmail({
         type="button"
         data-testid="join-unconfirmed-open"
         onClick={() => setOpen(true)}
-        className="mt-4 min-h-11 text-sm font-bold text-neo-cyan underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+        className="mt-4 min-h-11 text-sm font-bold text-edu-cyan-ink underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
       >
         {t(`${K}.unconfirmed.open`, 'Confirmation email never arrived?')}
       </button>
@@ -117,14 +117,14 @@ export function UnconfirmedJoinEmail({
     : null;
 
   return (
-    <div data-testid="join-unconfirmed-panel" className="mt-4 rounded-neo border-3 border-neo-cream bg-neo-navy-light p-3 text-neo-white shadow-hard-sm">
+    <div data-testid="join-unconfirmed-panel" className="mt-4 rounded-neo border-3 border-edu-line bg-edu-surface p-3 text-edu-ink shadow-hard-sm">
       <h2 className="font-neo-display text-base font-black">{t(`${K}.unconfirmed.title`, 'Fix the email, then join')}</h2>
-      <p className="mt-1 text-sm text-neo-white/80">
+      <p className="mt-1 text-sm text-edu-ink/80">
         {signedInEmail
           ? t(`${K}.unconfirmed.signedIn`, 'This account is not confirmed yet. You can still join, and you should fix the address so you can sign in next time.')
           : t(`${K}.unconfirmed.body`, 'A typo sends the confirmation nowhere. Resend it, or correct one or two characters.')}
       </p>
-      <label className="mt-3 block text-xs font-bold uppercase tracking-wide text-neo-white/70" htmlFor="join-unconfirmed-email">
+      <label className="mt-3 block text-xs font-bold uppercase tracking-wide text-edu-ink/70" htmlFor="join-unconfirmed-email">
         {t(`${K}.unconfirmed.emailLabel`, 'Email you signed up with')}
       </label>
       <input
@@ -135,9 +135,9 @@ export function UnconfirmedJoinEmail({
         value={email}
         readOnly={Boolean(signedInEmail)}
         onChange={(e) => setEmail(e.target.value)}
-        className="mt-1 w-full rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-3 py-2 font-mono text-sm text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+        className="mt-1 w-full rounded-neo border-2 border-edu-line bg-edu-surface px-3 py-2 font-mono text-sm text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
       />
-      <label className="mt-3 block text-xs font-bold uppercase tracking-wide text-neo-white/70" htmlFor="join-unconfirmed-next">
+      <label className="mt-3 block text-xs font-bold uppercase tracking-wide text-edu-ink/70" htmlFor="join-unconfirmed-next">
         {t(`${K}.unconfirmed.nextLabel`, 'Corrected email')}
       </label>
       <input
@@ -147,7 +147,7 @@ export function UnconfirmedJoinEmail({
         dir="ltr"
         value={nextEmail}
         onChange={(e) => setNextEmail(e.target.value)}
-        className="mt-1 w-full rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-3 py-2 font-mono text-sm text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+        className="mt-1 w-full rounded-neo border-2 border-edu-line bg-edu-surface px-3 py-2 font-mono text-sm text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
       />
       <div className="mt-3 flex flex-wrap gap-2">
         <button
@@ -166,13 +166,13 @@ export function UnconfirmedJoinEmail({
           data-testid="join-unconfirmed-correct"
           disabled={status === 'sending'}
           onClick={onCorrect}
-          className="min-h-11 rounded-neo border-2 border-neo-cream/50 px-3 font-neo-display text-sm font-bold text-neo-white disabled:opacity-60"
+          className="min-h-11 rounded-neo border-2 border-edu-line px-3 font-neo-display text-sm font-bold text-edu-ink disabled:opacity-60"
         >
           {t(`${K}.unconfirmed.correct`, 'Send to the corrected address')}
         </button>
       </div>
       {note && (
-        <p role="status" className="mt-2 text-sm font-semibold text-neo-cyan">
+        <p role="status" className="mt-2 text-sm font-semibold text-edu-cyan-ink">
           {note}
         </p>
       )}

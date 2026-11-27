@@ -87,14 +87,14 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
 
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-          <p dir="auto" className={`min-w-0 shrink truncate font-neo-display font-black leading-tight text-neo-white ${wide ? 'text-xl' : compact ? 'text-sm' : 'text-base sm:text-lg'} ${INK_TEXT}`}>
+          <p dir="auto" className={`min-w-0 shrink truncate font-neo-display font-black leading-tight text-edu-ink ${wide ? 'text-xl' : compact ? 'text-sm' : 'text-base sm:text-lg'} ${INK_TEXT}`}>
             {name}
           </p>
           {title && (
             <span
               dir="auto"
               data-testid="academy-class-tag"
-              className={`min-w-0 max-w-full truncate rounded-full border-2 border-neo-black px-2 font-neo-display font-black uppercase leading-[18px] tracking-wide text-neo-white ${wide ? 'text-xs leading-[22px]' : 'text-xs'} ${INK_TEXT}`}
+              className={`min-w-0 max-w-full truncate rounded-full border-2 border-neo-black px-2 font-neo-display font-black uppercase leading-[18px] tracking-wide text-edu-ink ${wide ? 'text-xs leading-[22px]' : 'text-xs'} ${INK_TEXT}`}
               style={toneStyle('pink', { shadow: 0, trim: 1 })}
             >
               {title}
@@ -128,7 +128,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
             )}
           </div>
         </div>
-        <p dir="ltr" className={`mt-0.5 text-start ${compact ? 'sr-only' : ''} font-neo-display text-xs font-black uppercase tracking-wider text-neo-yellow tabular-nums rtl:text-end`}>
+        <p dir="ltr" className={`mt-0.5 text-start ${compact ? 'sr-only' : ''} font-neo-display text-xs font-black uppercase tracking-wider text-edu-yellow-ink tabular-nums rtl:text-end`}>
           {t('academy.student.xpLine', '{xp} / {need} XP', { xp: shownXp, need: xp.xpNeededForNextLevel })}
         </p>
       </div>
@@ -141,7 +141,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
       <span className="flex items-center gap-1" title={t('education.xp.streak', 'Day Streak')}>
         <StreakMark streak={streak} atRisk={streakAtRisk} still={still} size={wide ? 36 : compact ? 22 : 28} t={t} />
         <span className="sr-only">{t('education.xp.streak', 'Day Streak')}</span>
-        <span className={`min-w-[1ch] font-neo-display ${compact ? 'text-base' : 'text-lg'} font-black tabular-nums text-neo-white ${INK_TEXT}`}>{streak}</span>
+        <span className={`min-w-[1ch] font-neo-display ${compact ? 'text-base' : 'text-lg'} font-black tabular-nums text-edu-ink ${INK_TEXT}`}>{streak}</span>
       </span>
       <span aria-hidden="true" className="h-5 w-[2px] rounded-full bg-neo-yellow/40" />
       <span className="flex items-center gap-1" title={t('academy.student.stars', 'Stars')}>
@@ -149,7 +149,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
           <Image src="/images/adventure/loot/gold-coin.webp" alt="" aria-hidden="true" fill unoptimized sizes="32px" className="object-contain" />
         </span>
         <span className="sr-only">{t('academy.student.stars', 'Stars')}</span>
-        <span className={`min-w-[1ch] font-neo-display ${compact ? 'text-base' : 'text-lg'} font-black tabular-nums text-neo-white ${INK_TEXT}`}>{shownStars}</span>
+        <span className={`min-w-[1ch] font-neo-display ${compact ? 'text-base' : 'text-lg'} font-black tabular-nums text-edu-ink ${INK_TEXT}`}>{shownStars}</span>
       </span>
       </span>
 
@@ -157,7 +157,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
         <button
           type="button"
           onClick={onSignOut}
-          className="icon-only flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-full border-2 border-neo-cream px-2 font-neo-body text-xs font-bold text-neo-white hover:border-neo-pink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="icon-only flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-full border-2 border-edu-line px-2 font-neo-body text-xs font-bold text-edu-ink hover:border-neo-pink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           <UserX className="h-4 w-4" aria-hidden="true" />
           <span className="sr-only sm:not-sr-only">{t('student.notYou', 'Not you?')}</span>

@@ -82,7 +82,7 @@ export function ProBanner({
           onClick={onDismiss}
           aria-label={dismissLabel}
           className={cn(
-            'absolute end-2 top-3 grid size-11 place-items-center rounded-neo border-2 text-neo-cream/80 transition-colors hover:bg-neo-cream/10 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+            'absolute end-2 top-3 grid size-11 place-items-center rounded-neo border-2 text-edu-ink/80 transition-colors hover:bg-edu-ink/10 hover:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
             NB_DARK_EDGE,
           )}
         >
@@ -93,11 +93,11 @@ export function ProBanner({
         <div className={cn('flex min-w-0 flex-1 items-center gap-4', onDismiss && 'pe-12 sm:pe-0')}>
           {lead}
           <div className="min-w-0">
-            <h3 className="font-neo-display text-lg font-black leading-snug text-neo-cream sm:text-xl">
+            <h3 className="font-neo-display text-lg font-black leading-snug text-edu-ink sm:text-xl">
               {title}
               <ProBadge aria-hidden="true" data-testid={`${testId}-sticker`} size="xs" label={proLabel} className="ms-2 align-middle" />
             </h3>
-            {body ? <div className="mt-1 font-neo-body text-sm font-semibold leading-snug text-neo-cream/80">{body}</div> : null}
+            {body ? <div className="mt-1 font-neo-body text-sm font-semibold leading-snug text-edu-ink/80">{body}</div> : null}
             {children}
           </div>
         </div>

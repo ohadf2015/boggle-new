@@ -29,7 +29,7 @@ export function AcademyBackdrop({ art }: { art: AcademyArt }) {
       data-testid="academy-backdrop"
       data-art={art}
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-neo-navy"
+      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-edu-surface"
     >
       {art === 'map' ? (
         <picture>

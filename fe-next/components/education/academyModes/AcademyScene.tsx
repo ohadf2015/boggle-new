@@ -103,7 +103,7 @@ export function AcademyScene({ theme, children, dim = 0.5 }: { theme: SceneTheme
   }, [reduce, px, py]);
 
   return (
-    <div data-testid="academy-scene" data-theme={theme} className="absolute inset-0 overflow-hidden bg-neo-navy">
+    <div data-testid="academy-scene" data-theme={theme} className="absolute inset-0 overflow-hidden bg-edu-surface">
       {/* The map, zoomed into this mode's island. Transform-only entrance. */}
       <m.div aria-hidden className="absolute -inset-8" style={{ x: backX, y: backY }}>
         <m.div

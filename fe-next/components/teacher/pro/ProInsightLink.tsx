@@ -63,7 +63,7 @@ export function ProInsightLink({ placement, language, label, proLabel, href, act
       data-testid={`pro-insight-link-${placement}`}
       onClick={onClick}
       className={cn(
-        'inline-flex min-h-11 items-center gap-2 self-start rounded-neo font-neo-body text-sm font-bold text-neo-cream/85 transition-colors hover:text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+        'inline-flex min-h-11 items-center gap-2 self-start rounded-neo font-neo-body text-sm font-bold text-edu-ink/85 transition-colors hover:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
         className,
       )}
     >

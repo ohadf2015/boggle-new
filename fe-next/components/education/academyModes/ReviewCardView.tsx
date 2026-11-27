@@ -44,7 +44,7 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
   if (card.kind === 'meaning') {
     return (
       <div className={panel} style={panelStyle}>
-        <p className="mb-1 text-center font-neo-display text-xs font-black uppercase tracking-widest text-neo-purple lg:mb-3 lg:text-lg min-[2200px]:text-2xl">
+        <p className="mb-1 text-center font-neo-display text-xs font-black uppercase tracking-widest text-edu-purple-ink lg:mb-3 lg:text-lg min-[2200px]:text-2xl">
           {t('academy.modes.review.pickMeaning', 'What does it mean?')}
         </p>
         <p data-testid="review-meaning-prompt" dir={dir} translate="no" className="mb-4 text-center font-neo-display text-4xl font-black text-neo-black sm:text-6xl [@media(orientation:landscape)_and_(max-height:520px)]:mb-2! [@media(orientation:landscape)_and_(max-height:520px)]:text-3xl! lg:text-[clamp(3rem,min(5vw,8vh),4.5rem)]">
@@ -108,7 +108,7 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
 
   return (
     <div className={panel} style={panelStyle}>
-      <p className="mb-1 text-center font-neo-display text-xs font-black uppercase tracking-widest text-neo-purple lg:mb-3 lg:text-lg min-[2200px]:text-2xl">
+      <p className="mb-1 text-center font-neo-display text-xs font-black uppercase tracking-widest text-edu-purple-ink lg:mb-3 lg:text-lg min-[2200px]:text-2xl">
         {t('academy.modes.review.unscramble', 'Unscramble the word')}
       </p>
       {card.definition && (

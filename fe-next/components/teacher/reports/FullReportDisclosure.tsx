@@ -5,10 +5,10 @@ import { BookMarked, ChevronDown, ClipboardCheck, FileText, History, type Lucide
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const ACCENTS = {
-  cyan: 'border-neo-cyan bg-neo-cyan/15 text-neo-cyan',
-  lime: 'border-neo-lime bg-neo-lime/15 text-neo-lime',
-  pink: 'border-neo-pink bg-neo-pink/15 text-neo-pink',
-  purple: 'border-neo-purple bg-neo-purple/15 text-neo-purple',
+  cyan: 'border-neo-cyan bg-neo-cyan/15 text-edu-cyan-ink',
+  lime: 'border-neo-lime bg-neo-lime/15 text-edu-lime-ink',
+  pink: 'border-neo-pink bg-neo-pink/15 text-edu-pink-ink',
+  purple: 'border-neo-purple bg-neo-purple/15 text-edu-purple-ink',
 } as const;
 
 interface ReportDisclosureProps {
@@ -27,7 +27,7 @@ export function ReportDisclosure({ testId, icon: Icon, accent, title, badge, hin
   return (
     <details
       data-testid={testId}
-      className="group rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 shadow-hard-sm transition-transform has-[summary:active]:translate-x-[1px] has-[summary:active]:translate-y-[1px] has-[summary:active]:shadow-none motion-reduce:transition-none"
+      className="group rounded-neo-lg border-2 border-edu-line bg-edu-surface/95 shadow-hard-sm transition-transform has-[summary:active]:translate-x-[1px] has-[summary:active]:translate-y-[1px] has-[summary:active]:shadow-none motion-reduce:transition-none"
       onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}
     >
       <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 px-4 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan sm:px-5 [&::-webkit-details-marker]:hidden">
@@ -35,12 +35,12 @@ export function ReportDisclosure({ testId, icon: Icon, accent, title, badge, hin
           <Icon className="size-4" aria-hidden="true" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block font-neo-display text-base sm:text-lg font-bold text-neo-white leading-snug">{title}{badge}</span>
-          <span className="block text-xs font-bold text-neo-cream/70 leading-snug">{hint}</span>
+          <span className="block font-neo-display text-base sm:text-lg font-bold text-edu-ink leading-snug">{title}{badge}</span>
+          <span className="block text-xs font-bold text-edu-ink/70 leading-snug">{hint}</span>
         </span>
-        <ChevronDown className="size-5 shrink-0 text-neo-cream/80 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+        <ChevronDown className="size-5 shrink-0 text-edu-ink/80 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
       </summary>
-      <div className="border-t border-neo-cream/20 p-3.5 sm:p-5">{children(open)}</div>
+      <div className="border-t border-edu-line/20 p-3.5 sm:p-5">{children(open)}</div>
     </details>
   );
 }

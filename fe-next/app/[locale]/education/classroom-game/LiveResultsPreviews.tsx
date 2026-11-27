@@ -95,7 +95,7 @@ export function PhoneResultsPreview() {
   }, [seedDeck, language]);
   const me = params?.get('me') ?? players[1]?.username ?? players[0]?.username ?? 'Maya';
   return (
-    <div className="fixed inset-0 z-[80] flex flex-col bg-neo-navy">
+    <div className="fixed inset-0 z-[80] flex flex-col bg-edu-page">
       <EduStudentResults finalScores={players} username={me} socket={null} classroomSummary={summary} />
     </div>
   );
@@ -109,7 +109,7 @@ export function QuizPreview() {
   const qboss = params?.get('qboss');
   if (params?.get('own') === '1') {
     return (
-      <div className="fixed inset-0 z-[80] flex flex-col gap-3 overflow-y-auto bg-neo-navy p-3">
+      <div className="fixed inset-0 z-[80] flex flex-col gap-3 overflow-y-auto bg-edu-page p-3">
         <VocabQuizStandings standings={standings} meUsername="Leo" limit={5} podium t={t} />
         {/* Same wrapper as VocabQuizView's end screen. */}
         <div className="shrink-0">
@@ -119,7 +119,7 @@ export function QuizPreview() {
     );
   }
   return (
-    <div className="fixed inset-0 z-[80] flex flex-col gap-3 overflow-hidden bg-neo-navy p-3 md:p-6">
+    <div className="fixed inset-0 z-[80] flex flex-col gap-3 overflow-hidden bg-edu-page p-3 md:p-6">
       {(qboss === 'defeated' || qboss === 'escaped') && (
         <ClassroomBossOutcome boss={{ maxHp: 100, hp: qboss === 'defeated' ? 0 : 38, lastHits: 3, defeated: qboss === 'defeated' }} t={t} />
       )}

@@ -61,7 +61,7 @@ export function WaitingWarmUpHero({ username, seed, t }: { username: string; see
     >
       <style>{WARM_UP_KEYFRAMES + HERO_KEYFRAMES}</style>
       <div className="mb-4 flex items-center justify-between gap-3">
-        <p className="min-w-0 font-neo-display text-2xl font-black leading-tight text-neo-cream lg:text-4xl">
+        <p className="min-w-0 font-neo-display text-2xl font-black leading-tight text-edu-ink lg:text-4xl">
           {tr(t, 'academy.live.warmUpHint', 'Warm-up: tap the glowing letter!')}
         </p>
         <div className="flex shrink-0 items-center gap-2">
@@ -77,7 +77,7 @@ export function WaitingWarmUpHero({ username, seed, t }: { username: string; see
             aria-label={t('mpUi.round.combo', { level: state.combo })}
             className={cn(
               'inline-flex min-w-16 items-center justify-center gap-0.5 rounded-neo border-[3px] px-2 py-1 font-neo-display font-black leading-none tabular-nums shadow-hard-sm',
-              state.combo === 0 ? 'border-neo-cream/70 bg-neo-navy text-2xl text-neo-cream/70' : hot ? 'border-neo-black bg-neo-pink text-3xl text-neo-black' : 'border-neo-black bg-neo-orange text-2xl text-neo-black',
+              state.combo === 0 ? 'border-edu-line bg-edu-surface text-2xl text-edu-ink/70' : hot ? 'border-neo-black bg-neo-pink text-3xl text-neo-black' : 'border-neo-black bg-neo-orange text-2xl text-neo-black',
               state.combo > 0 && 'motion-safe:animate-[lc-combo-bump_260ms_cubic-bezier(0.34,1.56,0.64,1)]',
             )}
           >
@@ -109,7 +109,7 @@ export function WaitingWarmUpHero({ username, seed, t }: { username: string; see
                     ? 'border-neo-black bg-neo-cyan text-neo-black motion-safe:animate-[lc-tile-burst_320ms_cubic-bezier(0.34,1.56,0.64,1)]'
                     : lit
                       ? 'z-10 scale-110 border-neo-black bg-neo-lime text-neo-black shadow-hard-sm motion-safe:animate-[lc-tile-glow_900ms_ease-in-out_infinite]'
-                      : 'border-neo-cream/70 bg-neo-navy text-neo-cream',
+                      : 'border-edu-line bg-edu-surface text-edu-ink',
               )}
             >
               {letter}
@@ -119,7 +119,7 @@ export function WaitingWarmUpHero({ username, seed, t }: { username: string; see
                   data-testid="warmup-burst"
                   aria-hidden="true"
                   dir="ltr"
-                  className="pointer-events-none absolute start-1/2 top-0 font-neo-display text-xl font-black text-neo-lime [-webkit-text-stroke:1px_rgb(var(--neo-black))] [paint-order:stroke_fill] motion-safe:animate-[lc-plus-float_420ms_ease-out_forwards] motion-reduce:hidden rtl:translate-x-1/2"
+                  className="pointer-events-none absolute start-1/2 top-0 font-neo-display text-xl font-black text-edu-lime-ink [-webkit-text-stroke:1px_rgb(var(--neo-black))] [paint-order:stroke_fill] motion-safe:animate-[lc-plus-float_420ms_ease-out_forwards] motion-reduce:hidden rtl:translate-x-1/2"
                 >
                   +1
                 </span>

@@ -197,7 +197,7 @@ function PhoneStrip({
               'font-neo-display',
               isMe
                 ? 'max-w-[9.5rem] bg-neo-cyan text-neo-black border-neo-black'
-                : 'max-w-[6rem] bg-neo-navy-light text-neo-cream border-neo-cream/40'
+                : 'max-w-[6rem] bg-edu-surface text-edu-ink border-edu-line'
             )}
           >
             {pop && <ScoreSparkBurst id={pop.id} />}
@@ -256,7 +256,7 @@ function ProjectorBoard({
                   className={cn(
                     'relative flex items-center gap-4 rounded-neo border-4 px-5 py-3 shadow-hard',
                     'max-md:gap-3 max-md:border-[3px] max-md:px-3 max-md:py-1.5 md:[@media(max-height:1000px)]:gap-3 md:[@media(max-height:1000px)]:py-1.5 lg:[@media(min-height:1001px)]:gap-5 lg:[@media(min-height:1001px)]:py-2',
-                    'bg-neo-navy text-neo-cream',
+                    'bg-edu-surface text-edu-ink',
                     rank === 1 ? 'border-neo-yellow' : rank <= 3 ? 'border-neo-lime' : 'border-neo-black'
                   )}
                 >
@@ -275,7 +275,7 @@ function ProjectorBoard({
                     <AdaptiveMotion.span
                       animate={{ scale: pop ? [1, 1.35, 1] : 1 }}
                       transition={{ duration: 0.35 }}
-                      className="font-neo-display text-4xl font-black tabular-nums text-neo-lime max-md:text-2xl md:[@media(max-height:1000px)]:text-3xl lg:[@media(min-height:1001px)]:text-5xl"
+                      className="font-neo-display text-4xl font-black tabular-nums text-edu-lime-ink max-md:text-2xl md:[@media(max-height:1000px)]:text-3xl lg:[@media(min-height:1001px)]:text-5xl"
                     >
                       {row.score}
                     </AdaptiveMotion.span>

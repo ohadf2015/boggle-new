@@ -16,7 +16,7 @@ import { NB_BLOCK, NB_SMALL } from './nb/nbStyles';
 type MenuIcon = ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' }>;
 
 const ITEM =
-  'min-h-11 cursor-pointer gap-3 rounded-neo px-3 py-2 text-start font-neo-body text-[15px] font-bold text-neo-cream hover:bg-neo-navy-elevated focus:bg-neo-navy-elevated';
+  'min-h-11 cursor-pointer gap-3 rounded-neo px-3 py-2 text-start font-neo-body text-[15px] font-bold text-edu-ink hover:bg-edu-surface focus:bg-edu-surface';
 
 function ItemBody({ icon: Icon, children }: { icon: MenuIcon; children: ReactNode }) {
   return (
@@ -39,7 +39,7 @@ export function CardOverflowMenu({ label, testId, header, children }: { label: s
       <DropdownMenuContent
         align="end"
         collisionPadding={12}
-        className="max-h-[min(75dvh,var(--radix-dropdown-menu-content-available-height))] w-72 max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light p-1.5 text-neo-cream shadow-hard-xl"
+        className="max-h-[min(75dvh,var(--radix-dropdown-menu-content-available-height))] w-72 max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-neo-lg border-[3px] border-edu-line bg-edu-surface p-1.5 text-edu-ink shadow-hard-xl"
       >
         {header}
         {children}
@@ -69,9 +69,9 @@ export function CardMenuAction({
 }) {
   const toggle = checked === undefined ? {} : { role: 'menuitemcheckbox', 'aria-checked': checked };
   return (
-    <DropdownMenuItem data-testid={testId} disabled={disabled} onSelect={onSelect} aria-haspopup={hasPopup} className={cn(ITEM, danger && 'text-neo-pink')} {...toggle}>
+    <DropdownMenuItem data-testid={testId} disabled={disabled} onSelect={onSelect} aria-haspopup={hasPopup} className={cn(ITEM, danger && 'text-edu-pink-ink')} {...toggle}>
       <ItemBody icon={icon}>{children}</ItemBody>
-      {checked ? <Check className="size-4 shrink-0 text-neo-lime" strokeWidth={3} aria-hidden="true" /> : null}
+      {checked ? <Check className="size-4 shrink-0 text-edu-lime-ink" strokeWidth={3} aria-hidden="true" /> : null}
     </DropdownMenuItem>
   );
 }
@@ -102,7 +102,7 @@ export function CardMenuControl({ testId, children }: { testId?: string; childre
         event.preventDefault();
         inner.current?.querySelector('button')?.click();
       }}
-      className={cn(ITEM, '[&_button]:pointer-events-none [&_button]:min-h-0 [&_button]:gap-3 [&_button]:px-0 [&_button]:text-[15px] [&_button]:text-neo-cream [&_button]:no-underline')}
+      className={cn(ITEM, '[&_button]:pointer-events-none [&_button]:min-h-0 [&_button]:gap-3 [&_button]:px-0 [&_button]:text-[15px] [&_button]:text-edu-ink [&_button]:no-underline')}
     >
       {/* The inner click must not bubble back into this item, or it would select again. */}
       <div ref={inner} onClick={(event) => event.stopPropagation()}>
@@ -113,5 +113,5 @@ export function CardMenuControl({ testId, children }: { testId?: string; childre
 }
 
 export function CardMenuDivider() {
-  return <DropdownMenuSeparator className="mx-2 my-1 bg-neo-cream/15" />;
+  return <DropdownMenuSeparator className="mx-2 my-1 bg-edu-ink/15" />;
 }

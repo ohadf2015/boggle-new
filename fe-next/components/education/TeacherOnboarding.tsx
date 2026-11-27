@@ -53,10 +53,10 @@ export function TeacherOnboarding({ open, onDismiss }: TeacherOnboardingProps) {
                 </span>
                 <span className="flex min-w-0 flex-col">
                   <span className="inline-flex items-center gap-1.5 font-neo-display text-base font-black">
-                    <Icon className="size-4 shrink-0 text-neo-cyan" aria-hidden="true" />
+                    <Icon className="size-4 shrink-0 text-edu-cyan-ink" aria-hidden="true" />
                     {t(`education.onboarding.steps.${id}.title`)}
                   </span>
-                  <span className="font-neo-body text-sm text-neo-cream/80">{t(`education.onboarding.steps.${id}.text`)}</span>
+                  <span className="font-neo-body text-sm text-edu-ink/80">{t(`education.onboarding.steps.${id}.text`)}</span>
                 </span>
               </li>
             ))}

@@ -181,15 +181,15 @@ export function ClassroomResultsCard({
       // Self-describing for a screenshot harness (and for a human wondering
       // whether the podium is mid-reveal or broken): poll for `done`.
       data-round-end-stage={stage}
-      className="p-5 rounded-neo border-[2px] border-neo-cream bg-neo-navy shadow-hard"
+      className="p-5 rounded-neo border-[2px] border-edu-line bg-edu-surface shadow-hard"
     >
       <div className="flex items-start gap-3 mb-4">
-        <GraduationCap className="w-6 h-6 text-neo-lime shrink-0 mt-0.5" />
+        <GraduationCap className="w-6 h-6 text-edu-lime-ink shrink-0 mt-0.5" />
         <div className="min-w-0">
-          <h3 className="text-neo-white font-neo-display font-bold text-lg leading-tight">
+          <h3 className="text-edu-ink font-neo-display font-bold text-lg leading-tight">
             {t('education.results.title')}
           </h3>
-          <p className="text-neo-white/70 font-neo-body text-sm">
+          <p className="text-edu-ink/70 font-neo-body text-sm">
             {summary.lessonNames.join(', ')} · {summary.teacherName}
           </p>
         </div>
@@ -218,7 +218,7 @@ export function ClassroomResultsCard({
               noise. Unlike the one-shot canvas burst, this keeps running, so a
               shot taken seconds later still shows a celebration. */}
           <CelebrationLoop active={isRevealed(1, stage) && (isTeacher || viewerWon)} />
-          <p className="mb-3 font-neo-display font-bold text-xs uppercase tracking-widest text-neo-yellow">
+          <p className="mb-3 font-neo-display font-bold text-xs uppercase tracking-widest text-edu-yellow-ink">
             {t('education.results.podium.title')}
           </p>
           <ResultsPodium entries={podium} stage={stage} layout="row" t={t} />
@@ -261,7 +261,7 @@ export function ClassroomResultsCard({
       {isTeacher && summary.participationBonus ? (
         <p
           data-testid="participation-bonus-note"
-          className="mb-4 p-3 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light text-neo-white shadow-hard font-neo-body text-sm"
+          className="mb-4 p-3 rounded-neo-lg border-[3px] border-edu-line bg-edu-surface text-edu-ink shadow-hard font-neo-body text-sm"
         >
           {t('education.results.participationBonus', { points: summary.participationBonus })}
         </p>
@@ -281,7 +281,7 @@ export function ClassroomResultsCard({
         />
       )}
       {isTeacher && rematchOffline && (
-        <p data-testid="classroom-rematch-offline" role="alert" className="mb-4 font-neo-body text-sm font-bold text-neo-pink">
+        <p data-testid="classroom-rematch-offline" role="alert" className="mb-4 font-neo-body text-sm font-bold text-edu-pink-ink">
           {t('eduLiveRoom.hostResults.playAgainOffline')}
         </p>
       )}

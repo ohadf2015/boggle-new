@@ -69,13 +69,13 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
             // screen's accent fill; a tile carries a cream edge (16.8:1 on navy,
             // where a black edge is 1.23:1) and keeps its mode colour as a rail,
             // so four posters side by side never put four accents on the page.
-            'border-neo-cream bg-neo-navy-light text-neo-cream shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed'
+            'border-edu-line bg-edu-surface text-edu-ink shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed'
           : // Locked is the same card with the colour drained and a padlock: it
             // still has to read as a control, just not one that is open yet.
             // No container `opacity-*` here — fading the whole button fades its
             // border too, and the contrast audit then measures a 1:1 edge on a
             // control it can still see. The greyscale art carries the state.
-            'cursor-not-allowed border-neo-cream bg-neo-navy text-neo-cream'
+            'cursor-not-allowed border-edu-line bg-edu-surface text-edu-ink'
       )}
     >
       {/* Art: bespoke poster bleeds to the edges, chip art floats on the accent. */}
@@ -109,13 +109,13 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
       )}
 
       {/* Name + one meta line, on a hard band so they read over any art. */}
-      <span className="relative mt-auto w-full border-t-[3px] border-neo-cream bg-neo-navy px-2 py-1.5">
-        <span className="block font-neo-display text-[12px] font-black uppercase leading-[1.1] text-neo-white text-balance">
+      <span className="relative mt-auto w-full border-t-[3px] border-edu-line bg-edu-surface px-2 py-1.5">
+        <span className="block font-neo-display text-[12px] font-black uppercase leading-[1.1] text-edu-ink text-balance">
           {t(tile.titleKey)}
         </span>
         <span
           data-tile-line=""
-          className="mt-0.5 flex flex-wrap items-center gap-1 font-neo-body text-xs font-bold leading-none text-neo-cream"
+          className="mt-0.5 flex flex-wrap items-center gap-1 font-neo-body text-xs font-bold leading-none text-edu-ink"
         >
           {tile.ready ? (
             <>
@@ -132,7 +132,7 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
               {tile.sessions > 0 && (
                 <span
                   data-testid={`practice-tile-plays-${tile.id}`}
-                  className="tabular-nums text-neo-cream"
+                  className="tabular-nums text-edu-ink"
                 >
                   {t('education.practicePicker.played', { count: tile.sessions })}
                 </span>

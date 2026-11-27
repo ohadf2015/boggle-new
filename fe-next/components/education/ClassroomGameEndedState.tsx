@@ -26,7 +26,7 @@ export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }:
     <div
       role="alertdialog"
       aria-labelledby="classroom-game-ended-title"
-      className="fixed inset-0 z-[90] flex items-center justify-center bg-neo-navy px-4"
+      className="fixed inset-0 z-[90] flex items-center justify-center bg-edu-page px-4"
     >
       <div className="relative w-full max-w-sm rounded-neo-lg border-3 border-neo-black bg-neo-lime px-6 pb-6 pt-16 text-neo-black shadow-hard-lg">
         {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}

@@ -26,10 +26,10 @@ export function NoLessonWordsPanel({ words, size, children, compact = false, hid
 
   return (
     <div data-testid="no-lesson-words-panel" className={cn('flex min-h-0 flex-col gap-1.5', projector && 'h-full @[96rem]/results:gap-3')}>
-      <p dir="auto" className={cn('font-neo-display font-bold leading-tight text-neo-cream', projector ? 'text-xl @[96rem]/results:text-3xl' : 'text-base')}>
+      <p dir="auto" className={cn('font-neo-display font-bold leading-tight text-edu-ink', projector ? 'text-xl @[96rem]/results:text-3xl' : 'text-base')}>
         {t('eduLive.results.noLessonTitle')}
       </p>
-      <p dir="auto" className={cn('font-neo-body font-bold leading-snug text-neo-white/85', projector ? 'text-base @[96rem]/results:text-xl' : 'text-sm')}>
+      <p dir="auto" className={cn('font-neo-body font-bold leading-snug text-edu-ink/85', projector ? 'text-base @[96rem]/results:text-xl' : 'text-sm')}>
         {t(words.length > 0 ? 'eduLive.results.noLessonBody' : 'eduLive.results.noLessonBodyEmpty')}
       </p>
       {shown.length > 0 && (
@@ -43,7 +43,7 @@ export function NoLessonWordsPanel({ words, size, children, compact = false, hid
               animate={{ scale: 1, rotate: 0 }}
               transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 18, delay: 0.08 * i }}
               className={cn(
-                'flex items-center gap-1.5 rounded-neo border-2 border-neo-cream/50 bg-neo-navy font-bold text-neo-cream',
+                'flex items-center gap-1.5 rounded-neo border-2 border-edu-line bg-edu-surface font-bold text-edu-ink',
                 projector ? 'px-2.5 py-1 text-base @[96rem]/results:px-3.5 @[96rem]/results:py-1.5 @[96rem]/results:text-2xl' : 'px-2.5 py-1 text-sm'
               )}
             >
@@ -56,7 +56,7 @@ export function NoLessonWordsPanel({ words, size, children, compact = false, hid
         </ul>
       )}
       {!compact && (
-        <p dir="auto" className={cn('font-neo-body font-bold text-neo-white/70', projector ? 'text-base @[96rem]/results:text-xl' : 'text-xs')}>
+        <p dir="auto" className={cn('font-neo-body font-bold text-edu-ink/70', projector ? 'text-base @[96rem]/results:text-xl' : 'text-xs')}>
           {t('eduLive.results.noLessonHint')}
         </p>
       )}

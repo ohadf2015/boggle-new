@@ -33,7 +33,7 @@ export function ClassroomLobbyShell({ pinned, children, footer, aside, className
     <div
       data-testid="classroom-lobby-shell"
       dir={dir}
-      className={cn('group/lobby @container/lobby relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-neo-navy', className)}
+      className={cn('group/lobby @container/lobby relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-edu-page', className)}
     >
       <div className="mx-auto flex w-full max-w-[1200px] min-h-0 flex-1 flex-col gap-2 px-1 py-1 @4xl/lobby:gap-3 @4xl/lobby:px-4">
         {/* The h1 is for screen readers; the visible line is information, so GO LIVE stays the only call to action. */}
@@ -43,7 +43,7 @@ export function ClassroomLobbyShell({ pinned, children, footer, aside, className
           </h1>
           <p
             data-testid="lobby-stage-subtitle"
-            className="hidden font-neo-body text-xs font-bold text-neo-cream/70 @lg/lobby:block @4xl/lobby:text-sm"
+            className="hidden font-neo-body text-xs font-bold text-edu-ink/70 @lg/lobby:block @4xl/lobby:text-sm"
           >
             {tr(t, 'academy.launch.subtitle', 'Pick a game. Your class joins with one code.')}
           </p>
@@ -75,7 +75,7 @@ export function ClassroomLobbyShell({ pinned, children, footer, aside, className
       </div>
 
       {footer ? (
-        <div className="shrink-0 border-t-[3px] border-neo-cream bg-neo-navy-light px-1 py-3">{footer}</div>
+        <div className="shrink-0 border-t-[3px] border-edu-line bg-edu-surface px-1 py-3">{footer}</div>
       ) : null}
     </div>
   );

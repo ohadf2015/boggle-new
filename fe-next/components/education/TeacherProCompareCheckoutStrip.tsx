@@ -134,15 +134,15 @@ export function TeacherProCompareCheckoutStrip({
   return (
     <aside
       data-testid="teacher-pro-compare-checkout-strip"
-      className={`relative mb-12 mt-3 rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-5 pt-7 shadow-hard-xl sm:p-6 sm:pt-8 ${className}`}
+      className={`relative mb-12 mt-3 rounded-neo-xl border-[3px] border-edu-line bg-edu-surface p-5 pt-7 shadow-hard-xl sm:p-6 sm:pt-8 ${className}`}
     >
       <span aria-hidden="true" className="edu-stripes pointer-events-none absolute inset-x-0 top-0 h-2 rounded-t-[13px] bg-neo-yellow" />
       <p className="absolute -top-3.5 start-4 inline-flex -rotate-2 items-center gap-1 rounded-neo border-[3px] border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-xs font-black uppercase text-neo-black shadow-hard">
         <Crown className="size-3.5" aria-hidden="true" />
         {c.eyebrow}
       </p>
-      <h2 className="mb-2 font-neo-display text-2xl font-black text-neo-cream">{c.heading}</h2>
-      <p className="mb-4 font-neo-body text-sm font-semibold leading-relaxed text-neo-cream/80 sm:text-base">{c.body}</p>
+      <h2 className="mb-2 font-neo-display text-2xl font-black text-edu-ink">{c.heading}</h2>
+      <p className="mb-4 font-neo-body text-sm font-semibold leading-relaxed text-edu-ink/80 sm:text-base">{c.body}</p>
       <PlanMiniTable locale={locale} />
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <TeacherProUpgradeLink
@@ -155,26 +155,26 @@ export function TeacherProCompareCheckoutStrip({
           <ProShine />
           {c.cta}
         </TeacherProUpgradeLink>
-        <p className="text-xs font-semibold text-neo-white/70">{c.note}</p>
+        <p className="text-xs font-semibold text-edu-ink/70">{c.note}</p>
       </div>
     </aside>
   );
 }
 
 function MiniCell({ value, copy }: { value: PlanCell; copy: TableCopy }) {
-  if (value === null) return <span className="font-black text-neo-yellow">{copy.unlimited}</span>;
+  if (value === null) return <span className="font-black text-edu-yellow-ink">{copy.unlimited}</span>;
   if (typeof value === 'number') return <bdi dir="ltr" className="font-black tabular-nums">{value}</bdi>;
   if (value) {
     return (
       <>
-        <Check className="mx-auto size-5 text-neo-yellow" strokeWidth={3} aria-hidden="true" />
+        <Check className="mx-auto size-5 text-edu-yellow-ink" strokeWidth={3} aria-hidden="true" />
         <span className="sr-only">{copy.included}</span>
       </>
     );
   }
   return (
     <>
-      <span aria-hidden="true" className="font-black text-neo-white/60">—</span>
+      <span aria-hidden="true" className="font-black text-edu-ink/60">—</span>
       <span className="sr-only">{copy.notIncluded}</span>
     </>
   );
@@ -184,14 +184,14 @@ function PlanMiniTable({ locale }: { locale: string }) {
   const { copy, rows } = teacherProCompareTable(locale);
   return (
     <div className="mb-5 w-full max-w-lg overflow-x-auto">
-      <table data-testid="teacher-pro-compare-table" className="w-full min-w-[18rem] table-fixed border-collapse text-sm text-neo-white">
+      <table data-testid="teacher-pro-compare-table" className="w-full min-w-[18rem] table-fixed border-collapse text-sm text-edu-ink">
         <colgroup>
           <col />
           <col className="w-20" />
           <col className="w-24" />
         </colgroup>
         <thead>
-          <tr className="border-b-2 border-neo-cream/40">
+          <tr className="border-b-2 border-edu-line">
             <th scope="col" className="pb-2" />
             <th scope="col" className="pb-2 text-center font-neo-display font-black">{copy.free}</th>
             <th scope="col" className="bg-neo-yellow/10 pb-2 pt-1 text-center">
@@ -201,7 +201,7 @@ function PlanMiniTable({ locale }: { locale: string }) {
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.id} className="border-b border-neo-cream/15 last:border-b-0">
+            <tr key={row.id} className="border-b border-edu-line/15 last:border-b-0">
               <th scope="row" className="py-1.5 pe-2 text-start font-bold leading-snug">{row.label}</th>
               <td className="py-1.5 text-center"><MiniCell value={row.free} copy={copy} /></td>
               <td className="bg-neo-yellow/10 py-1.5 text-center"><MiniCell value={row.pro} copy={copy} /></td>

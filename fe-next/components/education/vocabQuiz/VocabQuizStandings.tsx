@@ -49,7 +49,7 @@ export function VocabQuizStandings({
 
   if (shown.length === 0) {
     return (
-      <p className={cn('text-neo-white/60 font-neo-body', projector ? 'text-xl' : 'text-sm')}>
+      <p className={cn('text-edu-ink/60 font-neo-body', projector ? 'text-xl' : 'text-sm')}>
         {t('vocabQuiz.standings.empty')}
       </p>
     );
@@ -100,7 +100,7 @@ export function VocabQuizStandings({
                   projector ? 'py-3' : 'py-2',
                   isMe
                     ? 'bg-neo-lime text-neo-black shadow-hard'
-                    : 'bg-neo-navy-elevated text-neo-white shadow-hard-sm'
+                    : 'bg-edu-surface text-edu-ink shadow-hard-sm'
                 )}
               >
                 {MEDALS[rank] ? (
@@ -135,7 +135,7 @@ export function VocabQuizStandings({
                 {player.streak > 1 && (
                   <span
                     className={cn(
-                      'flex items-center gap-1 shrink-0 text-neo-orange',
+                      'flex items-center gap-1 shrink-0 text-edu-orange-ink',
                       projector ? 'text-xl' : 'text-sm'
                     )}
                     aria-label={t('vocabQuiz.streak.label', { count: player.streak })}

@@ -50,7 +50,7 @@ export function ArcChart({
   return (
     <figure data-testid="student-arc-chart" dir="ltr" role="img" aria-label={label} className="select-none">
       <div className="flex gap-x-2">
-        <div className="relative h-48 w-11 shrink-0 text-end text-[11px] font-bold tabular-nums text-neo-cream/60" aria-hidden="true">
+        <div className="relative h-48 w-11 shrink-0 text-end text-[11px] font-bold tabular-nums text-edu-ink/60" aria-hidden="true">
           {Y_TICKS.map((tick) => (
             <span
               key={tick}
@@ -63,12 +63,12 @@ export function ArcChart({
           ))}
         </div>
 
-        <div className="relative h-48 min-w-0 flex-1 rounded-neo border-2 border-neo-cream/40 bg-neo-navy">
+        <div className="relative h-48 min-w-0 flex-1 rounded-neo border-2 border-edu-line bg-edu-page">
           {Y_TICKS.map((tick) => (
             <span
               key={tick}
               aria-hidden="true"
-              className="absolute inset-x-0 border-t border-neo-cream/10"
+              className="absolute inset-x-0 border-t border-edu-line/10"
               style={{ top: `${100 - tick}%` }}
             />
           ))}
@@ -77,7 +77,7 @@ export function ArcChart({
             className="absolute inset-x-0 border-t-2 border-dashed border-neo-lime/80"
             style={{ top: `${100 - goal}%` }}
           >
-            <span className="absolute end-1 -top-5 rounded-sm bg-neo-navy px-1 text-[11px] font-black text-neo-lime">
+            <span className="absolute end-1 -top-5 rounded-sm bg-edu-surface px-1 text-[11px] font-black text-edu-lime-ink">
               {goalLabel}
             </span>
           </span>
@@ -117,7 +117,7 @@ export function ArcChart({
                 />
                 <span
                   className={cn(
-                    'absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] font-black tabular-nums text-neo-white',
+                    'absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] font-black tabular-nums text-edu-ink',
                     p.accuracy > 85 ? 'top-4' : '-top-5',
                   )}
                 >
@@ -131,7 +131,7 @@ export function ArcChart({
       </div>
       <div className="flex gap-x-2">
         <span aria-hidden="true" className="w-11 shrink-0" />
-        <div className="relative mt-1 h-5 min-w-0 flex-1 text-[11px] font-bold text-neo-cream/70" aria-hidden="true">
+        <div className="relative mt-1 h-5 min-w-0 flex-1 text-[11px] font-bold text-edu-ink/70" aria-hidden="true">
           {points.map((p, i) => {
             if (!showDate(i, points.length)) return null;
             const first = points.length > 1 && i === 0;

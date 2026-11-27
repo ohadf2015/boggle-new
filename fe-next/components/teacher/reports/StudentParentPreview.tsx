@@ -34,22 +34,22 @@ export function StudentParentPreview({ classroomId, studentId, studentName }: St
   return (
     <section
       aria-labelledby="parent-preview-title"
-      className="rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 shadow-hard sm:p-5"
+      className="rounded-neo-lg border-2 border-edu-line bg-edu-surface/95 p-4 shadow-hard sm:p-5"
     >
       <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 id="parent-preview-title" className="font-neo-display text-lg font-bold text-neo-white">
+          <h2 id="parent-preview-title" className="font-neo-display text-lg font-bold text-edu-ink">
             {t('parentReport.teacherPreviewTitle')}
           </h2>
-          <p className="text-sm text-neo-cream/75">{t('parentReport.teacherPreviewHint')}</p>
+          <p className="text-sm text-edu-ink/75">{t('parentReport.teacherPreviewHint')}</p>
         </div>
         <ShareParentReportButton classroomId={classroomId} studentId={studentId} />
       </div>
       {state.status === 'loading' && (
-        <div aria-busy="true" className="h-40 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
+        <div aria-busy="true" className="h-40 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
       )}
       {state.status === 'error' && (
-        <p role="alert" className="rounded-neo border-2 border-neo-pink bg-neo-pink/10 p-3 text-sm font-bold text-neo-white">
+        <p role="alert" className="rounded-neo border-2 border-neo-pink bg-neo-pink/10 p-3 text-sm font-bold text-edu-ink">
           {t('parentReport.loadFailed')}
         </p>
       )}

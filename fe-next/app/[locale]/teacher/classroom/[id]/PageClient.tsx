@@ -51,7 +51,7 @@ function ClassPage({ classroomId }: { classroomId: string }) {
   if (!classroom && error) {
     return (
       <div role="alert" className={cn(NB_PANEL, 'mx-auto my-6 flex max-w-md flex-col items-center gap-3 p-6 text-center')}>
-        <p className="font-neo-display text-lg font-bold text-neo-cream">{t('education.errors.serverUnavailable')}</p>
+        <p className="font-neo-display text-lg font-bold text-edu-ink">{t('education.errors.serverUnavailable')}</p>
         <NeoButton variant="secondary" data-testid="class-page-retry" onClick={() => void refresh()} className="w-full">
           {t('teacher.lastGame.retry')}
         </NeoButton>
@@ -61,7 +61,7 @@ function ClassPage({ classroomId }: { classroomId: string }) {
   if (!classroom?.join_code) {
     return (
       <div role="alert" className={cn(NB_PANEL, 'mx-auto my-6 flex max-w-md flex-col items-center gap-3 p-6 text-center')}>
-        <p className="font-neo-display text-lg font-bold text-neo-cream">{t('education.classroomGame.classroomNotFound')}</p>
+        <p className="font-neo-display text-lg font-bold text-edu-ink">{t('education.classroomGame.classroomNotFound')}</p>
         <Link href={`/${language}/teacher/classroom`} className={cn(NB_SECONDARY, 'w-full')}>
           {t('eduShell.home.yourClasses')}
         </Link>

@@ -24,8 +24,8 @@ export interface ClassLastGameState {
   game: ClassLastGameSummary | null;
 }
 
-const TITLE = 'font-neo-display text-base font-black leading-tight text-neo-cream';
-const LINE = 'truncate font-neo-body text-xs font-bold text-neo-cream/75';
+const TITLE = 'font-neo-display text-base font-black leading-tight text-edu-ink';
+const LINE = 'truncate font-neo-body text-xs font-bold text-edu-ink/75';
 
 /** The last class game as one row that opens its results; hidden until a game exists. */
 export function ClassLastGame({ state, resultsHref, language, t }: { state: ClassLastGameState; resultsHref: string; language: string; t: T }) {
@@ -35,7 +35,7 @@ export function ClassLastGame({ state, resultsHref, language, t }: { state: Clas
   }
   if (state.status === 'error') {
     return (
-      <p data-testid="class-page-last-game" className={cn(PANEL, 'px-4 py-3 font-neo-body text-sm font-bold text-neo-cream/80')}>
+      <p data-testid="class-page-last-game" className={cn(PANEL, 'px-4 py-3 font-neo-body text-sm font-bold text-edu-ink/80')}>
         {t('teacher.lastGame.error')}
       </p>
     );
@@ -51,7 +51,7 @@ export function ClassLastGame({ state, resultsHref, language, t }: { state: Clas
   return (
     <div data-testid="class-page-last-game">
       <Link href={resultsHref} className={HOME_ROW}>
-        <Trophy className="size-6 shrink-0 text-neo-yellow" strokeWidth={2.5} aria-hidden="true" />
+        <Trophy className="size-6 shrink-0 text-edu-yellow-ink" strokeWidth={2.5} aria-hidden="true" />
         <span className="flex min-w-0 flex-1 flex-col">
           <span className={TITLE}>{t('teacher.lastGame.title')}</span>
           <bdi className={LINE}>{facts}</bdi>
@@ -77,16 +77,16 @@ export function ClassWordLists({ lists, loading, libraryHref, language, t }: { l
       ) : lists.length > 0 ? (
         <details data-testid="class-page-lists-fold" className={cn(PANEL, 'group')}>
           <summary className="flex min-h-[60px] cursor-pointer list-none items-center gap-3 px-4 py-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan [&::-webkit-details-marker]:hidden">
-            <ClipboardList className="size-6 shrink-0 text-neo-cyan" strokeWidth={2.5} aria-hidden="true" />
+            <ClipboardList className="size-6 shrink-0 text-edu-cyan-ink" strokeWidth={2.5} aria-hidden="true" />
             <span className={cn(TITLE, 'flex-1')}>{t('eduHq.lists.label')}</span>
-            <span className="font-neo-body text-sm font-bold tabular-nums text-neo-cream/70">{lists.length}</span>
+            <span className="font-neo-body text-sm font-bold tabular-nums text-edu-ink/70">{lists.length}</span>
             <ChevronDown className="size-5 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
           </summary>
-          <ul className="flex flex-col divide-y divide-neo-cream/10 border-t-2 border-neo-cream/10 px-4">
+          <ul className="flex flex-col divide-y divide-edu-line/10 border-t-2 border-edu-line/10 px-4">
             {lists.slice(0, 5).map((l) => (
               <li key={l.id} className="flex min-h-11 items-center justify-between gap-3 py-1">
-                <ListNameButton lessonId={l.id} name={l.name} className="min-w-0 truncate font-neo-body text-sm font-black text-neo-cream" />
-                <span className="shrink-0 font-neo-body text-xs font-bold tabular-nums text-neo-cream/70">{t(pluralKeyOf('eduLibrary.card.words', l.wordCount, language), { count: l.wordCount })}</span>
+                <ListNameButton lessonId={l.id} name={l.name} className="min-w-0 truncate font-neo-body text-sm font-black text-edu-ink" />
+                <span className="shrink-0 font-neo-body text-xs font-bold tabular-nums text-edu-ink/70">{t(pluralKeyOf('eduLibrary.card.words', l.wordCount, language), { count: l.wordCount })}</span>
               </li>
             ))}
           </ul>
@@ -105,9 +105,9 @@ export function ClassDangerZone({ onRequestDelete, t }: { onRequestDelete: () =>
       id="delete"
       data-testid="class-page-danger"
       aria-labelledby="class-danger-title"
-      className="flex items-center justify-between gap-3 border-t-2 border-neo-cream/10 pt-4"
+      className="flex items-center justify-between gap-3 border-t-2 border-edu-line/10 pt-4"
     >
-      <h2 id="class-danger-title" className="font-neo-body text-sm font-bold text-neo-cream/70">{t('settings.dangerZone')}</h2>
+      <h2 id="class-danger-title" className="font-neo-body text-sm font-bold text-edu-ink/70">{t('settings.dangerZone')}</h2>
       <button type="button" onClick={onRequestDelete} data-testid="delete-class-affordance" className={cn(OUTLINE_BUTTON, 'min-h-11 shrink-0 px-3 text-neo-red hover:text-neo-red')}>
         <Trash2 className="size-4" aria-hidden="true" />
         {t('teacher.classroom.delete')}

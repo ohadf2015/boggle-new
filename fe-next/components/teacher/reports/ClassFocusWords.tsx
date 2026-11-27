@@ -33,7 +33,7 @@ export function ClassFocusWords({
   const state = useWordMasteryReport(classroomId);
 
   if (state.status === 'loading') {
-    return <div data-testid="class-focus-loading" aria-busy="true" className="h-48 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />;
+    return <div data-testid="class-focus-loading" aria-busy="true" className="h-48 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />;
   }
 
   const words = state.status === 'ready' ? snapshotWords(state.report.hardestWords) : [];
@@ -63,9 +63,9 @@ export function ClassFocusWords({
           {title}
           <ul className="mt-2">
             {fallback.slice(0, FALLBACK_SHOWN).map((m) => (
-              <li key={m.word} className="flex items-baseline justify-between gap-3 border-b-2 border-neo-cream/15 py-2 max-sm:[&:nth-child(n+4)]:hidden">
-                <bdi className="min-w-0 truncate font-neo-display text-xl font-black text-neo-white">{m.word}</bdi>
-                <span className="shrink-0 font-neo-body text-xs font-bold text-neo-cream/70">
+              <li key={m.word} className="flex items-baseline justify-between gap-3 border-b-2 border-edu-line/15 py-2 max-sm:[&:nth-child(n+4)]:hidden">
+                <bdi className="min-w-0 truncate font-neo-display text-xl font-black text-edu-ink">{m.word}</bdi>
+                <span className="shrink-0 font-neo-body text-xs font-bold text-edu-ink/70">
                   {t(pluralKeyOf('education.analytics.overview.hardWordsMeta', m.studentCount, language), { count: m.studentCount, pct: pct(m.errorRate) })}
                 </span>
               </li>

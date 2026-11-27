@@ -98,7 +98,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
     <div
       dir={dir}
       data-testid="esl-playable-demo"
-      className="mt-8 rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard sm:p-6"
+      className="mt-8 rounded-neo border-3 border-edu-line bg-edu-surface p-5 shadow-hard sm:p-6"
     >
       <div className="flex flex-wrap gap-2">
         {CEFR_LEVELS.map((lv) => (
@@ -107,7 +107,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
             type="button"
             onClick={() => pickLevel(lv)}
             className={`rounded-neo border-2 border-neo-black px-3 py-1.5 font-neo-display text-sm font-black ${
-              level === lv ? 'bg-neo-cyan text-neo-navy shadow-hard-sm' : 'bg-neo-navy text-neo-white'
+              level === lv ? 'bg-neo-cyan text-neo-navy shadow-hard-sm' : 'bg-edu-surface text-edu-ink'
             } focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
           >
             {lv}
@@ -115,17 +115,17 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
         ))}
       </div>
 
-      <p className="mt-4 font-neo-display text-xs font-black uppercase tracking-widest text-neo-cyan">
+      <p className="mt-4 font-neo-display text-xs font-black uppercase tracking-widest text-edu-cyan-ink">
         {copy.listLabel}
       </p>
       <ul className="mt-2 grid gap-2 sm:grid-cols-2">
         {list.map((g) => (
           <li
             key={g.word}
-            className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-2.5 py-1.5 text-sm text-neo-white"
+            className="rounded-neo border-2 border-edu-line bg-edu-surface px-2.5 py-1.5 text-sm text-edu-ink"
           >
             <span className="font-bold">{g.word}</span>
-            <span className="text-neo-white/70"> — {glossOf(g)}</span>
+            <span className="text-edu-ink/70"> — {glossOf(g)}</span>
           </li>
         ))}
       </ul>
@@ -142,7 +142,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
 
       {roundOver && (
         <div className="mt-5">
-          <p className="font-neo-display text-sm font-black uppercase tracking-wider text-neo-lime">
+          <p className="font-neo-display text-sm font-black uppercase tracking-wider text-edu-lime-ink">
             {copy.timesUp}
           </p>
           <button
@@ -160,7 +160,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
           <p
             data-testid="esl-demo-clock"
             className={`mt-4 font-neo-display text-lg font-black tabular-nums ${
-              timeLeft <= 10 ? 'text-neo-red' : 'text-neo-white'
+              timeLeft <= 10 ? 'text-neo-red' : 'text-edu-ink'
             }`}
           >
             {copy.time} {formatClock(timeLeft)}
@@ -174,7 +174,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
                   type="button"
                   onClick={() => onTile(i)}
                   className={`grid aspect-square place-items-center rounded-neo border-3 border-neo-black font-neo-display text-lg font-black ${
-                    on ? 'bg-neo-lime text-neo-navy shadow-hard-sm' : 'bg-neo-navy text-neo-white'
+                    on ? 'bg-neo-lime text-neo-navy shadow-hard-sm' : 'bg-edu-surface text-edu-ink'
                   } focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
                 >
                   {letter}
@@ -182,7 +182,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
               );
             })}
           </div>
-          <p className="mt-3 font-mono text-xl font-black tracking-[0.2em] text-neo-white">
+          <p className="mt-3 font-mono text-xl font-black tracking-[0.2em] text-edu-ink">
             {current || '—'}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -196,7 +196,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
             <button
               type="button"
               onClick={() => setPath([])}
-              className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-4 py-2 font-neo-display text-xs font-black uppercase text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+              className="rounded-neo border-2 border-edu-line bg-edu-surface px-4 py-2 font-neo-display text-xs font-black uppercase text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
             >
               {copy.clear}
             </button>
@@ -205,9 +205,9 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
       )}
 
       {found.length > 0 && (
-        <p className="mt-3 text-sm font-bold text-neo-white/80">
+        <p className="mt-3 text-sm font-bold text-edu-ink/80">
           {copy.found}: {found.map((w) => (
-            <span key={w} className="me-2 inline-block text-neo-lime">
+            <span key={w} className="me-2 inline-block text-edu-lime-ink">
               {w}
             </span>
           ))}
@@ -216,7 +216,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
 
       <Link
         href={practiceHref(level, locale)}
-        className="mt-5 inline-block font-neo-display text-sm font-black uppercase tracking-widest text-neo-cyan underline underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+        className="mt-5 inline-block font-neo-display text-sm font-black uppercase tracking-widest text-edu-cyan-ink underline underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         {copy.practice}
       </Link>

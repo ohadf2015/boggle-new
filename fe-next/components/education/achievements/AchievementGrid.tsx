@@ -84,7 +84,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                 'font-bold text-sm transition duration-200',
                 activeCategory === key
                   ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard'
-                  : 'bg-neo-navy-light text-neo-white border-neo-cream hover:bg-neo-navy'
+                  : 'bg-edu-surface text-edu-ink border-edu-line hover:bg-edu-surface'
               )}
             >
               {t(labelKey)}
@@ -118,7 +118,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                 <AdaptiveMotion.div
                   key={key}
                   className={cn(
-                    'bg-neo-navy border-neo border-neo-cream/40 rounded-neo p-3 shadow-hard',
+                    'bg-edu-surface border-neo border-edu-line rounded-neo p-3 shadow-hard',
                     'relative overflow-hidden',
                     !isEarned && 'grayscale opacity-75'
                   )}
@@ -153,7 +153,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                   </div>
 
                   {/* Name */}
-                  <h3 className="text-center font-bold text-sm text-neo-white mb-2 line-clamp-2">
+                  <h3 className="text-center font-bold text-sm text-edu-ink mb-2 line-clamp-2">
                     {displayName}
                   </h3>
 
@@ -183,7 +183,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                         <span>{tierProgress.currentTier}</span>
                       </div>
                     ) : (
-                      <div className="px-3 py-1 rounded-full border-neo border-neo-cream/40 bg-neo-navy-light text-neo-white font-black text-xs">
+                      <div className="px-3 py-1 rounded-full border-neo border-edu-line bg-edu-surface text-edu-ink font-black text-xs">
                         {t('education.achievements.locked')}
                       </div>
                     )}
@@ -193,12 +193,12 @@ export const AchievementGrid = memo<AchievementGridProps>(
                   {!tierProgress.isMaxTier && tierProgress.nextThreshold && (
                     <div className="space-y-1">
                       {/* Progress text */}
-                      <p className="text-xs text-center text-neo-white">
+                      <p className="text-xs text-center text-edu-ink">
                         {count}/{tierProgress.nextThreshold}
                       </p>
 
                       {/* Progress bar */}
-                      <div className="w-full h-2 bg-neo-navy/50 rounded-full overflow-hidden border border-neo-cream/40">
+                      <div className="w-full h-2 bg-edu-surface/50 rounded-full overflow-hidden border border-edu-line">
                         <AdaptiveMotion.div
                           className="h-full w-full origin-left rounded-full rtl:origin-right"
                           initial={{ scaleX: 0 }}

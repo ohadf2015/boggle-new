@@ -51,17 +51,17 @@ export function UnpluggedHud({
   return (
     <header
       data-testid="unplugged-hud"
-      className="shrink-0 flex items-center gap-2 sm:gap-4 px-2 sm:px-4 py-2 border-b-neo border-neo-cream/40 bg-neo-navy-light"
+      className="shrink-0 flex items-center gap-2 sm:gap-4 px-2 sm:px-4 py-2 border-b-neo border-edu-line bg-edu-surface"
     >
       <ClassicUnpluggedExitLink href={homeHref} label={exitLabel} />
 
       <div className="min-w-0 flex-1">
-        <p className="truncate font-neo-display font-bold text-neo-white text-[clamp(0.85rem,1.6vw,1.5rem)] leading-tight">
+        <p className="truncate font-neo-display font-bold text-edu-ink text-[clamp(0.85rem,1.6vw,1.5rem)] leading-tight">
           {lesson}
         </p>
-        <p className="truncate font-neo-body text-neo-cyan font-bold text-[clamp(0.6rem,1vw,0.95rem)]">
+        <p className="truncate font-neo-body text-edu-cyan-ink font-bold text-[clamp(0.6rem,1vw,0.95rem)]">
           {progressLabel}
-          {teacher ? <span className="text-neo-white/50"> · {teacher}</span> : null}
+          {teacher ? <span className="text-edu-ink/50"> · {teacher}</span> : null}
         </p>
       </div>
 
@@ -72,7 +72,7 @@ export function UnpluggedHud({
           'shrink-0 flex items-center gap-1 px-2 sm:px-3 py-1 rounded-neo shadow-hard-sm',
           onFire
             ? 'border-[3px] border-neo-black bg-neo-orange text-neo-black'
-            : 'border-[3px] border-neo-cream bg-neo-navy text-neo-cream',
+            : 'border-[3px] border-edu-line bg-edu-surface text-edu-ink',
         )}
       >
         <Flame
@@ -103,7 +103,7 @@ export function UnpluggedHud({
         aria-label={muteLabel}
         title={muteLabel}
         data-testid="unplugged-mute"
-        className="shrink-0 grid place-items-center w-11 h-11 rounded-neo border-[3px] border-neo-cream bg-neo-navy text-neo-cream shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+        className="shrink-0 grid place-items-center w-11 h-11 rounded-neo border-[3px] border-edu-line bg-edu-surface text-edu-ink shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
       >
         {muted ? (
           <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden />

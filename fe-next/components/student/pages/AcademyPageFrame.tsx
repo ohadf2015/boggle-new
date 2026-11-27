@@ -81,7 +81,7 @@ export function AcademyPageFrame({ title, art, badge, toolbar, regionLabel, pend
       dir={dir ?? (language === 'he' ? 'rtl' : 'ltr')}
       data-testid={pending ? 'academy-page-pending' : 'academy-page'}
       data-chrome={layout.chrome}
-      className="fixed inset-0 isolate overflow-hidden bg-neo-navy text-neo-white"
+      className="fixed inset-0 isolate overflow-hidden bg-edu-page text-edu-ink"
     >
       <AcademyBackdrop art="map" />
 
@@ -129,7 +129,7 @@ export function FrameSkeleton({ rows = 4, grid = false }: { rows?: number; grid?
       {Array.from({ length: rows }, (_, i) => (
         <div
           key={i}
-          className={cn('rounded-[16px] bg-neo-white/10 motion-safe:animate-pulse', grid ? 'h-36' : 'h-20')}
+          className={cn('rounded-[16px] bg-edu-ink/10 motion-safe:animate-pulse', grid ? 'h-36' : 'h-20')}
         />
       ))}
     </div>

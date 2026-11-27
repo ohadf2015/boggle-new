@@ -47,11 +47,11 @@ export function WordMasteryReport({ classroomId, classroomName, onStudentClick }
           </span>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} aria-hidden="true" className="h-24 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
+              <div key={i} aria-hidden="true" className="h-24 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
             ))}
           </div>
           {[0, 1, 2].map((i) => (
-            <div key={i} aria-hidden="true" className="h-14 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
+            <div key={i} aria-hidden="true" className="h-14 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
           ))}
         </div>
       </Shell>
@@ -61,7 +61,7 @@ export function WordMasteryReport({ classroomId, classroomName, onStudentClick }
   if (state.status === 'error') {
     return (
       <Shell>
-        <p role="alert" className="rounded-neo border-2 border-neo-pink bg-neo-pink/15 px-3 py-2 text-sm font-bold text-neo-white">
+        <p role="alert" className="rounded-neo border-2 border-neo-pink bg-neo-pink/15 px-3 py-2 text-sm font-bold text-edu-ink">
           {t('eduPro.mastery.error')}
         </p>
       </Shell>
@@ -96,9 +96,9 @@ export function WordMasteryReport({ classroomId, classroomName, onStudentClick }
 
   const { report, insights } = state;
   const reteach = report.hardestWords.length > 0 && (
-    <div data-print-hide className="rounded-neo border-2 border-neo-cream/35 p-3">
+    <div data-print-hide className="rounded-neo border-2 border-edu-line p-3">
       <MissedPracticeAction classroomId={classroomId} classroomName={classroomName} locked={false} />
-      <p className="mt-2 text-xs font-bold text-neo-cream/60">{t('eduPro.practice.whyNote')}</p>
+      <p className="mt-2 text-xs font-bold text-edu-ink/60">{t('eduPro.practice.whyNote')}</p>
     </div>
   );
   const hardest = (
@@ -107,7 +107,7 @@ export function WordMasteryReport({ classroomId, classroomName, onStudentClick }
         {report.hardestWords.length > 0 ? (
           <HardestWordsList words={report.hardestWords} states={insights ? statesOf(insights) : undefined} />
         ) : (
-          <p className="text-sm font-bold text-neo-cream/70">{t('eduPro.mastery.noneMissed')}</p>
+          <p className="text-sm font-bold text-edu-ink/70">{t('eduPro.mastery.noneMissed')}</p>
         )}
       </HardestBlock>
       {notFound}
@@ -212,8 +212,8 @@ function HardestBlock({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   return (
     <div>
-      <h3 className="mb-2 flex items-center gap-1.5 text-sm font-bold text-neo-cream/85">
-        <Flame className="size-4 text-neo-cream/70" aria-hidden="true" />
+      <h3 className="mb-2 flex items-center gap-1.5 text-sm font-bold text-edu-ink/85">
+        <Flame className="size-4 text-edu-ink/70" aria-hidden="true" />
         {t('eduPro.mastery.hardestTitle')}
       </h3>
       {children}
@@ -225,11 +225,11 @@ function NotFoundBlock({ words }: { words: HardWord[] }) {
   const { t } = useLanguage();
   return (
     <div data-testid="mastery-not-found">
-      <h3 className="flex items-center gap-1.5 text-sm font-bold text-neo-cream/85">
-        <SearchX className="size-4 text-neo-cream/70" aria-hidden="true" />
+      <h3 className="flex items-center gap-1.5 text-sm font-bold text-edu-ink/85">
+        <SearchX className="size-4 text-edu-ink/70" aria-hidden="true" />
         {t('eduPro.mastery.notFound.title')}
       </h3>
-      <p className="mb-2 mt-0.5 text-xs font-bold text-neo-cream/65">{t('eduPro.mastery.notFound.note')}</p>
+      <p className="mb-2 mt-0.5 text-xs font-bold text-edu-ink/65">{t('eduPro.mastery.notFound.note')}</p>
       <HardestWordsList words={words} notFound />
     </div>
   );
@@ -242,16 +242,16 @@ function Shell({ children, actions }: { children: React.ReactNode; actions?: Rea
       data-testid="word-mastery-report"
       data-report-print
       aria-label={t('eg2Rep.report.title')}
-      className="rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 shadow-hard sm:p-6"
+      className="rounded-neo-lg border-2 border-edu-line bg-edu-surface/95 p-4 shadow-hard sm:p-6"
     >
       {actions && <ReportPrintStyles />}
       <div className="mb-4 flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="font-neo-display text-xl font-bold text-neo-white sm:text-2xl">{t('eg2Rep.report.title')}</h2>
+            <h2 className="font-neo-display text-xl font-bold text-edu-ink sm:text-2xl">{t('eg2Rep.report.title')}</h2>
             <ProPoweredChip />
           </div>
-          <p className="mt-0.5 text-sm text-neo-cream/70">{t('eg2Rep.report.subtitle')}</p>
+          <p className="mt-0.5 text-sm text-edu-ink/70">{t('eg2Rep.report.subtitle')}</p>
         </div>
         {actions}
       </div>

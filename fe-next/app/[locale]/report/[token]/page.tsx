@@ -43,11 +43,11 @@ function InvalidReportView({ locale, t }: { locale: string; t: ReportT }) {
   return (
     <main
       dir={isRTL(locale as Locale) ? 'rtl' : 'ltr'}
-      className="min-h-dvh bg-neo-navy flex items-center justify-center p-6"
+      className="min-h-dvh bg-edu-page flex items-center justify-center p-6"
     >
-      <div className="w-full max-w-md border-3 bg-neo-navy border-neo-cream/40 shadow-hard rounded-neo p-6 text-center">
-        <h1 className="font-neo-display text-2xl text-neo-white mb-3">{t('parentReport.invalidTitle')}</h1>
-        <p className="font-neo-body text-neo-white/80">{t('parentReport.invalidBody')}</p>
+      <div className="w-full max-w-md border-3 bg-edu-surface border-edu-line shadow-hard rounded-neo p-6 text-center">
+        <h1 className="font-neo-display text-2xl text-edu-ink mb-3">{t('parentReport.invalidTitle')}</h1>
+        <p className="font-neo-body text-edu-ink/80">{t('parentReport.invalidBody')}</p>
       </div>
     </main>
   );

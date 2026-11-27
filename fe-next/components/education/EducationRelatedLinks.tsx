@@ -24,10 +24,10 @@ import { tr } from '@/lib/seo/wordLists/i18n';
  */
 
 const ACCENT_TEXT: Record<EducationAccent, string> = {
-  lime: 'text-neo-lime',
-  pink: 'text-neo-pink',
-  cyan: 'text-neo-cyan',
-  purple: 'text-neo-purple',
+  lime: 'text-edu-lime-ink',
+  pink: 'text-edu-pink-ink',
+  cyan: 'text-edu-cyan-ink',
+  purple: 'text-edu-purple-ink',
 };
 
 /** Harvested from the teacher-moment pages' `labels.relatedTitle`. Not translated here. */
@@ -78,7 +78,7 @@ export function EducationRelatedLinks({
     <>
       {rail.length > 0 && (
         <nav data-word-list-rail className="mt-16" aria-label={tr(locale, 'rail.title')}>
-          <h2 className="mb-4 font-neo-display text-xl font-black uppercase tracking-wide text-neo-white">
+          <h2 className="mb-4 font-neo-display text-xl font-black uppercase tracking-wide text-edu-ink">
             {tr(locale, 'rail.title')}
           </h2>
           <div className="flex flex-wrap gap-3 text-sm font-bold">
@@ -96,7 +96,7 @@ export function EducationRelatedLinks({
       )}
       {links.length > 0 && (
         <nav className="mt-16" aria-label={title}>
-          <h2 className="mb-4 font-neo-display text-xl font-black uppercase tracking-wide text-neo-white">
+          <h2 className="mb-4 font-neo-display text-xl font-black uppercase tracking-wide text-edu-ink">
             {title}
           </h2>
           <div className="flex flex-wrap gap-3 text-sm font-bold">
@@ -104,7 +104,7 @@ export function EducationRelatedLinks({
               <Link
                 key={r.href}
                 href={`/${locale}${r.href}`}
-                className={`rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-4 py-2 ${ACCENT_TEXT[r.accent]} transition-colors hover:bg-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
+                className={`rounded-neo border-2 border-edu-line bg-edu-surface px-4 py-2 ${ACCENT_TEXT[r.accent]} transition-colors hover:bg-edu-surface focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
               >
                 {r.label}
               </Link>

@@ -64,7 +64,7 @@ export function StudentResultsPreview({ v }: { v?: string }) {
   }, [c, me.score, rival.username]);
   return (
     <SocketScope socket={socket}>
-      <div className="fixed inset-0 flex flex-col bg-neo-navy">
+      <div className="fixed inset-0 flex flex-col bg-edu-page">
         <EduStudentResults
           finalScores={ranked}
           username={me.username}
@@ -83,7 +83,7 @@ export function HostResultsBatchPreview({ v }: { v?: string }) {
   const { t } = useLanguage();
   const round = useMemo(() => (v === 'zero' ? samplePreviewRound('zero') : samplePreviewRound('winner', { count: 12 })), [v]);
   return (
-    <div className="flex h-dvh flex-col bg-neo-navy">
+    <div className="flex h-dvh flex-col bg-edu-page">
       <EduHostResults summary={round.summary} players={round.players} t={t as T} onRematch={noop} onClose={noop} onExitRoom={noop} gameCode={GAME} socket={null} />
     </div>
   );

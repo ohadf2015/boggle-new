@@ -89,10 +89,10 @@ export function TeacherTrialWelcome({
           </div>
         </div>
         <div className={NB_DIALOG_BODY}>
-          <p data-testid="teacher-trial-welcome-billing" className="font-neo-body text-base font-semibold leading-relaxed text-neo-cream/90">
+          <p data-testid="teacher-trial-welcome-billing" className="font-neo-body text-base font-semibold leading-relaxed text-edu-ink/90">
             {t('teacher.proWelcome.noChargeUntil', { date: planEndDate(trialExpires, language) })}
           </p>
-          <p data-testid="teacher-trial-welcome-try" className="mt-2 font-neo-body text-sm leading-relaxed text-neo-cream/80">
+          <p data-testid="teacher-trial-welcome-try" className="mt-2 font-neo-body text-sm leading-relaxed text-edu-ink/80">
             {t('teacher.proWelcome.tryFirst')}
           </p>
         </div>
@@ -115,7 +115,7 @@ export function TeacherTrialWelcome({
             </button>
           )}
           {nextHref ? (
-            <button type="button" data-testid="teacher-trial-welcome-dismiss" onClick={() => close(true)} className="mt-2 min-h-11 font-neo-body text-sm font-bold text-neo-cream/80 underline underline-offset-4">
+            <button type="button" data-testid="teacher-trial-welcome-dismiss" onClick={() => close(true)} className="mt-2 min-h-11 font-neo-body text-sm font-bold text-edu-ink/80 underline underline-offset-4">
               {t('eduShell.firstSession.later')}
             </button>
           ) : null}

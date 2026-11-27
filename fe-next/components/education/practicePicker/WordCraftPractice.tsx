@@ -128,7 +128,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
 
   if (phase.name === 'playing') {
     return (
-      <div className="fixed inset-0 z-50 bg-neo-navy" data-testid="wordcraft-practice-game">
+      <div className="fixed inset-0 z-50 bg-edu-page" data-testid="wordcraft-practice-game">
         <WordCraftGameView seed={phase.seed} duel={null} hotseat={false} difficulty="easy" modifierOverride="none" lesson={{ locale: deal.locale, targets: deal.targets, onExit: onBack, resume: phase.resume, onState: saveRun }} />
       </div>
     );
@@ -141,8 +141,8 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
     if (!meaningful || outcome?.completed === false) {
       return (
         <div className={cn(DRILL_ROOT_CLASS, 'w-full justify-center rounded-neo border-[3px] border-neo-black p-4 text-center')} data-testid="wordcraft-practice-nudge">
-          <Grid2x2 className="w-10 h-10 mx-auto mb-2 text-neo-cyan" aria-hidden="true" />
-          <p className="font-neo-display text-lg text-neo-white mb-4 text-balance">
+          <Grid2x2 className="w-10 h-10 mx-auto mb-2 text-edu-cyan-ink" aria-hidden="true" />
+          <p className="font-neo-display text-lg text-edu-ink mb-4 text-balance">
             {t('education.wordcraftAssignment.needLessonWord', { count: WORDCRAFT_MIN_VALID_WORDS })}
           </p>
           <button
@@ -154,7 +154,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
             <RotateCcw className="w-6 h-6" aria-hidden="true" />
             {t('education.wordcraftAssignment.tryAgain')}
           </button>
-          <Button variant="ghost" onClick={onBack} className="w-full text-neo-white hover:text-neo-white hover:bg-neo-white/10">
+          <Button variant="ghost" onClick={onBack} className="w-full text-edu-ink hover:text-edu-ink hover:bg-edu-ink/10">
             {t('common.back')}
           </Button>
           {missedReview && <div className="mt-2">{missedReview}</div>}
@@ -183,7 +183,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
           onNext={missedReview && review ? () => router.push(missedReviewHref(uiLanguage ?? 'en', review.lessonId)) : onNext}
           nextLabel={missedReview ? t('wordcraftReview.next', { count: missed.length }) : nextLabel}
           badge={outcome?.assignmentCompleted ? (
-            <p data-testid="wordcraft-homework-done" className="inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-lime px-2.5 py-1 font-neo-display text-sm font-black uppercase text-neo-lime">
+            <p data-testid="wordcraft-homework-done" className="inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-lime px-2.5 py-1 font-neo-display text-sm font-black uppercase text-edu-lime-ink">
               <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
               {t('wordcraftReview.homeworkDone')}
             </p>
@@ -201,24 +201,24 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
           size="sm"
           onClick={onBack}
           aria-label={t('common.back')}
-          className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
+          className="text-edu-ink hover:text-edu-ink hover:bg-edu-ink/10"
         >
           <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
         </Button>
-        <h1 className="flex-1 min-w-0 flex items-center gap-2 text-xl font-neo-display text-neo-white text-balance">
-          <Grid2x2 className="w-6 h-6 text-neo-cyan shrink-0" aria-hidden="true" />
+        <h1 className="flex-1 min-w-0 flex items-center gap-2 text-xl font-neo-display text-edu-ink text-balance">
+          <Grid2x2 className="w-6 h-6 text-edu-cyan-ink shrink-0" aria-hidden="true" />
           {t('education.wordcraftAssignment.title')}
         </h1>
       </div>
-      <p className="font-neo-body text-neo-white/85 mb-3 text-pretty">{t('education.wordcraftAssignment.intro')}</p>
+      <p className="font-neo-body text-edu-ink/85 mb-3 text-pretty">{t('education.wordcraftAssignment.intro')}</p>
       {!deal.seeded && (
-        <p data-testid="wordcraft-practice-language-note" className="mb-3 rounded-neo border-2 border-neo-yellow px-3 py-2 font-neo-body text-sm font-bold text-neo-yellow text-pretty">
+        <p data-testid="wordcraft-practice-language-note" className="mb-3 rounded-neo border-2 border-neo-yellow px-3 py-2 font-neo-body text-sm font-bold text-edu-yellow-ink text-pretty">
           {t('education.wordcraftAssignment.languageFallback', 'Word Craft has no tiles for this list’s language yet, so this round uses your app language.')}
         </p>
       )}
       {targets.length > 0 && (
         <>
-          <h2 className="text-xs font-neo-display uppercase tracking-wider text-neo-cream/80 mb-2">
+          <h2 className="text-xs font-neo-display uppercase tracking-wider text-edu-ink/80 mb-2">
             {t('education.wordcraftAssignment.lessonWords')}
           </h2>
           <ul className="flex flex-wrap gap-2 mb-5" translate="no">

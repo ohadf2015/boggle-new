@@ -101,7 +101,7 @@ export function TeacherWhatsNewDialog({ open, onOpenChange }: { open: boolean; o
           {TEACHER_CHANGELOG.map((entry) => (
             <section key={entry.id} aria-labelledby={`whats-new-${entry.id}`}>
               <p className={cn(NB_STICKER, NB_BLOCK.cream)}>{formatDate(entry.date, language)}</p>
-              <h3 id={`whats-new-${entry.id}`} className="mb-3 mt-2 font-neo-display text-lg font-black text-neo-cream">
+              <h3 id={`whats-new-${entry.id}`} className="mb-3 mt-2 font-neo-display text-lg font-black text-edu-ink">
                 {t(`education.whatsNew.entries.${entry.id}.title`)}
               </h3>
               <ul className="space-y-2.5">
@@ -112,7 +112,7 @@ export function TeacherWhatsNewDialog({ open, onOpenChange }: { open: boolean; o
                       <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan shadow-hard">
                         <Icon className="size-4 text-neo-black" aria-hidden="true" />
                       </span>
-                      <span className="font-neo-body text-sm font-semibold leading-snug text-neo-cream/90">
+                      <span className="font-neo-body text-sm font-semibold leading-snug text-edu-ink/90">
                         {t(`education.whatsNew.entries.${entry.id}.${key}`)}
                       </span>
                     </li>

@@ -58,15 +58,15 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
   const averageTone = averageAccuracy === null ? undefined : accuracyTone(averageAccuracy);
 
   return (
-    <article data-testid="round-report" data-round-print="" className="rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light p-4 shadow-hard-sm sm:p-6">
+    <article data-testid="round-report" data-round-print="" className="rounded-neo-lg border-2 border-edu-line bg-edu-surface p-4 shadow-hard-sm sm:p-6">
       <style>{PRINT_CSS}</style>
       <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-        <h3 className="font-neo-display text-xl font-black text-neo-white">
+        <h3 className="font-neo-display text-xl font-black text-edu-ink">
           {t(roundTitleKey(game.gameMode))}
-          <span className="ms-2 text-sm font-bold text-neo-white/70">{when}</span>
+          <span className="ms-2 text-sm font-bold text-edu-ink/70">{when}</span>
         </h3>
         <div className="flex items-center gap-3">
-          <p data-testid="round-report-played" className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-cyan">
+          <p data-testid="round-report-played" className="inline-flex items-center gap-1.5 text-sm font-bold text-edu-cyan-ink">
             <Users className="size-4" aria-hidden />
             {t('teacher.windowProgress.activeLine', activeLineParams(game.participation))}
           </p>
@@ -74,7 +74,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
             type="button"
             data-testid="round-report-print"
             onClick={() => window.print()}
-            className="inline-flex min-h-9 items-center gap-1.5 rounded-neo border-2 border-neo-cream/40 px-2.5 text-xs font-black text-neo-white hover:border-neo-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan print:hidden"
+            className="inline-flex min-h-9 items-center gap-1.5 rounded-neo border-2 border-edu-line px-2.5 text-xs font-black text-edu-ink hover:border-edu-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan print:hidden"
           >
             <Printer className="size-4" aria-hidden />
             {t('teacher.classReport.print')}
@@ -83,12 +83,12 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
       </header>
       {game.missedWords.length === 0 ? (
         <section className="mt-3">
-          <p className="text-sm font-bold text-neo-white/80">{t('eduLive.results.noLessonTitle')}</p>
+          <p className="text-sm font-bold text-edu-ink/80">{t('eduLive.results.noLessonTitle')}</p>
           <ul className="mt-2 flex flex-col gap-1">
             {sortRoundRows(report.rows, 'score').map((row) => (
-              <li key={row.studentId} data-testid="round-report-player" className="flex min-h-8 items-center justify-between gap-2 px-1 text-sm font-bold text-neo-white">
+              <li key={row.studentId} data-testid="round-report-player" className="flex min-h-8 items-center justify-between gap-2 px-1 text-sm font-bold text-edu-ink">
                 <bdi className="truncate">{row.name}</bdi>
-                <span className="tabular-nums text-neo-white/80">{row.score}</span>
+                <span className="tabular-nums text-edu-ink/80">{row.score}</span>
               </li>
             ))}
           </ul>
@@ -96,18 +96,18 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
       ) : (
         <>
           <div className="mt-4 grid grid-cols-2 gap-3">
-            <div data-testid="round-report-accuracy" data-tone={averageTone} className="rounded-neo border-2 border-neo-cream/50 bg-neo-navy p-3 sm:p-4">
-              <p className="flex items-center gap-1.5 text-xs font-bold text-neo-white/80">
+            <div data-testid="round-report-accuracy" data-tone={averageTone} className="rounded-neo border-2 border-edu-line bg-edu-surface p-3 sm:p-4">
+              <p className="flex items-center gap-1.5 text-xs font-bold text-edu-ink/80">
                 <Target className="size-4 shrink-0" aria-hidden />
                 {t('teacher.lastGame.avgAccuracy')}
               </p>
-              <p className={cn('mt-1 font-neo-display text-3xl font-black tabular-nums leading-none', averageTone ? TONE_TEXT[averageTone] : 'text-neo-white/70')}>{averageAccuracy === null ? '—' : `${averageAccuracy}%`}</p>
-              <div aria-hidden className="mt-3 h-1.5 overflow-hidden rounded-full bg-neo-cream/20">
+              <p className={cn('mt-1 font-neo-display text-3xl font-black tabular-nums leading-none', averageTone ? TONE_TEXT[averageTone] : 'text-edu-ink/70')}>{averageAccuracy === null ? '—' : `${averageAccuracy}%`}</p>
+              <div aria-hidden className="mt-3 h-1.5 overflow-hidden rounded-full bg-edu-ink/20">
                 <div className="h-full rounded-full bg-current" style={{ width: `${Math.min(100, Math.max(0, averageAccuracy ?? 0))}%` }} />
               </div>
             </div>
-            <div data-testid="round-report-review-count" className="rounded-neo border-2 border-neo-cream/50 bg-neo-navy p-3 sm:p-4">
-              <p className="flex items-center gap-1.5 text-xs font-bold text-neo-white/80">
+            <div data-testid="round-report-review-count" className="rounded-neo border-2 border-edu-line bg-edu-surface p-3 sm:p-4">
+              <p className="flex items-center gap-1.5 text-xs font-bold text-edu-ink/80">
                 <BookX className="size-4 shrink-0" aria-hidden />
                 {t('academy.student.review')}
               </p>
@@ -116,9 +116,9 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
           </div>
 
           <section className="mt-5">
-            <h4 className="mb-2 font-neo-display text-sm font-black uppercase tracking-wide text-neo-white">{t('teacher.lastGame.wordsToReview')}</h4>
+            <h4 className="mb-2 font-neo-display text-sm font-black uppercase tracking-wide text-edu-ink">{t('teacher.lastGame.wordsToReview')}</h4>
             {missed.length === 0 ? (
-              <p className="text-sm font-bold text-neo-white/70">{t('teacher.lastGame.nothingToReview')}</p>
+              <p className="text-sm font-bold text-edu-ink/70">{t('teacher.lastGame.nothingToReview')}</p>
             ) : (
               <ul className="flex flex-wrap gap-2">
                 {missed.map((w) => (
@@ -131,7 +131,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
           </section>
 
           <section className="mt-6">
-            <div role="tablist" className="mb-2 flex border-b-2 border-neo-cream/20 print:hidden">
+            <div role="tablist" className="mb-2 flex border-b-2 border-edu-line/20 print:hidden">
               {(Object.keys(TAB_KEYS) as RoundTab[]).map((key) => (
                 <button
                   key={key}
@@ -143,7 +143,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
                   onClick={() => setTab(key)}
                   className={cn(
                     '-mb-0.5 min-h-10 min-w-0 border-b-2 px-2 font-neo-display text-xs font-black leading-tight sm:px-3 sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
-                    tab === key ? 'border-neo-lime text-neo-lime' : 'border-transparent text-neo-white/70 hover:text-neo-white',
+                    tab === key ? 'border-neo-lime text-edu-lime-ink' : 'border-transparent text-edu-ink/70 hover:text-edu-ink',
                   )}
                 >
                   {t(TAB_KEYS[key])}
@@ -170,7 +170,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
             </div>
           </section>
 
-          <div data-testid="round-report-footer" className="mt-6 border-t-2 border-neo-cream/20 pt-5 print:hidden">
+          <div data-testid="round-report-footer" className="mt-6 border-t-2 border-edu-line/20 pt-5 print:hidden">
             {hasPro ? <ProPoweredChip className="mb-3" /> : null}
             <MissedPracticeAction classroomId={classroomId} classroomName={classroomName} locked={!hasPro} words={report.practiceWords} />
           </div>

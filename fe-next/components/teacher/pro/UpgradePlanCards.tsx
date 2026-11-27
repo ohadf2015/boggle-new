@@ -55,9 +55,9 @@ const BUY_LINK =
 
 function Price({ amount, per, testId, dark }: { amount: string; per: string; testId?: string; dark?: boolean }) {
   return (
-    <p className={cn('flex items-baseline gap-1.5 font-neo-display font-black leading-none', dark ? 'text-neo-black' : 'text-neo-white')}>
+    <p className={cn('flex items-baseline gap-1.5 font-neo-display font-black leading-none', dark ? 'text-neo-black' : 'text-edu-ink')}>
       <bdi dir="ltr" data-testid={testId} className="text-4xl">{amount}</bdi>
-      <span className={cn('text-sm font-bold', dark ? 'text-neo-black/75' : 'text-neo-white/70')}>{per}</span>
+      <span className={cn('text-sm font-bold', dark ? 'text-neo-black/75' : 'text-edu-ink/70')}>{per}</span>
     </p>
   );
 }
@@ -65,11 +65,11 @@ function Price({ amount, per, testId, dark }: { amount: string; per: string; tes
 function BestFor({ text, dark }: { text: string; dark?: boolean }) {
   const { t } = useLanguage();
   return (
-    <div className={cn('mt-4 border-t-2 pt-3', dark ? 'border-neo-black' : 'border-neo-cream/25')}>
-      <p className={cn('text-[11px] font-black uppercase tracking-widest', dark ? 'text-neo-black/70' : 'text-neo-white/60')}>
+    <div className={cn('mt-4 border-t-2 pt-3', dark ? 'border-neo-black' : 'border-edu-line')}>
+      <p className={cn('text-[11px] font-black uppercase tracking-widest', dark ? 'text-neo-black/70' : 'text-edu-ink/60')}>
         {t('eg2Pro.plans.bestFor')}
       </p>
-      <p className={cn('mt-0.5 text-sm font-bold leading-snug', dark ? 'text-neo-black' : 'text-neo-white')}>{text}</p>
+      <p className={cn('mt-0.5 text-sm font-bold leading-snug', dark ? 'text-neo-black' : 'text-edu-ink')}>{text}</p>
     </div>
   );
 }
@@ -83,9 +83,9 @@ function FeatureRow({ label, dark }: { label: string; dark?: boolean }) {
           dark ? 'bg-neo-black' : 'bg-neo-lime',
         )}
       >
-        <Check className={cn('h-3 w-3', dark ? 'text-neo-yellow' : 'text-neo-black')} strokeWidth={3} aria-hidden />
+        <Check className={cn('h-3 w-3', dark ? 'text-edu-yellow-ink' : 'text-neo-black')} strokeWidth={3} aria-hidden />
       </span>
-      <span className={cn('text-sm font-bold leading-snug', dark ? 'text-neo-black' : 'text-neo-white')}>{label}</span>
+      <span className={cn('text-sm font-bold leading-snug', dark ? 'text-neo-black' : 'text-edu-ink')}>{label}</span>
     </li>
   );
 }
@@ -108,7 +108,7 @@ function FeatureList({ items, dark, visible }: { items: Array<{ label: string }>
           <summary
             className={cn(
               'inline-flex min-h-11 cursor-pointer list-none items-center gap-1 rounded-neo font-neo-body text-sm font-black underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan [&::-webkit-details-marker]:hidden',
-              dark ? 'text-neo-black' : 'text-neo-white',
+              dark ? 'text-neo-black' : 'text-edu-ink',
             )}
           >
             {t('eg2Pro.plans.moreFeatures', { count: rest.length })}
@@ -171,12 +171,12 @@ export function UpgradePlanCards({
       <article
         data-testid="plan-card-free"
         data-tilt
-        className="order-2 flex flex-col rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy-light p-4 shadow-hard-lg lg:order-1 sm:p-5"
+        className="order-2 flex flex-col rounded-neo border-[3px] border-edu-line bg-edu-surface p-4 shadow-hard-lg lg:order-1 sm:p-5"
       >
-        <h2 className="font-neo-display text-lg font-black text-neo-white">{t('teacher.subscription.freePlanName')}</h2>
-        <p className="mb-3 text-xs font-bold text-neo-white/65">{t('teacher.subscription.freeForever')}</p>
+        <h2 className="font-neo-display text-lg font-black text-edu-ink">{t('teacher.subscription.freePlanName')}</h2>
+        <p className="mb-3 text-xs font-bold text-edu-ink/65">{t('teacher.subscription.freeForever')}</p>
         <Price amount="$0" per={perMonth} />
-        <p data-testid="plan-free-note" className="mt-1.5 text-xs font-bold text-neo-white/65">
+        <p data-testid="plan-free-note" className="mt-1.5 text-xs font-bold text-edu-ink/65">
           {t('eg2Polish.plans.freeNote')}
         </p>
         <div className="mt-4 min-h-12">
@@ -189,13 +189,13 @@ export function UpgradePlanCards({
             </Link>
           )}
           {viewer === 'free' && (
-            <button type="button" disabled data-testid="pricing-free-current" className={cn(BTN, 'cursor-default bg-transparent text-neo-white/70 shadow-none hover:translate-y-0 border-neo-cream/40')}>
+            <button type="button" disabled data-testid="pricing-free-current" className={cn(BTN, 'cursor-default bg-transparent text-edu-ink/70 shadow-none hover:translate-y-0 border-edu-line')}>
               {t('teacher.subscription.currentPlan')}
             </button>
           )}
           {viewer === 'pro' && (
-            <p data-testid="plan-free-included" className="flex min-h-12 items-center gap-2 rounded-neo border-2 border-dashed border-neo-cream/40 px-3 text-sm font-bold text-neo-white/80">
-              <Check className="h-4 w-4 shrink-0 text-neo-cyan" strokeWidth={3} aria-hidden />
+            <p data-testid="plan-free-included" className="flex min-h-12 items-center gap-2 rounded-neo border-2 border-dashed border-edu-line px-3 text-sm font-bold text-edu-ink/80">
+              <Check className="h-4 w-4 shrink-0 text-edu-cyan-ink" strokeWidth={3} aria-hidden />
               {t('eg2Polish.plans.freeIncluded')}
             </p>
           )}
@@ -275,9 +275,9 @@ export function UpgradePlanCards({
         <h2 className="flex items-center gap-2 font-neo-display text-lg font-black">
           <School className="h-5 w-5" aria-hidden /> {t('eg2Pro.plans.schoolName')}
         </h2>
-        <p className="mb-3 text-xs font-bold text-neo-white/80">{t('eg2Pro.plans.schoolTagline', { min: SCHOOL_PRICING.minTeachers })}</p>
+        <p className="mb-3 text-xs font-bold text-edu-ink/80">{t('eg2Pro.plans.schoolTagline', { min: SCHOOL_PRICING.minTeachers })}</p>
         <SchoolPriceTag />
-        <p data-testid="school-monthly" className="mt-1.5 text-xs font-bold text-neo-white/85">
+        <p data-testid="school-monthly" className="mt-1.5 text-xs font-bold text-edu-ink/85">
           {t('eduPlans.cards.schoolMonthly', schoolMonthlyParams())}
         </p>
         <div className="mt-4 min-h-12">
@@ -290,7 +290,7 @@ export function UpgradePlanCards({
           items={['schoolF1', 'schoolF2', 'schoolF3'].map((k) => ({ label: t(`eg2Pro.plans.${k}`) }))}
         />
         <div className="pt-4">
-          <p className="text-[11px] font-black uppercase tracking-widest text-neo-white/60">{t('eg2Pro.plans.howItWorks')}</p>
+          <p className="text-[11px] font-black uppercase tracking-widest text-edu-ink/60">{t('eg2Pro.plans.howItWorks')}</p>
           <ol className="mt-2 space-y-2">
             {(['step1', 'step2', 'step3'] as const).map((step, i) => (
               <li key={step} className="flex items-center gap-2 text-sm font-bold">

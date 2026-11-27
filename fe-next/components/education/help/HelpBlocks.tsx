@@ -15,7 +15,7 @@ export function HelpBlocks({ blocks, locale, t }: { blocks: HelpBlock[]; locale:
     return was;
   };
   return (
-    <div className="space-y-6 text-lg leading-relaxed text-neo-gray-200">
+    <div className="space-y-6 text-lg leading-relaxed text-edu-ink/80">
       {blocks.map((b, i) => {
         switch (b.t) {
           case 'p':
@@ -26,7 +26,7 @@ export function HelpBlocks({ blocks, locale, t }: { blocks: HelpBlock[]; locale:
             );
           case 'h2':
             return (
-              <h2 key={i} className="pt-4 font-neo-display text-2xl font-black text-neo-white sm:text-3xl">
+              <h2 key={i} className="pt-4 font-neo-display text-2xl font-black text-edu-ink sm:text-3xl">
                 {b.text}
               </h2>
             );
@@ -77,7 +77,7 @@ export function HelpBlocks({ blocks, locale, t }: { blocks: HelpBlock[]; locale:
                         {j + 1}
                       </span>
                       <div className="min-w-0 flex-1 pt-1">
-                        <h3 className="flex flex-wrap items-center gap-x-3 gap-y-1 font-neo-display text-xl font-black text-neo-white sm:text-2xl">
+                        <h3 className="flex flex-wrap items-center gap-x-3 gap-y-1 font-neo-display text-xl font-black text-edu-ink sm:text-2xl">
                           <span className="sr-only">{t('eg2Help.article.step', { count: j + 1 })}: </span>
                           {s.time ? (
                             <span className="rounded-[6px] border-2 border-neo-black bg-neo-yellow px-2 py-0.5 font-mono text-sm font-black text-neo-navy">

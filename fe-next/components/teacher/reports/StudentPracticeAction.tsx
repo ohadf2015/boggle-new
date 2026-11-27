@@ -17,7 +17,7 @@ function localDay(d = new Date()) {
 }
 
 const BUTTON =
-  'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 px-4 py-2 font-neo-display text-sm font-black shadow-hard transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white motion-reduce:transition-none motion-reduce:hover:translate-y-0';
+  'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 px-4 py-2 font-neo-display text-sm font-black shadow-hard transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edu-line motion-reduce:transition-none motion-reduce:hover:translate-y-0';
 
 export function StudentPracticeAction({
   classroomId,
@@ -43,12 +43,12 @@ export function StudentPracticeAction({
         <Link
           data-testid="student-practice-locked"
           href={`/${language}/teacher/upgrade`}
-          className={cn(BUTTON, 'border-neo-lime bg-neo-navy text-neo-lime')}
+          className={cn(BUTTON, 'border-neo-lime bg-edu-surface text-edu-lime-ink')}
         >
           <Lock className="size-4" aria-hidden="true" />
           {cta}
         </Link>
-        <span className="text-xs font-bold text-neo-cream/70">{t('eg2Polish.arc.practice.proHint')}</span>
+        <span className="text-xs font-bold text-edu-ink/70">{t('eg2Polish.arc.practice.proHint')}</span>
       </div>
     );
   }
@@ -107,16 +107,16 @@ export function StudentPracticeAction({
           )}
           {cta}
         </button>
-        <span className="text-xs font-bold text-neo-cream/70">{t('eg2Polish.arc.practice.hint')}</span>
+        <span className="text-xs font-bold text-edu-ink/70">{t('eg2Polish.arc.practice.hint')}</span>
       </div>
       {status === 'already' && (
-        <p role="status" className="text-sm font-black text-neo-cyan">{t('eg2Polish.arc.practice.already')}</p>
+        <p role="status" className="text-sm font-black text-edu-cyan-ink">{t('eg2Polish.arc.practice.already')}</p>
       )}
       {status === 'nothing' && (
-        <p role="alert" className="text-sm font-black text-neo-pink">{t('eg2Polish.arc.practice.nothing')}</p>
+        <p role="alert" className="text-sm font-black text-edu-pink-ink">{t('eg2Polish.arc.practice.nothing')}</p>
       )}
       {status === 'failed' && (
-        <p role="alert" className="text-sm font-black text-neo-pink">{t('eduPro.practice.failed')}</p>
+        <p role="alert" className="text-sm font-black text-edu-pink-ink">{t('eduPro.practice.failed')}</p>
       )}
     </div>
   );

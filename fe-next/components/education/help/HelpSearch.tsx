@@ -63,12 +63,12 @@ export function HelpSearch({
       </form>
       <div id={`${id}-results`} aria-live="polite">
         {active ? (
-          <div className="mt-3 rounded-neo border-4 border-neo-cream/50 bg-neo-navy-light p-2 shadow-hard-lg">
+          <div className="mt-3 rounded-neo border-4 border-edu-line bg-edu-surface p-2 shadow-hard-lg">
             {hits.length === 0 ? (
-              <p className="p-3 text-neo-gray-200">{noResults}</p>
+              <p className="p-3 text-edu-ink/80">{noResults}</p>
             ) : (
               <>
-                <p className="px-3 pb-1 pt-2 text-xs font-black uppercase tracking-widest text-neo-gray-300">
+                <p className="px-3 pb-1 pt-2 text-xs font-black uppercase tracking-widest text-edu-ink/70">
                   {resultsTemplate.replace('{count}', String(hits.length))}
                 </p>
                 <ul>
@@ -76,17 +76,17 @@ export function HelpSearch({
                     <li key={h.slug}>
                       <Link
                         href={h.href}
-                        className="group flex items-center gap-3 rounded-[6px] px-3 py-3 hover:bg-neo-navy focus-visible:bg-neo-navy"
+                        className="group flex items-center gap-3 rounded-[6px] px-3 py-3 hover:bg-edu-surface focus-visible:bg-edu-surface"
                       >
                         <span className="min-w-0 flex-1">
-                          <span className="block font-neo-display text-lg font-bold text-neo-white group-hover:text-neo-lime">
+                          <span className="block font-neo-display text-lg font-bold text-edu-ink group-hover:text-edu-lime-ink">
                             {h.title}
                           </span>
-                          <span className="block truncate text-sm text-neo-gray-300">
+                          <span className="block truncate text-sm text-edu-ink/70">
                             {h.category} · {h.summary}
                           </span>
                         </span>
-                        <DirectionalIcon icon={ArrowRight} className="size-5 shrink-0 text-neo-cyan" />
+                        <DirectionalIcon icon={ArrowRight} className="size-5 shrink-0 text-edu-cyan-ink" />
                       </Link>
                     </li>
                   ))}

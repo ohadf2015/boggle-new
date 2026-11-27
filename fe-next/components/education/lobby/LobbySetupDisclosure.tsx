@@ -17,7 +17,7 @@ export interface LobbySetupDisclosureProps {
   children: ReactNode;
 }
 
-const focusRing = 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
+const focusRing = 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface';
 
 export function LobbySetupDisclosure({ label, summary, open, onToggle, children }: LobbySetupDisclosureProps) {
   const { t } = useLanguage();
@@ -30,14 +30,14 @@ export function LobbySetupDisclosure({ label, summary, open, onToggle, children 
         aria-expanded={open}
         onClick={onToggle}
         className={cn(
-          'flex min-h-12 w-full items-center gap-2 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 py-2 text-start shadow-hard',
-          'font-neo-body text-sm text-neo-cream/80 transition-transform hover:-translate-y-px motion-reduce:transition-none',
+          'flex min-h-12 w-full items-center gap-2 rounded-neo-lg border-[3px] border-edu-line bg-edu-surface px-3 py-2 text-start shadow-hard',
+          'font-neo-body text-sm text-edu-ink/80 transition-transform hover:-translate-y-px motion-reduce:transition-none',
           focusRing,
         )}
       >
         <SlidersHorizontal className="size-5 shrink-0" strokeWidth={3} aria-hidden="true" />
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className="font-bold text-neo-cream">{label}</span>
+          <span className="font-bold text-edu-ink">{label}</span>
           <span data-testid="lobby-setup-line" className="text-xs leading-snug @lg/lobby:text-sm">{summary}</span>
         </span>
         <span className={cn(NB_STICKER, NB_BLOCK.cyan, 'ms-auto shrink-0 text-sm')}>
@@ -61,7 +61,7 @@ export function LobbySetupDisclosure({ label, summary, open, onToggle, children 
             {children}
           </NbDialogBody>
           <NbDialogFooter className="sm:justify-between">
-            <p className="hidden font-neo-body text-sm text-neo-cream/75 sm:block">{t('eduShell.host.gameOptionsHint')}</p>
+            <p className="hidden font-neo-body text-sm text-edu-ink/75 sm:block">{t('eduShell.host.gameOptionsHint')}</p>
             <DialogClose data-testid="lobby-setup-done" className={cn(NB_PRIMARY, 'w-full sm:w-auto sm:min-w-40')}>
               {t('eduShell.host.listDone')}
             </DialogClose>

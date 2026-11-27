@@ -46,11 +46,11 @@ export function WarmUpSpellTiles({ words, seed, t, bare = false }: { words: stri
       data-testid="waiting-warmup"
       data-kind="spell"
       aria-label={tr(t, 'academy.live.warmUpTitle', 'Warm-up')}
-      className={bare ? 'w-full' : 'w-full max-w-sm rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy/90 p-2 shadow-hard'}
+      className={bare ? 'w-full' : 'w-full max-w-sm rounded-neo-lg border-[3px] border-edu-line bg-edu-surface/90 p-2 shadow-hard'}
     >
       <style>{WARM_UP_KEYFRAMES}</style>
       <div className="mb-1.5 flex items-center justify-between gap-2">
-        <p className="min-w-0 font-neo-display text-xs font-black uppercase leading-tight tracking-wide text-neo-cream lg:text-sm">
+        <p className="min-w-0 font-neo-display text-xs font-black uppercase leading-tight tracking-wide text-edu-ink lg:text-sm">
           {tr(t, 'academy.live.warmUpSpellHint', 'Warm-up: tap the letters in order')}
         </p>
         <div className="flex shrink-0 items-center gap-1.5">
@@ -81,12 +81,12 @@ export function WarmUpSpellTiles({ words, seed, t, bare = false }: { words: stri
               data-testid={`warmup-slot-${i}`}
               data-filled={done ? 'true' : 'false'}
               className={cn(
-                'grid h-11 min-w-10 place-items-center rounded-neo border-2 bg-neo-navy-light px-1 font-neo-display text-xl font-black leading-none',
+                'grid h-11 min-w-10 place-items-center rounded-neo border-2 bg-edu-surface px-1 font-neo-display text-xl font-black leading-none',
                 done
-                  ? 'border-neo-lime text-neo-lime motion-safe:animate-[lc-tile-hit_200ms_ease-out]'
+                  ? 'border-neo-lime text-edu-lime-ink motion-safe:animate-[lc-tile-hit_200ms_ease-out]'
                   : i === state.filled
-                    ? 'border-neo-cream text-neo-cream/35'
-                    : 'border-dashed border-neo-cream/35 text-neo-cream/35'
+                    ? 'border-edu-line text-edu-ink/35'
+                    : 'border-dashed border-edu-line text-edu-ink/35'
               )}
             >
               {letter}

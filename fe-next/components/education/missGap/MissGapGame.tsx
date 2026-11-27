@@ -312,9 +312,9 @@ export function MissGapGame({
   return (
     <div
       data-testid="miss-gap-game"
-      className="fixed inset-0 z-[90] bg-neo-navy flex flex-col overflow-hidden"
+      className="fixed inset-0 z-[90] bg-edu-page flex flex-col overflow-hidden"
     >
-      <header className="shrink-0 flex items-center gap-2 px-3 py-2 border-b-[3px] border-neo-cream bg-neo-navy-light">
+      <header className="shrink-0 flex items-center gap-2 px-3 py-2 border-b-[3px] border-edu-line bg-edu-surface">
         <button
           type="button"
           data-testid="miss-gap-game-exit"
@@ -324,13 +324,13 @@ export function MissGapGame({
         >
           <X className="w-5 h-5" aria-hidden />
         </button>
-        <p className="flex-1 min-w-0 truncate font-neo-display font-bold text-neo-white text-sm">
+        <p className="flex-1 min-w-0 truncate font-neo-display font-bold text-edu-ink text-sm">
           {lesson}
         </p>
         {phase === 'play' ? (
           <span
             data-testid="miss-gap-progress"
-            className="font-neo-display font-bold text-neo-cyan text-sm tabular-nums"
+            className="font-neo-display font-bold text-edu-cyan-ink text-sm tabular-nums"
           >
             {Math.min(index + 1, rounds.length)}/{rounds.length}
           </span>
@@ -351,14 +351,14 @@ export function MissGapGame({
                 aria-hidden
                 className="w-28 h-28 drop-shadow-[4px_4px_0_rgba(0,0,0,0.4)]"
               />
-              <h2 className="font-neo-display font-bold text-2xl text-neo-white leading-tight">
+              <h2 className="font-neo-display font-bold text-2xl text-edu-ink leading-tight">
                 {t(pluralKeyOf('education.homework.introTitle', rounds.length, language), { count: rounds.length })}
               </h2>
-              <p className="font-neo-body text-sm text-neo-cream">
+              <p className="font-neo-body text-sm text-edu-ink">
                 {t('education.homework.introSubtitle')}
               </p>
               <label className="w-full text-start">
-                <span className="block font-bold text-xs uppercase tracking-widest text-neo-cyan mb-1">
+                <span className="block font-bold text-xs uppercase tracking-widest text-edu-cyan-ink mb-1">
                   {t('education.homework.nameLabel')}
                 </span>
                 <input

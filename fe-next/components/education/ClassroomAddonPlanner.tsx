@@ -80,24 +80,24 @@ export function ClassroomAddonPlanner({
 
   return (
     <div
-      className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light shadow-hard"
+      className="w-full max-w-xl p-6 rounded-neo border-neo border-edu-line bg-edu-surface shadow-hard"
       data-testid="classroom-addon-planner"
       data-in-classroom={String(inClassroom)}
       data-mode={plan.ok ? plan.mode : 'none'}
     >
-      <p className="text-neo-pink font-bold text-xs uppercase tracking-widest mb-2">
+      <p className="text-edu-pink-ink font-bold text-xs uppercase tracking-widest mb-2">
         {t('education.classroomAddon.planner.eyebrow')}
       </p>
-      <h1 className="text-neo-white font-neo-display font-bold text-2xl leading-tight flex items-center gap-2">
-        <MessageSquareText className="w-6 h-6 text-neo-lime shrink-0" aria-hidden />
+      <h1 className="text-edu-ink font-neo-display font-bold text-2xl leading-tight flex items-center gap-2">
+        <MessageSquareText className="w-6 h-6 text-edu-lime-ink shrink-0" aria-hidden />
         {t('education.classroomAddon.planner.title')}
       </h1>
-      <p className="text-neo-white/70 font-neo-body text-sm mt-2">
+      <p className="text-edu-ink/70 font-neo-body text-sm mt-2">
         {t('education.classroomAddon.planner.subtitle')}
       </p>
 
       <label className="block mt-5">
-        <span className="text-neo-white font-bold text-sm">
+        <span className="text-edu-ink font-bold text-sm">
           {t('education.classroomAddon.planner.promptLabel')}
         </span>
         <textarea
@@ -106,7 +106,7 @@ export function ClassroomAddonPlanner({
           data-testid="classroom-addon-planner-prompt"
           rows={2}
           placeholder={t('education.classroomAddon.planner.promptPlaceholder')}
-          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body text-sm placeholder:text-neo-white/40"
+          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-edu-line bg-edu-surface text-edu-ink font-neo-body text-sm placeholder:text-edu-ink/40"
         />
       </label>
 
@@ -117,7 +117,7 @@ export function ClassroomAddonPlanner({
             type="button"
             data-testid={`classroom-addon-planner-example-${example.slice(0, 12).replace(/\s+/g, '-')}`}
             onClick={() => setPrompt(example)}
-            className="px-2.5 py-1 text-xs font-bold rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-cream/90 hover:border-neo-lime hover:text-neo-lime transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+            className="px-2.5 py-1 text-xs font-bold rounded-neo border-neo border-edu-line bg-edu-surface text-edu-ink/90 hover:border-neo-lime hover:text-edu-lime-ink transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             {example}
           </button>
@@ -125,7 +125,7 @@ export function ClassroomAddonPlanner({
       </div>
 
       <label className="block mt-4">
-        <span className="text-neo-white font-bold text-sm">
+        <span className="text-edu-ink font-bold text-sm">
           {t('education.classroomAddon.lessonLabel')}
         </span>
         <input
@@ -133,13 +133,13 @@ export function ClassroomAddonPlanner({
           value={lesson}
           onChange={(e) => setLesson(e.target.value)}
           data-testid="classroom-addon-planner-lesson"
-          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body text-sm"
+          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-edu-line bg-edu-surface text-edu-ink font-neo-body text-sm"
           autoComplete="off"
         />
       </label>
 
       <label className="block mt-4">
-        <span className="text-neo-white font-bold text-sm">
+        <span className="text-edu-ink font-bold text-sm">
           {t('education.classroomAddon.missedWordsLabel')}
         </span>
         <textarea
@@ -147,11 +147,11 @@ export function ClassroomAddonPlanner({
           onChange={(e) => setMissedText(e.target.value)}
           data-testid="classroom-addon-planner-missed-words"
           rows={2}
-          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body text-sm"
+          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-edu-line bg-edu-surface text-edu-ink font-neo-body text-sm"
         />
       </label>
 
-      <p className="text-neo-white/50 font-neo-body text-xs mt-2">
+      <p className="text-edu-ink/50 font-neo-body text-xs mt-2">
         {t('education.classroomAddon.planner.privacyNote')}
       </p>
 
@@ -160,7 +160,7 @@ export function ClassroomAddonPlanner({
           <NeoNote
             tone="info"
             data-testid="classroom-addon-planner-mode"
-            className="mt-4 text-neo-white font-neo-body text-sm"
+            className="mt-4 text-edu-ink font-neo-body text-sm"
           >
             <span className="font-bold">{t(modeLabelKey(plan.mode))}</span>
             {plan.timer_seconds ? (
@@ -226,8 +226,8 @@ export function ClassroomAddonPlanner({
             </a>
           ) : null}
 
-          <p className="text-neo-white/45 font-neo-body text-xs mt-3 flex items-start gap-1.5">
-            <GraduationCap className="w-3.5 h-3.5 mt-0.5 shrink-0 text-neo-pink" aria-hidden />
+          <p className="text-edu-ink/45 font-neo-body text-xs mt-3 flex items-start gap-1.5">
+            <GraduationCap className="w-3.5 h-3.5 mt-0.5 shrink-0 text-edu-pink-ink" aria-hidden />
             {t('education.classroomAddon.planner.foilNote')}
           </p>
         </>
@@ -235,7 +235,7 @@ export function ClassroomAddonPlanner({
         <NeoNote
           tone="alert"
           data-testid="classroom-addon-planner-need-input"
-          className="mt-5 text-neo-white font-neo-body text-sm"
+          className="mt-5 text-edu-ink font-neo-body text-sm"
         >
           {prompt.trim()
             ? t('education.classroomAddon.planner.needMissedWords')

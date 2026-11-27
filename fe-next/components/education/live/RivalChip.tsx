@@ -72,9 +72,9 @@ export default function RivalChip({ socket, className }: RivalChipProps) {
       role="group"
       aria-label={t(`education.rivals.aria.${status}`, { name: rival.rivalName, points: Math.abs(diff) })}
       className={cn(
-        'pointer-events-none flex min-h-9 max-w-full select-none items-center gap-1.5 rounded-neo border-2 bg-neo-navy py-0.5 pe-1 ps-1 font-neo-display text-sm font-bold text-neo-cream shadow-hard-sm',
+        'pointer-events-none flex min-h-9 max-w-full select-none items-center gap-1.5 rounded-neo border-2 bg-edu-page py-0.5 pe-1 ps-1 font-neo-display text-sm font-bold text-edu-ink shadow-hard-sm',
         'min-w-[8.5rem] lg:flex-wrap lg:gap-y-1 [@container(min-height:300px)]:min-h-14 [@container(min-height:300px)]:text-base',
-        overtake === 'took' ? 'border-neo-lime' : overtake === 'lost' ? 'border-neo-pink' : 'border-neo-cream/40',
+        overtake === 'took' ? 'border-neo-lime' : overtake === 'lost' ? 'border-neo-pink' : 'border-edu-line',
         overtake && 'motion-safe:animate-[edu-tug-shake_480ms_ease-out]',
         className,
       )}
@@ -99,7 +99,7 @@ export default function RivalChip({ socket, className }: RivalChipProps) {
           dir="auto"
           title={rival.rivalName}
           data-testid="rival-chip-short-name"
-          className="hidden max-w-[12ch] truncate text-sm leading-none text-neo-cream [@container(min-height:300px)]:block lg:hidden"
+          className="hidden max-w-[12ch] truncate text-sm leading-none text-edu-ink [@container(min-height:300px)]:block lg:hidden"
         >
           {rival.rivalName.trim()}
         </bdi>
@@ -115,7 +115,7 @@ export default function RivalChip({ socket, className }: RivalChipProps) {
           />
         </span>
       </span>
-      <span data-testid="rival-chip-avatar" aria-hidden="true" className="grid size-7 [@container(min-height:300px)]:size-10 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-neo-cream/60 bg-neo-navy-light text-base leading-none">
+      <span data-testid="rival-chip-avatar" aria-hidden="true" className="grid size-7 [@container(min-height:300px)]:size-10 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-edu-line bg-edu-surface text-base leading-none">
         {avatar?.emoji && !avatar.avatarImage && !avatar.customAvatar ? avatar.emoji : (
           <Avatar
             userId={rival.rivalName}

@@ -36,7 +36,7 @@ export function LobbyPresetCards({ active, onApply }: LobbyPresetCardsProps) {
   return (
     <section aria-labelledby="lobby-presets-title" className="@container/presets flex flex-col gap-2">
       <style>{CHECK_POP}</style>
-      <h2 id="lobby-presets-title" className="px-0.5 font-neo-display text-sm font-bold text-neo-cream/85 @2xl/presets:text-base">
+      <h2 id="lobby-presets-title" className="px-0.5 font-neo-display text-sm font-bold text-edu-ink/85 @2xl/presets:text-base">
         {t('teacher.classroom.presets.title')}
       </h2>
       <div role="radiogroup" aria-labelledby="lobby-presets-title" className="grid grid-cols-3 gap-2 @2xl/presets:gap-3">
@@ -52,18 +52,18 @@ export function LobbyPresetCards({ active, onApply }: LobbyPresetCardsProps) {
               title={t(`teacher.classroom.presets.${key}.desc`)}
               onClick={() => onApply(id)}
               className={cn(
-                'relative flex min-h-[6.5rem] min-w-0 flex-col items-start gap-2 rounded-neo-lg border-[3px] bg-neo-navy-light p-2.5 text-start text-neo-cream shadow-hard',
+                'relative flex min-h-[6.5rem] min-w-0 flex-col items-start gap-2 rounded-neo-lg border-[3px] bg-edu-surface p-2.5 text-start text-edu-ink shadow-hard',
                 'transition-[transform,border-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:translate-y-0.5 motion-reduce:transition-none',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface',
                 '@2xl/presets:min-h-[clamp(11rem,calc(100cqh-22rem),15rem)] @2xl/presets:gap-3 @2xl/presets:p-4',
-                on ? 'border-neo-lime ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy' : 'border-neo-cream/35 [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:border-neo-cream/60',
+                on ? 'border-neo-lime ring-2 ring-neo-lime ring-offset-2 ring-offset-edu-surface' : 'border-edu-line [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:border-edu-line',
               )}
             >
               <span
                 aria-hidden="true"
                 className={cn(
                   'grid size-9 shrink-0 place-items-center rounded-neo border-2 @2xl/presets:size-12',
-                  on ? 'border-neo-lime text-neo-lime' : 'border-neo-cream/40 text-neo-cream/80',
+                  on ? 'border-neo-lime text-edu-lime-ink' : 'border-edu-line text-edu-ink/80',
                 )}
               >
                 <Icon className="size-5 @2xl/presets:size-7" strokeWidth={2.5} />
@@ -72,13 +72,13 @@ export function LobbyPresetCards({ active, onApply }: LobbyPresetCardsProps) {
                 <span className="font-neo-display text-sm font-bold leading-tight [overflow-wrap:anywhere] @2xl/presets:text-lg">
                   {t(`teacher.classroom.presets.${key}.name`)}
                 </span>
-                <span className="hidden font-neo-body text-xs leading-snug text-neo-cream/75 @lg/presets:block @2xl/presets:text-sm">
+                <span className="hidden font-neo-body text-xs leading-snug text-edu-ink/75 @lg/presets:block @2xl/presets:text-sm">
                   {t(`teacher.classroom.presets.${key}.desc`)}
                 </span>
               </span>
               <span data-testid="preset-values" className="mt-auto hidden flex-wrap gap-1.5 @2xl/presets:flex">
                 {presetChips(id, tt).map((chip) => (
-                  <span key={chip} className="whitespace-nowrap rounded-full border border-neo-cream/35 px-2 py-0.5 font-neo-body text-xs font-bold text-neo-cream/80">
+                  <span key={chip} className="whitespace-nowrap rounded-full border border-edu-line px-2 py-0.5 font-neo-body text-xs font-bold text-edu-ink/80">
                     {chip}
                   </span>
                 ))}
@@ -87,9 +87,9 @@ export function LobbyPresetCards({ active, onApply }: LobbyPresetCardsProps) {
                 <span
                   data-testid="preset-check"
                   aria-hidden="true"
-                  className="absolute end-2 top-2 grid size-6 place-items-center rounded-full border-2 border-neo-lime bg-neo-navy motion-safe:animate-[lc-preset-check_240ms_cubic-bezier(0.23,1,0.32,1)]"
+                  className="absolute end-2 top-2 grid size-6 place-items-center rounded-full border-2 border-neo-lime bg-edu-surface motion-safe:animate-[lc-preset-check_240ms_cubic-bezier(0.23,1,0.32,1)]"
                 >
-                  <Check className="size-3.5 text-neo-lime" strokeWidth={4} />
+                  <Check className="size-3.5 text-edu-lime-ink" strokeWidth={4} />
                 </span>
               ) : null}
             </button>

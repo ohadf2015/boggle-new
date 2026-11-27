@@ -21,15 +21,15 @@ export function TeacherBrand({
       aria-label={t('eduShell.brand.homeLink')}
       className={cn(
         'flex min-w-0 items-center gap-2 rounded-neo',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface',
       )}
     >
       <EduMascot moment="welcome" size={compact ? 36 : 44} className={compact ? 'size-9 shrink-0' : 'size-11 shrink-0'} />
       <span className="flex min-w-0 flex-col leading-none">
-        <span className={cn('truncate font-neo-display font-black text-neo-cream', compact ? 'text-lg' : 'text-xl')}>
+        <span className={cn('truncate font-neo-display font-black text-edu-ink', compact ? 'text-lg' : 'text-xl')}>
           {t('eduShell.brand.name')}
         </span>
-        <span className="truncate font-neo-display text-xs font-bold text-neo-cream/70">{t('eduShell.brand.tagline')}</span>
+        <span className="truncate font-neo-display text-xs font-bold text-edu-ink/70">{t('eduShell.brand.tagline')}</span>
       </span>
     </Link>
   );

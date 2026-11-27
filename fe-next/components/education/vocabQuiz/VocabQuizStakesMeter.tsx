@@ -62,7 +62,7 @@ export function VocabQuizStakesMeter({ clock, points, timeUp = false, t }: Vocab
       data-testid="vocab-quiz-stakes"
       className={cn(
         'flex shrink-0 flex-col items-center gap-1',
-        clock.urgent ? 'text-neo-orange' : muted ? 'text-neo-white/60' : 'text-neo-lime'
+        clock.urgent ? 'text-edu-orange-ink' : muted ? 'text-edu-ink/60' : 'text-edu-lime-ink'
       )}
     >
       <span className="relative grid size-14 place-items-center sm:size-[4.5rem] [@media(max-height:560px)]:size-12">

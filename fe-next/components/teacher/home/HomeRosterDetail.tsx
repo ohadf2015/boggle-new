@@ -19,7 +19,7 @@ type T = (key: string, params?: Record<string, string | number>) => string;
 export const STATUS_DOT: Record<RosterStatus, string> = {
   done: 'bg-neo-lime',
   late: 'bg-neo-yellow',
-  idle: 'border-2 border-neo-cream/40 bg-transparent',
+  idle: 'border-2 border-edu-line bg-transparent',
 };
 
 export function StatusDot({ status, className }: { status: RosterStatus; className?: string }) {
@@ -35,15 +35,15 @@ export function StatusDot({ status, className }: { status: RosterStatus; classNa
 
 // Only Behind is solid so the eye lands on who needs help, not on the many who played.
 const STATUS_PILL: Record<RosterStatus, string> = {
-  done: 'border-neo-lime/60 bg-neo-lime/20 text-neo-lime',
+  done: 'border-neo-lime/60 bg-neo-lime/20 text-edu-lime-ink',
   late: 'border-neo-black bg-neo-yellow text-neo-black shadow-hard-sm',
-  idle: 'border-neo-cream/30 bg-neo-cream/15 text-neo-cream/90',
+  idle: 'border-edu-line bg-edu-ink/15 text-edu-ink/90',
 };
 
 export const STATUS_RING: Record<RosterStatus, string> = {
   done: 'ring-neo-lime',
   late: 'ring-neo-yellow',
-  idle: 'ring-neo-cream/30',
+  idle: 'ring-edu-line',
 };
 
 export function StatusPill({ status, label }: { status: RosterStatus; label: string }) {
@@ -77,16 +77,16 @@ function DetailBody({ row, onClose, onAssign, language, nowMs, t, titleAs }: Det
         <AvatarLite userId={row.id} customAvatar={row.avatarConfig as AvatarLiteConfig | null} pixelSize={44} className="shrink-0" />
         <div className="min-w-0 flex-1">
           {titleAs === 'dialog' ? (
-            <DialogPrimitive.Title className={cn(NB_DIALOG_TITLE, 'truncate text-neo-cream')}>{name}</DialogPrimitive.Title>
+            <DialogPrimitive.Title className={cn(NB_DIALOG_TITLE, 'truncate text-edu-ink')}>{name}</DialogPrimitive.Title>
           ) : (
-            <h3 className={cn(NB_DIALOG_TITLE, 'truncate text-neo-cream')}>{name}</h3>
+            <h3 className={cn(NB_DIALOG_TITLE, 'truncate text-edu-ink')}>{name}</h3>
           )}
           <p className="mt-1">
             <StatusPill status={row.status} label={t(`eduShell.home.roster.status.${row.status}`)} />
             {row.level !== null ? (
               <span
                 data-testid="home-roster-level"
-                className="ms-1.5 inline-flex items-center gap-1 whitespace-nowrap rounded-full border-2 border-neo-cyan/60 bg-neo-cyan/15 px-2 py-px align-middle text-xs font-black text-neo-cyan"
+                className="ms-1.5 inline-flex items-center gap-1 whitespace-nowrap rounded-full border-2 border-neo-cyan/60 bg-neo-cyan/15 px-2 py-px align-middle text-xs font-black text-edu-cyan-ink"
               >
                 <Star className="size-3" aria-hidden="true" />
                 {t('eduShell.home.roster.statLevel', { level: row.level })}
@@ -105,13 +105,13 @@ function DetailBody({ row, onClose, onAssign, language, nowMs, t, titleAs }: Det
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <Stat icon={<Zap className="size-4 text-neo-yellow" aria-hidden="true" />} value={row.xp.toLocaleString(language)} label={t('eduShell.home.roster.statXp')} />
-        <Stat icon={<BookOpenCheck className="size-4 text-neo-lime" aria-hidden="true" />} value={row.wordsMastered.toLocaleString(language)} label={t('eduShell.home.roster.statWords')} />
+        <Stat icon={<Zap className="size-4 text-edu-yellow-ink" aria-hidden="true" />} value={row.xp.toLocaleString(language)} label={t('eduShell.home.roster.statXp')} />
+        <Stat icon={<BookOpenCheck className="size-4 text-edu-lime-ink" aria-hidden="true" />} value={row.wordsMastered.toLocaleString(language)} label={t('eduShell.home.roster.statWords')} />
       </div>
 
       <div>
-        <h4 className="mb-1.5 font-neo-display text-sm font-black text-neo-cream">{t('eduShell.home.roster.recent')}</h4>
-        <ul data-testid="home-roster-activity" className={cn('divide-y-2 divide-neo-cream/15 rounded-neo-lg border-[3px] bg-neo-navy-light', NB_DARK_EDGE)}>
+        <h4 className="mb-1.5 font-neo-display text-sm font-black text-edu-ink">{t('eduShell.home.roster.recent')}</h4>
+        <ul data-testid="home-roster-activity" className={cn('divide-y-2 divide-edu-line/15 rounded-neo-lg border-[3px] bg-edu-surface', NB_DARK_EDGE)}>
           <Activity icon={<CalendarDays className="size-4" aria-hidden="true" />} text={t('eduShell.home.roster.lastPlayed', { when: played })} />
           <Activity icon={<StreakFlame days={row.streak} size={16} animated={false} />} text={row.streak > 0 ? t('eduShell.home.roster.streak', { count: row.streak }) : t('eduShell.home.roster.noStreak')} />
           <Activity
@@ -133,20 +133,20 @@ function DetailBody({ row, onClose, onAssign, language, nowMs, t, titleAs }: Det
 
 function Stat({ icon, value, label }: { icon: ReactNode; value: string; label: string }) {
   return (
-    <div data-testid="home-roster-stat" className={cn('rounded-neo-lg border-[3px] bg-neo-navy-light px-3 py-2 shadow-hard', NB_DARK_EDGE)}>
-      <span className="flex items-center gap-1.5 font-neo-display text-lg font-black tabular-nums text-neo-cream">
+    <div data-testid="home-roster-stat" className={cn('rounded-neo-lg border-[3px] bg-edu-surface px-3 py-2 shadow-hard', NB_DARK_EDGE)}>
+      <span className="flex items-center gap-1.5 font-neo-display text-lg font-black tabular-nums text-edu-ink">
         {icon}
         {value}
       </span>
-      <span className="block font-neo-body text-xs font-semibold text-neo-cream/70">{label}</span>
+      <span className="block font-neo-body text-xs font-semibold text-edu-ink/70">{label}</span>
     </div>
   );
 }
 
 function Activity({ icon, text }: { icon: ReactNode; text: string }) {
   return (
-    <li className="flex items-center gap-2 px-3 py-1.5 font-neo-body text-sm font-semibold text-neo-cream/85">
-      <span className="text-neo-cream/60">{icon}</span>
+    <li className="flex items-center gap-2 px-3 py-1.5 font-neo-body text-sm font-semibold text-edu-ink/85">
+      <span className="text-edu-ink/60">{icon}</span>
       {text}
     </li>
   );
@@ -163,7 +163,7 @@ export function RosterDrawer(props: DetailProps) {
       initial={reduced ? false : { x: props.isRTL ? -16 : 16, scale: 0.98 }}
       animate={{ x: 0, scale: 1 }}
       transition={EDU_MOTION.spring.settle}
-      className="min-w-0 border-neo-cream/15 p-3 sm:p-4 @3xl/roster:border-s-2"
+      className="min-w-0 border-edu-line/15 p-3 sm:p-4 @3xl/roster:border-s-2"
     >
       <DetailBody {...props} titleAs="h3" />
     </m.aside>
@@ -179,7 +179,7 @@ export function RosterSheet(props: DetailProps) {
         <DialogPrimitive.Overlay className="fixed inset-0 z-90 bg-neo-black/85" />
         <DialogPrimitive.Content
           aria-describedby={undefined}
-          className={cn('fixed inset-x-0 bottom-0 z-90 max-h-[85dvh] overflow-y-auto rounded-t-neo-xl border-[3px] border-b-0 bg-neo-navy px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 focus:outline-none', NB_DARK_EDGE)}
+          className={cn('fixed inset-x-0 bottom-0 z-90 max-h-[85dvh] overflow-y-auto rounded-t-neo-xl border-[3px] border-b-0 bg-edu-surface px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 focus:outline-none', NB_DARK_EDGE)}
         >
           <m.div initial={reduced ? false : { y: 48 }} animate={{ y: 0 }} transition={EDU_MOTION.spring.settle}>
             <span aria-hidden="true" className="mx-auto mb-3 block h-1.5 w-12 rounded-full bg-neo-cream/40" />

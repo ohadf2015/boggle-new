@@ -29,7 +29,7 @@ function FillBar({ pct, className, children }: { pct: number; className?: string
   const reduced = useReducedMotionSafe();
   const scale = Math.max(0, Math.min(1, pct));
   return (
-    <span className={cn('relative block overflow-hidden rounded-full border-2 border-neo-cream/50 bg-neo-black/50', className)}>
+    <span className={cn('relative block overflow-hidden rounded-full border-2 border-edu-line bg-neo-black/50', className)}>
       <m.span
         className="absolute inset-0 block origin-left rounded-full rtl:origin-right"
         style={toneStyle('gold', { shadow: 0, trim: 1 })}
@@ -38,7 +38,7 @@ function FillBar({ pct, className, children }: { pct: number; className?: string
         transition={reduced ? { duration: 0 } : { ...EDU_MOTION.spring.settle, delay: 0.15 }}
       />
       {children && (
-        <span className="relative flex h-full items-center justify-center font-neo-display text-xs font-black text-neo-white [text-shadow:0_1px_0_rgb(var(--neo-black))]">
+        <span className="relative flex h-full items-center justify-center font-neo-display text-xs font-black text-edu-ink [text-shadow:0_1px_0_rgb(var(--neo-black))]">
           {children}
         </span>
       )}
@@ -55,16 +55,16 @@ function NextUpCard({ next, t, lead = true }: { next: NextAward; t: T; lead?: bo
       </Medallion>
       <div className="min-w-0">
         <p className="flex items-baseline gap-2">
-          {lead && <span dir="auto" className={cn(CAPS, 'shrink-0 text-neo-lime')}>{t('academy.pages.awardsNextUp', 'Next up')}</span>}
-          <span dir="auto" className="ms-auto truncate font-neo-body text-xs font-bold text-neo-white/80">
+          {lead && <span dir="auto" className={cn(CAPS, 'shrink-0 text-edu-lime-ink')}>{t('academy.pages.awardsNextUp', 'Next up')}</span>}
+          <span dir="auto" className="ms-auto truncate font-neo-body text-xs font-bold text-edu-ink/80">
             {t('academy.pages.awardsToTier', '{left} more for {tier}', { left: next.left, tier: tierLabel(t, next.nextTier) })}
           </span>
         </p>
-        <p dir="auto" className={cn('truncate font-neo-display font-black leading-tight text-neo-white', lead ? 'text-lg sm:text-xl' : 'text-sm', INK_TEXT)}>
+        <p dir="auto" className={cn('truncate font-neo-display font-black leading-tight text-edu-ink', lead ? 'text-lg sm:text-xl' : 'text-sm', INK_TEXT)}>
           {t(next.award.nameKey)}
         </p>
         {lead && (
-          <p data-testid="awards-next-how" dir="auto" className="font-neo-body text-sm font-bold leading-snug text-neo-white/85">
+          <p data-testid="awards-next-how" dir="auto" className="font-neo-body text-sm font-bold leading-snug text-edu-ink/85">
             {t(next.award.descriptionKey)}
           </p>
         )}
@@ -114,13 +114,13 @@ export function AwardsHero({ achievements, celebrate = false }: { achievements: 
                 <span className="text-2xl leading-none">🏆</span>
               </Medallion>
               <div className="min-w-0 flex-1">
-                <p dir="auto" className={cn(CAPS, 'text-neo-yellow', INK_TEXT)}>{t('academy.pages.awardsWon', 'Awards won')}</p>
+                <p dir="auto" className={cn(CAPS, 'text-edu-yellow-ink', INK_TEXT)}>{t('academy.pages.awardsWon', 'Awards won')}</p>
                 <div className="flex items-center gap-2.5">
                   <p className="flex shrink-0 items-baseline gap-1.5">
-                    <span data-testid="awards-hero-earned" className={cn('font-neo-display text-[2rem] font-black leading-none text-neo-white tabular-nums sm:text-4xl', INK_TEXT)}>
+                    <span data-testid="awards-hero-earned" className={cn('font-neo-display text-[2rem] font-black leading-none text-edu-ink tabular-nums sm:text-4xl', INK_TEXT)}>
                       <AnimatedNumber to={earned} from={0} onDone={() => setLanded(true)} />
                     </span>
-                    <span dir="auto" className={cn('font-neo-display text-base font-black text-neo-white/85', INK_TEXT)}>
+                    <span dir="auto" className={cn('font-neo-display text-base font-black text-edu-ink/85', INK_TEXT)}>
                       {t('academy.pages.awardsOfTotal', 'of {total}', { total })}
                     </span>
                   </p>
@@ -154,7 +154,7 @@ export function AwardsHero({ achievements, celebrate = false }: { achievements: 
               ))}
             </div>
           ) : (
-            <p dir="auto" className={cn(WELL, 'flex items-center justify-center text-center font-neo-display text-base font-black text-neo-yellow', INK_TEXT)}>
+            <p dir="auto" className={cn(WELL, 'flex items-center justify-center text-center font-neo-display text-base font-black text-edu-yellow-ink', INK_TEXT)}>
               {t('academy.pages.awardsAllMaxed', 'Every award maxed out!')}
             </p>
           )}

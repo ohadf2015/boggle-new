@@ -43,7 +43,7 @@ export function RecallQuiz({ items, pool, target, onFinish, t, rng = Math.random
   return (
     <div data-testid="recall-quiz" className="flex w-full flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <span data-testid="recall-progress" className="font-neo-display text-sm font-bold tabular-nums text-neo-cream/80">
+        <span data-testid="recall-progress" className="font-neo-display text-sm font-bold tabular-nums text-edu-ink/80">
           {t('eduStudent.recall.progress', { mastered, total })}
         </span>
         {last?.correct && state.streak >= 2 && (
@@ -57,13 +57,13 @@ export function RecallQuiz({ items, pool, target, onFinish, t, rng = Math.random
           </span>
         )}
       </div>
-      <div aria-hidden="true" className="h-2.5 overflow-hidden rounded-full border-2 border-neo-cream/40 bg-neo-navy-light">
+      <div aria-hidden="true" className="h-2.5 overflow-hidden rounded-full border-2 border-edu-line bg-edu-surface">
         <div className="h-full bg-neo-lime transition-[width] duration-300 motion-reduce:transition-none" style={{ width: `${total ? (mastered / total) * 100 : 0}%` }} />
       </div>
 
       {reviewing && last ? (
         <div data-testid="recall-feedback-wrong" role="status" className="flex flex-col gap-2 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-5 py-4 text-neo-black shadow-hard">
-          <p className="font-neo-display text-sm font-black uppercase text-neo-pink">{t('eduStudent.recall.wrongLead')}</p>
+          <p className="font-neo-display text-sm font-black uppercase text-edu-pink-ink">{t('eduStudent.recall.wrongLead')}</p>
           <p dir="auto" className="break-words font-neo-display text-[clamp(1.5rem,8cqw,2.25rem)] font-black leading-tight">{last.word}</p>
           <p dir="auto" className="font-neo-body text-base leading-snug">{last.definition}</p>
           <button type="button" data-testid="recall-next" autoFocus onClick={() => setReviewing(false)} className={cn(BUTTON, PRESS, 'mt-1 bg-neo-cyan uppercase')}>
@@ -90,7 +90,7 @@ export function RecallQuiz({ items, pool, target, onFinish, t, rng = Math.random
               {last?.correct ? t('eduStudent.recall.correct') : ''}
             </span>
             {last?.correct && (
-              <span data-testid="recall-correct" aria-hidden="true" className="inline-flex items-center gap-1 self-start font-neo-display text-sm font-black text-neo-lime">
+              <span data-testid="recall-correct" aria-hidden="true" className="inline-flex items-center gap-1 self-start font-neo-display text-sm font-black text-edu-lime-ink">
                 <Check className="size-4" />
                 {t('eduStudent.recall.correct')}
               </span>

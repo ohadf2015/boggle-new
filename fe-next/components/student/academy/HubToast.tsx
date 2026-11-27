@@ -61,7 +61,7 @@ export function HubToast({ reward, note, onDismiss, reducedMotion, rail }: Props
                     className="object-cover"
                   />
                 </span>
-                <span dir="auto" className="font-neo-body text-sm font-bold leading-snug text-neo-white">
+                <span dir="auto" className="font-neo-body text-sm font-bold leading-snug text-edu-ink">
                   {note?.kind === 'arena'
                     ? t('academy.student.arenaWaiting', "Your teacher hasn't started a live game yet. This island lights up when they do.")
                     : t('academy.student.bossLockedNote', 'Master {count} more words to unlock the boss.', {

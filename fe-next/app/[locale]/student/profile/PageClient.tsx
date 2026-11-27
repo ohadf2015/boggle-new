@@ -129,7 +129,7 @@ export default function StudentProfilePageClient() {
                 className="shrink-0 rounded-full border-3 border-neo-black shadow-hard"
               />
               <div className="min-w-0 flex-1">
-                <h1 dir="auto" className={cn('line-clamp-2 break-words font-neo-display text-2xl font-black text-neo-white sm:text-3xl', INK_TEXT)}>
+                <h1 dir="auto" className={cn('line-clamp-2 break-words font-neo-display text-2xl font-black text-edu-ink sm:text-3xl', INK_TEXT)}>
                   {profile?.display_name || profile?.username || t('common.guest')}
                 </h1>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -148,23 +148,23 @@ export default function StudentProfilePageClient() {
                 </div>
               </div>
             </div>
-            <div className="border-t border-neo-cream/20 pt-3">
+            <div className="border-t border-edu-line/20 pt-3">
               <ProfileXpBar xp={xpProgress} level={currentLevel} />
             </div>
           </div>
 
           {isLoadingProgress ? (
             <div className="grid grid-cols-3 gap-2">
-              {['a', 'b', 'c'].map((id) => <div key={id} className="h-16 rounded-[14px] bg-neo-white/10 motion-safe:animate-pulse" />)}
+              {['a', 'b', 'c'].map((id) => <div key={id} className="h-16 rounded-[14px] bg-edu-ink/10 motion-safe:animate-pulse" />)}
             </div>
           ) : fresh ? (
             <div data-testid="profile-first-step" className={cn(CARD, 'flex items-center gap-3')} style={toneStyle('night', { shadow: 3, trim: 2 })}>
               <Medallion tone="gold" size={48} shadow={2}><span className="text-2xl leading-none" aria-hidden="true">🚀</span></Medallion>
               <div className="min-w-0 flex-1">
-                <p dir="auto" className={cn('font-neo-display text-lg font-black leading-tight text-neo-white', INK_TEXT)}>
+                <p dir="auto" className={cn('font-neo-display text-lg font-black leading-tight text-edu-ink', INK_TEXT)}>
                   {t('academy.pages.profileFirstTitle', 'Your first lesson starts your level')}
                 </p>
-                <p dir="auto" className="font-neo-body text-sm font-bold text-neo-white/85">
+                <p dir="auto" className="font-neo-body text-sm font-bold text-edu-ink/85">
                   {t('academy.pages.profileFirstBody', 'Play one round and your XP, words and awards show up here.')}
                 </p>
               </div>
@@ -179,12 +179,12 @@ export default function StudentProfilePageClient() {
           ) : (
             <div className="grid grid-cols-3 gap-2">
               {[
-                { label: t('education.student.lessonsAssigned'), value: lessons.length, tone: 'text-neo-white' },
-                { label: t('education.practice.wordsFound'), value: wordsFound, tone: 'text-neo-lime' },
-                { label: t('education.practice.complete'), value: sessions, tone: 'text-neo-cyan' },
+                { label: t('education.student.lessonsAssigned'), value: lessons.length, tone: 'text-edu-ink' },
+                { label: t('education.practice.wordsFound'), value: wordsFound, tone: 'text-edu-lime-ink' },
+                { label: t('education.practice.complete'), value: sessions, tone: 'text-edu-cyan-ink' },
               ].map((s) => (
                 <div key={s.label} className={STAT}>
-                  <div dir="auto" className="mb-1 font-neo-body text-xs font-bold uppercase tracking-wide text-neo-cream/70">{s.label}</div>
+                  <div dir="auto" className="mb-1 font-neo-body text-xs font-bold uppercase tracking-wide text-edu-ink/70">{s.label}</div>
                   <div className={cn('font-neo-display text-3xl font-black tabular-nums', s.tone)}>{s.value}</div>
                 </div>
               ))}
@@ -192,7 +192,7 @@ export default function StudentProfilePageClient() {
           )}
 
           {isLoadingAchievements ? (
-            <div className="h-24 rounded-[18px] bg-neo-white/10 motion-safe:animate-pulse" />
+            <div className="h-24 rounded-[18px] bg-edu-ink/10 motion-safe:animate-pulse" />
           ) : achievements.length > 0 ? (
             <div className={CARD} style={toneStyle('night', { shadow: 3, trim: 2 })}>
               <EducationBadgeGrid studentId={user!.id} achievements={achievements} />
@@ -200,8 +200,8 @@ export default function StudentProfilePageClient() {
             </div>
           ) : (
             <div data-testid="profile-awards-teaser" className={cn(CARD, 'flex flex-col gap-3')} style={toneStyle('night', { shadow: 3, trim: 2 })}>
-              <h2 className={cn('font-neo-display text-xl font-black text-neo-white', INK_TEXT)}>{t('student.dashboard.achievements')}</h2>
-              <p dir="auto" className="font-neo-body text-sm font-bold text-neo-white/85">
+              <h2 className={cn('font-neo-display text-xl font-black text-edu-ink', INK_TEXT)}>{t('student.dashboard.achievements')}</h2>
+              <p dir="auto" className="font-neo-body text-sm font-bold text-edu-ink/85">
                 {next
                   ? t('academy.pages.profileNextAward', 'Closest award: {name}. {how}', { name: t(next.award.nameKey), how: t(next.award.descriptionKey) })
                   : t('academy.pages.profileNoAwardsYet', 'Win your first award by finishing a lesson.')}
@@ -221,7 +221,7 @@ function AllAwardsLink({ href, label }: { href: string; label: string }) {
       href={href}
       className={cn(
         pressClasses(2),
-        'mt-3 inline-flex min-h-11 items-center gap-1.5 self-start rounded-neo border-2 border-neo-cream/50 px-3 font-neo-display text-sm font-black text-neo-cyan',
+        'mt-3 inline-flex min-h-11 items-center gap-1.5 self-start rounded-neo border-2 border-edu-line px-3 font-neo-display text-sm font-black text-edu-cyan-ink',
       )}
     >
       <span>{label}</span>

@@ -34,7 +34,7 @@ export interface LessonBuilderProps {
 }
 
 const PAGE_SIZE = 6;
-const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-neo-cream/60 px-3 font-bold text-neo-white hover:border-neo-cream disabled:opacity-40';
+const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-edu-line px-3 font-bold text-edu-ink hover:border-edu-line disabled:opacity-40';
 
 export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hideDiscoverLink, heading, onListCount }: LessonBuilderProps = {}) {
   const { t, language } = useLanguage();
@@ -181,7 +181,7 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
             type="button"
             onClick={browseDiscover}
             data-testid="lessons-browse-discover"
-            className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream/60 px-3 font-neo-display text-sm font-bold text-neo-white transition hover:border-neo-cream"
+            className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-edu-line px-3 font-neo-display text-sm font-bold text-edu-ink transition hover:border-edu-line"
           >
             <Compass className="size-4" aria-hidden="true" />
             {t('eduLibrary.tabs.discover')}
@@ -200,13 +200,13 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
           </button>
         </div>
       </div>
-      <p className="max-w-prose text-sm text-neo-cream/80 text-pretty max-sm:hidden">{t('teacher.lesson.sectionHint')}</p>
+      <p className="max-w-prose text-sm text-edu-ink/80 text-pretty max-sm:hidden">{t('teacher.lesson.sectionHint')}</p>
 
       {lessons.length === 0 ? (
         <div className={cn('space-y-4', isCreatingFromPack && 'pointer-events-none opacity-60')}>
-          <div className="rounded-neo border-3 border-dashed border-neo-cream/40 bg-neo-navy-light/60 px-4 py-6 text-center">
-            <h3 className="font-neo-display text-xl text-neo-white text-balance">{t('teacher.lesson.noLessons')}</h3>
-            <p className="mx-auto mt-1 max-w-prose text-sm text-neo-white/80 text-pretty">{t('eduLibrary.myLists.emptyHint')}</p>
+          <div className="rounded-neo border-3 border-dashed border-edu-line bg-edu-surface/60 px-4 py-6 text-center">
+            <h3 className="font-neo-display text-xl text-edu-ink text-balance">{t('teacher.lesson.noLessons')}</h3>
+            <p className="mx-auto mt-1 max-w-prose text-sm text-edu-ink/80 text-pretty">{t('eduLibrary.myLists.emptyHint')}</p>
           </div>
           <StarterPacksSection onSelectPack={handleSelectStarterPack} showTrialChecklist />
         </div>
@@ -245,7 +245,7 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
               <button type="button" disabled={paged.page === 0} onClick={() => setPage(paged.page - 1)} className={PAGER_BUTTON}>
                 {t('eduLibrary.pager.prev')}
               </button>
-              <span className="text-sm font-bold tabular-nums text-neo-white">
+              <span className="text-sm font-bold tabular-nums text-edu-ink">
                 {t('eduLibrary.pager.status', { page: paged.page + 1, total: paged.pageCount })}
               </span>
               <button type="button" disabled={paged.page >= paged.pageCount - 1} onClick={() => setPage(paged.page + 1)} className={PAGER_BUTTON}>

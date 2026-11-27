@@ -72,7 +72,7 @@ export function AsyncDuelTurnCard({
       data-duel-type={isLive ? 'realtime' : 'async'}
       data-state={hasTarget ? 'target-set' : 'first-move'}
       className={cn(
-        'rounded-neo border-[3px] border-neo-cream bg-neo-navy p-3 shadow-hard',
+        'rounded-neo border-[3px] border-edu-line bg-edu-surface p-3 shadow-hard',
         className
       )}
     >
@@ -103,14 +103,14 @@ export function AsyncDuelTurnCard({
               {t('education.duels.turnLiveBadge')}
             </span>
           )}
-          <p className="truncate font-neo-display text-base font-black uppercase italic tracking-tight text-neo-white">
+          <p className="truncate font-neo-display text-base font-black uppercase italic tracking-tight text-edu-ink">
             {isLive
               ? t('education.duels.turnLiveInvite', undefined, { name: opponentName })
               : hasTarget
                 ? t('education.duels.turnBeatThem', undefined, { name: opponentName })
                 : t('education.duels.turnFirstMove', undefined, { name: opponentName })}
           </p>
-          <p className="truncate font-neo-body text-xs font-bold text-neo-cream/80">
+          <p className="truncate font-neo-body text-xs font-bold text-edu-ink/80">
             {lessonName}
           </p>
         </div>
@@ -157,7 +157,7 @@ export function AsyncDuelTurnCard({
           type="button"
           data-testid="duel-turn-decline"
           onClick={() => onDecline(duelId)}
-          className="rounded-neo border-[3px] border-neo-cream bg-neo-navy px-3 py-2.5 font-neo-body text-sm font-black text-neo-cream shadow-hard-sm transition duration-100 hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+          className="rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 py-2.5 font-neo-body text-sm font-black text-edu-ink shadow-hard-sm transition duration-100 hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {t('education.duels.turnDecline')}
         </button>

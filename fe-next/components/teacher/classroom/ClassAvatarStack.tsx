@@ -35,7 +35,7 @@ export function ClassAvatarStack({ classroomId }: { classroomId: string }) {
       {extra > 0 ? (
         <span
           data-testid="avatar-stack-more"
-          className="-ms-2 grid h-[30px] min-w-[30px] place-items-center rounded-full border-2 border-neo-cream/40 bg-neo-navy px-1 font-neo-display text-[0.7rem] font-bold tabular-nums text-neo-cream ring-2 ring-neo-navy-light"
+          className="-ms-2 grid h-[30px] min-w-[30px] place-items-center rounded-full border-2 border-edu-line bg-edu-surface px-1 font-neo-display text-[0.7rem] font-bold tabular-nums text-edu-ink ring-2 ring-neo-navy-light"
         >
           +{extra}
         </span>

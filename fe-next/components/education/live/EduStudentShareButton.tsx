@@ -30,7 +30,7 @@ export function EduStudentShareButton({ t, language, placing }: { t: Translate; 
       title={t('eduLiveRoom.studentResults.share')}
       onClick={() => void share()}
       className={cn(
-        'inline-flex size-11 shrink-0 items-center justify-center rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated text-neo-cream shadow-hard-sm hover:bg-neo-navy-light',
+        'inline-flex size-11 shrink-0 items-center justify-center rounded-neo border-[3px] border-edu-line bg-edu-surface text-edu-ink shadow-hard-sm hover:bg-edu-surface',
         PRESS
       )}
     >

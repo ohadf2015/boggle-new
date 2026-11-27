@@ -17,10 +17,10 @@ export function JoinTargetCard({ target }: { target: JoinTarget }) {
       data-live={live ? 'true' : 'false'}
       className={cn(
         'rounded-neo border-3 p-3 shadow-hard',
-        live ? 'border-neo-black bg-neo-pink text-neo-black' : 'border-neo-lime bg-neo-navy-light text-neo-cream'
+        live ? 'border-neo-black bg-neo-pink text-neo-black' : 'border-neo-lime bg-edu-surface text-edu-ink'
       )}
     >
-      <p className={cn('flex items-center gap-2 font-neo-display text-xs font-black uppercase tracking-wide', live ? 'text-neo-black' : 'text-neo-lime')}>
+      <p className={cn('flex items-center gap-2 font-neo-display text-xs font-black uppercase tracking-wide', live ? 'text-neo-black' : 'text-edu-lime-ink')}>
         {live && (
           <span aria-hidden="true" className="relative flex size-2.5">
             <span className="absolute inline-flex size-full rounded-full bg-neo-white motion-safe:animate-ping" />
@@ -34,7 +34,7 @@ export function JoinTargetCard({ target }: { target: JoinTarget }) {
           {target.label}
         </p>
       )}
-      <p className={cn('mt-1 line-clamp-2 font-neo-body text-sm font-bold leading-snug', live ? 'text-neo-black/85' : 'text-neo-cream/80')}>
+      <p className={cn('mt-1 line-clamp-2 font-neo-body text-sm font-bold leading-snug', live ? 'text-neo-black/85' : 'text-edu-ink/80')}>
         {t(live ? `${K}.preview.gameConfirm` : `${K}.preview.classroomNext`)}
       </p>
     </div>

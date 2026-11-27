@@ -21,30 +21,30 @@ export function MasteryHeatmap({ report, names }: { report: WordMasteryReport; n
 
   return (
     <details
-      className="group rounded-neo border-2 border-neo-cream/50 bg-neo-navy"
+      className="group rounded-neo border-2 border-edu-line bg-edu-surface"
       onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}
     >
-      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 font-neo-display text-sm font-bold text-neo-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan [&::-webkit-details-marker]:hidden">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 font-neo-display text-sm font-bold text-edu-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan [&::-webkit-details-marker]:hidden">
         <span>{t('eduPro.mastery.heatmapToggle')}</span>
         <ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
       </summary>
-      <div className="space-y-2.5 border-t-2 border-neo-cream/40 p-3">
-        <p className="hidden text-xs font-bold text-neo-cream/70 sm:block">{t('eduPro.mastery.heatmapHint')}</p>
-        <p className="text-xs font-bold text-neo-cream/70 sm:hidden">{t('eduPro.mastery.phoneHint')}</p>
+      <div className="space-y-2.5 border-t-2 border-edu-line p-3">
+        <p className="hidden text-xs font-bold text-edu-ink/70 sm:block">{t('eduPro.mastery.heatmapHint')}</p>
+        <p className="text-xs font-bold text-edu-ink/70 sm:hidden">{t('eduPro.mastery.phoneHint')}</p>
         <MasteryLegend />
         <div className="hidden sm:block">
-          <div data-testid="mastery-heatmap-scroll" className="max-h-[70vh] overflow-x-auto overflow-y-auto rounded-neo border-2 border-neo-cream/40">
+          <div data-testid="mastery-heatmap-scroll" className="max-h-[70vh] overflow-x-auto overflow-y-auto rounded-neo border-2 border-edu-line">
             <table className="w-full border-separate border-spacing-0 text-xs">
               <thead>
                 <tr>
-                  <th scope="col" className="sticky start-0 top-0 z-30 w-44 min-w-[9.5rem] border-b-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2 text-start align-bottom font-bold text-neo-cream/80">
+                  <th scope="col" className="sticky start-0 top-0 z-30 w-44 min-w-[9.5rem] border-b-2 border-edu-line bg-edu-surface px-3 py-2 text-start align-bottom font-bold text-edu-ink/80">
                     <span className="flex items-end justify-between gap-2">
                       <span>{t('eduPro.mastery.studentColumn')}</span>
-                      <span className="text-[10px] text-neo-cream/80">{t('eduPro.mastery.needsHelpColumn')}</span>
+                      <span className="text-[10px] text-edu-ink/80">{t('eduPro.mastery.needsHelpColumn')}</span>
                     </span>
                   </th>
                   {view.words.map((w) => (
-                    <th key={w.word} scope="col" title={w.display} className="sticky top-0 z-10 min-w-12 border-b-2 border-neo-cream/40 bg-neo-navy-light px-1 py-2 text-center align-bottom font-bold text-neo-white">
+                    <th key={w.word} scope="col" title={w.display} className="sticky top-0 z-10 min-w-12 border-b-2 border-edu-line bg-edu-surface px-1 py-2 text-center align-bottom font-bold text-edu-ink">
                       <span className="mx-auto block max-w-[6.5rem] truncate text-[13px]" dir="auto">{w.display}</span>
                     </th>
                   ))}
@@ -53,18 +53,18 @@ export function MasteryHeatmap({ report, names }: { report: WordMasteryReport; n
               <tbody key={open ? 'open' : 'closed'}>
                 {view.students.map((s, row) => (
                   <tr key={s.id} className="group/row">
-                    <th scope="row" className="sticky start-0 z-20 border-b border-neo-cream/40 bg-neo-navy px-3 py-1 text-start font-bold text-neo-white group-hover/row:bg-neo-navy-light">
+                    <th scope="row" className="sticky start-0 z-20 border-b border-edu-line bg-edu-surface px-3 py-1 text-start font-bold text-edu-ink group-hover/row:bg-edu-surface">
                       <span className="flex items-center justify-between gap-2">
                         <span className="min-w-0">
                           <span title={s.fullName} className="block truncate text-sm" dir="auto">{s.name}</span>
-                          <span className="block text-[11px] font-bold text-neo-cream/60 tabular-nums">{s.accuracy}%</span>
+                          <span className="block text-[11px] font-bold text-edu-ink/60 tabular-nums">{s.accuracy}%</span>
                         </span>
                         <span
                           data-testid="mastery-needs-help"
                           aria-label={t('eduPro.mastery.needsHelpLabel', { name: s.fullName, count: s.needsHelp })}
                           className={cn(
                             'grid h-7 min-w-8 shrink-0 place-items-center rounded-full border-2 px-2 font-neo-display text-sm font-black tabular-nums',
-                            s.needsHelp > 0 ? 'border-black bg-neo-pink text-neo-black shadow-hard-sm' : 'border-neo-cream/40 text-neo-cream/60',
+                            s.needsHelp > 0 ? 'border-black bg-neo-pink text-neo-black shadow-hard-sm' : 'border-edu-line text-edu-ink/60',
                           )}
                         >
                           {s.needsHelp}
@@ -78,7 +78,7 @@ export function MasteryHeatmap({ report, names }: { report: WordMasteryReport; n
                         ? t('eduPro.mastery.cellLabel', { name: s.fullName, word: w.display, correct: cell.correct, attempts: cell.attempts })
                         : t('eduPro.mastery.cellUnseen', { name: s.fullName, word: w.display });
                       return (
-                        <td key={w.word} className="border-b border-neo-cream/40 p-0.5 group-hover/row:bg-neo-white/[0.03]">
+                        <td key={w.word} className="border-b border-edu-line p-0.5 group-hover/row:bg-neo-white/[0.03]">
                           <m.span
                             data-testid="mastery-heatmap-cell"
                             data-tone={tone}
@@ -100,15 +100,15 @@ export function MasteryHeatmap({ report, names }: { report: WordMasteryReport; n
               </tbody>
               <tfoot>
                 <tr>
-                  <th scope="row" className="sticky bottom-0 start-0 z-30 border-t-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2 text-start text-[11px] font-black text-neo-cream/80">
+                  <th scope="row" className="sticky bottom-0 start-0 z-30 border-t-2 border-edu-line bg-edu-surface px-3 py-2 text-start text-[11px] font-black text-edu-ink/80">
                     {t('eduPro.mastery.missedRow')}
                   </th>
                   {view.words.map((w) => (
-                    <td key={w.word} className="sticky bottom-0 z-10 border-t-2 border-neo-cream/40 bg-neo-navy-light px-1 py-2 text-center">
+                    <td key={w.word} className="sticky bottom-0 z-10 border-t-2 border-edu-line bg-edu-surface px-1 py-2 text-center">
                       <span
                         data-testid="mastery-word-missed"
                         aria-label={t('eduPro.mastery.wordMissedLabel', { word: w.display, count: w.struggled, total: w.asked })}
-                        className={cn('font-neo-display text-sm font-black tabular-nums', w.struggled > 0 ? 'text-neo-pink' : 'text-neo-lime')}
+                        className={cn('font-neo-display text-sm font-black tabular-nums', w.struggled > 0 ? 'text-edu-pink-ink' : 'text-edu-lime-ink')}
                       >
                         {`${w.struggled}/${w.asked}`}
                       </span>

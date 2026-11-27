@@ -37,13 +37,13 @@ export function StrugglePreview({ masteryByPlayer, teacherName, language, t, max
   return (
     <section
       data-testid="struggle-preview"
-      className="flex shrink-0 items-center gap-3 rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 py-2 shadow-hard-xl @lg/results:gap-4 @lg/results:px-4 @lg/results:py-3"
+      className="flex shrink-0 items-center gap-3 rounded-neo-xl border-[3px] border-edu-line bg-edu-surface px-3 py-2 shadow-hard-xl @lg/results:gap-4 @lg/results:px-4 @lg/results:py-3"
     >
       <ul aria-hidden="true" className="flex w-24 shrink-0 flex-col gap-1 @lg/results:w-36 @lg/results:gap-1.5">
         {pcts.slice(0, maxBars).map((pct, i) => (
           <li key={i} data-testid="struggle-bar" data-pct={String(pct)} className="flex items-center gap-1.5">
             <span className="h-2 w-6 shrink-0 rounded-sm bg-neo-cream/50 @lg/results:h-2.5 @lg/results:w-8" />
-            <span className="h-2 flex-1 overflow-hidden rounded-sm bg-neo-navy @lg/results:h-2.5">
+            <span className="h-2 flex-1 overflow-hidden rounded-sm bg-edu-page @lg/results:h-2.5">
               <span
                 className="block h-full origin-left bg-neo-cream rtl:origin-right"
                 style={{ transform: `scaleX(${Math.max(0.06, pct / 100)})` }}
@@ -53,7 +53,7 @@ export function StrugglePreview({ masteryByPlayer, teacherName, language, t, max
         ))}
       </ul>
       <div className="flex min-w-0 flex-col items-start gap-2">
-        <p className="flex flex-wrap items-center gap-2 font-neo-display text-base font-black leading-tight text-neo-cream @[96rem]/results:text-xl">
+        <p className="flex flex-wrap items-center gap-2 font-neo-display text-base font-black leading-tight text-edu-ink @[96rem]/results:text-xl">
           {t('eduPlans.reports.title')}
           <ProPoweredChip />
         </p>
@@ -79,7 +79,7 @@ export function StrugglePreview({ masteryByPlayer, teacherName, language, t, max
               <Table2 className="size-4 shrink-0" aria-hidden="true" />
               {t('eduProResults.openGrid')}
             </button>
-            <p data-testid="struggle-open-grid-note" className="text-xs font-semibold text-neo-cream/80 @[96rem]/results:text-sm">
+            <p data-testid="struggle-open-grid-note" className="text-xs font-semibold text-edu-ink/80 @[96rem]/results:text-sm">
               {t('eduProResults.openGridNote')}
             </p>
           </>

@@ -10,17 +10,17 @@ import { NEO_BLOCK_TONES, NEO_BUTTON, NEO_DARK_EDGE, NEO_FOCUS as FOCUS } from '
 export const NB_DARK_EDGE = NEO_DARK_EDGE;
 
 /** Panel: dark card with a cream outline and a hard shadow. Pass a color block for the lead card. */
-export const NB_PANEL = `rounded-neo-xl border-[3px] ${NB_DARK_EDGE} bg-[#2a2b4a] text-neo-cream shadow-hard-xl`;
+export const NB_PANEL = `rounded-neo-xl border-[3px] ${NB_DARK_EDGE} bg-[#2a2b4a] text-edu-ink shadow-hard-xl`;
 
 /**
  * Bold panel for a screen that should shout: full cream outline and a big colored offset,
  * since a black shadow barely shows on the navy page. Pick the color per panel.
  */
 export const NB_PANEL_POP = {
-  lime: 'rounded-neo-xl border-[3px] border-neo-cream bg-[#2a2b4a] text-neo-cream shadow-hard-lime-xl',
-  cyan: 'rounded-neo-xl border-[3px] border-neo-cream bg-[#2a2b4a] text-neo-cream shadow-hard-cyan-xl',
-  pink: 'rounded-neo-xl border-[3px] border-neo-cream bg-[#2a2b4a] text-neo-cream shadow-hard-pink-xl',
-  yellow: 'rounded-neo-xl border-[3px] border-neo-cream bg-[#2a2b4a] text-neo-cream shadow-hard-yellow-xl',
+  lime: 'rounded-neo-xl border-[3px] border-edu-line bg-[#2a2b4a] text-edu-ink shadow-hard-lime-xl',
+  cyan: 'rounded-neo-xl border-[3px] border-edu-line bg-[#2a2b4a] text-edu-ink shadow-hard-cyan-xl',
+  pink: 'rounded-neo-xl border-[3px] border-edu-line bg-[#2a2b4a] text-edu-ink shadow-hard-pink-xl',
+  yellow: 'rounded-neo-xl border-[3px] border-edu-line bg-[#2a2b4a] text-edu-ink shadow-hard-yellow-xl',
 } as const;
 
 /** Tilted icon tile for a panel heading. Combine with an NB_BLOCK color. */
@@ -38,7 +38,7 @@ export const NB_PRIMARY_FACE = `inline-flex items-center justify-center gap-2 ro
 /** A real second action: dark, still chunky. */
 export const NB_SECONDARY = NEO_BUTTON.secondary;
 /** NB_SECONDARY's face for a <PressSurface asChild>; pair with a cream/40 lip, since black has no edge on navy. */
-export const NB_SECONDARY_FACE = `inline-flex min-h-[48px] items-center justify-center gap-2 rounded-neo-lg border-[3px] ${NB_DARK_EDGE} bg-neo-navy-light px-4 text-center font-neo-display text-base font-black leading-tight text-neo-cream shadow-neo-cream/40 ${FOCUS}`;
+export const NB_SECONDARY_FACE = `inline-flex min-h-[48px] items-center justify-center gap-2 rounded-neo-lg border-[3px] ${NB_DARK_EDGE} bg-edu-surface px-4 text-center font-neo-display text-base font-black leading-tight text-edu-ink shadow-edu-line ${FOCUS}`;
 /** Small chunky button for inside cards. Combine with an NB_BLOCK color. */
 export const NB_SMALL = NEO_BUTTON.small;
 
@@ -48,13 +48,13 @@ export const NB_STICKER =
 
 /** Quiet underlined link for the rare way out. */
 export const NB_LINK = [
-  'inline-flex min-h-[44px] items-center gap-1 rounded-neo px-2 font-neo-body text-sm font-bold text-neo-cream/85 underline decoration-2 underline-offset-4 hover:text-neo-cream',
+  'inline-flex min-h-[44px] items-center gap-1 rounded-neo px-2 font-neo-body text-sm font-bold text-edu-ink/85 underline decoration-2 underline-offset-4 hover:text-edu-ink',
   FOCUS,
 ].join(' ');
 
 /** Dashed row that opens rarer options (Advanced). */
 export const NB_ADVANCED = [
-  'flex min-h-[48px] w-full items-center justify-between gap-2 rounded-neo-lg border-[3px] border-dashed border-neo-cream/35 px-3 text-start font-neo-body text-sm font-bold text-neo-cream/85 hover:border-neo-cream/70 hover:text-neo-cream',
+  'flex min-h-[48px] w-full items-center justify-between gap-2 rounded-neo-lg border-[3px] border-dashed border-edu-line px-3 text-start font-neo-body text-sm font-bold text-edu-ink/85 hover:border-edu-line hover:text-edu-ink',
   FOCUS,
 ].join(' ');
 

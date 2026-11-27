@@ -69,7 +69,7 @@ export default function AwardsPreviewClient() {
   const view = params?.get('view');
   if (view !== 'awards' && view !== 'empty') {
     return (
-      <div className="fixed inset-0 z-[80] flex h-dvh flex-col bg-neo-navy">
+      <div className="fixed inset-0 z-[80] flex h-dvh flex-col bg-edu-page">
         <ClassroomResultsCardSteps
           key={arrived ? 'live' : 'ssr'}
           summary={RESULTS}

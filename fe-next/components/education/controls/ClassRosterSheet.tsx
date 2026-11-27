@@ -99,7 +99,7 @@ export function ClassRosterSheet({ rows, statusOf, onRemove, t }: ClassRosterShe
                 </span>
 
                 {row.isIdle ? (
-                  <span className="inline-flex items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-pink px-2 py-1 font-neo-display text-xs lg:text-base xl:text-lg tv:text-xl font-black uppercase text-neo-white">
+                  <span className="inline-flex items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-pink px-2 py-1 font-neo-display text-xs lg:text-base xl:text-lg tv:text-xl font-black uppercase text-edu-ink">
                     <Zap className="h-3 w-3 tv:h-5 tv:w-5" aria-hidden="true" />
                     {t('education.liveControls.idleBadge')}
                   </span>

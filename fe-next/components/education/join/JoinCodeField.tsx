@@ -144,7 +144,7 @@ export function JoinCodeField({
                       ? 'border-neo-black bg-neo-red text-neo-white shadow-hard'
                       : filled
                         ? 'border-neo-black bg-neo-lime text-neo-navy shadow-hard'
-                        : 'border-neo-cream bg-neo-navy-light text-neo-white/30 shadow-hard-sm',
+                        : 'border-edu-line bg-edu-surface text-edu-ink/30 shadow-hard-sm',
                     isActive && 'group-focus-within:border-neo-black group-focus-within:bg-neo-cyan group-focus-within:text-neo-navy group-focus-within:shadow-hard'
                   )}
                 >
@@ -157,7 +157,7 @@ export function JoinCodeField({
                       {char}
                     </span>
                   ) : isActive ? (
-                    <span className="hidden h-[45%] w-1.5 rounded-full bg-neo-navy group-focus-within:block motion-safe:animate-pulse" />
+                    <span className="hidden h-[45%] w-1.5 rounded-full bg-edu-surface group-focus-within:block motion-safe:animate-pulse" />
                   ) : null}
                 </div>
               );
@@ -194,7 +194,7 @@ export function JoinCodeField({
           <PressSurface
             lip={2}
             onClick={onPaste}
-            className="flex size-12 shrink-0 items-center justify-center rounded-neo border-3 border-neo-cyan bg-neo-navy-light text-neo-cyan shadow-neo-cyan/40 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan lg:size-14"
+            className="flex size-12 shrink-0 items-center justify-center rounded-neo border-3 border-neo-cyan bg-edu-surface text-edu-cyan-ink shadow-neo-cyan/40 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan lg:size-14"
             aria-label={t('joinView.pasteCode')}
             title={t('joinView.pasteCode')}
           >

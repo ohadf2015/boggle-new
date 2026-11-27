@@ -62,14 +62,14 @@ export function CancelReasonChips({ initialReason }: { initialReason: string | n
 
   if (answered) {
     return (
-      <p data-testid="cancel-reason-thanks" className="mt-2 text-xs font-bold text-neo-cream/70">
+      <p data-testid="cancel-reason-thanks" className="mt-2 text-xs font-bold text-edu-ink/70">
         {t('teacher.subscription.cancelReasonThanks')}
       </p>
     );
   }
   return (
-    <div data-testid="cancel-reason-row" className="mt-3 border-t-2 border-neo-cream/15 pt-3">
-      <p data-testid="cancel-reason-prompt" className="text-xs font-black uppercase tracking-wide text-neo-cream/70">
+    <div data-testid="cancel-reason-row" className="mt-3 border-t-2 border-edu-line/15 pt-3">
+      <p data-testid="cancel-reason-prompt" className="text-xs font-black uppercase tracking-wide text-edu-ink/70">
         {t('teacher.subscription.cancelReasonPrompt')}
       </p>
       <div className="mt-2 flex flex-wrap gap-2" data-testid="teacher-pro-trial-cancel-reasons">

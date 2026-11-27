@@ -54,10 +54,10 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
           onClick={flow.backToCode}
           aria-label={t(`${K}.flow.changeCode`)}
           title={t(`${K}.flow.changeCode`)}
-          className="flex min-h-11 items-center gap-3 self-start rounded-neo border-3 border-neo-cream bg-neo-navy-light px-3 py-2 shadow-hard transition-transform duration-100 motion-safe:active:translate-x-0.5 motion-safe:active:translate-y-0.5 active:shadow-hard-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan"
+          className="flex min-h-11 items-center gap-3 self-start rounded-neo border-3 border-edu-line bg-edu-surface px-3 py-2 shadow-hard transition-transform duration-100 motion-safe:active:translate-x-0.5 motion-safe:active:translate-y-0.5 active:shadow-hard-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan"
         >
-          <DirectionalIcon icon={ArrowLeft} className="h-4 w-4 text-neo-cyan" />
-          <span dir="ltr" className="font-neo-display text-2xl font-black tracking-[0.2em] text-neo-lime">
+          <DirectionalIcon icon={ArrowLeft} className="h-4 w-4 text-edu-cyan-ink" />
+          <span dir="ltr" className="font-neo-display text-2xl font-black tracking-[0.2em] text-edu-lime-ink">
             {flow.code}
           </span>
         </button>
@@ -68,20 +68,20 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
           {flow.codeRejected ? (
             <JoinAlert>{t(`${K}.invalidCode`)}</JoinAlert>
           ) : flow.target?.verdict === 'ended' ? (
-            <p data-testid="join-ended-note" role="status" className="rounded-neo border-3 border-neo-cream bg-neo-navy-light p-3 font-neo-body text-base font-bold text-neo-cream shadow-hard">
+            <p data-testid="join-ended-note" role="status" className="rounded-neo border-3 border-edu-line bg-edu-surface p-3 font-neo-body text-base font-bold text-edu-ink shadow-hard">
               {t('education.student.gameEnded.joinClassLine')}
             </p>
           ) : flow.target && (flow.target.label || flow.target.verdict === 'game') ? (
             <JoinTargetCard target={flow.target} />
           ) : flow.isChecking ? (
-            <div className="rounded-neo border-3 border-neo-cream bg-neo-navy-light p-3 shadow-hard">
+            <div className="rounded-neo border-3 border-edu-line bg-edu-surface p-3 shadow-hard">
               <div className="h-3 w-24 rounded-full bg-neo-cyan/40 motion-safe:animate-pulse" />
               <div className="mt-2 h-4 w-40 rounded-full bg-neo-cyan/25 motion-safe:animate-pulse" />
             </div>
           ) : null}
         </div>
 
-        <h1 className="font-neo-display text-3xl font-black uppercase leading-[0.95] tracking-tight wrap-break-word text-neo-white short:text-2xl sm:text-4xl lg:text-5xl">
+        <h1 className="font-neo-display text-3xl font-black uppercase leading-[0.95] tracking-tight wrap-break-word text-edu-ink short:text-2xl sm:text-4xl lg:text-5xl">
           {t(flow.showNameField ? `${K}.flow.nameHeadline` : `${K}.flow.readyHeadline`)}
         </h1>
       </div>
@@ -91,7 +91,7 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
           <div className="flex flex-col gap-2">
             <label
               htmlFor="join-nickname"
-              className="font-neo-display text-sm font-black uppercase tracking-wide text-neo-cyan lg:text-base"
+              className="font-neo-display text-sm font-black uppercase tracking-wide text-edu-cyan-ink lg:text-base"
             >
               {t(`${K}.nameLabel`)}
             </label>
@@ -121,26 +121,26 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
                   nameRef.current?.focus();
                 }}
                 className={cn(
-                  'inline-flex min-h-11 items-center gap-2 rounded-neo px-4 py-2 font-neo-display text-base font-black text-neo-white transition-transform motion-safe:active:translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan',
-                  suggestionLeads ? 'border-2 border-neo-cream/60 bg-transparent px-3 text-sm text-neo-cream/80' : 'border-3 border-neo-cyan bg-neo-navy-light shadow-hard-sm'
+                  'inline-flex min-h-11 items-center gap-2 rounded-neo px-4 py-2 font-neo-display text-base font-black text-edu-ink transition-transform motion-safe:active:translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan',
+                  suggestionLeads ? 'border-2 border-edu-line bg-transparent px-3 text-sm text-edu-ink/80' : 'border-3 border-neo-cyan bg-edu-surface shadow-hard-sm'
                 )}
               >
                 <Dices
                   key={diceSpin}
                   aria-hidden="true"
-                  className="size-6 text-neo-cyan motion-safe:animate-[lc-join-dice_450ms_ease-out]"
+                  className="size-6 text-edu-cyan-ink motion-safe:animate-[lc-join-dice_450ms_ease-out]"
                   strokeWidth={2.5}
                 />
                 {t('eduStudent.join.surpriseMe')}
               </button>
-              <p id="join-name-hint" className="font-neo-body text-sm text-neo-white/75">
+              <p id="join-name-hint" className="font-neo-body text-sm text-edu-ink/75">
                 {t(`${K}.nameHint`)}
               </p>
             </div>
             <style>{'@keyframes lc-join-dice{0%{transform:rotate(0) scale(.8)}60%{transform:rotate(300deg) scale(1.15)}100%{transform:rotate(360deg) scale(1)}}'}</style>
           </div>
         ) : (
-          <p className="font-neo-body text-base font-bold text-neo-white/80 lg:text-lg">{t(`${K}.flow.readySub`)}</p>
+          <p className="font-neo-body text-base font-bold text-edu-ink/80 lg:text-lg">{t(`${K}.flow.readySub`)}</p>
         )}
 
         {flow.suggestedName && (
@@ -173,14 +173,14 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
           ref={goRef}
           data-primary={suggestionLeads ? undefined : 'true'}
           disabled={!flow.canSubmit || suggestionLeads}
-          className={cn('text-2xl lg:text-3xl', suggestionLeads && 'border-neo-cream/60 bg-neo-navy-light text-neo-cream shadow-none')}
+          className={cn('text-2xl lg:text-3xl', suggestionLeads && 'border-edu-line bg-edu-surface text-edu-ink shadow-none')}
         >
           <Sparkles aria-hidden="true" className="size-6" />
           {flow.isSubmitting ? t(`${K}.joining`) : t(`${K}.flow.go`)}
         </JoinPrimaryButton>
 
         {(flow.isHolding || flow.isSubmitting) && (
-          <p role="status" className="text-center font-neo-body text-sm font-bold text-neo-lime">
+          <p role="status" className="text-center font-neo-body text-sm font-bold text-edu-lime-ink">
             {t(flow.isSubmitting ? `${K}.flow.entering` : `${K}.preparing`)}
           </p>
         )}

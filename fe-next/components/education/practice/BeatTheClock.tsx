@@ -123,7 +123,7 @@ export default function BeatTheClock({
           // border is the only thing that can make it findable at all.
           enabled
             ? 'border-neo-black bg-neo-pink text-neo-black shadow-hard-sm'
-            : 'border-neo-cream bg-neo-navy text-neo-cream'
+            : 'border-edu-line bg-edu-surface text-edu-ink'
         )}
       >
         {enabled ? (
@@ -140,12 +140,12 @@ export default function BeatTheClock({
             data-testid="beat-the-clock-time"
             className={cn(
               'font-neo-display text-base font-black tabular-nums leading-none',
-              urgent ? 'text-neo-pink' : 'text-neo-white'
+              urgent ? 'text-edu-pink-ink' : 'text-edu-ink'
             )}
           >
             {formatClock(left)}
           </span>
-          <div aria-hidden="true" className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-neo border-[2px] border-neo-cream/40 bg-neo-black/40">
+          <div aria-hidden="true" className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-neo border-[2px] border-edu-line bg-neo-black/40">
             <div
               className={cn(
                 'h-full transition-[width] duration-1000 ease-linear',

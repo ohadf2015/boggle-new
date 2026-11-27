@@ -16,7 +16,7 @@ export function TvRecapHeader({ title, lessonNames }: TvRecapHeaderProps) {
       data-testid="tv-recap-header"
       className="shrink-0 @max-[64rem]/results:mt-auto flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-1 @3xl/results:gap-x-4 @3xl/results:px-16 @5xl/results:justify-start @5xl/results:ps-1 @5xl/results:pe-20"
     >
-      {title && <h2 className="font-neo-display font-black leading-none text-neo-cream text-xl @3xl/results:text-3xl @[96rem]/results:text-4xl @[137.5rem]/results:text-6xl">
+      {title && <h2 className="font-neo-display font-black leading-none text-edu-ink text-xl @3xl/results:text-3xl @[96rem]/results:text-4xl @[137.5rem]/results:text-6xl">
         {title}
       </h2>}
       {lesson && (

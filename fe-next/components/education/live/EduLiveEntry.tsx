@@ -28,9 +28,9 @@ interface EduLiveEntryProps {
 
 function Frame({ testId, mascot, children }: { testId: string; mascot: string; children: React.ReactNode }) {
   return (
-    <div data-testid={testId} className="flex min-h-0 flex-1 items-center justify-center bg-neo-navy px-4 py-8 text-neo-cream">
+    <div data-testid={testId} className="flex min-h-0 flex-1 items-center justify-center bg-edu-page px-4 py-8 text-edu-ink">
       <style>{LIVE_KEYFRAMES}</style>
-      <div className="flex w-full max-w-sm flex-col items-center gap-4 rounded-neo-lg border-4 border-neo-cream bg-neo-navy-light p-6 text-center shadow-hard-lg">
+      <div className="flex w-full max-w-sm flex-col items-center gap-4 rounded-neo-lg border-4 border-edu-line bg-edu-surface p-6 text-center shadow-hard-lg">
         {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
         <img src={mascot} alt="" aria-hidden="true" className="size-28 select-none motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite]" />
         {children}
@@ -46,7 +46,7 @@ function ActiveEntry({ entry, isHost, language, t }: Omit<EduLiveEntryProps, 'ur
 
   if (flow.entryView === 'classroom-name' && room) {
     return (
-      <div data-testid="edu-live-name" className="flex min-h-0 flex-1 flex-col bg-neo-navy">
+      <div data-testid="edu-live-name" className="flex min-h-0 flex-1 flex-col bg-edu-page">
         <ClassroomJoinNamePrompt roomCode={room} onSubmit={flow.handleClassroomNameSubmit} initialName={getStoredUsername() || ''} disabled={entry.isJoining} />
       </div>
     );
@@ -58,7 +58,7 @@ function ActiveEntry({ entry, isHost, language, t }: Omit<EduLiveEntryProps, 'ur
       return (
         <Frame testId="edu-live-host-ended" mascot={EDU_MASCOT.tip}>
           <h1 role="alert" className="font-neo-display text-2xl font-black">{t('eduLiveRoom.entry.hostEndedTitle')}</h1>
-          <p className="font-neo-body text-base font-bold text-neo-cream/80">{t('eduLiveRoom.entry.hostEndedHint')}</p>
+          <p className="font-neo-body text-base font-bold text-edu-ink/80">{t('eduLiveRoom.entry.hostEndedHint')}</p>
           <Link
             href={teacherHostHref(language, {})}
             data-testid="edu-live-host-start-new"
@@ -74,7 +74,7 @@ function ActiveEntry({ entry, isHost, language, t }: Omit<EduLiveEntryProps, 'ur
     return (
       <Frame testId="edu-live-host-refused" mascot={EDU_MASCOT.tip}>
         <h1 role="alert" className="font-neo-display text-2xl font-black">{t('eduLiveRoom.entry.hostRefusedTitle')}</h1>
-        <p className="font-neo-body text-base font-bold text-neo-cream/80">{t('eduLiveRoom.entry.hostRefusedHint')}</p>
+        <p className="font-neo-body text-base font-bold text-edu-ink/80">{t('eduLiveRoom.entry.hostRefusedHint')}</p>
         <button type="button" data-testid="edu-live-host-retry" onClick={() => entry.handleJoin(true, entry.defaultLanguage, room, `${name} Room`, name, { isPrivate: true, isClassroom: true })} className={cn(PRIMARY_BUTTON, PRESS, 'min-h-12 w-full px-5 text-lg')}>
           {t('eduLiveRoom.entry.hostRetry')}
         </button>
@@ -94,8 +94,8 @@ function ActiveEntry({ entry, isHost, language, t }: Omit<EduLiveEntryProps, 'ur
     return (
       <Frame testId="edu-live-waiting-teacher" mascot={EDU_MASCOT.tip}>
         <h1 className="font-neo-display text-2xl font-black">{t('eduLiveRoom.entry.waitingTeacher')}</h1>
-        <p className="font-neo-body text-base font-bold text-neo-cream/80">{t('eduLiveRoom.entry.waitingTeacherHint')}</p>
-        <span aria-hidden="true" className="h-2 w-full overflow-hidden rounded-full bg-neo-navy">
+        <p className="font-neo-body text-base font-bold text-edu-ink/80">{t('eduLiveRoom.entry.waitingTeacherHint')}</p>
+        <span aria-hidden="true" className="h-2 w-full overflow-hidden rounded-full bg-edu-surface">
           <span className="block h-full w-1/3 animate-pulse rounded-full bg-neo-cyan motion-reduce:animate-none" />
         </span>
       </Frame>
@@ -108,8 +108,8 @@ function ActiveEntry({ entry, isHost, language, t }: Omit<EduLiveEntryProps, 'ur
         {t(isHost ? 'eduLiveRoom.entry.openingRoom' : 'eduLiveRoom.entry.connecting')}
       </p>
       <div aria-hidden="true" className="flex w-full flex-col gap-2">
-        <span className="h-10 w-full animate-pulse rounded-neo bg-neo-navy motion-reduce:animate-none" />
-        <span className="mx-auto h-4 w-2/3 animate-pulse rounded-full bg-neo-navy motion-reduce:animate-none" />
+        <span className="h-10 w-full animate-pulse rounded-neo bg-edu-surface motion-reduce:animate-none" />
+        <span className="mx-auto h-4 w-2/3 animate-pulse rounded-full bg-edu-surface motion-reduce:animate-none" />
       </div>
     </Frame>
   );
@@ -120,7 +120,7 @@ export default function EduLiveEntry({ entry, urlRoom, isHost, isSpectator = fal
     return (
       <Frame testId="edu-live-room-full" mascot={EDU_MASCOT.tip}>
         <h1 role="status" aria-live="polite" className="font-neo-display text-2xl font-black">{t('eduLiveRoom.entry.roomFullTitle')}</h1>
-        <p className="font-neo-body text-base font-bold text-neo-cream/80">{t('eduLiveRoom.entry.roomFullHint', { max: MAX_PLAYERS_PER_ROOM })}</p>
+        <p className="font-neo-body text-base font-bold text-edu-ink/80">{t('eduLiveRoom.entry.roomFullHint', { max: MAX_PLAYERS_PER_ROOM })}</p>
       </Frame>
     );
   }
@@ -129,7 +129,7 @@ export default function EduLiveEntry({ entry, urlRoom, isHost, isSpectator = fal
     return (
       <Frame testId="edu-live-no-room" mascot={EDU_MASCOT.empty}>
         <h1 className="font-neo-display text-2xl font-black">{t('eduLiveRoom.entry.noRoomTitle')}</h1>
-        <p className="font-neo-body text-base font-bold text-neo-cream/80">
+        <p className="font-neo-body text-base font-bold text-edu-ink/80">
           {t(isHost ? 'eduLiveRoom.entry.noRoomHost' : 'eduLiveRoom.entry.noRoomStudent')}
         </p>
         <Link href={href} data-testid="edu-live-no-room-cta" className={cn(PRIMARY_BUTTON, PRESS, 'min-h-12 w-full px-5 text-lg')}>

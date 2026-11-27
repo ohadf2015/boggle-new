@@ -42,15 +42,15 @@ export function PageClient({ geo, faq }: { geo?: GeoAnswer; faq?: ReactNode }) {
   }
 
   return (
-    <main className="min-h-dvh bg-neo-navy">
+    <main className="min-h-dvh bg-edu-page">
       <LandingHeader />
       {setupPending && (
-        <p className="mx-auto max-w-6xl px-4 pt-3 text-end text-sm text-neo-cream/80 sm:px-6 lg:px-8">
+        <p className="mx-auto max-w-6xl px-4 pt-3 text-end text-sm text-edu-ink/80 sm:px-6 lg:px-8">
           {t('eg2Land.studentNote')}{' '}
           <Link
             href={`/${language}/student`}
             data-testid="landing-student-classes-link"
-            className="font-bold text-neo-cream underline underline-offset-2 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="font-bold text-edu-ink underline underline-offset-2 hover:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             {t('eg2Land.studentLink')}
           </Link>

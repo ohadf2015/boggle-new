@@ -28,7 +28,7 @@ interface Props {
 // two lines instead of being clipped — every locale fits at 390px.
 // `icon-only`: opts out of a global landscape-phone rule that pads every button.
 const ITEM_BASE =
-  'icon-only relative flex flex-col items-center justify-start gap-0.5 rounded-[12px] px-0.5 pt-1 font-neo-display text-xs leading-[1.05] font-black text-neo-white outline-none transition-transform active:translate-y-[2px] focus-visible:ring-2 focus-visible:ring-neo-yellow';
+  'icon-only relative flex flex-col items-center justify-start gap-0.5 rounded-[12px] px-0.5 pt-1 font-neo-display text-xs leading-[1.05] font-black text-edu-ink outline-none transition-transform active:translate-y-[2px] focus-visible:ring-2 focus-visible:ring-neo-yellow';
 /** Phone: five equal columns. Desktop: each item as wide as its label (never crushed). */
 const itemClass = (big: boolean, iconOnly: boolean) =>
   `${ITEM_BASE} ${iconOnly ? 'w-11 flex-none justify-center pt-0' : big ? 'min-w-[4.5rem] flex-none px-2' : 'min-w-0 flex-1'}`;
@@ -76,7 +76,7 @@ export function AcademyDock({ locale, reviewCount, onOpenClass, onSolo, big = fa
             reviewCount > 0 ? (
               <span className="absolute -top-2 end-1" aria-label={t('academy.student.reviewDueAria', '{count} words to review', { count: reviewCount })}>
                 <Medallion tone="pink" size={20} shadow={1}>
-                  <span className="font-neo-display text-xs font-black leading-none text-neo-white">{reviewCount}</span>
+                  <span className="font-neo-display text-xs font-black leading-none text-edu-ink">{reviewCount}</span>
                 </Medallion>
               </span>
             ) : undefined

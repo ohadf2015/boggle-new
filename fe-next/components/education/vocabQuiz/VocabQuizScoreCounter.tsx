@@ -89,7 +89,7 @@ export function VocabQuizScoreCounter({ score, pop, t, className }: VocabQuizSco
     <span className={cn('relative inline-flex items-baseline', className)}>
       <span
         data-testid="vocab-quiz-score"
-        className="font-neo-display font-black tabular-nums text-neo-lime"
+        className="font-neo-display font-black tabular-nums text-edu-lime-ink"
         aria-label={t('vocabQuiz.score.label', { score })}
       >
         {shown}

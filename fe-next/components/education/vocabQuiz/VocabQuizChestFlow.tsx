@@ -100,7 +100,7 @@ export function VocabQuizChestFlow({
   if (picker === 'inline') {
     if (!chestPending || ownChest) return null;
     return (
-      <div className="w-full h-full grid place-items-center rounded-neo border-[3px] border-neo-yellow bg-neo-navy-elevated shadow-hard">
+      <div className="w-full h-full grid place-items-center rounded-neo border-[3px] border-neo-yellow bg-edu-surface shadow-hard">
         <TreasureChestPicker onPick={handlePick} disabled={pickedChest !== null} pickedIndex={pickedChest} t={t} />
       </div>
     );
@@ -109,9 +109,9 @@ export function VocabQuizChestFlow({
   const hitBanner = showHit && chestHit && (
     <div
       role="status"
-      className="fixed top-3 start-4 end-16 z-[60] mx-auto max-w-sm rounded-neo border-[3px] border-neo-cyan bg-neo-navy-elevated p-3 text-center shadow-hard"
+      className="fixed top-3 start-4 end-16 z-[60] mx-auto max-w-sm rounded-neo border-[3px] border-neo-cyan bg-edu-surface p-3 text-center shadow-hard"
     >
-      <p className="font-neo-display font-bold text-neo-white">
+      <p className="font-neo-display font-bold text-edu-ink">
         {chestHit.outcome === 'steal'
           ? t('vocabQuiz.treasure.hitSteal', { actor: chestHit.actor, amount: chestHit.amount })
           : t('vocabQuiz.treasure.hitSwap', { actor: chestHit.actor })}
@@ -131,8 +131,8 @@ export function VocabQuizChestFlow({
   if (picker === 'overlay' && chestPending && !ownChest) {
     return (
       <>
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-neo-navy px-4">
-          <div className="w-full max-w-sm rounded-neo border-[3px] border-neo-yellow bg-neo-navy-elevated shadow-hard">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-edu-page px-4">
+          <div className="w-full max-w-sm rounded-neo border-[3px] border-neo-yellow bg-edu-surface shadow-hard">
             <TreasureChestPicker onPick={handlePick} disabled={pickedChest !== null} pickedIndex={pickedChest} t={t} />
           </div>
         </div>

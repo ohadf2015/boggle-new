@@ -122,7 +122,7 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
       <section data-testid="assignment-progress-report">
         <SectionTitle>{t('teacher.reports.assignmentProgress.title')}</SectionTitle>
         <ReportEmpty />
-        <p className="mt-2 text-center text-sm text-neo-cream/70">{t('teacher.reports.assignmentProgress.empty')}</p>
+        <p className="mt-2 text-center text-sm text-edu-ink/70">{t('teacher.reports.assignmentProgress.empty')}</p>
       </section>
     );
   }
@@ -136,7 +136,7 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
             type="button"
             onClick={exportCsv}
             data-testid="assignment-progress-csv-export"
-            className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-4 py-2 font-bold text-black shadow-hard transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white"
+            className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-4 py-2 font-bold text-black shadow-hard transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edu-line"
           >
             <Download className="size-4" aria-hidden="true" />
             {t('teacher.reports.assignmentProgress.exportCsv')}
@@ -146,7 +146,7 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
             href={`/${language}/teacher/upgrade`}
             data-testid="assignment-progress-csv-upgrade"
             onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'assignment_progress_csv' })}
-            className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 font-bold text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white"
+            className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 font-bold text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edu-line"
           >
             <Lock className="size-4" aria-hidden="true" />
             {t('teacher.reports.assignmentProgress.exportCsvPro', { price: `$${TEACHER_PRO_PRICE_USD}` })}
@@ -154,10 +154,10 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
         )}
       </div>
 
-      <div className="overflow-x-auto rounded-neo border-2 border-neo-cream/40 bg-neo-navy">
+      <div className="overflow-x-auto rounded-neo border-2 border-edu-line bg-edu-surface">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="bg-neo-navy text-neo-cream/80">
+            <tr className="bg-edu-surface text-edu-ink/80">
               <th scope="col" className="p-3 text-start font-bold">{t('teacher.reports.columns.student')}</th>
               <th scope="col" className="p-3 text-start font-bold">{t('teacher.reports.columns.assignment')}</th>
               <th scope="col" className="p-3 text-start font-bold">{t('teacher.reports.columns.status')}</th>
@@ -171,11 +171,11 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
                 key={`${row.studentId}:${row.assignmentId}`}
                 data-testid="assignment-progress-row"
                 data-status={row.status}
-                className="border-t border-neo-cream/20"
+                className="border-t border-edu-line/20"
               >
-                <td className="px-3 py-2 font-bold text-neo-white">{row.studentName}</td>
-                <td className="px-3 py-2 text-neo-white">{row.assignmentTitle}</td>
-                <td className="px-3 py-2 text-neo-white">
+                <td className="px-3 py-2 font-bold text-edu-ink">{row.studentName}</td>
+                <td className="px-3 py-2 text-edu-ink">{row.assignmentTitle}</td>
+                <td className="px-3 py-2 text-edu-ink">
                   {row.status === 'completed' ? (
                     t('teacher.reports.assignmentProgress.statusCompleted')
                   ) : row.status === 'overdue' ? (
@@ -189,10 +189,10 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
                     t('teacher.reports.assignmentProgress.statusMissing')
                   )}
                 </td>
-                <td className="px-3 py-2 text-end text-neo-white tabular-nums">
+                <td className="px-3 py-2 text-end text-edu-ink tabular-nums">
                   {row.score == null ? '—' : row.score}
                 </td>
-                <td className="hidden px-3 py-2 text-end text-neo-white tabular-nums sm:table-cell">
+                <td className="hidden px-3 py-2 text-end text-edu-ink tabular-nums sm:table-cell">
                   {row.accuracy == null ? '—' : `${row.accuracy}%`}
                 </td>
               </tr>

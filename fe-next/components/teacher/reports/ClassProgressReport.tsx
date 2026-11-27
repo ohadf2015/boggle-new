@@ -86,7 +86,7 @@ export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: 
         onClick={() => onStudentClick(studentId)}
         aria-label={t('teacher.reports.viewStudentProgress', { name })}
         className={cn(
-          'group inline-flex min-h-11 items-center gap-1 text-start font-bold text-neo-white underline-offset-4 transition-colors hover:text-neo-lime hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
+          'group inline-flex min-h-11 items-center gap-1 text-start font-bold text-edu-ink underline-offset-4 transition-colors hover:text-edu-lime-ink hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
           className
         )}
       >
@@ -97,7 +97,7 @@ export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: 
         />
       </button>
     ) : (
-      <span className={cn('font-bold text-neo-white', className)}>{name}</span>
+      <span className={cn('font-bold text-edu-ink', className)}>{name}</span>
     );
 
   return (
@@ -124,7 +124,7 @@ export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: 
             {data.topPerformers.map((performer, index) => (
               <li
                 key={performer.studentId}
-                className="flex items-center gap-3 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-3 shadow-hard-sm"
+                className="flex items-center gap-3 rounded-neo border-2 border-edu-line bg-edu-surface p-3 shadow-hard-sm"
               >
                 <span
                   aria-hidden="true"
@@ -137,7 +137,7 @@ export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: 
                 </span>
                 <div className="min-w-0">
                   {studentName(performer.studentId, performer.studentName)}
-                  <p className="text-sm text-neo-cream/75 tabular-nums">
+                  <p className="text-sm text-edu-ink/75 tabular-nums">
                     {`${performer.accuracy}% · ${t(pluralKeyOf('education.classroomGame.words', performer.wordsLearned, language), { count: performer.wordsLearned })}`}
                   </p>
                 </div>
@@ -154,7 +154,7 @@ export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: 
             {data.studentsNeedingAttention.map((student) => (
               <li key={student.studentId} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-1">
                 <div className="min-w-0 flex-1">{studentName(student.studentId, student.studentName)}</div>
-                <span className="text-sm text-neo-white">
+                <span className="text-sm text-edu-ink">
                   <AccuracyBar value={student.accuracy} />
                 </span>
                 <span className="rounded-neo border-2 border-black bg-neo-pink px-2 py-0.5 text-xs font-bold text-black">
@@ -168,10 +168,10 @@ export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: 
 
       <section>
         <SectionTitle>{t('teacher.reports.sections.studentRankings')}</SectionTitle>
-        <div className="overflow-x-auto rounded-neo border-2 border-neo-cream/40 bg-neo-navy">
+        <div className="overflow-x-auto rounded-neo border-2 border-edu-line bg-edu-surface">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-neo-navy text-neo-cream/80">
+              <tr className="bg-edu-surface text-edu-ink/80">
                 <th scope="col" className="w-16 p-3 text-start font-bold">{t('teacher.reports.columns.rank')}</th>
                 <th scope="col" className="p-3 text-start font-bold">{t('teacher.reports.columns.student')}</th>
                 <th scope="col" className="hidden p-3 text-end font-bold sm:table-cell">{t('teacher.reports.columns.score')}</th>
@@ -181,14 +181,14 @@ export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: 
             </thead>
             <tbody>
               {data.studentRankings.map((student) => (
-                <tr key={student.studentId} className="border-t border-neo-cream/40 transition-colors hover:bg-neo-cream/5">
-                  <td className="px-3 font-neo-display text-base font-black text-neo-cream/80 tabular-nums">{student.rank}</td>
+                <tr key={student.studentId} className="border-t border-edu-line transition-colors hover:bg-edu-ink/5">
+                  <td className="px-3 font-neo-display text-base font-black text-edu-ink/80 tabular-nums">{student.rank}</td>
                   <td className="px-3">{studentName(student.studentId, student.studentName)}</td>
-                  <td className="hidden px-3 text-end text-neo-white tabular-nums sm:table-cell">{student.score}</td>
-                  <td className="px-3 text-neo-white">
+                  <td className="hidden px-3 text-end text-edu-ink tabular-nums sm:table-cell">{student.score}</td>
+                  <td className="px-3 text-edu-ink">
                     <AccuracyBar value={student.accuracy} />
                   </td>
-                  <td className="px-3 text-end text-neo-white tabular-nums">{student.wordsLearned}</td>
+                  <td className="px-3 text-end text-edu-ink tabular-nums">{student.wordsLearned}</td>
                 </tr>
               ))}
             </tbody>

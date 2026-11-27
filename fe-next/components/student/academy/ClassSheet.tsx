@@ -48,7 +48,7 @@ export function ClassSheet({ classroomId, userId, className, onClose, reducedMot
         initial={reducedMotion ? false : { y: 40, scale: 0.97 }}
         animate={{ y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 320, damping: 26 }}
-        className="relative m-3 flex max-h-[80dvh] w-full max-w-lg flex-col rounded-neo border-3 border-neo-cream bg-neo-navy shadow-hard-lg"
+        className="relative m-3 flex max-h-[80dvh] w-full max-w-lg flex-col rounded-neo border-3 border-edu-line bg-edu-surface shadow-hard-lg"
       >
         <div className="flex items-center justify-between gap-3 border-b-3 border-neo-black bg-neo-lime px-4 py-3">
           <div className="min-w-0">
@@ -78,7 +78,7 @@ export function ClassSheet({ classroomId, userId, className, onClose, reducedMot
           ) : visibility === 'hidden' ? (
             <p
               data-testid="class-sheet-standings-off"
-              className="mt-3 flex items-start gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-3 font-neo-body text-sm font-bold text-neo-cream"
+              className="mt-3 flex items-start gap-2 rounded-neo border-2 border-edu-line bg-edu-surface p-3 font-neo-body text-sm font-bold text-edu-ink"
             >
               <EyeOff className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
               {t('student.dashboard.leaderboardOff')}

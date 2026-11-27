@@ -52,7 +52,7 @@ const TILE_TONES = [
  * vanishes — so these keep a cream border to stay visibly a control, and the
  * ink sits at 70% (8.4:1) rather than the 25-45% that fell under AA.
  */
-const MUTED_TILE = 'bg-neo-navy-light text-neo-cream border-neo-cream';
+const MUTED_TILE = 'bg-edu-surface text-edu-ink border-edu-line';
 
 export function MissGapRoundView({
   round,
@@ -106,7 +106,7 @@ export function MissGapRoundView({
     <div className="flex flex-col flex-1 min-h-0 gap-3">
       {/* Timer bar — a shrinking strip reads faster than a number on a phone. */}
       <div
-        className="h-3 w-full rounded-neo border-[2px] border-neo-cream bg-neo-navy-light overflow-hidden shrink-0"
+        className="h-3 w-full rounded-neo border-[2px] border-edu-line bg-edu-surface overflow-hidden shrink-0"
         role="timer"
         aria-label={t('education.homework.timeLeft', { seconds: Math.ceil(secondsLeft) })}
       >
@@ -134,14 +134,14 @@ export function MissGapRoundView({
       <div className="shrink-0 lg:flex lg:flex-col lg:justify-center">
         <p
           data-testid="miss-gap-round-prompt"
-          className="text-neo-cyan font-bold text-xs uppercase tracking-widest"
+          className="text-edu-cyan-ink font-bold text-xs uppercase tracking-widest"
         >
           {prompt}
         </p>
         {round.kind === 'meaning' || round.kind === 'spell' ? (
           <p
             data-testid="miss-gap-round-word"
-            className="text-neo-white font-neo-display font-bold text-3xl lg:text-5xl leading-tight break-words"
+            className="text-edu-ink font-neo-display font-bold text-3xl lg:text-5xl leading-tight break-words"
           >
             {/* A spell round hides the word ONLY when a definition is there to
                 go on. With no definition there is nothing to recall from, so
@@ -151,12 +151,12 @@ export function MissGapRoundView({
               : round.word}
           </p>
         ) : (
-          <p className="text-neo-cream font-neo-body text-sm">
+          <p className="text-edu-ink font-neo-body text-sm">
             {t('education.homework.promptSpellingHint')}
           </p>
         )}
         {round.kind === 'spell' && round.hint ? (
-          <p className="text-neo-cream font-neo-body text-sm mt-1">{round.hint}</p>
+          <p className="text-edu-ink font-neo-body text-sm mt-1">{round.hint}</p>
         ) : null}
       </div>
 
@@ -187,7 +187,7 @@ export function MissGapRoundView({
                       ? 'bg-neo-lime text-neo-black border-neo-black'
                       : spelled[i]
                         ? 'bg-neo-cyan text-neo-black border-neo-black'
-                        : 'bg-neo-navy text-neo-cream border-neo-cream',
+                        : 'bg-edu-surface text-edu-ink border-edu-line',
                   )}
                 >
                   {locked ? letter : (spelled[i] ?? '')}
@@ -286,10 +286,10 @@ export function MissGapRoundView({
             'font-neo-display font-bold',
             locked ? 'text-xl' : 'text-base',
             !locked
-              ? 'text-neo-cream'
+              ? 'text-edu-ink'
               : outcome === 'correct'
-                ? 'text-neo-lime'
-                : 'text-neo-cream',
+                ? 'text-edu-lime-ink'
+                : 'text-edu-ink',
           )}
         >
           {!locked

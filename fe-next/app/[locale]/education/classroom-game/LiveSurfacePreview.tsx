@@ -59,7 +59,7 @@ function StagePreview({ stage }: { stage: string }) {
 
   if (stage === 'wordcraft') return modeSet ? <InGamePreview /> : null;
   return (
-    <div className="fixed inset-0 z-[80] flex items-stretch justify-center gap-6 bg-neo-navy p-8">
+    <div className="fixed inset-0 z-[80] flex items-stretch justify-center gap-6 bg-edu-page p-8">
       {stage === 'wheel' && (
         <ProjectorWheel puzzle={{ centerLetter: 'r', outerLetters: ['s', 't', 'o', 'm', 'a', 'i'], allLetters: ['r', 's', 't', 'o', 'm', 'a', 'i'] }} label={t('eduLiveRoom.round.wheelLabel')} />
       )}
@@ -113,19 +113,19 @@ function WaitingPreview() {
   }, [arrived, roster.length]);
   const classmates = roster.slice(0, arrived);
   return (
-    <div className="fixed inset-0 z-[80] flex flex-col bg-neo-navy">
+    <div className="fixed inset-0 z-[80] flex flex-col bg-edu-page">
       <EduStudentLobby
         username="Maya"
         avatar={<Avatar userId="Maya" size="2xl" className="!h-full !w-full" />}
         onEditAvatar={() => toast('Preview: avatar builder')}
-        nameSlot={<h2 className="truncate text-xl font-black text-neo-cream">Maya</h2>}
+        nameSlot={<h2 className="truncate text-xl font-black text-edu-ink">Maya</h2>}
         readySlot={
           <button
             type="button"
             onClick={() => setReady((v) => !v)}
             className={`focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan ${ready
               ? 'w-full rounded-neo border-3 border-neo-black bg-neo-lime py-3 font-black uppercase text-neo-black shadow-hard'
-              : 'w-full rounded-neo border-3 border-neo-lime bg-neo-navy py-3 font-black uppercase text-neo-lime shadow-hard'}`}
+              : 'w-full rounded-neo border-3 border-neo-lime bg-edu-surface py-3 font-black uppercase text-edu-lime-ink shadow-hard'}`}
           >
             {ready ? t('playerView.readyConfirmed') : t('playerView.readyUp')}
           </button>

@@ -70,7 +70,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
       <div className="flex flex-col gap-5 py-2 sm:gap-6">
         <div className="flex items-center gap-3">
           <EduMascot moment="success" size={96} className="size-14 shrink-0 drop-shadow-[3px_3px_0_rgb(var(--neo-black))] sm:size-20" />
-          <h1 data-wipe className="font-neo-display text-4xl font-black leading-none text-neo-cream sm:text-5xl">{t('eduShell.setup.title')}</h1>
+          <h1 data-wipe className="font-neo-display text-4xl font-black leading-none text-edu-ink sm:text-5xl">{t('eduShell.setup.title')}</h1>
         </div>
 
         <div className="flex flex-col gap-2">
@@ -116,11 +116,11 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
             <div id="setup-advanced" className="flex flex-col gap-4 max-sm:[&_p[id$='-hint']]:hidden">
               {own ? <SetupOwnWordsField own={own} t={t} /> : null}
               {ownCount !== null ? (
-                <p data-testid="setup-own-list-hint" className="font-neo-body text-sm font-semibold text-neo-cream/80">
+                <p data-testid="setup-own-list-hint" className="font-neo-body text-sm font-semibold text-edu-ink/80">
                   {t('eduShell.setup.ownWords.listHint', { count: ownCount })}
                 </p>
               ) : (
-                <p data-testid="setup-starter-list-hint" className="font-neo-body text-sm font-semibold text-neo-cream/80">
+                <p data-testid="setup-starter-list-hint" className="font-neo-body text-sm font-semibold text-edu-ink/80">
                   {t('eduShell.setup.starterListHint', { name: t(props.pack.nameKey) })}
                 </p>
               )}
@@ -164,7 +164,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
         </div>
 
         {errorKey ? (
-          <p role="alert" className="font-neo-body text-base font-bold text-neo-pink">
+          <p role="alert" className="font-neo-body text-base font-bold text-edu-pink-ink">
             {t(errorKey)}
           </p>
         ) : null}
@@ -206,7 +206,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
           {t('eduShell.setup.skip')}
         </Link>
         {cap ? (
-          <p data-testid="setup-cap-meter" className="font-neo-body text-xs font-bold text-neo-cream/75">
+          <p data-testid="setup-cap-meter" className="font-neo-body text-xs font-bold text-edu-ink/75">
             {t('eduShell.setup.capMeter', { count: cap.count, limit: cap.limit })}
           </p>
         ) : null}

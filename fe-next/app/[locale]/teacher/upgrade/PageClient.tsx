@@ -160,7 +160,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
           href={`/${language}/legal/${page}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="text-edu-cyan-ink hover:text-edu-lime-ink font-bold text-xs underline transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           {t(page === 'terms' ? 'legal.termsOfService' : page === 'refund' ? 'legal.refundPolicy' : 'legal.privacyPolicy')}
           <span className="sr-only"> ({t('common.opensInNewTab')})</span>
@@ -187,7 +187,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
         'min-h-11 flex-1 rounded-neo border-2 px-4 font-neo-display text-sm font-black transition-colors sm:flex-none sm:px-6',
         tab === value
           ? 'border-neo-black bg-neo-lime text-neo-black shadow-hard-sm'
-          : 'border-neo-cream/40 bg-neo-navy-light text-neo-white hover:border-neo-lime',
+          : 'border-edu-line bg-edu-surface text-edu-ink hover:border-neo-lime',
       )}
     >
       {label}
@@ -197,9 +197,9 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
   const legalFooter = (
     <div
       data-testid="upgrade-footer"
-      className="hidden lg:block shrink-0 border-t border-neo-cream/20 mt-8 pt-3 pb-3 px-4 text-center"
+      className="hidden lg:block shrink-0 border-t border-edu-line/20 mt-8 pt-3 pb-3 px-4 text-center"
     >
-      <p className="text-neo-white/70 font-bold text-xs mb-1.5">{t('teacher.subscription.legalNote')}</p>
+      <p className="text-edu-ink/70 font-bold text-xs mb-1.5">{t('teacher.subscription.legalNote')}</p>
       <div className="flex flex-wrap justify-center gap-3">{legalLinks}</div>
     </div>
   );
@@ -210,14 +210,14 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
       chromeFree={publicVisitor}
       header={publicVisitor ? <LandingHeader /> : undefined}
       contentClassName={cn('w-full px-4 lg:px-6', isRTL && 'rtl')}
-      className="bg-neo-navy"
+      className="bg-edu-surface"
     >
       <div ref={revealRef} className="mx-auto max-w-6xl pb-8 pt-4 lg:pt-6">
         {resolvingPlan ? (
           <PlanCardsSkeleton />
         ) : viewer === 'pro' ? (
           <>
-            <h1 className="mb-4 font-neo-poster text-2xl font-extrabold tracking-[-0.01em] text-neo-white [overflow-wrap:anywhere] md:text-3xl">{t('eg2Pro.tools.plansTitle')}</h1>
+            <h1 className="mb-4 font-neo-poster text-2xl font-extrabold tracking-[-0.01em] text-edu-ink [overflow-wrap:anywhere] md:text-3xl">{t('eg2Pro.tools.plansTitle')}</h1>
             <ProPlanPanel
               status={status}
               source={source}
@@ -229,7 +229,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
               included={proFeatures}
             />
             <section data-testid="pro-tools" className="mt-8">
-              <h2 className="mb-3 font-neo-poster text-xl font-extrabold tracking-[-0.01em] text-neo-white [overflow-wrap:anywhere] md:text-2xl">{t('eg2Pro.tools.title')}</h2>
+              <h2 className="mb-3 font-neo-poster text-xl font-extrabold tracking-[-0.01em] text-edu-ink [overflow-wrap:anywhere] md:text-2xl">{t('eg2Pro.tools.title')}</h2>
               <ParentReportPack />
             </section>
             <UpgradeFaq />
@@ -239,15 +239,15 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
             <div ref={tabsRef} className="mb-4 flex flex-col gap-3 scroll-mt-4 lg:flex-row lg:items-end lg:justify-between">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
-                  <p data-testid="upgrade-value-eyebrow" className="text-xs font-black uppercase tracking-widest text-neo-cyan">
+                  <p data-testid="upgrade-value-eyebrow" className="text-xs font-black uppercase tracking-widest text-edu-cyan-ink">
                     {t('teacher.subscription.proPlanName')}
                   </p>
-                  <TeacherProofLine className="flex items-center gap-1.5 text-xs font-bold text-neo-white/85" />
+                  <TeacherProofLine className="flex items-center gap-1.5 text-xs font-bold text-edu-ink/85" />
                 </div>
-                <h1 className="font-neo-poster text-2xl font-extrabold tracking-[-0.01em] text-neo-white [overflow-wrap:anywhere] md:text-3xl" style={{ textWrap: 'balance' }}>
+                <h1 className="font-neo-poster text-2xl font-extrabold tracking-[-0.01em] text-edu-ink [overflow-wrap:anywhere] md:text-3xl" style={{ textWrap: 'balance' }}>
                   {t('teacher.subscription.upgradePricingTitle')}
                 </h1>
-                <p data-testid="upgrade-value-prop" className="mt-0.5 text-sm font-bold text-neo-lime">
+                <p data-testid="upgrade-value-prop" className="mt-0.5 text-sm font-bold text-edu-lime-ink">
                   {t('teacher.subscription.valueHeadline')}
                 </p>
               </div>
@@ -260,7 +260,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
             {tab === 'teacher' ? (
               <div id="upgrade-panel-teacher" role="tabpanel" aria-labelledby="upgrade-tab-teacher" data-testid="upgrade-hero-section">
                 {blockedInApp ? (
-                  <p data-testid="upgrade-not-in-app" className="rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-4 text-center text-sm font-bold text-neo-white shadow-hard-lg">
+                  <p data-testid="upgrade-not-in-app" className="rounded-neo-xl border-[3px] border-edu-line bg-edu-surface p-4 text-center text-sm font-bold text-edu-ink shadow-hard-lg">
                     {t('teacher.subscription.notInApp')}
                   </p>
                 ) : (
@@ -299,12 +299,12 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                   }
                 />
                 )}
-                <p className="mt-3 text-center text-xs font-bold text-neo-white/70">
+                <p className="mt-3 text-center text-xs font-bold text-edu-ink/70">
                   {t('eduPlans.cards.liveCapNote', { players: MAX_PLAYERS_PER_ROOM })}
                 </p>
                 <UpgradeYourClasses classes={classrooms} />
                 <div data-testid="upgrade-legal-inline" className="lg:hidden mt-3 text-center">
-                  <p className="text-neo-white/70 font-bold text-xs mb-1">{t('teacher.subscription.legalNote')}</p>
+                  <p className="text-edu-ink/70 font-bold text-xs mb-1">{t('teacher.subscription.legalNote')}</p>
                   <div className="flex flex-wrap justify-center gap-3">{legalLinks}</div>
                 </div>
                 <div data-tm className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
@@ -312,10 +312,10 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                     <div
                       key={label}
                       data-testid="trust-chip"
-                      className="flex items-center gap-2 rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 py-2 shadow-hard"
+                      className="flex items-center gap-2 rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 py-2 shadow-hard"
                     >
-                      <Icon className="h-4 w-4 shrink-0 text-neo-lime" strokeWidth={2.5} aria-hidden />
-                      <span className="text-xs font-bold leading-snug text-neo-white">{label}</span>
+                      <Icon className="h-4 w-4 shrink-0 text-edu-lime-ink" strokeWidth={2.5} aria-hidden />
+                      <span className="text-xs font-bold leading-snug text-edu-ink">{label}</span>
                     </div>
                   ))}
                 </div>

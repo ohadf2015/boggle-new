@@ -263,13 +263,13 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
   if (!deal.seeded) {
     return (
       <AcademyModeFrame title={title} onBack={onBack} accent="yellow" theme="workshop" testId="workshop-screen">
-        <div data-testid="workshop-unsupported" className="flex w-full max-w-md flex-col items-center rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated p-6 text-center shadow-hard-lg">
+        <div data-testid="workshop-unsupported" className="flex w-full max-w-md flex-col items-center rounded-neo border-[3px] border-edu-line bg-edu-surface p-6 text-center shadow-hard-lg">
           {/* eslint-disable-next-line @next/next/no-img-element -- static art */}
           <img src={ACADEMY_ART.wordcraft} alt="" className="mb-3 h-28 w-28 object-contain opacity-80 drop-shadow-[4px_4px_0_rgb(var(--neo-black))]" />
-          <h2 className="mb-2 font-neo-display text-2xl font-black text-neo-white">
+          <h2 className="mb-2 font-neo-display text-2xl font-black text-edu-ink">
             {t('academy.modes.workshop.unsupportedTitle', 'The workshop is still learning this language')}
           </h2>
-          <p className="mb-5 font-neo-body text-neo-cream/85">
+          <p className="mb-5 font-neo-body text-edu-ink/85">
             {t('academy.modes.workshop.unsupportedBody', "Word Workshop doesn't have letter tiles for this lesson's language yet. Try the lesson's other games!")}
           </p>
           <button type="button" data-testid="workshop-back" onClick={onBack} className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', primaryButtonClass, 'w-full')}>
@@ -285,7 +285,7 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
   if (phase.name === 'playing') {
     if (gameViewFailed) throw new Error('Word Workshop: game view chunk failed to load');
     return (
-      <div ref={gameRef} className="fixed inset-0 z-50 overflow-hidden bg-neo-navy [--wk-col:760px]" data-testid="workshop-game" data-academy-workshop="">
+      <div ref={gameRef} className="fixed inset-0 z-50 overflow-hidden bg-edu-page [--wk-col:760px]" data-testid="workshop-game" data-academy-workshop="">
         <WorkshopBoardSkin reduce={reduce} />
         <AcademyScene theme="workshop" dim={0.62}>
           {WordCraftGameView ? (
@@ -404,7 +404,7 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
                   )}
                   {missedReview}
                   {recordFailed && (
-                    <p data-testid="workshop-xp-not-saved" className="font-neo-body text-xs text-neo-pink lg:text-lg">
+                    <p data-testid="workshop-xp-not-saved" className="font-neo-body text-xs text-edu-pink-ink lg:text-lg">
                       {t('academy.modes.xpNotSaved', "Couldn't save XP this time. Play again to try once more.")}
                     </p>
                   )}
@@ -421,8 +421,8 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
           ) : (
             <div className="relative flex h-full w-full max-w-md flex-col items-center justify-center gap-4 text-center lg:max-w-3xl">
               <WorkshopRival mood={rival.mood} taunt={{ key: 'academy.modes.workshop.rival.gloat', en: 'My workshop, my rules!' }} bubbleSide="below" />
-              <h2 className="font-neo-display text-3xl font-black uppercase text-neo-white lg:text-7xl" style={{ textShadow: '3px 3px 0 rgb(var(--neo-black))' }}>{verdict}</h2>
-              <p data-testid="workshop-nudge" className="font-neo-body text-base text-neo-cream lg:text-2xl">
+              <h2 className="font-neo-display text-3xl font-black uppercase text-edu-ink lg:text-7xl" style={{ textShadow: '3px 3px 0 rgb(var(--neo-black))' }}>{verdict}</h2>
+              <p data-testid="workshop-nudge" className="font-neo-body text-base text-edu-ink lg:text-2xl">
                 {t('academy.modes.workshop.nudge', 'Build at least one lesson word (or 3 words) to earn the chest. You got this!')}
               </p>
               <div className="flex w-full gap-2 lg:gap-4">{actions}</div>

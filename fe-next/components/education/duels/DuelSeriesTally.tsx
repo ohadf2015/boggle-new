@@ -39,7 +39,7 @@ const PIP_CLASS: Record<PipResult, string> = {
   win: 'bg-neo-lime',
   loss: 'bg-neo-pink',
   draw: 'bg-neo-cyan',
-  pending: 'bg-neo-navy',
+  pending: 'bg-edu-surface',
 };
 
 export function DuelSeriesTally({ series, status, className }: DuelSeriesTallyProps) {
@@ -76,7 +76,7 @@ export function DuelSeriesTally({ series, status, className }: DuelSeriesTallyPr
       </div>
       <p
         data-testid="duel-series-label"
-        className="font-neo-body text-xs font-black uppercase tracking-widest text-neo-cream/85"
+        className="font-neo-body text-xs font-black uppercase tracking-widest text-edu-ink/85"
       >
         {label}
       </p>

@@ -56,14 +56,14 @@ export function TreasureChestTicker({ chestEvents, t }: TreasureChestTickerProps
       className={cn(
         // Above the host control bar (fixed to the bottom of the projector).
         'fixed bottom-32 inset-x-4 z-[70] mx-auto w-fit max-w-3xl',
-        'rounded-neo border-[3px] bg-neo-navy-elevated px-6 py-3 shadow-hard',
+        'rounded-neo border-[3px] bg-edu-surface px-6 py-3 shadow-hard',
         latest.outcome === 'steal' ? 'border-neo-pink' : 'border-neo-cyan'
       )}
     >
       <p
         className={cn(
           'font-neo-display font-bold text-2xl md:text-4xl text-center',
-          latest.outcome === 'steal' ? 'text-neo-pink' : 'text-neo-cyan'
+          latest.outcome === 'steal' ? 'text-edu-pink-ink' : 'text-edu-cyan-ink'
         )}
       >
         {label}

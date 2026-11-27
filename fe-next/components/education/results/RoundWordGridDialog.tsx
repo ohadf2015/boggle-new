@@ -132,7 +132,7 @@ export function RoundWordGridDialog({ language, round, proLabel = 'Pro', offer, 
                     rel="noopener noreferrer"
                     data-testid="round-grid-cta"
                     onClick={offer.onClick}
-                    className={cn(ACTION, 'bg-neo-pink text-neo-white')}
+                    className={cn(ACTION, 'bg-neo-pink text-edu-ink')}
                   >
                     <Sparkles className="size-4 shrink-0" aria-hidden="true" />
                     {offer.label}

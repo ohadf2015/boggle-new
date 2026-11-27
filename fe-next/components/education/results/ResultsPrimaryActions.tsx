@@ -36,7 +36,7 @@ import { HardestWordsInsight } from './HardestWordsInsight';
  * original cyan chip with a black edge.
  */
 const QUIET_LINK =
-  'self-center flex min-h-11 items-center justify-center gap-1.5 px-3 py-1 font-neo-body font-bold text-sm text-neo-cream rounded-neo border-[2px] border-neo-cream/60 hover:border-neo-cream transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
+  'self-center flex min-h-11 items-center justify-center gap-1.5 px-3 py-1 font-neo-body font-bold text-sm text-edu-ink rounded-neo border-[2px] border-edu-line hover:border-edu-line transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
 const LOUD_LINK =
   'self-center flex min-h-11 items-center justify-center gap-2 px-3 py-2 font-neo-body font-bold text-sm bg-neo-cyan text-neo-black border-[2px] border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
@@ -98,7 +98,7 @@ export function ResultsPrimaryActions({
             'flex items-center justify-center gap-2 px-4 py-4 font-neo-display font-bold text-lg',
             'bg-neo-yellow text-neo-black border-[3px] border-neo-black rounded-neo',
             'min-h-11 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition',
-            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface'
           )}
         >
           <RotateCcw className="w-6 h-6 shrink-0" aria-hidden />

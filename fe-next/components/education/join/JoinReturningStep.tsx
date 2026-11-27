@@ -24,11 +24,11 @@ export function JoinReturningStep({ name, leaving, leaveFailed, onYes, onNotMe }
       <div>
         <h1
           id="join-returning-title"
-          className="font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-neo-white short:text-3xl sm:text-5xl lg:text-6xl"
+          className="font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-edu-ink short:text-3xl sm:text-5xl lg:text-6xl"
         >
           {name ? t(`${K}.returning.title`, { name }) : t(`${K}.returning.titleNoName`)}
         </h1>
-        <p className="mt-2 font-neo-body text-base font-bold text-neo-cyan short:mt-1 short:text-sm lg:text-lg">
+        <p className="mt-2 font-neo-body text-base font-bold text-edu-cyan-ink short:mt-1 short:text-sm lg:text-lg">
           {t(`${K}.returning.sub`)}
         </p>
       </div>

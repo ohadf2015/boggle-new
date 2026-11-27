@@ -36,10 +36,10 @@ export function StudentMissedWords({ words, definitions, language, t, onPractice
   return (
     <section
       data-testid="student-missed-words"
-      className={cn('rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-3 py-2 shadow-hard', className)}
+      className={cn('rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 py-2 shadow-hard', className)}
     >
       <div className="mb-1.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
-        <h3 className="min-w-0 font-neo-display text-sm font-black uppercase leading-tight tracking-wide text-neo-yellow">
+        <h3 className="min-w-0 font-neo-display text-sm font-black uppercase leading-tight tracking-wide text-edu-yellow-ink">
           {t('eduStudent.results.missedTitle')}
         </h3>
         {onPractice && (
@@ -80,7 +80,7 @@ export function StudentMissedWords({ words, definitions, language, t, onPractice
               <Volume2 aria-hidden="true" className="size-4 text-neo-navy/70" />
             </button>
             {definition && (
-              <span data-testid="missed-word-definition" dir="auto" className="min-w-0 flex-1 font-neo-body text-sm leading-snug text-neo-cream/90">
+              <span data-testid="missed-word-definition" dir="auto" className="min-w-0 flex-1 font-neo-body text-sm leading-snug text-edu-ink/90">
                 {definition}
               </span>
             )}

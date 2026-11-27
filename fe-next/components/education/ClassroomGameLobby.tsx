@@ -321,7 +321,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
       }
     >
       {startError && (
-        <div role="alert" data-testid="create-room-error" className="mb-4 rounded-neo border-[3px] border-neo-pink bg-neo-navy-light px-4 py-3 text-center font-bold text-neo-white">
+        <div role="alert" data-testid="create-room-error" className="mb-4 rounded-neo border-[3px] border-neo-pink bg-edu-surface px-4 py-3 text-center font-bold text-edu-ink">
           <span className="block">{t(startError)}</span>
           <button
             type="button"

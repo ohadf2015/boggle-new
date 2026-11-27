@@ -9,7 +9,7 @@ const BORDER = {
   cyan: 'border-neo-cyan',
   lime: 'border-neo-lime',
   purple: 'border-neo-purple',
-  white: 'border-neo-white',
+  white: 'border-edu-line',
 } as const;
 
 interface VocabQuizMascotFaceProps {
@@ -32,7 +32,7 @@ export function VocabQuizMascotFace({ face, className, shape = 'circle', border 
         'pointer-events-none block shrink-0 overflow-hidden border-[3px] p-[8%]',
         shape === 'circle' ? 'rounded-full' : 'rounded-neo',
         BORDER[border],
-        bg === 'navy' ? 'bg-neo-navy' : 'bg-neo-navy-elevated',
+        bg === 'navy' ? 'bg-edu-surface' : 'bg-edu-surface',
         className
       )}
     >

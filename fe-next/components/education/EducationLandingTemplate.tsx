@@ -45,7 +45,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
         {footerCta.highlight && (
           <>
             <br />
-            <span className={`bg-neo-navy px-3 ${a.text}`}>{footerCta.highlight}</span>
+            <span className={`bg-edu-surface px-3 ${a.text}`}>{footerCta.highlight}</span>
           </>
         )}
       </h2>
@@ -56,7 +56,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
             key={cta.href}
             href={`/${locale}${cta.href}`}
             className={`rounded-neo border-4 border-neo-black px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider sm:text-lg ${
-              i === 0 ? `bg-neo-navy ${a.text} shadow-hard-lg` : 'bg-neo-cyan text-neo-navy shadow-hard'
+              i === 0 ? `bg-edu-surface ${a.text} shadow-hard-lg` : 'bg-neo-cyan text-neo-navy shadow-hard'
             } focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black`}
           >
             {cta.label}
@@ -67,7 +67,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
   ) : null;
 
   return (
-    <main className="relative isolate min-h-dvh overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
+    <main className="relative isolate min-h-dvh overflow-x-hidden bg-edu-page text-edu-ink texture-halftone">
       <AmbientBackdrop theme="student" className="max-lg:hidden bottom-auto h-dvh" />
       {jsonLd.map((node) => (
         <JsonLd key={node['@id']} data={node} />
@@ -95,7 +95,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
             <span className={a.text}>{hero.h1.part2}</span>
           </h1>
 
-          <p className="mt-7 max-w-[62ch] text-lg leading-relaxed text-neo-white/80 sm:text-xl">
+          <p className="mt-7 max-w-[62ch] text-lg leading-relaxed text-edu-ink/80 sm:text-xl">
             {hero.subtitle}
           </p>
 
@@ -104,7 +104,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
               asChild
               lip={6}
               data-hero-primary
-              className={`rounded-neo border-4 border-neo-black ${a.fill} ${a.ink} px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white`}
+              className={`rounded-neo border-4 border-neo-black ${a.fill} ${a.ink} px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line`}
             >
             <Link href={`/${locale}${hero.primaryCta.href}`}>
               <span className="block text-base sm:text-lg">{hero.primaryCta.label}</span>
@@ -120,7 +120,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
               <PressSurface
                 asChild
                 lip={2}
-                className="rounded-neo border-3 border-neo-cream/40 bg-transparent px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-neo-cream/30 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white"
+                className="rounded-neo border-3 border-edu-line bg-transparent px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-edu-ink shadow-edu-line focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line"
               >
               <Link href={`/${locale}${hero.secondaryCta.href}`}>
                 <span className="block text-base sm:text-lg">{hero.secondaryCta.label}</span>
@@ -135,7 +135,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
           </div>
 
           {hero.facts.length > 0 && (
-            <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs font-bold uppercase tracking-widest text-neo-white/60">
+            <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs font-bold uppercase tracking-widest text-edu-ink/60">
               {hero.facts.map((f) => (
                 <li key={f}>{f}</li>
               ))}
@@ -151,7 +151,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
         {heroBanner?.subtitle && heroBanner.subtitle !== hero.subtitle && (
           <section className="mt-14 max-w-3xl">
             <h2 className="font-neo-display text-2xl font-black uppercase leading-tight sm:text-3xl">{heroBanner.title}</h2>
-            <p className="mt-3 text-base leading-relaxed text-neo-white/80 sm:text-lg">{heroBanner.subtitle}</p>
+            <p className="mt-3 text-base leading-relaxed text-edu-ink/80 sm:text-lg">{heroBanner.subtitle}</p>
           </section>
         )}
 
@@ -163,12 +163,12 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
         {answer && (
           <section
             data-answer
-            className={`mt-16 rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-lg sm:p-8`}
+            className={`mt-16 rounded-neo border-4 border-edu-line bg-edu-surface p-6 shadow-hard-lg sm:p-8`}
           >
             <h2 className="font-neo-display text-xl font-black leading-tight sm:text-2xl">
               {answer.question}
             </h2>
-            <p className="mt-4 max-w-[70ch] text-base leading-relaxed text-neo-white/85 sm:text-lg">
+            <p className="mt-4 max-w-[70ch] text-base leading-relaxed text-edu-ink/85 sm:text-lg">
               {answer.answer}
             </p>
           </section>

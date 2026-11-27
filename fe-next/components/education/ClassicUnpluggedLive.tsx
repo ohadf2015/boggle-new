@@ -139,15 +139,15 @@ export function ClassicUnpluggedLive({
     return (
       <div
         data-testid="classic-unplugged-live"
-        className="fixed inset-0 z-40 overflow-hidden bg-neo-navy flex items-center justify-center px-4"
+        className="fixed inset-0 z-40 overflow-hidden bg-edu-page flex items-center justify-center px-4"
       >
         <ClassicUnpluggedExitLink
           href={homeHref}
           label={t('education.results.classicUnpluggedExit')}
           className="absolute top-3 start-3"
         />
-        <div className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-cream bg-neo-navy-light shadow-hard text-center">
-          <p className="text-neo-white font-neo-body mb-4">{t(classGapCardKind(payload) === 'sweep' ? 'education.results.allFound' : 'eg2Fix.gap.empty')}</p>
+        <div className="w-full max-w-xl p-6 rounded-neo border-neo border-edu-line bg-edu-surface shadow-hard text-center">
+          <p className="text-edu-ink font-neo-body mb-4">{t(classGapCardKind(payload) === 'sweep' ? 'education.results.allFound' : 'eg2Fix.gap.empty')}</p>
           <Link
             href={homeHref}
             className="inline-flex items-center justify-center px-4 py-3 font-bold bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
@@ -163,7 +163,7 @@ export function ClassicUnpluggedLive({
     <div
       data-testid="classic-unplugged-live"
       data-phase={run.state.phase}
-      className="fixed inset-0 z-40 overflow-hidden bg-neo-navy flex flex-col"
+      className="fixed inset-0 z-40 overflow-hidden bg-edu-page flex flex-col"
     >
       <UnpluggedHud
         lesson={lesson}

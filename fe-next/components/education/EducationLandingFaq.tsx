@@ -12,16 +12,16 @@ export function EducationLandingFaq({ locale, items }: { locale: string; items: 
         className="lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start lg:gap-12"
       >
         <div data-testid="landing-faq-aside" className="lg:sticky lg:top-24">
-          <h2 className="text-balance font-neo-poster text-2xl font-extrabold leading-tight tracking-[-0.01em] text-neo-white [overflow-wrap:anywhere] sm:text-3xl lg:text-4xl">
+          <h2 className="text-balance font-neo-poster text-2xl font-extrabold leading-tight tracking-[-0.01em] text-edu-ink [overflow-wrap:anywhere] sm:text-3xl lg:text-4xl">
             {translateKey('eg2Land.faq.title', locale, 'Teacher questions')}
           </h2>
-          <p className="mt-3 max-w-[40ch] text-base leading-relaxed text-neo-white/75">
+          <p className="mt-3 max-w-[40ch] text-base leading-relaxed text-edu-ink/75">
             {translateKey('eg2Land.faq.intro', locale, 'Short answers to what teachers ask before their first class.')}
           </p>
           <Link
             href={`/${locale}/education/help`}
             data-testid="landing-faq-help"
-            className="group/help mt-3 inline-flex min-h-11 items-center gap-1.5 font-bold text-neo-cyan underline decoration-2 underline-offset-4 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="group/help mt-3 inline-flex min-h-11 items-center gap-1.5 font-bold text-edu-cyan-ink underline decoration-2 underline-offset-4 hover:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             {translateKey('eg2Land.faq.helpLink', locale, 'More answers in the help center')}
             <ArrowRight

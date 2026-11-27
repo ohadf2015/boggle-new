@@ -163,7 +163,7 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
                   aria-label={t('academy.student.reviewDueAria', '{count} words to review', { count: target.badge })}
                 >
                   <Medallion tone="pink" size={24} shadow={1}>
-                    <span className="font-neo-display text-xs font-black leading-none text-neo-white [text-shadow:0_1px_0_#000]">{target.badge}</span>
+                    <span className="font-neo-display text-xs font-black leading-none text-edu-ink [text-shadow:0_1px_0_#000]">{target.badge}</span>
                   </Medallion>
                 </span>
               )}
@@ -171,9 +171,9 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
           ) : (
             <Medallion tone="night" size={compact ? 40 : 48}>
               {kind === 'join-class' ? (
-                <UserPlus className="h-6 w-6 text-neo-yellow" strokeWidth={2.5} />
+                <UserPlus className="h-6 w-6 text-edu-yellow-ink" strokeWidth={2.5} />
               ) : kind === 'waiting' ? (
-                <Hourglass className="h-6 w-6 text-neo-yellow" strokeWidth={2.5} />
+                <Hourglass className="h-6 w-6 text-edu-yellow-ink" strokeWidth={2.5} />
               ) : (
                 <Sparkles className="h-6 w-6 fill-neo-yellow text-neo-black" strokeWidth={2} />
               )}
@@ -203,7 +203,7 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
         <span className="relative flex shrink-0">
           <Medallion tone="night" size={big ? 58 : compact ? 38 : 46} shadow={2}>
             {isJoining ? (
-              <Loader2 className="h-5 w-5 animate-spin text-neo-yellow" aria-hidden="true" />
+              <Loader2 className="h-5 w-5 animate-spin text-edu-yellow-ink" aria-hidden="true" />
             ) : (
               <DirectionalIcon icon={Play} mirror className={`h-5 w-5 fill-neo-yellow text-neo-black ${INK_TEXT}`} />
             )}

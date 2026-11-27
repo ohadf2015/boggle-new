@@ -77,7 +77,7 @@ const PLATE: Record<1 | 2 | 3, string> = {
 };
 
 /** Nobody scored: a plain slate block, so no metal hands out a place nobody earned. */
-const MUTED_PLATE = 'bg-neo-navy-light border-neo-cream/50 text-neo-cream';
+const MUTED_PLATE = 'bg-edu-surface border-edu-line text-edu-ink';
 
 const RIBBON: Record<1 | 2 | 3, string> = { 1: 'bg-neo-pink', 2: 'bg-neo-cyan', 3: 'bg-neo-purple' };
 
@@ -225,7 +225,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
           data-testid={revealed ? 'podium-avatar' : undefined}
           aria-hidden="true"
           className={cn(
-            'relative grid place-items-center overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy-light shadow-[0.4cqw_0.4cqw_0_rgb(var(--neo-black))] [&_svg]:h-full [&_svg]:w-full',
+            'relative grid place-items-center overflow-hidden rounded-full border-[3px] border-edu-line bg-edu-surface shadow-[0.4cqw_0.4cqw_0_rgb(var(--neo-black))] [&_svg]:h-full [&_svg]:w-full',
             winner && !muted ? 'ring-[0.4cqw] ring-neo-yellow' : ''
           )}
           style={{ width: winner ? '10cqw' : '8cqw', height: winner ? '10cqw' : '8cqw' }}
@@ -233,7 +233,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
           {revealed ? (
             <Avatar userId={entry.username} size="xl" disableEffects className="!h-full !w-full" />
           ) : (
-            <span className="font-neo-display font-black text-neo-cream" style={{ fontSize: '4cqw' }}>?</span>
+            <span className="font-neo-display font-black text-edu-ink" style={{ fontSize: '4cqw' }}>?</span>
           )}
         </span>
         <p
@@ -259,7 +259,7 @@ export function PodiumStage({ entries, stage = FINAL_STAGE, t, children, classNa
       data-muted={muted ? 'true' : undefined}
       dir="ltr"
       className={cn(
-        'relative mx-auto aspect-[1920/1086] w-full overflow-hidden rounded-neo-lg border-4 border-neo-cream bg-neo-navy shadow-hard-lg [container-type:inline-size]',
+        'relative mx-auto aspect-[1920/1086] w-full overflow-hidden rounded-neo-lg border-4 border-edu-line bg-edu-surface shadow-hard-lg [container-type:inline-size]',
         className
       )}
     >
@@ -292,7 +292,7 @@ export function PodiumStage({ entries, stage = FINAL_STAGE, t, children, classNa
       <div
         aria-hidden="true"
         data-testid="podium-floor"
-        className="absolute inset-x-0 bottom-0 border-t-[3px] border-t-neo-cream/50 bg-neo-navy-light"
+        className="absolute inset-x-0 bottom-0 border-t-[3px] border-t-edu-line bg-edu-surface"
         style={{ height: `${FLOOR}%` }}
       />
 

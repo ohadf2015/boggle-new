@@ -48,7 +48,7 @@ export function ProjectorBossStage({ remainingTime, trailing, style }: Projector
   const hud = cn('transition-opacity duration-700', (view.status === 'defeated' || view.status === 'escaped') && 'opacity-30');
 
   return (
-    <div data-testid="projector-boss-stage" className="relative isolate flex min-h-0 flex-1 overflow-hidden bg-neo-navy [container-type:size]" style={style}>
+    <div data-testid="projector-boss-stage" className="relative isolate flex min-h-0 flex-1 overflow-hidden bg-edu-page [container-type:size]" style={style}>
       <Image src={ARENA} alt="" fill priority sizes="100vw" className="-z-10 object-cover" />
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_42%,transparent_30%,rgb(8_10_30/0.82)_100%)]" aria-hidden="true" />
       <div className={cn('pointer-events-none absolute inset-0 -z-10 transition-colors duration-700', PHASE_TINT[view.phase - 1])} aria-hidden="true" />
@@ -58,7 +58,7 @@ export function ProjectorBossStage({ remainingTime, trailing, style }: Projector
         <div ref={shakeRef} className="relative h-full w-full">
           <header className="absolute inset-x-[22%] top-[1.6cqw] z-20">
             <div className="mb-[0.6cqw] flex items-end justify-between gap-[1cqw]">
-              <h1 dir="auto" className="truncate font-neo-display text-[3cqw] font-black uppercase leading-none tracking-wide text-neo-cream [text-shadow:0.22cqw_0.22cqw_0_rgb(var(--neo-black))]">
+              <h1 dir="auto" className="truncate font-neo-display text-[3cqw] font-black uppercase leading-none tracking-wide text-edu-ink [text-shadow:0.22cqw_0.22cqw_0_rgb(var(--neo-black))]">
                 {bossName}
               </h1>
               <PhasePips phase={view.phase} label={t('classroomBoss.phase', { n: view.phase })} />

@@ -123,10 +123,10 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
           data-testid="duel-rematch-offer"
           className={cn(
             'fixed z-50 bottom-6 inset-e-6 md:bottom-8 md:inset-e-8 w-full max-w-sm',
-            'rounded-neo border-[3px] border-neo-lime bg-neo-navy p-4 shadow-hard'
+            'rounded-neo border-[3px] border-neo-lime bg-edu-surface p-4 shadow-hard'
           )}
         >
-          <p className="font-neo-display text-base font-black uppercase italic tracking-tight text-neo-cream">
+          <p className="font-neo-display text-base font-black uppercase italic tracking-tight text-edu-ink">
             {t('education.duels.rematchWants', undefined, {
               name: rematchOffer.fromName || t('common.opponent'),
             })}
@@ -155,7 +155,7 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
               type="button"
               data-testid="duel-rematch-offer-dismiss"
               onClick={() => setRematchOffer(null)}
-              className="shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy p-2 text-neo-cream transition-colors hover:bg-neo-cream hover:text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+              className="shrink-0 rounded-neo border-[2px] border-edu-line bg-edu-surface p-2 text-edu-ink transition-colors hover:bg-neo-cream hover:text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
               aria-label={t('common.dismiss')}
             >
               <X className="h-5 w-5" />
@@ -179,22 +179,22 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
         >
           <div
             className={cn(
-              'p-4 rounded-neo border-[3px] border-neo-cream',
-              'bg-neo-navy shadow-hard',
+              'p-4 rounded-neo border-[3px] border-edu-line',
+              'bg-edu-surface shadow-hard',
               'flex items-center gap-4'
             )}
           >
             {/* Icon */}
             <div className="shrink-0">
-              <Swords className="w-8 h-8 text-neo-lime" />
+              <Swords className="w-8 h-8 text-edu-lime-ink" />
             </div>
 
             {/* Content */}
             <div className="flex-1">
-              <p className="text-neo-white font-bold mb-1">
+              <p className="text-edu-ink font-bold mb-1">
                 {t('challengeReceived')}
               </p>
-              <p className="text-neo-white text-sm">
+              <p className="text-edu-ink text-sm">
                 {t('challengedYou', { name: challenge.challengerName })}
               </p>
             </div>
@@ -203,7 +203,7 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
             <button
               type="button"
               onClick={handleDismiss}
-              className="shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy p-1.5 text-neo-cream transition-colors hover:bg-neo-cream hover:text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+              className="shrink-0 rounded-neo border-[2px] border-edu-line bg-edu-surface p-1.5 text-edu-ink transition-colors hover:bg-neo-cream hover:text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
               aria-label={t('common.dismiss')}
             >
               <X className="w-5 h-5" />

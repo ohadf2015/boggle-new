@@ -167,7 +167,7 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
               {!isFirst && (
                 <DirectionalIcon
                   icon={ChevronRight}
-                  className="w-4 h-4 text-neo-white shrink-0"
+                  className="w-4 h-4 text-edu-ink shrink-0"
                   aria-hidden="true"
                 />
               )}
@@ -176,7 +176,7 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
               {isLast ? (
                 <span
                   className={cn(
-                    'text-neo-cyan font-bold',
+                    'text-edu-cyan-ink font-bold',
                     'truncate max-w-[150px] sm:max-w-none'
                   )}
                   aria-current="page"
@@ -193,10 +193,10 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
                 <Link
                   href={item.href}
                   className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
-                    'text-neo-white hover:text-neo-white',
+                    'text-edu-ink hover:text-edu-ink',
                     'transition-colors duration-100',
                     'truncate max-w-[100px] sm:max-w-none',
-                    'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 focus:ring-offset-neo-navy rounded-sm'
+                    'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 focus:ring-offset-edu-surface rounded-sm'
                   )}
                 >
                   {isFirst && (

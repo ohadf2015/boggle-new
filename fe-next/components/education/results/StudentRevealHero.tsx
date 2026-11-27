@@ -89,7 +89,7 @@ export function StudentRevealHero({ rank, total, score, verdict, beat, rival, ga
         <div className="min-w-0 flex-1">
           <p
             data-testid="edu-student-headline"
-            className="inline-flex -rotate-2 rounded-neo bg-neo-navy px-2.5 py-1 font-neo-display text-sm font-black uppercase tracking-wide text-neo-lime shadow-hard-sm"
+            className="inline-flex -rotate-2 rounded-neo bg-edu-surface px-2.5 py-1 font-neo-display text-sm font-black uppercase tracking-wide text-edu-lime-ink shadow-hard-sm"
           >
             {t(headlineKey(rank, total, score))}
           </p>

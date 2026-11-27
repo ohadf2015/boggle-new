@@ -39,7 +39,7 @@ export function AssignmentLessonStep({
     <AssignmentStep step="list" n={1} label={t('teacher.assignment.lessonLabel')} headingId={headingId}>
       <div data-testid="assignment-lesson-picker" aria-busy={isLoading}>
         {isLoading ? (
-          <div className="h-20 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light motion-safe:animate-pulse" />
+          <div className="h-20 rounded-neo border-2 border-edu-line bg-edu-surface motion-safe:animate-pulse" />
         ) : (
           <LessonPicker
             mode="single"

@@ -141,10 +141,10 @@ export function WinnerSpotlight({
       data-active={String(active)}
       data-outcome={kind}
       className={cn(
-        'relative flex items-center gap-4 text-neo-white',
+        'relative flex items-center gap-4 text-edu-ink',
         quiet
-          ? cn('rounded-neo-lg border-[3px] shadow-hard-xl', lead ? 'border-neo-black bg-neo-pink' : 'border-neo-cream/50 bg-neo-navy-light')
-          : 'rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated shadow-hard',
+          ? cn('rounded-neo-lg border-[3px] shadow-hard-xl', lead ? 'border-neo-black bg-neo-pink' : 'border-edu-line bg-edu-surface')
+          : 'rounded-neo border-[2px] border-edu-line bg-edu-surface shadow-hard',
         projector
           ? quiet
             ? 'px-4 py-3 gap-4 @[96rem]/results:px-6 @[96rem]/results:py-4 @[137.5rem]/results:px-10 @[137.5rem]/results:py-6'
@@ -175,7 +175,7 @@ export function WinnerSpotlight({
           // nothing about hit-testing, and a capture run lost a lobby click to
           // `covered by <video>`. Nothing here is ever the target of a tap.
           'pointer-events-none shrink-0 overflow-hidden rounded-neo',
-          lead ? 'border-[3px] border-neo-black bg-neo-cream' : 'border-[2px] border-neo-cream bg-neo-navy',
+          lead ? 'border-[3px] border-neo-black bg-neo-cream' : 'border-[2px] border-edu-line bg-edu-surface',
           projector
             ? quiet
               ? 'w-20 h-20 @[96rem]/results:w-28 @[96rem]/results:h-28 @[137.5rem]/results:w-40 @[137.5rem]/results:h-40'
@@ -226,7 +226,7 @@ export function WinnerSpotlight({
             quiet ? 'tracking-normal' : 'uppercase tracking-widest',
             // 40% white on navy-elevated measured 3.50:1 — a smudge at the
             // back of a room, which is the only place this line is read from.
-            !active ? 'text-neo-white/75' : lead ? 'text-neo-white' : quiet ? 'text-neo-cream' : 'text-neo-yellow',
+            !active ? 'text-edu-ink/75' : lead ? 'text-edu-ink' : quiet ? 'text-edu-ink' : 'text-edu-yellow-ink',
             projector ? (quiet ? 'text-2xl @[96rem]/results:text-3xl @[137.5rem]/results:text-5xl' : 'text-3xl @[137.5rem]/results:text-5xl') : quiet ? 'text-base' : 'text-sm'
           )}
         >
@@ -236,7 +236,7 @@ export function WinnerSpotlight({
         {active && earned && (
           <p
             className={cn(
-              'mt-1 flex items-baseline gap-3 font-neo-display font-black text-neo-white truncate',
+              'mt-1 flex items-baseline gap-3 font-neo-display font-black text-edu-ink truncate',
               projector ? 'text-5xl @[137.5rem]/results:text-8xl' : 'text-2xl'
             )}
           >
@@ -249,7 +249,7 @@ export function WinnerSpotlight({
           <p
             data-testid="winner-zero-body"
             className={cn(
-              'mt-1 font-neo-body font-bold leading-snug text-neo-cream',
+              'mt-1 font-neo-body font-bold leading-snug text-edu-ink',
               projector ? (quiet ? 'text-lg @[96rem]/results:text-xl @[137.5rem]/results:text-4xl' : 'text-xl @[137.5rem]/results:text-4xl') : 'text-sm'
             )}
           >

@@ -16,7 +16,7 @@ const ROUNDS_SHOWN = 5;
 const ROUNDS_LISTED = 12;
 const ROW_H = 52;
 const PAGER_RESERVE = 64;
-const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-neo-cream/60 px-3 text-sm font-bold text-neo-cream hover:border-neo-cream disabled:opacity-40';
+const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-edu-line px-3 text-sm font-bold text-edu-ink hover:border-edu-line disabled:opacity-40';
 
 export interface RoundReportsProps {
   classroomId: string;
@@ -52,9 +52,9 @@ export function RoundReports({ classroomId, classroomName, onStudentClick, previ
 
   return (
     <section data-testid="round-reports" aria-labelledby="round-reports-title" className="space-y-3">
-      <h2 id="round-reports-title" className="font-neo-display text-xl font-black text-neo-white">{t('teacher.lastGame.previousGames')}</h2>
+      <h2 id="round-reports-title" className="font-neo-display text-xl font-black text-edu-ink">{t('teacher.lastGame.previousGames')}</h2>
       {!previewGames && fetched.isLoading ? (
-        <div className="h-32 animate-pulse rounded-neo bg-neo-cream/10 motion-reduce:animate-none" />
+        <div className="h-32 animate-pulse rounded-neo bg-edu-ink/10 motion-reduce:animate-none" />
       ) : !previewGames && fetched.error ? (
         <p role="alert" className="rounded-neo border-2 border-neo-black bg-neo-yellow px-3 py-2 text-sm font-bold text-neo-black">{t('teacher.lastGame.error')}</p>
       ) : (
@@ -64,7 +64,7 @@ export function RoundReports({ classroomId, classroomName, onStudentClick, previ
             type="button"
             data-testid="round-reports-back"
             onClick={() => setOpenCode(null)}
-            className="inline-flex min-h-10 items-center gap-2 rounded-neo border-2 border-neo-cream/60 px-3 text-sm font-bold text-neo-cream hover:bg-neo-cream/10"
+            className="inline-flex min-h-10 items-center gap-2 rounded-neo border-2 border-edu-line px-3 text-sm font-bold text-edu-ink hover:bg-edu-ink/10"
           >
             <DirectionalIcon icon={ArrowLeft} className="size-4" />
             {t('teacher.lastGame.previousGames')}
@@ -86,19 +86,19 @@ export function RoundReports({ classroomId, classroomName, onStudentClick, previ
               type="button"
               data-testid="round-report-collapsed"
               onClick={() => setOpenCode(game.gameCode)}
-              className="flex min-h-12 w-full items-center gap-3 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light px-3 py-2 text-start hover:border-neo-cream/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+              className="flex min-h-12 w-full items-center gap-3 rounded-neo border-2 border-edu-line bg-edu-surface px-3 py-2 text-start hover:border-edu-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
             >
-              <span className="font-neo-display text-sm font-black text-neo-white">
+              <span className="font-neo-display text-sm font-black text-edu-ink">
                 {t(roundTitleKey(game.gameMode))}
               </span>
-              <span className="text-xs font-bold text-neo-white/60">
+              <span className="text-xs font-bold text-edu-ink/60">
                 {new Date(game.playedAt).toLocaleString(language, { weekday: 'short', hour: 'numeric', minute: '2-digit' })}
               </span>
-              <span className="ms-auto inline-flex items-center gap-1 text-xs font-bold text-neo-cyan">
+              <span className="ms-auto inline-flex items-center gap-1 text-xs font-bold text-edu-cyan-ink">
                 <Users className="size-3.5" aria-hidden />
                 {t('teacher.windowProgress.activeLine', activeLineParams(game.participation))}
               </span>
-              <ChevronDown className="size-4 shrink-0 text-neo-white/70" aria-hidden />
+              <ChevronDown className="size-4 shrink-0 text-edu-ink/70" aria-hidden />
             </button>
           ),
         )}
@@ -109,7 +109,7 @@ export function RoundReports({ classroomId, classroomName, onStudentClick, previ
           <button type="button" data-testid="round-reports-prev" disabled={shownPage === 0} onClick={() => setPage(shownPage - 1)} className={PAGER_BUTTON}>
             {t('eduLibrary.pager.prev')}
           </button>
-          <span className="text-sm font-bold text-neo-cream/80">{t('eduLibrary.pager.status', { page: shownPage + 1, total: pageCount })}</span>
+          <span className="text-sm font-bold text-edu-ink/80">{t('eduLibrary.pager.status', { page: shownPage + 1, total: pageCount })}</span>
           <button type="button" data-testid="round-reports-next" disabled={shownPage >= pageCount - 1} onClick={() => setPage(shownPage + 1)} className={PAGER_BUTTON}>
             {t('eduLibrary.pager.next')}
           </button>

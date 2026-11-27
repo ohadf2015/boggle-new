@@ -32,7 +32,7 @@ export interface WeeklyEmailReportProps {
 type T = (key: string, params?: Record<string, string | number>) => string;
 
 const BTN =
-  'inline-flex min-h-10 items-center gap-1.5 rounded-neo border-2 border-neo-cream/50 bg-neo-navy px-3 font-neo-display text-xs font-black uppercase text-neo-white shadow-hard-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0 active:shadow-none motion-reduce:transition-none';
+  'inline-flex min-h-10 items-center gap-1.5 rounded-neo border-2 border-edu-line bg-edu-page px-3 font-neo-display text-xs font-black uppercase text-edu-ink shadow-hard-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0 active:shadow-none motion-reduce:transition-none';
 
 export function WeeklyEmailReport({ classroomId, classroomName }: WeeklyEmailReportProps) {
   const { t, language } = useLanguage();
@@ -105,7 +105,7 @@ export function WeeklyEmailReport({ classroomId, classroomName }: WeeklyEmailRep
         <h2 data-accent-decor className={cn(STICKER, "bg-neo-yellow text-base")}>
           {t('teacher.digest.emailReportTitle')}
         </h2>
-        <p className="mt-2 text-sm font-bold text-neo-cream/75">
+        <p className="mt-2 text-sm font-bold text-edu-ink/75">
           {t('teacher.digest.emailReportSubtitle')}
         </p>
       </header>
@@ -114,14 +114,14 @@ export function WeeklyEmailReport({ classroomId, classroomName }: WeeklyEmailRep
         <div
           data-testid="weekly-email-report-loading"
           aria-busy="true"
-          className="flex min-h-20 items-center justify-center gap-2 text-neo-cream/80"
+          className="flex min-h-20 items-center justify-center gap-2 text-edu-ink/80"
         >
           <Loader2 className="size-5 animate-spin" aria-hidden="true" />
           <span>{t('teacher.digest.emailReportLoading')}</span>
         </div>
       ) : error || !metrics ? (
         <NeoPanel tone="navy" className="p-4 text-center" data-testid="weekly-email-report-error">
-          <p className="font-bold text-neo-white">{t('teacher.digest.emailReportLoadError')}</p>
+          <p className="font-bold text-edu-ink">{t('teacher.digest.emailReportLoadError')}</p>
           <button
             type="button"
             onClick={() => void refresh()}
@@ -163,7 +163,7 @@ export function WeeklyEmailReport({ classroomId, classroomName }: WeeklyEmailRep
               type="button"
               data-testid="weekly-email-report-copy"
               onClick={() => void copy()}
-              className={cn(BTN, copied && 'border-neo-lime text-neo-lime')}
+              className={cn(BTN, copied && 'border-neo-lime text-edu-lime-ink')}
             >
               {copied ? (
                 <Check className="size-4" aria-hidden="true" />
@@ -183,7 +183,7 @@ export function WeeklyEmailReport({ classroomId, classroomName }: WeeklyEmailRep
             <span
               role="status"
               data-testid="weekly-email-report-copied"
-              className={cn('text-xs font-black text-neo-lime', !copied && 'sr-only')}
+              className={cn('text-xs font-black text-edu-lime-ink', !copied && 'sr-only')}
             >
               {copied ? t('teacher.digest.emailReportCopied') : ''}
             </span>
