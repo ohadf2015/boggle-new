@@ -315,7 +315,7 @@ export function forwardToPostHog(
       // Server: API routes, Socket.IO backend, cron jobs.
       void import("@/lib/posthog")
         .then(({ getPostHogServer }) => {
-          getPostHogServer()?.captureException(error, distinctId, properties);
+          getPostHogServer()?.captureException(error, { distinctId, properties });
         })
         .catch(() => {});
     } else {
