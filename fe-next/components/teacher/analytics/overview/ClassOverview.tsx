@@ -74,7 +74,7 @@ export function ClassOverview({ classroomId, classroomName, surface = 'class_rep
   );
 
   if (isLoading) {
-    return withFocus(<div aria-busy="true" className="h-12 rounded-neo-lg bg-edu-ink/10 motion-safe:animate-pulse" />, true);
+    return withFocus(<div key="loading" data-testid="overview-status-pending" aria-busy="true" className="h-12 rounded-neo-lg bg-edu-ink/10 motion-safe:animate-pulse" />, true);
   }
   if (error || !metrics) {
     return withFocus(
