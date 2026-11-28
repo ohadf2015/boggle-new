@@ -35,6 +35,15 @@ describe('TeacherClassEntryCard (top of home)', () => {
     expect(screen.getByTestId('home-teacher-class-entry')).toHaveAttribute('href', '/he/teacher');
   });
 
+  it('Given the top classroom card, Then it carries moving stripes and a shine, both motion-safe only', () => {
+    rooms.value = { classrooms: [CLASS], isLoading: false };
+    render(<TeacherClassEntryCard trial={null} />);
+    const fx = screen.getByTestId('home-teacher-class-fx');
+    expect(fx).toHaveAttribute('aria-hidden', 'true');
+    expect(fx.className).toMatch(/pointer-events-none/);
+    expect(fx.querySelector('[data-testid="home-teacher-class-shine"]')).not.toBeNull();
+  });
+
   it('Given no class yet, Then it stays a single compact row with no extra button row', () => {
     render(<TeacherClassEntryCard trial={null} />);
     expect(screen.queryByTestId('home-teacher-class-open')).toBeNull();

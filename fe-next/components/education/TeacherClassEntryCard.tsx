@@ -10,6 +10,7 @@ import { CopyCode } from '@/components/home-preview/ClassroomStrip';
 import type { TrialStatus } from '@/lib/education/trial';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { TrialPill } from './HomeEducationCard';
+import motion from '@/components/home-preview/homeMotion.module.css';
 
 interface TeacherClassEntryCardProps {
   trial: TrialStatus | null;
@@ -31,10 +32,16 @@ export function TeacherClassEntryCard({ trial, previewClass }: TeacherClassEntry
     <div
       data-testid="home-teacher-class-card"
       className={cn(
-        'group relative flex w-full flex-wrap items-center gap-x-3 gap-y-2.5 rounded-neo border-[3px] border-neo-black bg-neo-cyan px-3 py-2.5 text-neo-black shadow-hard',
-        'motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:-translate-y-0.5 active:translate-y-px'
+        'group relative isolate flex w-full flex-wrap items-center gap-x-3 gap-y-2.5 rounded-neo border-[3px] border-neo-black bg-neo-cyan px-3 py-2.5 text-neo-black shadow-hard',
+        'motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:-translate-y-0.5 active:translate-y-px',
+        motion.drop
       )}
     >
+      {/* Drifting stripes and a shine that sweeps across now and then; the CSS module stops both under reduced motion. */}
+      <span data-testid="home-teacher-class-fx" aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-[inherit]">
+        <span className={motion.stripes} />
+        <span data-testid="home-teacher-class-shine" className={motion.shine} style={{ animationDelay: '2.2s' }} />
+      </span>
       <span
         aria-hidden="true"
         className={cn('h-10 w-10 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-cyan edu-sky:text-edu-cyan-ink motion-safe:transition-transform motion-safe:group-hover:-rotate-6', newest ? 'hidden sm:flex' : 'flex')}
@@ -70,10 +77,14 @@ export function TeacherClassEntryCard({ trial, previewClass }: TeacherClassEntry
           className="inline-flex w-full items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface px-3 py-2 font-neo-display text-sm font-black text-neo-lime edu-sky:text-edu-lime-ink shadow-hard-sm sm:w-auto sm:shrink-0"
         >
           {t('homeFresh.sections.classrooms.openClassroom')}
-          <DirectionalIcon icon={ArrowRight} className="h-4 w-4" />
+          <span className={cn('inline-flex', motion.nudge)}>
+            <DirectionalIcon icon={ArrowRight} className="h-4 w-4" />
+          </span>
         </span>
       ) : (
-        <DirectionalIcon icon={ArrowRight} className="h-5 w-5 shrink-0" />
+        <span className={cn('relative inline-flex shrink-0', motion.nudge)}>
+          <DirectionalIcon icon={ArrowRight} className="h-5 w-5 shrink-0" />
+        </span>
       )}
     </div>
   );

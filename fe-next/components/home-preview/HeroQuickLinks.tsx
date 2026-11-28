@@ -8,6 +8,7 @@ import { StreakFlame } from '@/components/streak/StreakFlame';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { getSecondsUntilNextDaily } from '@/utils/dailyChallenge/dateUtils';
 import { formatTimeHHMMSS } from '@/shared/utils/timeFormatting';
+import styles from './homeMotion.module.css';
 
 interface HeroQuickLinksProps {
   lang: string;
@@ -66,13 +67,21 @@ export function HeroQuickLinks({ lang, t, animate, streak, streakLoading, atRisk
         <Link
           href={`/${lang}/multiplayer?autoCreate=true`}
           data-testid="hp-play-friends"
+          data-motion={animate ? 'live' : undefined}
           onClick={() => trackLandingCtaClick('home_play_friends')}
-          className={`${CARD} bg-neo-pink`}
+          className={`${CARD} relative bg-neo-pink`}
         >
+          {animate ? (
+            <span aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+              <span data-testid="hp-mp-stripes" className={styles.stripes} />
+              <span className={styles.shine} style={{ animationDelay: '3.1s' }} />
+            </span>
+          ) : null}
           <span className={`${ICON} bg-black text-neo-pink`}>
-            <Users className="h-5 w-5" strokeWidth={2.75} aria-hidden="true" />
+            {animate ? <span data-testid="hp-mp-ping" aria-hidden="true" className={`${styles.ping} rounded-xl`} /> : null}
+            <Users className={`h-5 w-5 ${animate ? styles.hop : ''}`} strokeWidth={2.75} aria-hidden="true" />
           </span>
-          <span className={LABEL}>{t('homePlay.chipMultiplayer')}</span>
+          <span className={`relative ${LABEL}`}>{t('homePlay.chipMultiplayer')}</span>
         </Link>
       </PressSurface>
 
@@ -85,7 +94,7 @@ export function HeroQuickLinks({ lang, t, animate, streak, streakLoading, atRisk
           onClick={() => trackLandingCtaClick('home_daily_chip')}
           className={`${CARD} bg-neo-orange`}
         >
-          <span className={`${ICON} bg-neo-yellow`}>
+          <span className={`${ICON} bg-neo-yellow ${animate && known && atRisk && !done ? styles.tug : ''}`}>
             <StreakFlame days={known ? streak : 0} size={26} mood={known && atRisk ? 'worried' : 'happy'} animated={known} />
             {done && (
               <span className="absolute -end-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-black bg-neo-lime">

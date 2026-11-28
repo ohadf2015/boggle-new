@@ -16,6 +16,8 @@ import { firstGameRoute } from '@/lib/onboarding/firstGameRoute';
 import { PressSurface } from '@/components/motion/PressSurface';
 import { MascotRig } from '@/components/motion/MascotRig';
 import HolidayMascot from '@/components/holidays/HolidayMascot';
+import { StreakFlame } from '@/components/streak/StreakFlame';
+import styles from './homeMotion.module.css';
 
 const EASE_OUT = 'cubic-bezier(0.22,1,0.36,1)';
 const BREATH: Keyframe[] = [
@@ -32,6 +34,8 @@ interface PlayHeroProps {
   avatar: { userId: string; customAvatar: CustomAvatarConfig | null } | null;
   /** The mascot's line; null until every input it depends on has resolved. */
   bubble: string | null;
+  /** The line is about the streak: the bubble wears that streak's flame. */
+  bubbleFlame?: number | null;
   streak: number;
   streakLoading: boolean;
   atRisk?: boolean;
@@ -63,6 +67,7 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
       </div>
       <SparkleLoop enabled={loop} />
       <div className="relative z-10">
+        <div className={animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}>
         <div className={loop ? 'animate-[qp-avatar-bob_2.8s_ease-in-out_0.9s_infinite]' : ''}>
           <div className="relative">
             {!avatar && (
@@ -71,7 +76,10 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
             <div ref={avatar ? avatarSlotCallback : undefined} data-testid="hp-avatar-slot" className="h-[104px] w-[104px] lg:h-[136px] lg:w-[136px]" />
           </div>
         </div>
-        <span aria-hidden="true" className="absolute -bottom-1.5 left-1/2 -z-10 h-3 w-20 -translate-x-1/2 rounded-[50%] bg-black/45" />
+        </div>
+        <span aria-hidden="true" className="absolute -bottom-1.5 left-1/2 -z-10 h-3 w-20 -translate-x-1/2">
+          <span className={`block h-full w-full rounded-[50%] bg-black/45 ${loop ? 'animate-[qp-shadow-bob_2.8s_ease-in-out_0.9s_infinite]' : ''}`} />
+        </span>
         <span aria-hidden="true" className="absolute -start-[46px] bottom-0 -rotate-12 lg:-start-[60px]">
           <MascotRig state={animate ? 'hop' : 'idle'}>
             <span data-testid="hp-mascot" className="block">
@@ -95,10 +103,10 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
   );
 }
 
-export function PlayHero({ lang, t, animate, avatar, bubble, streak, streakLoading, atRisk = false, playedToday = false, onAvatarSaved, onPlay }: PlayHeroProps) {
-  const [coarse, setCoarse] = useState(true);
-  useEffect(() => setCoarse(window.matchMedia?.('(hover: none) and (pointer: coarse)').matches ?? false), []);
-  const loop = animate && !coarse;
+export function PlayHero({ lang, t, animate, avatar, bubble, bubbleFlame = null, streak, streakLoading, atRisk = false, playedToday = false, onAvatarSaved, onPlay }: PlayHeroProps) {
+  // Phones get the idle loops too: each one moves a small layer by transform
+  // only (compositor work, no repaint), and reduced motion turns them all off.
+  const loop = animate;
   const heroRef = useRef<HTMLElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
 
@@ -108,11 +116,9 @@ export function PlayHero({ lang, t, animate, avatar, bubble, streak, streakLoadi
     hero?.querySelectorAll('[data-hero-row]').forEach((row, i) => {
       row.animate?.([{ transform: 'translateY(18px) scale(0.96)' }, { transform: 'none' }], { duration: 420, delay: i * 70, easing: EASE_POP, fill: 'backwards' });
     });
-    // A touch phone gets a few breaths, not a loop for as long as the home sits open.
-    const touch = window.matchMedia?.('(hover: none) and (pointer: coarse)').matches;
     const breath = hero
       ?.querySelector('[data-hero-breathe]')
-      ?.animate?.(BREATH, { duration: 3200, delay: 1400, iterations: touch ? 3 : Infinity, easing: 'ease-in-out' });
+      ?.animate?.(BREATH, { duration: 3200, delay: 1400, iterations: Infinity, easing: 'ease-in-out' });
     return () => breath?.cancel?.();
   }, [animate]);
 
@@ -155,8 +161,19 @@ export function PlayHero({ lang, t, animate, avatar, bubble, streak, streakLoadi
           <AvatarStage avatar={avatar} animate={animate} loop={loop} t={t} onAvatarSaved={onAvatarSaved} />
           <div
             ref={bubbleRef}
-            className={`absolute start-[calc(50%+62px)] top-0 z-20 max-w-[136px] origin-bottom-left rounded-2xl border-[3px] border-black bg-neo-cream px-3 py-2 shadow-[0_3px_0_0] shadow-neo-black rtl:origin-bottom-right lg:start-[calc(50%+80px)] lg:max-w-[180px] ${bubble ? '' : 'invisible'}`}
+            data-testid="hp-bubble-box"
+            data-motion={animate ? 'float' : undefined}
+            className={`absolute start-[calc(50%+62px)] top-0 z-20 max-w-[136px] origin-bottom-left rounded-2xl border-[3px] border-black bg-neo-cream px-3 py-2 shadow-[0_3px_0_0] shadow-neo-black rtl:origin-bottom-right lg:start-[calc(50%+80px)] lg:max-w-[180px] ${bubble ? '' : 'invisible'} ${animate ? styles.float : ''}`}
           >
+            {bubbleFlame ? (
+              <span
+                data-testid="hp-bubble-flame"
+                aria-hidden="true"
+                className={`absolute -end-3 -top-4 flex h-8 w-8 items-center justify-center rounded-full border-[3px] border-black bg-neo-yellow ${animate && atRisk ? styles.tug : ''}`}
+              >
+                <StreakFlame days={bubbleFlame} size={22} mood={atRisk ? 'worried' : 'happy'} animated={animate} />
+              </span>
+            ) : null}
             <span aria-hidden="true" className="absolute -start-[8px] bottom-3 h-3.5 w-3.5 rotate-45 border-b-[3px] border-s-[3px] border-black bg-neo-cream rtl:-rotate-45" />
             <p data-testid="hp-bubble" aria-live="polite" className="relative font-neo-display text-sm font-bold leading-snug text-black lg:text-base">
               {bubble ?? ''}
@@ -179,8 +196,13 @@ export function PlayHero({ lang, t, animate, avatar, bubble, streak, streakLoadi
               data-testid="hp-play-now"
               data-hero-primary
               onClick={handlePlayClick}
-              className="flex h-[72px] w-full items-center justify-center gap-3 rounded-3xl border-[3px] border-black bg-neo-lime px-4 font-neo-display text-[28px] font-bold tracking-wide text-black uppercase [@media(max-height:700px)]:h-[64px] lg:h-[84px] lg:text-4xl"
+              className="relative flex h-[72px] w-full items-center justify-center gap-3 rounded-3xl border-[3px] border-black bg-neo-lime px-4 font-neo-display text-[28px] font-bold tracking-wide text-black uppercase [@media(max-height:700px)]:h-[64px] lg:h-[84px] lg:text-4xl"
             >
+              {animate ? (
+                <span aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+                  <span data-testid="hp-play-shine" className={styles.shine} />
+                </span>
+              ) : null}
               <Play className="h-8 w-8 shrink-0 fill-current" strokeWidth={2.75} aria-hidden="true" />
               <span className="truncate">{t('homePlay.playNow')}</span>
             </Link>
@@ -193,7 +215,7 @@ export function PlayHero({ lang, t, animate, avatar, bubble, streak, streakLoadi
       </div>
 
       <div data-hero-row>
-        <ModeRail lang={lang} t={t} />
+        <ModeRail lang={lang} t={t} animate={loop} />
       </div>
     </section>
   );

@@ -8,6 +8,7 @@ import { StreakWeekStrip } from '@/components/streak/StreakWeekStrip';
 import { StreakAtRiskPill } from '@/components/streak/StreakAtRiskPill';
 import { StreakFreezeButton } from '@/components/streak/StreakFreezeButton';
 import { streakTier, type NextMilestone, type WeekDay } from '@/lib/daily/streakRewards';
+import styles from './homeMotion.module.css';
 
 interface DailyBlockProps {
   lang: string;
@@ -23,18 +24,25 @@ interface DailyBlockProps {
   isGuest?: boolean;
   /** Refetch after a freeze purchase. */
   onStreakChanged?: () => void;
+  /** Motion on (mounted, no reduced-motion): the flame glows, the week pops in, today beats. */
+  animate?: boolean;
 }
 
 /** The streak at a glance: flame, this week, one link into today's daily. */
-export function DailyBlock({ lang, t, streak, streakLoading, freezes = 0, atRisk = false, week, next = null, isGuest = false, onStreakChanged }: DailyBlockProps) {
+export function DailyBlock({ lang, t, streak, streakLoading, freezes = 0, atRisk = false, week, next = null, isGuest = false, onStreakChanged, animate = false }: DailyBlockProps) {
+  const lit = animate && !streakLoading && streak > 0;
   return (
     <section
       aria-labelledby="hp-daily-title"
       data-testid="hp-daily"
+      data-motion={animate ? 'live' : undefined}
       className="flex flex-col gap-3 rounded-3xl border-[3px] border-neo-cream/15 bg-neo-navy-elevated p-4 text-neo-cream lg:p-5"
     >
       <div className="flex items-center gap-3">
-        <StreakFlame days={streakLoading ? 0 : streak} size={44} mood={atRisk && !streakLoading ? 'worried' : 'happy'} animated={!streakLoading} />
+        <span className={`relative shrink-0 ${animate && atRisk && !streakLoading ? styles.tug : ''}`}>
+          {lit ? <span data-testid="hp-daily-glow" aria-hidden="true" className={styles.glow} /> : null}
+          <StreakFlame days={streakLoading ? 0 : streak} size={44} mood={atRisk && !streakLoading ? 'worried' : 'happy'} animated={!streakLoading} className="relative" />
+        </span>
         <div className="min-w-0 flex-1">
           <h2 id="hp-daily-title" className="truncate font-neo-display text-lg font-bold leading-tight">
             {streakLoading ? t('homePlay.chipDaily') : streak > 0 ? t('homePlay.chipStreak', { n: streak }) : t('homePlay.dailyNoStreak')}
@@ -49,7 +57,7 @@ export function DailyBlock({ lang, t, streak, streakLoading, freezes = 0, atRisk
       </div>
 
       {!streakLoading && atRisk && <StreakAtRiskPill days={streak} className="self-start" />}
-      {week && <StreakWeekStrip week={week} size="sm" />}
+      {week && <StreakWeekStrip week={week} size="sm" className={animate ? styles.week : undefined} />}
       {!streakLoading && next && (
         <span data-testid="hp-daily-next-reward" className="text-xs font-bold leading-snug text-neo-cream/70">
           {t('dailyStreak.flame.heroNext', { n: next.remaining, days: next.days, coins: next.coins })}
@@ -64,7 +72,9 @@ export function DailyBlock({ lang, t, streak, streakLoading, freezes = 0, atRisk
             className="inline-flex max-w-full items-center gap-1.5 rounded-2xl border-[3px] border-neo-orange bg-neo-navy px-3.5 py-2 text-start font-neo-display text-sm leading-tight font-bold text-neo-orange shadow-neo-orange/40"
           >
             {t('homeFresh.sections.daily.cta')}
-            <ArrowRight className="h-4 w-4 shrink-0 rtl:-scale-x-100" strokeWidth={3} aria-hidden="true" />
+            <span className={`inline-flex shrink-0 ${animate ? styles.nudge : ''}`}>
+              <ArrowRight className="h-4 w-4 shrink-0 rtl:-scale-x-100" strokeWidth={3} aria-hidden="true" />
+            </span>
           </Link>
         </PressSurface>
         <Link
