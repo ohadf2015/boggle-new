@@ -171,6 +171,15 @@ describe('ClassroomRosterProgress', () => {
     expect(within(screen.getByTestId('classroom-roster-parent-print')).queryByText('You')).toBeNull();
   });
 
+  it('leaves the teacher\'s own seat in their class out of the student rows', async () => {
+    studentsState.data = [
+      rosterStudent('s1', { display_name: 'Ada' }, '2026-11-01T00:00:00Z'),
+      rosterStudent('teacher-1', { display_name: 'Fish' }, '2026-11-01T00:00:00Z'),
+    ];
+    render(<ClassroomRosterProgress classroomId="c1" />);
+    expect(await screen.findAllByTestId('classroom-roster-row')).toHaveLength(1);
+  });
+
   it('quiet mode renders nothing while loading, then only the test row', async () => {
     assignmentsState.data = [{ id: 'a1', lesson_id: 'L1', title: 'Animals', due_date: null }];
     ownProgressState.data = [{ lesson_id: 'L1', completed_at: '2026-11-01T00:00:00Z' }];
