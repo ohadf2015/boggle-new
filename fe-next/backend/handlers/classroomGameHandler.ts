@@ -35,6 +35,7 @@ import { registerClassroomGameModeHandlers } from './classroomGameModeHandler.js
 import { registerClassroomReteachHandlers } from './classroomReteachHandler.js';
 import { getAuthUserId, classroomIdentityRefusal, refuseUnidentified } from './classroomSocketAuth.js';
 import { cleanClassroomSeatName } from './classroomSeatName.js';
+import { persistLiveRoomState, getPersistedLiveRoomState } from '../modules/classroomLiveRoomPersistence.js';
 import { getSupabase } from '../modules/supabase/client.js';
 import { bumpTeacherLastSeen } from './bumpTeacherLastSeen.js';
 import { markTeacherRoomOpened } from '../modules/supabase/teacherActivation.js';
@@ -176,6 +177,25 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
 
       // Create the game in Redis
       await createClassroomGame(gameData);
+      // Persist minimal room state to Postgres for dead-room recovery across restarts
+      void persistLiveRoomState({
+        roomCode: payload.gameCode,
+        classroomId: payload.classroomId,
+        teacherId: payload.teacherId,
+        hostIdentity: {
+          userId: payload.teacherId,
+          username: payload.teacherName,
+          socketId: socket.id,
+        },
+        roster: [],
+        gameConfig: {
+          language: gameData.language,
+          gameMode: gameData.settings.gameMode,
+          settings: gameData.settings,
+        },
+        lessonWords: payload.vocabularyWords || [],
+        currentPhase: 'waiting',
+      });
       // A created room is not a taught round: this stamps room_opened only.
       // live_started is stamped in recordClassroomRound when the first real
       // (2+ player) round completes.
@@ -361,6 +381,27 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       // reconnect must rebind, and both must go through this same path.
       bindSocketToGame(socket.id, joinPayload.gameCode);
 
+      // Update roster in persisted DB state for dead-room recovery
+      void (async () => {
+        try {
+          const current = await getPersistedLiveRoomState(joinPayload.gameCode);
+          if (current) {
+            const roster = current.roster || [];
+            if (!roster.some((p) => p.userId === joinPayload.userId)) {
+              roster.push({
+                userId: joinPayload.userId,
+                username: joinPayload.username,
+                socketId: socket.id,
+              });
+              current.roster = roster;
+              await persistLiveRoomState(current);
+            }
+          }
+        } catch (err) {
+          logger.warn('CLASSROOM_GAME', `Failed to update roster in persisted room: ${err}`);
+        }
+      })();
+
       // Get updated game state
       const game = await getClassroomGame(joinPayload.gameCode);
 
@@ -421,6 +462,17 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       // A deliberate leave removes the student from the joined roster too, so
       // the lobby headline can stop counting them.
       broadcastClassroomRoster(io, leavePayload.gameCode);
+      void (async () => {
+        try {
+          const current = await getPersistedLiveRoomState(leavePayload.gameCode);
+          if (current && current.roster) {
+            current.roster = current.roster.filter((p) => p.userId !== leavePayload.userId);
+            await persistLiveRoomState(current);
+          }
+        } catch (err) {
+          logger.warn('CLASSROOM_GAME', `Failed to update roster on leave in persisted room: ${err}`);
+        }
+      })();
       logger.info('CLASSROOM_GAME', `Player ${leavePayload.userId} left game ${leavePayload.gameCode}`);
     } catch (error) {
       logger.error('CLASSROOM_GAME', `Failed to leave game: ${error}`);
@@ -468,6 +520,18 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       }
 
       await updateClassroomGameStatus(payload.gameCode, 'playing');
+      // Persist phase transition to playing for dead-room recovery across restarts
+      void (async () => {
+        try {
+          const current = await getPersistedLiveRoomState(payload.gameCode);
+          if (current) {
+            current.currentPhase = 'playing';
+            await persistLiveRoomState(current);
+          }
+        } catch (err) {
+          logger.warn('CLASSROOM_GAME', `Failed to update phase in persisted room: ${err}`);
+        }
+      })();
       // authUserId was checked against game.teacherId above. Never throws.
       await bumpTeacherLastSeen(getSupabase(), authUserId);
 

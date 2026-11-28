@@ -35,6 +35,7 @@ import { lateJoinStudentKey } from '@/lib/education/endedCodeTries';
 import { secondsSinceEnd } from '@/lib/education/secondsSinceEnd';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { captureClassroomGameMoved, emitClassroomGameMoved, findNewerClassroomGame } from './classroomGameMove';
+import { restoreLiveRoomFromDb, getPersistedLiveRoomState } from '../modules/classroomLiveRoomPersistence.js';
 import { getGameRoom } from '../utils/socketHelpers.js';
 import logger from '../utils/logger.js';
 
@@ -96,6 +97,21 @@ export async function answerMissingRoom(
   avatar?: unknown,
   io?: Server
 ): Promise<'opened' | void> {
+  // Check if room appeared in memory meanwhile
+  if (getGame(gameCode)) return 'opened';
+
+  // Attempt dead-room recovery from persistent Postgres DB
+  const verifiedUserId = (socket.data?.verifiedUserId as string | undefined) || undefined;
+  try {
+    const recovered = await restoreLiveRoomFromDb(gameCode, socket, verifiedUserId);
+    if (recovered && getGame(gameCode)) {
+      logger.info('CLASSROOM_GAME', `Restored live room ${gameCode} from DB after restart`);
+      return 'opened';
+    }
+  } catch (err) {
+    logger.warn('CLASSROOM_GAME', `DB recovery failed for ${gameCode}: ${(err as Error)?.message ?? err}`);
+  }
+
   let record: ClassroomGame | null = null;
   try {
     record = await getClassroomGame(gameCode);
@@ -169,6 +185,12 @@ export async function answerMissingRoom(
   }
 
   if (!record) {
+    const persisted = await getPersistedLiveRoomState(gameCode).catch(() => null);
+    if (persisted?.classroomId && persisted.currentPhase === 'ended') {
+      void socket.join(`classroom:${persisted.classroomId}`);
+      emitError(socket, ErrorCodes.CLASSROOM_SESSION_WAITING, { details: { classroomId: persisted.classroomId } });
+      return;
+    }
     emitError(socket, ErrorCodes.GAME_NOT_FOUND, { details: { gameCode } });
     return;
   }

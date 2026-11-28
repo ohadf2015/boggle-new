@@ -143,6 +143,7 @@ function EduLiveRoom(): React.JSX.Element {
                 message={s.t(CLASSROOM_ROOM_GONE_KEY)}
                 hubHref={classroomStudentHomePath(s.language)}
                 onRetry={s.retryClassroomRoom}
+                onRestart={isTeacher ? () => s.handleExitToLobby() : undefined}
               />
             )}
           </div>
