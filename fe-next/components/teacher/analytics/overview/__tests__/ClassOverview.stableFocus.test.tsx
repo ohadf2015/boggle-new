@@ -50,4 +50,10 @@ describe('ClassOverview focus words', () => {
     expect(screen.getByTestId('overview-attention')).toBeInTheDocument();
     expect(mounts.count).toBe(1);
   });
+
+  it('holds the roster fold row while loading, so it does not push the report tabs down when metrics land', () => {
+    hook.loading = true;
+    render(<ClassOverview classroomId="c1" classroomName="7B" />);
+    expect(screen.getByTestId('overview-roster-fold-pending')).toBeInTheDocument();
+  });
 });

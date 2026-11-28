@@ -62,18 +62,19 @@ export function ClassOverview({ classroomId, classroomName, surface = 'class_rep
   );
   const focusPanelClass = `${REPORT_HERO_PANEL} grid gap-6 lg:grid-cols-2 [&>:only-child]:lg:col-span-2`;
   // Same tree position as the ready layout below, so the words panel is not remounted (and refetched) when metrics land.
-  const withFocus = (status: ReactNode) => (
+  const withFocus = (status: ReactNode, rosterPending = false) => (
     <div className="space-y-3">
       {status}
       <div data-testid="overview-focus" className={focusPanelClass}>
         {null}
         {focusWords}
       </div>
+      {rosterPending ? <div data-testid="overview-roster-fold-pending" aria-hidden="true" className="h-[73px] rounded-neo-lg bg-edu-ink/10 motion-safe:animate-pulse" /> : null}
     </div>
   );
 
   if (isLoading) {
-    return withFocus(<div aria-busy="true" className="h-12 rounded-neo-lg bg-edu-ink/10 motion-safe:animate-pulse" />);
+    return withFocus(<div aria-busy="true" className="h-12 rounded-neo-lg bg-edu-ink/10 motion-safe:animate-pulse" />, true);
   }
   if (error || !metrics) {
     return withFocus(
