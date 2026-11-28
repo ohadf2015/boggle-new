@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
+import { getBlogPostDates } from '@/lib/blog/posts';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import MultiplayerStrategyPageClient from './PageClient';
 import { contentByLocale } from './content';
@@ -11,8 +12,7 @@ interface PageProps {
 }
 
 const SLUG = 'multiplayer-strategy-guide';
-const DATE_PUBLISHED = '2026-08-03';
-const DATE_MODIFIED = '2026-08-03';
+const { datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED } = getBlogPostDates(SLUG);
 
 const metaTitles: Record<string, string> = {
   en: 'Multiplayer Word Game Strategy Guide — How to Win Real-Time Word Battles',

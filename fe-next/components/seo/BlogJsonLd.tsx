@@ -1,30 +1,18 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { withBodyLocales } from '@/lib/seo/bodyLocales';
+import {
+    BLOG_AUTHOR,
+    BLOG_PUBLISHER,
+    INDEXABLE_ROBOTS,
+    SITE_URL,
+    blogFeedUrl,
+    blogImageSet,
+    toIsoDateTime,
+} from '@/lib/blog/posts';
 
-const SITE_URL = 'https://www.lexiclash.live';
-
-// Map blog slugs to their hero images (posts without dedicated images use OG fallback)
-const BLOG_IMAGE_MAP: Record<string, string> = {
-    '10-surprising-benefits-word-games': '/images/blog/10-benefits.jpg',
-    'best-boggle-alternatives-2026': '/images/blog/boggle-alternatives.jpg',
-    'daily-challenge-strategies': '/images/blog/daily-strategies.jpg',
-    'improve-word-game-skills': '/images/blog/improve-skills.jpg',
-    'multilingual-word-learning': '/images/blog/multilingual-learning.jpg',
-    'science-behind-word-games': '/images/blog/science-brain.jpg',
-    'top-player-secrets': '/images/blog/top-player-secrets.jpg',
-    'why-word-games-are-addictive': '/images/blog/why-addictive.jpg',
-    'word-games-for-brain-training': '/images/blog/brain-training-words.jpg',
-    'netflix-word-game-2026-rise': '/images/blog/netflix-word-games.jpg',
-    'most-popular-word-games-2026': '/images/blog/most-popular-word-games-2026.jpg',
-    'multiplayer-strategy-guide': '/images/blog/strategy-tactics.jpg',
-};
-
-const FALLBACK_IMAGE = '/og-image-en.webp';
-
-function getBlogImage(slug: string): string {
-    return `${SITE_URL}${BLOG_IMAGE_MAP[slug] || FALLBACK_IMAGE}`;
-}
+// Image, dates, author and publisher come from lib/blog/posts, the same list the sitemaps and
+// RSS feeds read, so the article schema can't drift from them.
 
 interface CitationRef {
     title: string;
@@ -70,7 +58,6 @@ export function BlogPostingJsonLd({
     articleSection,
 }: BlogPostingJsonLdProps): ReactNode {
     const articleUrl = `${SITE_URL}/${locale}/blog/${slug}`;
-    const imageUrl = getBlogImage(slug);
 
     const schema = {
         '@context': 'https://schema.org',
@@ -79,32 +66,24 @@ export function BlogPostingJsonLd({
         description,
         url: articleUrl,
         mainEntityOfPage: { '@type': 'WebPage', '@id': articleUrl },
-        datePublished,
-        dateModified: dateModified || datePublished,
+        datePublished: toIsoDateTime(datePublished),
+        dateModified: toIsoDateTime(dateModified || datePublished),
         ...(wordCount && { wordCount }),
         ...(keywords && { keywords }),
         ...(articleSection && { articleSection }),
         inLanguage: locale,
-        image: {
-            '@type': 'ImageObject',
-            url: imageUrl,
-            width: 1200,
-            height: 630,
-        },
+        // 16x9, 4x3 and 1x1, each 1200px+ wide (Google Article / Discover guidance).
+        image: blogImageSet(slug),
         author: {
             '@type': 'Person',
-            name: 'Ohad Fisher',
-            alternateName: 'Ohad Fisher',
-            url: `${SITE_URL}/about/ohad-fisher`,
+            name: BLOG_AUTHOR.name,
+            url: BLOG_AUTHOR.url,
             jobTitle: 'Founder & Editor-in-Chief, LexiClash',
             description:
                 'Founder of LexiClash. Word-game designer and cognitive-science enthusiast with 8+ years researching word games, linguistics, and brain health.',
             image: `${SITE_URL}/images/author-ohad.png`,
             email: 'editor@lexiclash.live',
-            sameAs: [
-                'https://www.lexiclash.live/about/ohad-fisher',
-                'https://www.lexiclash.live/editorial-policy',
-            ],
+            sameAs: [BLOG_AUTHOR.url, `${SITE_URL}/en/editorial-policy`],
             knowsAbout: [
                 'Word Games',
                 'Cognitive Science',
@@ -113,11 +92,7 @@ export function BlogPostingJsonLd({
                 'Game Design',
                 'Multilingual Learning',
             ],
-            worksFor: {
-                '@type': 'Organization',
-                name: 'LexiClash Ltd',
-                url: SITE_URL,
-            },
+            worksFor: { '@type': 'Organization', '@id': BLOG_PUBLISHER['@id'], name: BLOG_PUBLISHER.name, url: SITE_URL },
         },
         ...(citations && citations.length > 0 && {
             citation: citations.map((c) => ({
@@ -132,17 +107,9 @@ export function BlogPostingJsonLd({
         reviewedBy: {
             '@type': 'Organization',
             name: 'LexiClash Editorial Team',
-            url: `${SITE_URL}/editorial-policy`,
+            url: `${SITE_URL}/en/editorial-policy`,
         },
-        publisher: {
-            '@type': 'Organization',
-            name: 'LexiClash Ltd',
-            url: SITE_URL,
-            logo: {
-                '@type': 'ImageObject',
-                url: `${SITE_URL}/icon-192.png`,
-            },
-        },
+        publisher: BLOG_PUBLISHER,
         speakable: {
             '@type': 'SpeakableSpecification',
             cssSelector: ['h1', '[data-speakable="true"]'],
@@ -203,7 +170,7 @@ export function generateBlogMetadata({
     hasTranslation = true,
     ruTranslated = false,
 }: BlogMetadataOptions): Metadata {
-    const imageUrl = getBlogImage(slug);
+    const [imageUrl] = blogImageSet(slug);
     const articleUrl = `https://www.lexiclash.live/${locale}/blog/${slug}`;
 
     return withBodyLocales({
@@ -215,10 +182,10 @@ export function generateBlogMetadata({
             description,
             url: articleUrl,
             siteName: 'LexiClash',
-            images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
-            publishedTime: datePublished,
-            modifiedTime: dateModified || datePublished,
-            authors: ['Ohad Fisher'],
+            images: [{ url: imageUrl, alt: title }],
+            publishedTime: toIsoDateTime(datePublished),
+            modifiedTime: toIsoDateTime(dateModified || datePublished),
+            authors: [BLOG_AUTHOR.url],
         },
         twitter: {
             card: 'summary_large_image',
@@ -228,6 +195,7 @@ export function generateBlogMetadata({
         },
         alternates: {
             canonical: articleUrl,
+            types: { 'application/rss+xml': blogFeedUrl(locale) },
             languages: {
                 'x-default': `https://www.lexiclash.live/en/blog/${slug}`,
                 he: `https://www.lexiclash.live/he/blog/${slug}`,
@@ -259,6 +227,6 @@ export function generateBlogMetadata({
                     : {}),
             },
         },
-        robots: hasTranslation ? { index: true, follow: true } : { index: false, follow: true },
+        robots: hasTranslation ? INDEXABLE_ROBOTS : { index: false, follow: true },
     }, `/blog/${slug}`, locale);
 }

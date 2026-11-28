@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
+import { getBlogPostDates } from '@/lib/blog/posts';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import WhyAddictivePageClient from './PageClient';
 import { contentByLocale } from './content';
@@ -11,8 +12,7 @@ interface PageProps {
 }
 
 const SLUG = 'why-word-games-are-addictive';
-const DATE_PUBLISHED = '2025-11-12';
-const DATE_MODIFIED = '2026-05-19';
+const { datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED } = getBlogPostDates(SLUG);
 
 const metaTitles: Record<string, string> = {
   en: 'Why Word Games Are So Addictive: Dopamine, Flow and More',

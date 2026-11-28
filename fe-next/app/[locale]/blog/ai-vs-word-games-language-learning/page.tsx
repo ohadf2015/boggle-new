@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
+import { getBlogPostDates } from '@/lib/blog/posts';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
 import AiVsWordGamesPageClient from './PageClient';
@@ -12,8 +13,7 @@ interface PageProps {
 }
 
 const SLUG = 'ai-vs-word-games-language-learning';
-const DATE_PUBLISHED = '2026-06-27';
-const DATE_MODIFIED = '2026-06-27';
+const { datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED } = getBlogPostDates(SLUG);
 
 const metaTitles: Record<string, string> = {
   en: 'AI Language Apps vs Word Games: Which Teaches Vocabulary Faster? (Science + Reddit)',

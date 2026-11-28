@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
+import { getBlogPostDates } from '@/lib/blog/posts';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import SciencePageClient from './PageClient';
 import { contentByLocale } from './content';
@@ -11,8 +12,7 @@ interface PageProps {
 }
 
 const SLUG = 'science-behind-word-games';
-const DATE_PUBLISHED = '2025-07-03';
-const DATE_MODIFIED = '2026-11-08';
+const { datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED } = getBlogPostDates(SLUG);
 
 const metaTitles: Record<string, string> = {
   en: 'Word Games & Brain Health - Scientific Benefits Explained',

@@ -181,6 +181,23 @@ describe('sitemap', () => {
     }
   });
 
+  // Each article carries its own last edit, from the manifest the JSON-LD and RSS read,
+  // instead of one shared BLOG_UPDATED constant that never moved.
+  it('dates each blog article by its own last edit and the index by the newest one', () => {
+    const article = routes.find((r) => r.url === `${BASE_URL}/en/blog/best-boggle-alternatives-2026`);
+    expect(article?.lastModified).toBe('2026-11-04T00:00:00Z');
+    const other = routes.find((r) => r.url === `${BASE_URL}/en/blog/boggle-vs-wordle`);
+    expect(other?.lastModified).toBe('2026-05-19T00:00:00Z');
+    const index = routes.find((r) => r.url === `${BASE_URL}/en/blog`);
+    expect(String(index?.lastModified) >= '2026-11-04').toBe(true);
+  });
+
+  it('lists the June articles that were missing from the blog index', () => {
+    for (const slug of ['ai-vs-word-games-language-learning', 'spelling-bee-science-vocabulary']) {
+      expect(routes.find((r) => r.url === `${BASE_URL}/en/blog/${slug}`), slug).toBeDefined();
+    }
+  });
+
   it('lists EN and SV anagram hubs (zero-click rec 6487) and not other locales', () => {
     expect(routes.find((r) => r.url === `${BASE_URL}/en/anagram`)).toBeDefined();
     expect(routes.find((r) => r.url === `${BASE_URL}/sv/anagram`)).toBeDefined();

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
+import { getBlogPostDates } from '@/lib/blog/posts';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import MostPopularWordGamesPageClient from './PageClient';
@@ -13,8 +14,7 @@ interface PageProps {
 }
 
 const SLUG = 'most-popular-word-games-2026';
-const DATE_PUBLISHED = '2026-05-15';
-const DATE_MODIFIED = '2026-05-19';
+const { datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED } = getBlogPostDates(SLUG);
 
 const metaTitles: Record<string, string> = {
   en: 'The Most Popular Online Word Games of 2026 — and Why They Exploded',

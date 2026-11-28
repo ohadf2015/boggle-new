@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
+import { getBlogPostDates } from '@/lib/blog/posts';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { extractFaqFromSections } from '@/utils/seo/parseFaqProse';
 import AlternativasAScrabblePageClient from './PageClient';
@@ -13,8 +14,7 @@ interface PageProps {
 }
 
 const SLUG = 'alternativas-a-scrabble';
-const DATE_PUBLISHED = '2026-05-11';
-const DATE_MODIFIED = '2026-05-11';
+const { datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED } = getBlogPostDates(SLUG);
 
 const metaTitles: Record<string, string> = {
   es: 'Alternativas a Scrabble: 4 Juegos de Palabras que Realmente Valen la Pena (2026)',

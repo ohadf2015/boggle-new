@@ -3,7 +3,9 @@ import { render, screen } from '@testing-library/react';
 
 vi.mock('@/components/AutoHideHeader', () => ({ default: () => null }));
 vi.mock('@/components/ads', () => ({ InlineBannerAd: () => null }));
-vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: 'en' }) }));
+vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: 'en', t: (k: string) => k }) }));
+const pathname = vi.hoisted(() => ({ current: '/' }));
+vi.mock('next/navigation', () => ({ usePathname: () => pathname.current }));
 
 import { BlogPostLayout, BlogSections } from '../BlogPostLayout';
 
@@ -52,5 +54,35 @@ describe('BlogPostLayout', () => {
     );
     expect(screen.getByText(/2026/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Back' }).getAttribute('href')).toBe('/en/blog');
+  });
+});
+
+describe('BlogPostLayout on a blog post', () => {
+  const base = { locale: 'en', backLabel: 'Back', category: 'Guide', title: 'Title', readTime: '5 min', ctas: [{ href: '/en/daily', label: 'Play' }] };
+
+  it('shows the author byline and both dates from the manifest, as machine-readable <time>s', () => {
+    pathname.current = '/en/blog/boggle-vs-wordle';
+    const { container } = render(
+      <BlogPostLayout {...base} date="1999-01-01">
+        <p>Body</p>
+      </BlogPostLayout>,
+    );
+    expect(screen.getByRole('link', { name: 'Ohad Fisher' }).getAttribute('href')).toBe('/en/about/ohad-fisher');
+    const times = [...container.querySelectorAll('time')].map((t) => t.getAttribute('dateTime'));
+    expect(times).toEqual(['2026-03-28', '2026-05-19']);
+    expect(container.textContent).toContain('legal.lastUpdated');
+    pathname.current = '/';
+  });
+
+  it('omits the updated line when the post was never edited', () => {
+    pathname.current = '/es/blog/alternativas-a-scrabble';
+    const { container } = render(
+      <BlogPostLayout {...base} locale="es">
+        <p>Body</p>
+      </BlogPostLayout>,
+    );
+    expect([...container.querySelectorAll('time')].map((t) => t.getAttribute('dateTime'))).toEqual(['2026-05-11']);
+    expect(container.textContent).not.toContain('legal.lastUpdated');
+    pathname.current = '/';
   });
 });

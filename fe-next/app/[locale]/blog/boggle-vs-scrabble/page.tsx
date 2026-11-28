@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
+import { getBlogPostDates } from '@/lib/blog/posts';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { extractFaqFromSections } from '@/utils/seo/parseFaqProse';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
@@ -17,8 +18,7 @@ interface PageProps {
 }
 
 const SLUG = 'boggle-vs-scrabble';
-const DATE_PUBLISHED = '2026-03-28';
-const DATE_MODIFIED = '2026-05-19';
+const { datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED } = getBlogPostDates(SLUG);
 
 const metaTitles: Record<string, string> = {
   en: 'Boggle vs Scrabble: Honest Verdict After Years of Both (2026)',
