@@ -47,6 +47,8 @@ import { ReportError, ReportSkeleton, useReportData } from './ReportChrome';
 export interface ClassroomRosterProgressProps {
   classroomId: string;
   classroomName?: string;
+  /** Empty-class mode: no skeleton or error, render only when there's something to show. */
+  quiet?: boolean;
 }
 
 /** Full quoted keys — the reports i18n contract test scans lookup maps like this one. */
@@ -95,7 +97,7 @@ const ROW_H = 44;
 const PAGER_RESERVE = 88;
 const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-edu-line px-3 text-sm font-bold text-edu-ink hover:border-edu-line disabled:opacity-40';
 
-export function ClassroomRosterProgress({ classroomId, classroomName = '' }: ClassroomRosterProgressProps) {
+export function ClassroomRosterProgress({ classroomId, classroomName = '', quiet = false }: ClassroomRosterProgressProps) {
   const { t, language } = useLanguage();
   const { hasPro, loading: proLoading } = useTeacherPro();
   const teacherId = useAuth().user?.id ?? null;
@@ -249,8 +251,8 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
     }
   }, [parentSummary]);
 
-  if (loading) return <ReportSkeleton />;
-  if (failed) return <ReportError onRetry={retry} />;
+  if (loading) return quiet ? null : <ReportSkeleton />;
+  if (failed) return quiet ? null : <ReportError onRetry={retry} />;
   if (!data || (data.rows.length === 0 && !data.testRun)) return null;
   const testRun = data.testRun;
   const pageCount = Math.max(1, Math.ceil(data.rows.length / Math.max(1, pageSize)));

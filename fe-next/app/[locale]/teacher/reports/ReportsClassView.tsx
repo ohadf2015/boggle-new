@@ -73,7 +73,10 @@ export function ReportsClassView({ classroomId, classroom, section, onSectionCha
       </div>
       {weekPanel}
       {classIsEmpty ? (
-        <ReportsClassEmpty classroomId={classroomId} />
+        <>
+          <ReportsClassEmpty classroomId={classroomId} />
+          <ClassroomRosterProgress classroomId={classroomId} classroomName={name} quiet />
+        </>
       ) : (
         <>
           <ClassOverview
