@@ -222,6 +222,52 @@ let checkoutReturnBeacon: Promise<void> | null = null;
 export function checkoutReturnBeaconPromise(): Promise<void> | null {
   return checkoutReturnBeacon;
 }
+
+/**
+ * POST the return beacon even if the unsigned landing already recorded it.
+ * After a teacher signs back in, this is what lets the server grant Pro.
+ * Never throws.
+ */
+export function claimCheckoutReturn(checkoutId?: string | null): Promise<void> {
+  let id = normalizeCheckoutId(checkoutId);
+  let path: string | undefined;
+  let url: string | null = null;
+  if (typeof window !== 'undefined') {
+    if (id === null) {
+      try {
+        id = checkoutIdFromSearch(window.location?.search ?? '');
+      } catch {
+        /* best-effort */
+      }
+    }
+    try {
+      path = window.location?.pathname;
+      const href = window.location?.href;
+      url = typeof href === 'string' && href.length <= 300 ? href : null;
+    } catch {
+      /* best-effort */
+    }
+  }
+  if (typeof fetch !== 'function') {
+    checkoutReturnBeacon = Promise.resolve();
+    return checkoutReturnBeacon;
+  }
+  const req = fetch('/api/subscription/checkout-return', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      product: 'teacher_pro',
+      provider: 'polar',
+      ...(path ? { path } : {}),
+      ...(id ? { checkout_id: id } : {}),
+      ...(url ? { url } : {}),
+    }),
+    keepalive: true,
+    credentials: 'same-origin',
+  }).then(() => undefined, () => undefined);
+  checkoutReturnBeacon = req;
+  return req;
+}
 /** A reload within this window is the same return from checkout, not a new one. */
 const SUCCESS_DEDUPE_MS = 24 * 3_600_000;
 

@@ -64,6 +64,36 @@ export function checkoutOwnerId(checkout: PolarCheckoutSnapshot): string | null 
   );
 }
 
+export function normalizeEmail(raw: unknown): string | null {
+  if (typeof raw !== 'string') return null;
+  const email = raw.trim().toLowerCase();
+  return email.includes('@') ? email : null;
+}
+
+/** Billing email Polar has for this checkout, if any. */
+export function checkoutCustomerEmail(checkout: PolarCheckoutSnapshot): string | null {
+  const customer = asRecord(checkout.customer);
+  const meta = asRecord(checkout.metadata);
+  return normalizeEmail(checkout.customer_email) || normalizeEmail(customer.email) || normalizeEmail(meta.email);
+}
+
+/**
+ * True when this checkout belongs to the signed-in teacher: Polar's external
+ * customer id matches their user id, or Polar's customer email matches theirs.
+ * Never true for an anonymous visitor (callers must pass a signed-in id).
+ */
+export function checkoutBelongsToTeacher(
+  checkout: PolarCheckoutSnapshot,
+  args: { authedUserId: string; authedEmail?: string | null },
+): boolean {
+  if (!args.authedUserId) return false;
+  const owner = checkoutOwnerId(checkout);
+  if (owner && owner === args.authedUserId) return true;
+  const polarEmail = checkoutCustomerEmail(checkout);
+  const userEmail = normalizeEmail(args.authedEmail);
+  return !!polarEmail && !!userEmail && polarEmail === userEmail;
+}
+
 export function checkoutProductId(checkout: PolarCheckoutSnapshot): string | null {
   const direct = str(checkout.product_id) || idFrom(checkout.product);
   if (direct) return direct;
@@ -87,11 +117,12 @@ function trialMarker(checkout: PolarCheckoutSnapshot): { trial: boolean; trialEn
  */
 export function planGrantFromPolarCheckout(
   checkout: PolarCheckoutSnapshot,
-  args: { authedUserId: string; proProductId?: string | null },
+  args: { authedUserId: string; authedEmail?: string | null; proProductId?: string | null },
 ): CheckoutGrantPlan {
   if (!checkoutIsSuccess(checkout)) return { ok: false, reason: 'not_success' };
-  const owner = checkoutOwnerId(checkout);
-  if (!owner || owner !== args.authedUserId) return { ok: false, reason: 'not_owner' };
+  if (!checkoutBelongsToTeacher(checkout, { authedUserId: args.authedUserId, authedEmail: args.authedEmail })) {
+    return { ok: false, reason: 'not_owner' };
+  }
   if (!args.proProductId) return { ok: false, reason: 'missing_product' };
   const productId = checkoutProductId(checkout);
   if (!productId || productId !== args.proProductId) return { ok: false, reason: 'foreign_product' };
@@ -114,11 +145,13 @@ export function planGrantFromPolarCheckout(
 export async function grantProOnCheckoutReturn(args: {
   checkout: PolarCheckoutSnapshot;
   authedUserId: string;
+  authedEmail?: string | null;
   proProductId?: string | null;
   grant?: typeof grantProFromCheckout;
 }): Promise<CheckoutGrantResult> {
   const plan = planGrantFromPolarCheckout(args.checkout, {
     authedUserId: args.authedUserId,
+    authedEmail: args.authedEmail,
     proProductId: args.proProductId,
   });
   if (!plan.ok) return 'skipped';

@@ -15963,7 +15963,10 @@ const sv = {
       "failureTitle": "Pro är inte bekräftat ännu",
       "failureBody": "Om du blev debiterad brukar åtkomsten komma inom en minut. Kontrollera igen, eller skriv till oss om den fortfarande saknas.",
       "retry": "Kontrollera igen",
-      "close": "Stäng"
+      "close": "Stäng",
+      "signInTitle": "Logga in för att aktivera Teacher Pro",
+      "signInBody": "Din betalning gick igenom. Logga in på samma lärarkonto för att slå på Pro.",
+      "signInCta": "Logga in"
     },
     "plan": {
       "pro": "Pro",

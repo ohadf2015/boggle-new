@@ -11,6 +11,12 @@ import {
   normalizeCheckoutId,
   readReturnIntent,
   rememberReturnIntent,
+  PENDING_RETURN_CHECKOUT_KEY,
+  PENDING_RETURN_CHECKOUT_TTL_MS,
+  clearPendingReturnCheckout,
+  pendingReturnCheckoutId,
+  readPendingReturnCheckout,
+  rememberPendingReturnCheckout,
 } from '../checkoutReturn';
 
 function mem(): Storage {
@@ -142,5 +148,39 @@ describe('isFreshCheckoutLanding', () => {
     expect(isFreshCheckoutLanding(store(), '?checkout=success', 0)).toBe(true);
     const broken = { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } };
     expect(isFreshCheckoutLanding(broken, search, 0)).toBe(true);
+  });
+});
+
+describe('pending return checkout id', () => {
+  const ID = '52e32342-5f87-49e6-ac1c-7c636b5192ff';
+
+  it('stores a Polar checkout id so a later sign-in can still claim it', () => {
+    const storage = mem();
+    rememberPendingReturnCheckout(storage, ID, 1_000);
+    expect(readPendingReturnCheckout(storage, 1_000)).toBe(ID);
+    expect(storage.getItem(PENDING_RETURN_CHECKOUT_KEY)).toBeTruthy();
+  });
+
+  it('prefers the success-URL checkout id over the stored one', () => {
+    const storage = mem();
+    rememberPendingReturnCheckout(storage, ID, 1_000);
+    const fromUrl = '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a';
+    expect(pendingReturnCheckoutId(`?checkout=success&checkout_id=${fromUrl}`, storage, 1_000)).toBe(fromUrl);
+  });
+
+  it('falls back to the stored id when the URL has none, and forgets an expired one', () => {
+    const storage = mem();
+    rememberPendingReturnCheckout(storage, ID, 1_000);
+    expect(pendingReturnCheckoutId('?checkout=success', storage, 1_000)).toBe(ID);
+    expect(readPendingReturnCheckout(storage, 1_000 + PENDING_RETURN_CHECKOUT_TTL_MS + 1)).toBeNull();
+    rememberPendingReturnCheckout(storage, ID, 1_000);
+    clearPendingReturnCheckout(storage);
+    expect(readPendingReturnCheckout(storage, 1_000)).toBeNull();
+  });
+
+  it('ignores a malformed stored id', () => {
+    const storage = mem();
+    rememberPendingReturnCheckout(storage, 'not-a-uuid', 1_000);
+    expect(readPendingReturnCheckout(storage, 1_000)).toBeNull();
   });
 });

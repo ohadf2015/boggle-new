@@ -49,6 +49,7 @@ import {
   PRO_SUCCESS_SEEN_STORAGE_KEY,
   RETURN_LANDED_STORAGE_KEY,
   trackEduProCheckoutReturnLanded,
+  claimCheckoutReturn,
   trackEduTrialReminderShown,
   trackEduTrialReminderCtaClick,
   trackTeacherTrialBannerShown,
@@ -582,5 +583,24 @@ describe('trackRecoveryClicked', () => {
       provider: 'polar',
     });
     keyState.present = true;
+  });
+});
+
+describe('claimCheckoutReturn', () => {
+  it('POSTs the checkout-return beacon even after the unsigned landing was already recorded', () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: true } as Response);
+    const checkoutId = '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a';
+    try {
+      trackEduProCheckoutReturnLanded(1_000, { checkoutId, url: null });
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(trackEduProCheckoutReturnLanded(2_000, { checkoutId, url: null })).toBe(false);
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      void claimCheckoutReturn(checkoutId);
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+      const body = JSON.parse(String(fetchSpy.mock.calls[1][1]?.body));
+      expect(body.checkout_id).toBe(checkoutId);
+    } finally {
+      fetchSpy.mockRestore();
+    }
   });
 });

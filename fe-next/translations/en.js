@@ -13937,7 +13937,10 @@ const en = {
       "failureTitle": "Pro is not confirmed yet",
       "failureBody": "If you were charged, access usually arrives within a minute. Check again, or write to us if it is still missing.",
       "retry": "Check again",
-      "close": "Close"
+      "close": "Close",
+      "signInTitle": "Sign in to finish activating Teacher Pro",
+      "signInBody": "Your checkout went through. Sign in to the same teacher account to turn Pro on.",
+      "signInCta": "Sign in"
     },
     "plan": {
       "pro": "Pro",

@@ -34,13 +34,11 @@ describe('<TeacherGate>', () => {
     expect(screen.queryByText('INSIDE')).toBeNull();
   });
 
-  it('keeps ?checkout=success on the return path so the grant poll can resume', () => {
-    window.history.pushState({}, '', '/en/teacher/curriculum?checkout=success');
+  it('does not redirect a Polar checkout return, so the teacher can sign in and finish activating Pro', () => {
+    window.history.pushState({}, '', '/en/teacher/curriculum?checkout=success&checkout_id=4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a');
     mockUseTeacherAccess.mockReturnValue({ hasAccess: false, status: 'none', isLoading: false });
     render(<TeacherGate><div>INSIDE</div></TeacherGate>);
-    expect(mockRouterReplace).toHaveBeenCalledWith(
-      '/en/education/access?from=' + encodeURIComponent('/en/teacher/curriculum?checkout=success'),
-    );
+    expect(mockRouterReplace).not.toHaveBeenCalled();
     window.history.pushState({}, '', '/');
   });
 
