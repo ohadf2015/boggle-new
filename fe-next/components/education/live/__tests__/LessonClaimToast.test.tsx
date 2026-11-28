@@ -92,6 +92,7 @@ describe('LessonClaimToast', () => {
   });
 
   it('Given a claim already shown, When the view remounts mid-round (reconnect), Then the old toast does not pop again but the next claim does', () => {
+    act(() => ingestLessonClaimsRound({ lessonClaims: { ...race, total: 3, slots: [...race.slots, { index: 2, first: 'A', length: 4, claim: null }] } }));
     act(() => ingestLessonClaim(claim('Noa')));
     render(<LessonClaimToast socket={fakeSocket() as never} me="Dana" t={t} dir="ltr" />);
     expect(screen.queryByTestId('lesson-claim-toast')).not.toBeInTheDocument();
@@ -121,5 +122,17 @@ describe('LessonClaimToast', () => {
     act(() => ingestLessonClaimsRound({}));
     const { container } = render(<LessonClaimToast socket={fakeSocket() as never} me="Dana" t={t} dir="ltr" />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('Given the class claims the last lesson word, When it lands, Then everyone sees the list-cleared banner that says the round is wrapping up, and it stays after the claim toast would leave', () => {
+    render(<LessonClaimToast socket={fakeSocket() as never} me="Dana" t={t} dir="ltr" />);
+    act(() => {
+      ingestLessonClaim(claim('Noa'));
+      ingestLessonClaim({ ...claim('Ari'), index: 1, word: 'cell', claimedCount: 2 });
+    });
+    expect(screen.getByTestId('lesson-list-cleared').textContent).toContain('education.race.listCleared:{"count":2}');
+    expect(screen.queryByTestId('lesson-claim-toast')).toBeNull();
+    act(() => vi.advanceTimersByTime(CLAIM_TOAST_MS + 100));
+    expect(screen.getByTestId('lesson-list-cleared')).toBeTruthy();
   });
 });

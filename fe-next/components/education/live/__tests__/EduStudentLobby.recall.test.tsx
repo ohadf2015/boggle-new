@@ -64,12 +64,17 @@ describe('EduStudentLobby learn then recall', () => {
     act(() => useStudyDeck.getState().clear());
   });
 
-  it('given a deck with definitions, when the lobby opens, then every word is listed with its meaning and READY waits for the quiz', () => {
+  it('given a deck with definitions, when the lobby opens, then every word shows as a chip, its meaning opens on tap, and READY waits for the quiz', () => {
     act(() => useStudyDeck.getState().setDeck('ROOM1', deck));
     render(<EduStudentLobby {...base} />);
 
     const meet = screen.getByTestId('recall-meet');
     for (const card of deck) expect(within(meet).getByText(card.word)).toBeInTheDocument();
+    expect(within(meet).queryByText('Carries water')).toBeNull();
+    const chip = within(meet).getByRole('button', { name: new RegExp(deck.find((c) => c.definition === 'Carries water')!.word) });
+    expect(chip).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(chip);
+    expect(chip).toHaveAttribute('aria-expanded', 'true');
     expect(within(meet).getByText('Carries water')).toBeInTheDocument();
     expect(screen.getByTestId('study-ready-locked')).toHaveTextContent('eduStudent.recall.readyLocked');
     expect(screen.queryByTestId('ready-slot')).not.toBeInTheDocument();

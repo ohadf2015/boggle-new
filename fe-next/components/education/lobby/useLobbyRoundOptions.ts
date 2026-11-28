@@ -35,7 +35,7 @@ export function useLobbyRoundOptions({ initialMinutes, initialQuestions, initial
   const [treasureChestsEnabled, setTreasureChestsEnabled] = useState(true);
   const [targetWord, setTargetWord] = useState('');
   const [minWordLength, setMinWordLength] = useState(3);
-  const [timerMinutes, setTimerMinutes] = useState(initialMinutes ?? remembered?.timerMinutes ?? 3);
+  const [timerMinutes, setTimerMinutes] = useState(initialMinutes ?? remembered?.timerMinutes ?? 2);
   const [allowLateJoin, setAllowLateJoin] = useState(remembered?.allowLateJoin ?? true);
   const [economy, setEconomy] = useState<ClassroomEconomyConfig>(ZERO_ECONOMY_SNAPSHOT.config);
   const [rivalry, setRivalry] = useState(true);

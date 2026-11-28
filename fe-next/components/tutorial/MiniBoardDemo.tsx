@@ -65,7 +65,7 @@ export function MiniBoardDemo({ word, points, rtl = false, reduced = false, clas
           <m.span
             data-testid="mini-finger"
             data-offset="below-right"
-            className="pointer-events-none absolute -ms-2.5 -mt-2.5 h-5 w-5 rounded-full border-[3px] border-neo-cream bg-transparent shadow-[0_0_0_2px_rgb(var(--neo-black))]"
+            className="pointer-events-none absolute -ms-2.5 -mt-2.5 h-5 w-5 rounded-full border-[3px] border-neo-cream edu-sky:border-edu-line bg-transparent shadow-[0_0_0_2px_rgb(var(--neo-black))]"
             style={{ left: 0, top: 0 }}
             initial={false}
             animate={{

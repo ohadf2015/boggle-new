@@ -32,7 +32,7 @@ export interface ClassroomPresetValues {
 
 export const CLASSROOM_PRESETS: Record<ClassroomPresetId, ClassroomPresetValues> = {
   standard: {
-    timerMinutes: 3,
+    timerMinutes: 2,
     boardSize: 'medium',
     minWordLength: 3,
     playStyle: 'ffa',
@@ -42,7 +42,7 @@ export const CLASSROOM_PRESETS: Record<ClassroomPresetId, ClassroomPresetValues>
   },
   // The named weekly ritual: last list, teams by default, loud and fast.
   'friday-battle': {
-    timerMinutes: 3,
+    timerMinutes: 2,
     boardSize: 'medium',
     minWordLength: 3,
     playStyle: 'teams',
@@ -53,7 +53,7 @@ export const CLASSROOM_PRESETS: Record<ClassroomPresetId, ClassroomPresetValues>
   // Support/SPED: fewer words, longer timer, larger type, audio cues, and a
   // flat participation bonus so every student scores.
   sped: {
-    timerMinutes: 5,
+    timerMinutes: 4,
     boardSize: 'small',
     minWordLength: 2,
     playStyle: 'ffa',

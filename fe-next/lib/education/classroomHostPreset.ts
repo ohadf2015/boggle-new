@@ -28,7 +28,7 @@ const BOARD_SIZE_TO_DIFFICULTY: Record<string, DifficultyLevel> = {
   large: 'HARD',
 };
 
-const DEFAULT_TIMER_MINUTES = 3;
+const DEFAULT_TIMER_MINUTES = 2;
 const DEFAULT_MIN_WORD_LENGTH = 3;
 
 export function classroomHostPreset(

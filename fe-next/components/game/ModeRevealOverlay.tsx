@@ -50,8 +50,8 @@ const ModeRevealOverlay: React.FC<ModeRevealOverlayProps> = ({
   return (
     // Solid full-screen layer like MpCountdownStage: the board behind it is not
     // interactive until GO, so it must not be visible (GR #11487 rage clicks).
-    <div data-testid="mode-reveal" className="fixed inset-0 z-[10000] bg-neo-navy flex items-center justify-center overflow-hidden px-4">
-      <PopIn className="flex w-full max-w-sm flex-col items-center gap-3 rounded-[28px] border-3 border-neo-black bg-neo-navy-light px-5 py-8 text-center shadow-[0_6px_0_rgb(var(--neo-black))] tv:max-w-2xl tv:py-14">
+    <div data-testid="mode-reveal" className="fixed inset-0 z-[10000] bg-neo-navy edu-sky:bg-edu-page flex items-center justify-center overflow-hidden px-4">
+      <PopIn className="flex w-full max-w-sm flex-col items-center gap-3 rounded-[28px] border-3 border-neo-black bg-neo-navy-light edu-sky:bg-edu-surface px-5 py-8 text-center shadow-[0_6px_0_rgb(var(--neo-black))] tv:max-w-2xl tv:py-14">
         {showRound && (
           <span
             data-testid="round-splash"
@@ -60,7 +60,7 @@ const ModeRevealOverlay: React.FC<ModeRevealOverlayProps> = ({
             {t('countdown.round', { number: displayRound! })}
           </span>
         )}
-        <span className="max-w-full break-words font-neo-display text-5xl font-bold uppercase text-neo-lime tv:text-8xl">
+        <span className="max-w-full break-words font-neo-display text-5xl font-bold uppercase text-neo-lime edu-sky:text-edu-lime-ink tv:text-8xl">
           {modeLabel}
         </span>
       </PopIn>

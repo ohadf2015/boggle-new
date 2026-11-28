@@ -36,6 +36,16 @@ export const EDU_SKY_ROOTS = [
   'app/[locale]/education/help',
   'app/[locale]/dev/boss',
   'app/[locale]/dev/reward-chest',
+  // Main-game pieces a classroom student sees before and around the board; twinned, so the main game keeps its look.
+  'components/multiplayer/round/MpCountdownStage.tsx',
+  'components/multiplayer/shell/MpScreen.tsx',
+  'components/multiplayer/ClassroomJoinNamePrompt.tsx',
+  'components/tutorial/CoachDemo.tsx',
+  'components/tutorial/MiniBoardDemo.tsx',
+  'components/game/ModeRevealOverlay.tsx',
+  'components/GoRipplesAnimation.tsx',
+  'player/PlayerView.tsx',
+  'player/components/PlayerInGameView.tsx',
 ];
 
 /** Route roots that render <EduSkyScope> and export the sky viewport. */

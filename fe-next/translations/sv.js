@@ -15686,11 +15686,20 @@ const sv = {
       "chestDone": "Kistan öppnad",
       "streak": "Håll din {count}-dagarslåga vid liv",
       "streakDone": "Lågan tänd idag",
+      "streakStart": "Tänd din låga",
       "warmupCta": "Värm upp inför spelet",
       "play": "Spela"
     }
   },
   "teacher": {
+    "studentView": {
+      "open": "Se elevappen",
+      "banner": "Elevvy: det här ser {name}",
+      "back": "Tillbaka till klassen",
+      "error": "Vi kunde inte ladda klassens lektioner.",
+      "retry": "Försök igen",
+      "studentName": "Du"
+    },
     "classPage": {
       "noLists": "Klassen har inga ordlistor än.",
       "coverage": "{pct} % av listans ord hittade"
@@ -16325,15 +16334,15 @@ const sv = {
         "title": "Snabbinställningar",
         "fridayBattle": {
           "name": "Fredagens ordkamp",
-          "desc": "Lag · din senaste lista · högljutt och snabbt"
+          "desc": "Två lag tävlar om att hitta lektionsorden"
         },
         "sped": {
           "name": "Stöd (SPED)",
-          "desc": "Färre ord · mer tid · större text"
+          "desc": "Färre ord, mer tid och större bokstäver"
         },
         "standard": {
           "name": "Standard",
-          "desc": "Alla mot alla · 3 minuter"
+          "desc": "Alla spelar för sig själva"
         }
       },
       "playStyle": {
@@ -17233,6 +17242,7 @@ const sv = {
       "claimedCount": "{claimed}/{total} tagna",
       "takenBy": "{name} hittade {word} först",
       "youClaimed": "{word} är din! +{bonus}",
+      "listCleared": "Klassen hittade alla {count} lektionsord! 🎉",
       "claimedBy": "{name} snodde {word}!",
       "projectorTitle": "Ordrace"
     },
@@ -22455,6 +22465,10 @@ const sv = {
     }
   },
   "eduStudent": {
+    "countdown": {
+      "goal": "Hitta {count} lektionsord!",
+      "goalBonus": "+{bonus} poäng per ord"
+    },
     "mode": {
       "vocabQuiz": {
         "rule": "Läs ledtråden och tryck på ordet som passar. Snabbt och rätt ger mest poäng."
@@ -22482,7 +22496,7 @@ const sv = {
       "studyLearned_other": "{count} ord klara"
     },
     "recall": {
-      "intro": "Läs igenom dem, sen kollar ett snabbt quiz att de sitter.",
+      "intro": "Tryck på ett ord för att se vad det betyder.",
       "start": "Starta quizet",
       "question": "Vilket ord betyder det här?",
       "spellQuestion": "Bygg ordet som betyder detta",

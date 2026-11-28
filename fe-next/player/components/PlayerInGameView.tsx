@@ -332,7 +332,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           {Array.from({ length: 16 }).map((_, i) => (
             <div
               key={`placeholder-${i}`}
-              className="aspect-square rounded-xl bg-slate-700/50 text-white animate-pulse"
+              className="aspect-square rounded-xl bg-slate-700/50 text-white edu-sky:text-edu-ink animate-pulse"
               style={{ animationDelay: `${i * 50}ms` }}
             />
           ))}

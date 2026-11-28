@@ -13660,11 +13660,20 @@ const en = {
       "chestDone": "Chest opened",
       "streak": "Keep your {count}-day flame",
       "streakDone": "Flame lit today",
+      "streakStart": "Light your flame",
       "warmupCta": "Warm up for the game",
       "play": "Play"
     }
   },
   "teacher": {
+    "studentView": {
+      "open": "See the student app",
+      "banner": "Student view: what {name} sees",
+      "back": "Back to class",
+      "error": "We couldn't load this class's lessons.",
+      "retry": "Try again",
+      "studentName": "You"
+    },
     "classPage": {
       "noLists": "No word lists in this class yet.",
       "coverage": "{pct}% of list words found"
@@ -14030,15 +14039,15 @@ const en = {
         "title": "Quick setups",
         "fridayBattle": {
           "name": "Friday Vocab Battle",
-          "desc": "Teams · your last list · fast-paced"
+          "desc": "Two teams race to find the lesson words"
         },
         "sped": {
           "name": "Support (SPED)",
-          "desc": "Fewer words · more time · larger type"
+          "desc": "Fewer words, more time and bigger letters"
         },
         "standard": {
           "name": "Standard",
-          "desc": "Everyone for themselves · 3 minutes"
+          "desc": "Everyone plays for themselves"
         }
       },
       "playStyle": {
@@ -15207,6 +15216,7 @@ const en = {
       "claimedCount": "{claimed}/{total} claimed",
       "takenBy": "{name} got {word} first",
       "youClaimed": "{word} is yours! +{bonus}",
+      "listCleared": "Class found all {count} lesson words! 🎉",
       "claimedBy": "{name} grabbed {word}!",
       "projectorTitle": "Word race"
     },
@@ -21476,6 +21486,10 @@ const en = {
     }
   },
   "eduStudent": {
+    "countdown": {
+      "goal": "Find {count} lesson words!",
+      "goalBonus": "+{bonus} points each"
+    },
     "mode": {
       "vocabQuiz": {
         "rule": "Read the clue, tap the matching word. Quick and correct scores most."
@@ -21503,7 +21517,7 @@ const en = {
       "studyLearned_other": "{count} words learned"
     },
     "recall": {
-      "intro": "Read through them, then a quick quiz checks you've got them.",
+      "intro": "Tap a word to see what it means.",
       "start": "Quiz me",
       "question": "Which word means this?",
       "spellQuestion": "Build the word that means this",

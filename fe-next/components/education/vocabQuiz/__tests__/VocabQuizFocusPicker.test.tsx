@@ -55,8 +55,8 @@ function setup(words: VocabularyWord[], overrides: Record<string, unknown> = {})
     <VocabQuizFocusPicker
       words={words}
       focus="any"
-      questionCount={10}
-      secondsPerQuestion={20}
+      questionCount={8}
+      secondsPerQuestion={15}
       onFocusChange={onFocusChange}
       onQuestionCountChange={onQuestionCountChange}
       onSecondsChange={onSecondsChange}
@@ -120,8 +120,8 @@ describe('VocabQuizFocusPicker', () => {
 
   it('lets the teacher set the round length and the per-question clock', async () => {
     const { onQuestionCountChange, onSecondsChange } = setup(ENRICHED);
-    await userEvent.click(screen.getByRole('radio', { name: '15' }));
-    expect(onQuestionCountChange).toHaveBeenCalledWith(15);
+    await userEvent.click(screen.getByRole('radio', { name: '12' }));
+    expect(onQuestionCountChange).toHaveBeenCalledWith(12);
     await userEvent.click(screen.getByRole('radio', { name: 'vocabQuiz.setup.seconds:30' }));
     expect(onSecondsChange).toHaveBeenCalledWith(30);
   });

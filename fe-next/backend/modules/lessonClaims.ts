@@ -11,6 +11,7 @@ import {
   LESSON_RACE_MAX_SLOTS,
   LESSON_RACE_MIN_HUMANS,
   LESSON_RACE_MODES,
+  LIST_CLEARED_END_MS,
 } from '@/shared/constants/lessonScoring';
 import {
   LESSON_WORD_CLAIMED_EVENT,
@@ -21,6 +22,8 @@ import {
 } from '@/shared/types/lessonClaims';
 import { lessonWordKey } from '@/shared/utils/wordNormalization';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
+import { clearGameTimer } from '../utils/timerManager.js';
+import logger from '../utils/logger.js';
 
 export interface LessonClaimsState {
   roundId: number;
@@ -163,7 +166,19 @@ function claimAndAnnounce(io: Server, gameCode: string, game: RaceGame & { lesso
   });
   if (!event) return 0;
   broadcastToRoom(io, getGameRoom(gameCode), LESSON_WORD_CLAIMED_EVENT, event);
+  if (event.claimedCount === event.total) endWhenListCleared(io, gameCode, game, event.roundId);
   return event.bonus;
+}
+
+function endWhenListCleared(io: Server, gameCode: string, game: RaceGame, roundId: number): void {
+  clearGameTimer(gameCode);
+  const t = setTimeout(() => {
+    if ((game.gameSessionId ?? 0) !== roundId || game.gameState !== 'in-progress') return;
+    void import('../services/gameLifecycle/gameEnd.js')
+      .then(({ endGame }) => endGame(io, gameCode))
+      .catch((err: Error) => logger.error('LESSON_RACE', `${gameCode}: endGame after list cleared failed: ${err.message}`));
+  }, LIST_CLEARED_END_MS);
+  t.unref?.();
 }
 
 /** Hook-in for the accepted-word path: records the claim, tells the room, returns the bonus to add. */

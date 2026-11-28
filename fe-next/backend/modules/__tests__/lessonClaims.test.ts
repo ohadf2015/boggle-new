@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+const endGame = vi.fn(async () => {});
+vi.mock('../../services/gameLifecycle/gameEnd.js', () => ({ endGame }));
+vi.mock('../../utils/timerManager.js', () => ({ clearGameTimer: vi.fn() }));
+
 vi.mock('../../utils/socketHelpers.js', () => ({
   broadcastToRoom: vi.fn(),
   getGameRoom: (code: string) => `game:${code}`,
@@ -16,7 +20,7 @@ import {
   onBotWordPlayed,
   type LessonClaimsState,
 } from '../lessonClaims';
-import { LESSON_CLAIM_BONUS, LESSON_RACE_MAX_SLOTS } from '@/shared/constants/lessonScoring';
+import { LESSON_CLAIM_BONUS, LESSON_RACE_MAX_SLOTS, LIST_CLEARED_END_MS } from '@/shared/constants/lessonScoring';
 
 const start = (over: Partial<Parameters<typeof startLessonClaims>[0]> = {}) =>
   startLessonClaims({
@@ -295,5 +299,46 @@ describe('teacher previewing with bots', () => {
     const g = { ...room(game.lessonClaims as LessonClaimsState, { Teacher: { isHost: true }, Noa: {}, Dana: {}, Bolt: { isBot: true } }), gameSessionId: 5 };
     expect(lessonClaimsView(g.lessonClaims!).claimedCount).toBe(0);
     expect(botPlays(g)).toBe(0);
+  });
+});
+
+describe('class clears the whole list', () => {
+  const game = () => ({
+    lessonClaims: start({ placedWords: ['storm', 'shad'] }),
+    gameSessionId: 4,
+    gameState: 'in-progress',
+    language: 'en',
+    users: { Noa: { isBot: false }, Ari: { isBot: false } },
+  });
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    endGame.mockClear();
+    vi.mocked(broadcastToRoom).mockClear();
+  });
+
+  it('Given 2 lesson words, When students claim both, Then the room hears the list is cleared and the round ends after a short hold', async () => {
+    const g = game();
+    onLessonWordAccepted({} as never, 'ABCD', g as never, { word: 'storm', username: 'Noa', fromLesson: true });
+    await vi.advanceTimersByTimeAsync(LIST_CLEARED_END_MS * 2);
+    expect(endGame).not.toHaveBeenCalled();
+
+    onLessonWordAccepted({} as never, 'ABCD', g as never, { word: 'shad', username: 'Ari', fromLesson: true });
+    expect(broadcastToRoom).toHaveBeenLastCalledWith({}, 'game:ABCD', 'lessonWordClaimed', expect.objectContaining({ claimedCount: 2, total: 2 }));
+    await vi.advanceTimersByTimeAsync(LIST_CLEARED_END_MS - 1);
+    expect(endGame).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1);
+    expect(endGame).toHaveBeenCalledWith({}, 'ABCD');
+    vi.useRealTimers();
+  });
+
+  it('Given the list is cleared, When the round already ended or a new round dealt before the hold ran out, Then it does not end anything', async () => {
+    const g = game();
+    onLessonWordAccepted({} as never, 'ABCD', g as never, { word: 'storm', username: 'Noa', fromLesson: true });
+    onLessonWordAccepted({} as never, 'ABCD', g as never, { word: 'shad', username: 'Ari', fromLesson: true });
+    g.gameSessionId = 5;
+    await vi.advanceTimersByTimeAsync(LIST_CLEARED_END_MS);
+    expect(endGame).not.toHaveBeenCalled();
+    vi.useRealTimers();
   });
 });

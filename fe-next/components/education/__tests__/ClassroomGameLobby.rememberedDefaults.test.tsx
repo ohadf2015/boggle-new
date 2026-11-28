@@ -59,6 +59,6 @@ describe('ClassroomGameLobby remembered round defaults', () => {
   });
 
   it('given a first-time teacher, when they go live, then the sane defaults apply', () => {
-    expect(mount()).toMatchObject({ timerMinutes: 3, boardSize: 'medium', allowLateJoin: true });
+    expect(mount()).toMatchObject({ timerMinutes: 2, boardSize: 'medium', allowLateJoin: true });
   });
 });

@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { SocketContext } from '@/utils/SocketContext';
 import GridComponent from '@/components/GridComponent';
 import { MpRoundLayout } from '@/components/multiplayer/round/MpRoundLayout';
+import { ClassroomBoardProvider } from '@/components/education/live/classroomBoard';
 import { MpRoundTraySlot } from '@/components/multiplayer/round/MpRoundTray';
 import { MP_ROUND_CONTAINER_CLASS } from '@/components/multiplayer/round/roundContainer';
 import { ClassroomRoundDock } from '@/components/education/live/ClassroomRoundDock';
@@ -12,6 +13,7 @@ import { EduStudentLobby } from '@/components/education/live/EduStudentLobby';
 import { ClassroomStreakFlame } from '@/components/education/economy/ClassroomStreakFlame';
 import { LessonClaimToast } from '@/components/education/live/LessonClaimToast';
 import { ingestLessonClaim, ingestLessonClaimsRound } from '@/components/education/live/useLessonClaims';
+import { MpCountdownStage, __resetCountdownDupGuard } from '@/components/multiplayer/round/MpCountdownStage';
 import { CLASSROOM_ECONOMY_EVENTS as E } from '@/shared/constants/classroomEconomy';
 import { RIVAL_EVENTS } from '@/shared/types/rivalry';
 import { useStudyDeck } from '@/lib/education/studyDeckStore';
@@ -163,6 +165,7 @@ export function LiveRoundPreview({ state, v }: { state: string; v?: string }) {
   );
   return (
     <SocketContext.Provider value={value}>
+      <ClassroomBoardProvider value>
       <div className="flex h-dvh flex-col">
         <div className={MP_ROUND_CONTAINER_CLASS}>
           <MpRoundLayout
@@ -183,6 +186,23 @@ export function LiveRoundPreview({ state, v }: { state: string; v?: string }) {
           <LessonClaimToast socket={socket.asSocket()} me={f.me} t={t as T} dir={language === 'he' ? 'rtl' : 'ltr'} />
         </div>
       </div>
+      </ClassroomBoardProvider>
     </SocketContext.Provider>
+  );
+}
+
+/** The classroom 3-2-1, restarted every 2.5s so it never reaches GO; `v` picks the mode (default classic, with an 8-word race). */
+export function CountdownPreview({ v }: { v?: string }) {
+  const [run, setRun] = useState(0);
+  useEffect(() => {
+    ingestLessonClaimsRound({ lessonClaims: { roundId: 1, total: 8, claimedCount: 0, slots: [] } });
+    setRun(1);
+    const id = window.setInterval(() => { __resetCountdownDupGuard(); setRun((n) => n + 1); }, 2500);
+    return () => window.clearInterval(id);
+  }, []);
+  return (
+    <ClassroomBoardProvider value>
+      {run > 0 && <MpCountdownStage key={run} classroom={{ mode: v ?? 'classic' }} />}
+    </ClassroomBoardProvider>
   );
 }

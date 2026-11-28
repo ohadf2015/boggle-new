@@ -6,9 +6,9 @@
  *   support   → collapsible bottom-sheet "Word bank (N)" listing the lesson words
  *               embedded in the board (large type, tap to expand; collapsed by default
  *               so it never covers the grid unasked).
- *   challenge → small badge: "Challenge: aim for 5+ letter words".
- *   core      → in a Classic round, a "Lesson words 1/4" strip: each word on the board
- *               shows only its first letter until the student finds it. Nothing elsewhere.
+ *   core, challenge → in a Classic round, a "Lesson words 1/4" strip: each word on the board
+ *               shows only its first letter until the student finds it. Elsewhere challenge
+ *               gets a small "aim for 5+ letter words" badge.
  *
  * Both `level` and `words` come from the server's per-socket `classroomContext`
  * (see useMultiplayerSocket). The board is shared, so this changes what the
@@ -56,7 +56,7 @@ export function StudentWordBank({
   const gameModeConfirmed = useGameStore((s) => s.gameModeConfirmed);
   const gameLanguage = useGameStore((s) => s.gameLanguage);
   const targets = useMemo(
-    () => (level === 'core'
+    () => (level !== 'support'
       ? buildLessonTargets({ words, foundWords, grid, language: gameLanguage ?? language, gameMode, gameModeConfirmed })
       : null),
     [level, words, foundWords, grid, gameLanguage, language, gameMode, gameModeConfirmed],

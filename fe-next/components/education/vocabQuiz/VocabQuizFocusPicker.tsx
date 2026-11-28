@@ -52,8 +52,8 @@ const FOCUS_CHIPS: { key: VocabFocus; icon: typeof BookOpen }[] = VOCAB_FOCUSES.
   icon: FOCUS_ICONS[key] ?? HelpCircle,
 }));
 
-const QUESTION_COUNTS = [5, 10, 15, 20] as const;
-const SECONDS_CHOICES = [10, 20, 30, 45] as const;
+const QUESTION_COUNTS = [5, 8, 12, 20] as const;
+const SECONDS_CHOICES = [10, 15, 20, 30] as const;
 
 export interface VocabQuizFocusPickerProps {
   /** The teacher's selected lesson words, with whatever per-word data they hold. */

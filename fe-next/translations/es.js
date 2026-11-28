@@ -15322,11 +15322,20 @@ const es = {
       "chestDone": "Cofre abierto",
       "streak": "Mantén tu racha de {count} días",
       "streakDone": "Racha encendida hoy",
+      "streakStart": "Enciende tu llama",
       "warmupCta": "Calienta para el juego",
       "play": "Jugar"
     }
   },
   "teacher": {
+    "studentView": {
+      "open": "Ver la app del alumno",
+      "banner": "Vista de alumno: lo que ve {name}",
+      "back": "Volver a la clase",
+      "error": "No pudimos cargar las lecciones de esta clase.",
+      "retry": "Reintentar",
+      "studentName": "Tú"
+    },
     "classPage": {
       "noLists": "Esta clase aún no tiene listas de palabras.",
       "coverage": "Encontraron el {pct} % de la lista"
@@ -15941,15 +15950,15 @@ const es = {
         "title": "Ajustes rápidos",
         "fridayBattle": {
           "name": "Batalla de vocabulario del viernes",
-          "desc": "Equipos · tu última lista · rápido y ruidoso"
+          "desc": "Dos equipos compiten por encontrar las palabras de la lección"
         },
         "sped": {
           "name": "Apoyo (SPED)",
-          "desc": "Menos palabras · más tiempo · letra grande"
+          "desc": "Menos palabras, más tiempo y letras más grandes"
         },
         "standard": {
           "name": "Estándar",
-          "desc": "Cada uno por su cuenta · 3 minutos"
+          "desc": "Cada uno juega por su cuenta"
         }
       },
       "playStyle": {
@@ -16870,6 +16879,7 @@ const es = {
       "claimedCount": "{claimed}/{total} atrapadas",
       "takenBy": "{name} encontró {word} primero",
       "youClaimed": "¡{word} es tuya! +{bonus}",
+      "listCleared": "¡La clase encontró las {count} palabras de la lección! 🎉",
       "claimedBy": "¡{name} se llevó {word}!",
       "projectorTitle": "Carrera de palabras"
     },
@@ -22467,6 +22477,10 @@ const es = {
     }
   },
   "eduStudent": {
+    "countdown": {
+      "goal": "¡Encuentra {count} palabras de la lección!",
+      "goalBonus": "+{bonus} puntos cada una"
+    },
     "mode": {
       "vocabQuiz": {
         "rule": "Lee la pista y toca la palabra que encaja. Rápido y bien es lo que más puntúa."
@@ -22494,7 +22508,7 @@ const es = {
       "studyLearned_other": "{count} palabras aprendidas"
     },
     "recall": {
-      "intro": "Léelas una vez y luego un quiz rápido comprueba que te las sabes.",
+      "intro": "Toca una palabra para ver qué significa.",
       "start": "Empezar el quiz",
       "question": "¿Qué palabra significa esto?",
       "spellQuestion": "Arma la palabra que significa esto",

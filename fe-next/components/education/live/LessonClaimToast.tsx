@@ -12,6 +12,7 @@ import { BURST_COLORS } from '@/components/education/economy/cashBurst';
 import { useLastLessonClaim, useLessonClaims } from './useLessonClaims';
 
 export const CLAIM_TOAST_MS = 3500;
+const LANE = 'pointer-events-none fixed inset-x-0 top-[calc(3.5rem+env(safe-area-inset-top))] z-50 flex justify-center px-2 lg:top-[5.5rem]';
 const TOAST_REACTIONS = REACTIONS.slice(0, 3);
 const SHOWN_INCOMING = 5;
 const BURST_PIECES = Array.from({ length: 14 }, (_, i) => ({
@@ -56,6 +57,25 @@ export function LessonClaimToast({ socket, me, t, dir }: LessonClaimToastProps) 
     return () => window.clearTimeout(timer);
   }, [claim, dismissReaction, me, playRareWordSound]);
 
+  if (race && race.total > 0 && race.claimedCount === race.total) {
+    return (
+      <div dir={dir} className={LANE}>
+        <m.div
+          data-testid="lesson-list-cleared"
+          role="status"
+          initial={reduced ? false : { y: -24, scale: 0.85 }}
+          animate={{ y: 0, scale: 1 }}
+          transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 14 }}
+          className="w-full max-w-xl rounded-neo border-4 border-neo-black bg-neo-yellow px-3 py-2 text-center text-neo-black shadow-hard-lg"
+        >
+          <span className="block font-neo-display text-2xl font-black uppercase leading-tight [overflow-wrap:anywhere]">
+            {t('education.race.listCleared', { count: race.total })}
+          </span>
+        </m.div>
+      </div>
+    );
+  }
+
   if (!race || !claim || shownSeq !== claim.seq) return null;
 
   const mine = claim.username.toLowerCase() === me.toLowerCase();
@@ -63,7 +83,7 @@ export function LessonClaimToast({ socket, me, t, dir }: LessonClaimToastProps) 
   const enter = reduced ? false : { y: -16, scale: 0.92 };
 
   return (
-    <div dir={dir} className="pointer-events-none fixed inset-x-0 top-[calc(3.5rem+env(safe-area-inset-top))] z-50 flex justify-center px-2 lg:top-[5.5rem]">
+    <div dir={dir} className={LANE}>
       {mine ? (
         <m.div
           key={claim.seq}

@@ -75,8 +75,15 @@ describe('EduStudentLobby ready path', () => {
     expect(screen.queryByTestId('study-ready-locked')).toBeNull();
   });
 
+  it('given a student still practising, then the bar shows only the locked READY line, not a second instruction', () => {
+    seedDeck();
+    render(<EduStudentLobby {...base} />);
+    const footer = screen.getByTestId('edu-student-lobby-bar');
+    expect(within(footer).queryByTestId('edu-student-waiting')).toBeNull();
+    expect(within(footer).getByTestId('study-ready-locked')).toBeInTheDocument();
+  });
+
   it.each([
-    ['still practising', true, false, 'eduLiveRoom.student.waitPractice'],
     ['free to get ready', false, false, 'eduLiveRoom.student.waitReady'],
     ['already ready', false, true, 'academy.waiting.forTeacher'],
   ])('given a student %s, then the pinned bar says what they are waiting for', (_label, withDeck, isReady, key) => {

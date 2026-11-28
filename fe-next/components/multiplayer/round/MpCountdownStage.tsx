@@ -18,6 +18,9 @@ import { PopIn } from '@/components/motion/PopIn';
 import { captionKeyFor, getModeCoach } from '@/lib/tutorial/modeCoachContent';
 import { useTypingDesktop } from '@/lib/input/typedWordHint';
 import { mpCoachMode } from '@/lib/tutorial/mpCoachMode';
+import { useLessonClaims } from '@/components/education/live/useLessonClaims';
+import { useClassroomContextStore } from '@/hooks/gameState/classroomContextStore';
+import { LESSON_RACE_MODES, LESSON_WORD_BONUS } from '@/shared/constants/lessonScoring';
 import styles from './round.module.css';
 
 /** Max avatars in the "who am I about to play?" row; the rest become "+N". */
@@ -92,6 +95,9 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
     : classroom ? classroomRoundModeMeta(classroom.mode, classroom.vocabQuizVariant) : roundModeMeta(storeMode);
   const coachKey = bossRound ? undefined : mpCoachMode((classroom ? classroom.mode : storeMode) ?? undefined);
   const howTo = coachKey ? getModeCoach(coachKey) : null;
+  const race = useLessonClaims();
+  const bankSize = useClassroomContextStore((s) => s.wordBank.length);
+  const lessonGoal = classroom && !bossRound && classroom.mode && LESSON_RACE_MODES.has(classroom.mode) ? (race?.total || bankSize) : 0;
 
   // onComplete in a ref: parent re-renders (timeUpdate) pass new callbacks and
   // must never reset the countdown clock (the old "stuck at 3" bug).
@@ -145,12 +151,12 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
       data-mode={mode.slug}
       role="status"
       aria-live="assertive"
-      className="fixed inset-0 z-[10000] flex flex-col items-center justify-center gap-[min(3vh,1.5rem)] overflow-hidden bg-neo-navy opacity-100 text-neo-white pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] px-4 select-none tv:gap-10"
+      className="fixed inset-0 z-[10000] flex flex-col items-center justify-center gap-[min(3vh,1.5rem)] overflow-hidden bg-neo-navy edu-sky:bg-edu-page opacity-100 text-neo-white edu-sky:text-edu-ink pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] px-4 select-none tv:gap-10"
     >
       {/* 1. The mode card springs in: what you're about to play, in one line. */}
       <PopIn
         data-testid="mp-countdown-card"
-        className="flex w-full max-w-sm flex-col items-center gap-2 rounded-[28px] border-3 border-neo-black bg-neo-navy-light px-5 pt-5 pb-4 text-center shadow-[0_6px_0_rgb(var(--neo-black))] tv:max-w-2xl tv:gap-4 tv:p-10"
+        className="flex w-full max-w-sm flex-col items-center gap-2 rounded-[28px] border-3 border-neo-black bg-neo-navy-light edu-sky:bg-edu-surface px-5 pt-5 pb-4 text-center shadow-[0_6px_0_rgb(var(--neo-black))] tv:max-w-2xl tv:gap-4 tv:p-10"
       >
         <span
           data-testid="mp-countdown-icon"
@@ -158,14 +164,23 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
         >
           <Icon aria-hidden="true" className="h-9 w-9 tv:h-16 tv:w-16" strokeWidth={2.5} />
         </span>
-        <span data-testid="mp-countdown-mode" className={cn('font-neo-display font-bold uppercase tracking-wide text-3xl tv:text-6xl', MODE_TEXT[mode.color])}>
+        <span data-testid="mp-countdown-mode" className={cn('font-neo-display font-bold uppercase tracking-wide text-3xl tv:text-6xl', MODE_TEXT[mode.color], 'edu-sky:text-edu-ink')}>
           {t(mode.nameKey)}
         </span>
-        <p data-testid="mp-countdown-rule" dir="auto" className="font-neo-body font-bold text-base tv:text-3xl text-neo-white/85 leading-snug text-balance">
-          {t(mode.ruleKey)}
-        </p>
+        {lessonGoal > 0 ? (
+          <p data-testid="mp-countdown-goal" dir="auto" className="flex flex-col items-center gap-1.5 font-neo-display font-black leading-tight tv:gap-4">
+            <span className="text-2xl tv:text-5xl">{t('eduStudent.countdown.goal', { count: lessonGoal })}</span>
+            <span className="rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-0.5 text-base text-neo-black shadow-[0_3px_0_rgb(var(--neo-black))] tv:text-3xl">
+              {t('eduStudent.countdown.goalBonus', { bonus: LESSON_WORD_BONUS })}
+            </span>
+          </p>
+        ) : (
+          <p data-testid="mp-countdown-rule" dir="auto" className="font-neo-body font-bold text-base tv:text-3xl text-neo-white/85 edu-sky:text-edu-ink/85 leading-snug text-balance">
+            {t(mode.ruleKey)}
+          </p>
+        )}
         {/* 2. The move itself, looping: a finger swipes a real word and it scores. */}
-        {demo && howTo && (
+        {lessonGoal === 0 && demo && howTo && (
           <PopIn delay={0.15} data-testid="mp-countdown-howto" className="mt-1 flex flex-col items-center gap-1.5 tv:scale-150 tv:my-8">
             {demo.demo === 'drag' ? (
               <MiniBoardDemo word={t('mpUi.round.demoWord')} points={3} rtl={dir === 'rtl'} reduced={reduceMotion} />
@@ -174,7 +189,7 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
                 <CoachDemo demo={demo.demo} accent={howTo.accent} emoji={demo.emoji} />
               </div>
             )}
-            <span dir="auto" className={demo.demo === 'drag' ? 'sr-only' : 'font-neo-body text-sm font-bold text-neo-white/70'}>{t(captionKeyFor(demo, typingDesktop))}</span>
+            <span dir="auto" className={demo.demo === 'drag' ? 'sr-only' : 'font-neo-body text-sm font-bold text-neo-white/70 edu-sky:text-edu-ink/70'}>{t(captionKeyFor(demo, typingDesktop))}</span>
           </PopIn>
         )}
       </PopIn>
@@ -216,7 +231,7 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
           data-testid="mp-countdown-numeral"
           className={cn(
             'relative max-w-full text-center font-neo-display font-bold leading-none tabular-nums [text-shadow:0.06em_0.06em_0_var(--neo-black)]',
-            isGo ? 'text-[min(26vh,14vw)] md:text-[min(26vh,20vw)] text-neo-lime' : 'text-[min(20vh,36vw)] text-neo-white',
+            isGo ? 'text-[min(26vh,14vw)] md:text-[min(26vh,20vw)] text-neo-lime edu-sky:text-edu-lime-ink' : 'text-[min(20vh,36vw)] text-neo-white edu-sky:text-edu-ink',
             !reduceMotion && styles.countPunch,
           )}
         >
@@ -232,14 +247,14 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
               <span
                 key={p.username}
                 data-hop={i}
-                className={cn('rounded-full border-3 border-neo-black bg-neo-navy-light shadow-[0_3px_0_rgb(var(--neo-black))]', animate && styles.hopIn)}
+                className={cn('rounded-full border-3 border-neo-black bg-neo-navy-light edu-sky:bg-edu-surface shadow-[0_3px_0_rgb(var(--neo-black))]', animate && styles.hopIn)}
                 style={{ width: 'calc(48px * var(--mp-u, 1))', height: 'calc(48px * var(--mp-u, 1))', ...(animate ? { animationDelay: `${300 + i * HOP_STEP_MS}ms` } : null) }}
               >
                 <Avatar pixelSize={44} customAvatar={p.avatar?.customAvatar ?? null} userId={p.username} className="rounded-full" />
               </span>
             ))}
             {overflow > 0 && (
-              <span className="ms-1 rounded-full border-2 border-neo-black bg-neo-navy-light px-2 py-0.5 text-sm font-bold">+{overflow}</span>
+              <span className="ms-1 rounded-full border-2 border-neo-black bg-neo-navy-light edu-sky:bg-edu-surface px-2 py-0.5 text-sm font-bold">+{overflow}</span>
             )}
           </div>
         )}
@@ -248,7 +263,7 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
             {t(pluralKeyOf('mpUi.round.youVsBots', botCount, language), { count: botCount })}
           </p>
         ) : (
-          <p className="font-neo-display font-bold uppercase tracking-[0.2em] rtl:tracking-normal text-sm tv:text-2xl text-neo-white/60">
+          <p className="font-neo-display font-bold uppercase tracking-[0.2em] rtl:tracking-normal text-sm tv:text-2xl text-neo-white/60 edu-sky:text-edu-ink/60">
             {t('mpUi.round.getReady')}
           </p>
         )}

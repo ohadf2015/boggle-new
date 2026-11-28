@@ -13,7 +13,7 @@ import type { CoachAccent, CoachDemoType } from '@/lib/tutorial/modeCoachContent
 const ACCENT_BG: Record<CoachAccent, string> = {
   lime: 'bg-neo-lime text-neo-black',
   cyan: 'bg-neo-cyan text-neo-black',
-  pink: 'bg-neo-pink text-neo-white',
+  pink: 'bg-neo-pink text-neo-white edu-sky:text-edu-ink',
   purple: 'bg-neo-purple text-neo-white',
 };
 
@@ -24,7 +24,7 @@ function Tile({ children, className, active }: { children?: React.ReactNode; cla
     <div
       className={cn(
         'flex h-7 w-7 items-center justify-center rounded-[5px] border-2 border-black font-neo-display text-sm font-black shadow-hard-sm',
-        active ? '' : 'bg-neo-navy-light text-neo-white/70',
+        active ? '' : 'bg-neo-navy-light edu-sky:bg-edu-surface text-neo-white/70 edu-sky:text-edu-ink/70',
         className,
       )}
     >
@@ -59,14 +59,14 @@ function LongWordDemo({ accent, reduced }: { accent: CoachAccent; reduced: boole
       <div className="flex flex-col items-center gap-1">
         <div className="flex gap-1">
           {['G', 'O'].map((l) => (
-            <Tile key={l} active className="bg-neo-navy-light text-neo-white">
+            <Tile key={l} active className="bg-neo-navy-light edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink">
               {l}
             </Tile>
           ))}
         </div>
-        <span className="font-neo-display text-[10px] font-black text-neo-white/60">+2</span>
+        <span className="font-neo-display text-[10px] font-black text-neo-white/60 edu-sky:text-edu-ink/60">+2</span>
       </div>
-      <span className="font-neo-display text-lg font-black text-neo-white/50">→</span>
+      <span className="font-neo-display text-lg font-black text-neo-white/50 edu-sky:text-edu-ink/50">→</span>
       <div className="flex flex-col items-center gap-1">
         <m.div
           className="flex gap-1"
@@ -87,7 +87,7 @@ function LongWordDemo({ accent, reduced }: { accent: CoachAccent; reduced: boole
 
 function TapClueDemo({ reduced }: { reduced: boolean }) {
   // Wordle-style feedback flipping in sequence.
-  const colors = ['bg-neo-lime text-neo-black', 'bg-neo-yellow text-neo-black', 'bg-neo-navy-light text-neo-white/70', 'bg-neo-lime text-neo-black'];
+  const colors = ['bg-neo-lime text-neo-black', 'bg-neo-yellow text-neo-black', 'bg-neo-navy-light edu-sky:bg-edu-surface text-neo-white/70 edu-sky:text-edu-ink/70', 'bg-neo-lime text-neo-black'];
   return (
     <div className="flex gap-1.5">
       {['W', 'O', 'R', 'D'].map((l, i) => (
@@ -116,7 +116,7 @@ function CenterLetterDemo({ accent, reduced }: { accent: CoachAccent; reduced: b
         { t: '100%', l: '50%', x: '-50%', y: '-100%' },
       ].map((p, i) => (
         <div key={i} className="absolute" style={{ top: p.t, left: p.l, transform: `translate(${p.x}, ${p.y})` }}>
-          <Tile active className="bg-neo-navy-light text-neo-white">
+          <Tile active className="bg-neo-navy-light edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink">
             {['R', 'T', 'E', 'S'][i]}
           </Tile>
         </div>
@@ -164,7 +164,7 @@ function ClearTilesDemo({ accent, reduced }: { accent: CoachAccent; reduced: boo
             animate={reduced ? {} : clearing ? { scale: [1, 1.2, 0], opacity: [1, 1, 0] } : { y: [0, 0, -6, 0] }}
             transition={reduced ? undefined : { duration: 1.8, ...LOOP }}
           >
-            <Tile active className={clearing ? ACCENT_BG[accent] : 'bg-neo-navy-light text-neo-white/70'}>
+            <Tile active className={clearing ? ACCENT_BG[accent] : 'bg-neo-navy-light edu-sky:bg-edu-surface text-neo-white/70 edu-sky:text-edu-ink/70'}>
               {'BLASTX'[i]}
             </Tile>
           </m.div>
@@ -181,7 +181,7 @@ function Floor({ word, className }: { word: string; className?: string }) {
     <div
       data-testid="coach-stack-floor"
       className={cn(
-        'flex h-5 items-center justify-center rounded-[4px] border-2 border-black bg-neo-navy-light font-neo-display text-[10px] font-black tracking-[0.2em] text-neo-white shadow-hard-sm',
+        'flex h-5 items-center justify-center rounded-[4px] border-2 border-black bg-neo-navy-light edu-sky:bg-edu-surface font-neo-display text-[10px] font-black tracking-[0.2em] text-neo-white edu-sky:text-edu-ink shadow-hard-sm',
         className,
       )}
     >
@@ -207,7 +207,7 @@ function StackDemo({ accent, reduced }: { accent: CoachAccent; reduced: boolean 
               animate={reduced ? {} : { scale: [1, 1, 1.22, 1, 1] }}
               transition={reduced ? undefined : { ...STACK_LOOP, times: [0, on, on + 0.05, on + 0.1, 1] }}
             >
-              <Tile active className="bg-neo-navy-light text-neo-white">{l}</Tile>
+              <Tile active className="bg-neo-navy-light edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink">{l}</Tile>
               <m.span
                 aria-hidden
                 className={cn('absolute inset-0 flex items-center justify-center rounded-[5px] border-2 border-black font-neo-display text-sm font-black', ACCENT_BG[accent])}
@@ -273,7 +273,7 @@ function ConnectGroupDemo({ accent, reduced }: { accent: CoachAccent; reduced: b
             animate={reduced ? {} : grouped ? { scale: [1, 1.12, 1] } : {}}
             transition={reduced ? undefined : { duration: 1.4, ...LOOP }}
           >
-            <Tile active className={grouped ? ACCENT_BG[accent] : 'bg-neo-navy-light text-neo-white/60'} />
+            <Tile active className={grouped ? ACCENT_BG[accent] : 'bg-neo-navy-light edu-sky:bg-edu-surface text-neo-white/60 edu-sky:text-edu-ink/60'} />
           </m.div>
         );
       })}
@@ -285,19 +285,19 @@ function ChainDemo({ accent, reduced }: { accent: CoachAccent; reduced: boolean 
   return (
     <div className="flex items-center gap-1">
       {['C', 'A', 'T'].map((l, i) => (
-        <Tile key={l} active className={i === 2 ? ACCENT_BG[accent] : 'bg-neo-navy-light text-neo-white'}>
+        <Tile key={l} active className={i === 2 ? ACCENT_BG[accent] : 'bg-neo-navy-light edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink'}>
           {l}
         </Tile>
       ))}
       <m.span
-        className="font-neo-display text-base font-black text-neo-white/50"
+        className="font-neo-display text-base font-black text-neo-white/50 edu-sky:text-edu-ink/50"
         animate={reduced ? {} : { x: [0, 4, 0], opacity: [0.4, 1, 0.4] }}
         transition={reduced ? undefined : { duration: 1.2, ...LOOP }}
       >
         →
       </m.span>
       {['T', 'O', 'P'].map((l, i) => (
-        <Tile key={l} active className={i === 0 ? ACCENT_BG[accent] : 'bg-neo-navy-light text-neo-white'}>
+        <Tile key={l} active className={i === 0 ? ACCENT_BG[accent] : 'bg-neo-navy-light edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink'}>
           {l}
         </Tile>
       ))}
@@ -307,10 +307,10 @@ function ChainDemo({ accent, reduced }: { accent: CoachAccent; reduced: boolean 
 
 function accentText(accent: CoachAccent): string {
   return {
-    lime: 'text-neo-lime',
-    cyan: 'text-neo-cyan',
-    pink: 'text-neo-pink',
-    purple: 'text-neo-purple',
+    lime: 'text-neo-lime edu-sky:text-edu-lime-ink',
+    cyan: 'text-neo-cyan edu-sky:text-edu-cyan-ink',
+    pink: 'text-neo-pink edu-sky:text-edu-pink-ink',
+    purple: 'text-neo-purple edu-sky:text-edu-purple-ink',
   }[accent];
 }
 
@@ -359,7 +359,7 @@ export function CoachDemo({ demo, accent, emoji, compact = false }: CoachDemoPro
     <div
       dir="ltr"
       className={cn(
-        'flex items-center justify-center rounded-neo border-neo border-black bg-neo-navy/60',
+        'flex items-center justify-center rounded-neo border-neo border-black bg-neo-navy/60 edu-sky:bg-edu-surface/60',
         compact ? 'h-16 w-32 shrink-0' : 'h-[108px] w-full',
       )}
       aria-hidden="true"
