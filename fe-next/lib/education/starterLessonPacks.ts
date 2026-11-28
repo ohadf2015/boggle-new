@@ -8,6 +8,7 @@
  */
 
 import type { LessonWord } from '@/types/education';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 
 import type { Language } from '@/lib/supabase/education/types';
 
@@ -225,7 +226,7 @@ export const STARTER_LESSON_PACKS: StarterLessonPack[] = [
     settings: {
       gridSize: 4,
       minWordLength: 3,
-      timeLimit: 180,
+      timeLimit: EDU_MAX_ROUND_SEC,
       allowDiagonal: true,
     },
   },
@@ -239,7 +240,7 @@ export const STARTER_LESSON_PACKS: StarterLessonPack[] = [
     settings: {
       gridSize: 5,
       minWordLength: 4,
-      timeLimit: 240,
+      timeLimit: EDU_MAX_ROUND_SEC,
       allowDiagonal: true,
     },
   },
@@ -253,7 +254,7 @@ export const STARTER_LESSON_PACKS: StarterLessonPack[] = [
     settings: {
       gridSize: 4,
       minWordLength: 2,
-      timeLimit: 180,
+      timeLimit: EDU_MAX_ROUND_SEC,
       allowDiagonal: true,
     },
   },
@@ -267,7 +268,7 @@ export const STARTER_LESSON_PACKS: StarterLessonPack[] = [
     settings: {
       gridSize: 4,
       minWordLength: 3,
-      timeLimit: 180,
+      timeLimit: EDU_MAX_ROUND_SEC,
       allowDiagonal: true,
     },
   },
@@ -281,7 +282,7 @@ export const STARTER_LESSON_PACKS: StarterLessonPack[] = [
     settings: {
       gridSize: 4,
       minWordLength: 3,
-      timeLimit: 180,
+      timeLimit: EDU_MAX_ROUND_SEC,
       allowDiagonal: true,
     },
   },
@@ -295,7 +296,7 @@ export const STARTER_LESSON_PACKS: StarterLessonPack[] = [
     settings: {
       gridSize: 4,
       minWordLength: 1,
-      timeLimit: 180,
+      timeLimit: EDU_MAX_ROUND_SEC,
       allowDiagonal: true,
     },
   },
@@ -309,7 +310,7 @@ export const STARTER_LESSON_PACKS: StarterLessonPack[] = [
     settings: {
       gridSize: 4,
       minWordLength: 3,
-      timeLimit: 180,
+      timeLimit: EDU_MAX_ROUND_SEC,
       allowDiagonal: true,
     },
   },

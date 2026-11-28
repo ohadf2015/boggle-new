@@ -51,7 +51,7 @@ function renderWithSize(difficulty: 'small' | 'medium' | 'large' | undefined) {
     <ProjectorLobby
       {...baseProps}
       templateSettings={{
-        timerSeconds: 180,
+        timerSeconds: 60,
         // `undefined` is what an older saved template looks like.
         difficulty: difficulty as string,
         minWordLength: 3,
@@ -95,7 +95,7 @@ describe('ProjectorLobby — the calm dial hides the round clock', () => {
     lessonNames: ['Week 3'],
     gameMode: 'classic',
     settings: {
-      timerMinutes: 3,
+      timerMinutes: 2,
       boardSize: 'medium',
       allowLateJoin: true,
       vocabQuizQuestionCount: null,
@@ -107,7 +107,7 @@ describe('ProjectorLobby — the calm dial hides the round clock', () => {
   it('timer=off: no minutes row, even though the room record carries a timer', () => {
     mockLiveGame = CLASSIC_OFF;
     render(<ProjectorLobby {...baseProps} />);
-    expect(screen.queryByText('eduLiveRoom.lobby.minutes:3')).not.toBeInTheDocument();
+    expect(screen.queryByText('eduLiveRoom.lobby.minutes:2')).not.toBeInTheDocument();
   });
 
   it('timer=off on a quiz: no per-question seconds row', () => {
@@ -134,7 +134,7 @@ describe('ProjectorLobby — the calm dial hides the round clock', () => {
       settings: { ...CLASSIC_OFF.settings, pressure: { leaderboard: 'full', timer: 'full', speedScoring: true } },
     };
     render(<ProjectorLobby {...baseProps} />);
-    expect(screen.getByText('eduLiveRoom.lobby.minutes:3')).toBeInTheDocument();
+    expect(screen.getByText('eduLiveRoom.lobby.minutes:2')).toBeInTheDocument();
   });
 });
 
@@ -143,8 +143,8 @@ describe('ProjectorLobby — local settings beat the server record, never a defa
 
   it('reads the teacher\'s own template the instant the lobby mounts', () => {
     renderWithSize('large');
-    // 180s → 3 minutes, from sessionStorage, with no server round-trip.
-    expect(screen.getByText('eduLiveRoom.lobby.minutes:3')).toBeInTheDocument();
+    // 60s → 1 minute, from sessionStorage, with no server round-trip.
+    expect(screen.getByText('eduLiveRoom.lobby.minutes:1')).toBeInTheDocument();
   });
 
   it('falls back to the room record when there is no local copy', () => {
@@ -155,7 +155,7 @@ describe('ProjectorLobby — local settings beat the server record, never a defa
       lessonNames: ['Week 3'],
       gameMode: 'classic',
       settings: {
-        timerMinutes: 5,
+        timerMinutes: 1,
         boardSize: 'small',
         allowLateJoin: false,
         vocabQuizQuestionCount: null,
@@ -163,7 +163,7 @@ describe('ProjectorLobby — local settings beat the server record, never a defa
       },
     };
     render(<ProjectorLobby {...baseProps} />);
-    expect(screen.getByText('eduLiveRoom.lobby.minutes:5')).toBeInTheDocument();
+    expect(screen.getByText('eduLiveRoom.lobby.minutes:1')).toBeInTheDocument();
     expect(screen.getByText('5×5')).toBeInTheDocument();
     expect(screen.getByText('education.projectorLobby.lateJoinOff')).toBeInTheDocument();
   });

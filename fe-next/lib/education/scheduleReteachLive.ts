@@ -20,7 +20,7 @@ import {
 /** Spaced-reteach delay — ~2 weeks, matching Kahoot Takeover replay window. */
 export const RETEACH_LIVE_DELAY_DAYS = 14;
 
-/** Default Live block length on the calendar (3-min game + buffer). */
+/** Default Live block length on the calendar (2-min game + buffer). */
 export const RETEACH_LIVE_CALENDAR_MINUTES = 15;
 
 export const SCHEDULED_RETEACH_STORAGE_KEY = 'lexiclash.scheduledReteachLive.v1';

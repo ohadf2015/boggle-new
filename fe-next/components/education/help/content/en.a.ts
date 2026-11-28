@@ -86,7 +86,7 @@ export const enA: HelpLocaleContent = {
       {
         t: 'list',
         items: [
-          '[[academy.hq.modes.classic]]: one shared letter grid; students trace every word they can spot. Great for spelling and word-building with any list. 3 minutes by default.',
+          '[[academy.hq.modes.classic]]: one shared letter grid; students trace every word they can spot. Great for spelling and word-building with any list. 2 minutes by default.',
           '[[academy.hq.modes.vocabQuiz]]: four choices, one meaning; the fastest correct answer scores most. Best for checking meaning. Needs a list with definitions.',
           '[[academy.hq.modes.blast]]: fast rounds where words set off chain combos. Pure energy for a Friday or the last ten minutes.',
           '[[academy.hq.modes.wordHunt]]: the class races to dig the list words out of the grid. Good for brand-new words students have only just met.',

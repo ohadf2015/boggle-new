@@ -13,7 +13,8 @@
  * tables quietly disagreeing is recurring pitfall class 3.
  */
 
-import { fixedRoundSeconds } from '@/shared/utils/fixedRoundTimer';
+import { classroomRoundSeconds } from '@/shared/utils/fixedRoundTimer';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 import {
   CLASSROOM_GAME_MODES,
   VOCAB_QUIZ_MODE,
@@ -79,16 +80,16 @@ interface ModeShape {
 
 const MODE_SHAPE: Record<string, ModeShape> = {
   classic: { poster: '/mascot/teacher/modes/classic.webp', accent: 'cyan', minutes: 2, needsDefinitions: false },
-  'word-hunt': { poster: '/mascot/teacher/modes/word-hunt.webp', accent: 'lime', minutes: 3, needsDefinitions: false },
+  'word-hunt': { poster: '/mascot/teacher/modes/word-hunt.webp', accent: 'lime', minutes: 2, needsDefinitions: false },
   blast: { poster: '/mascot/teacher/modes/blast.webp', accent: 'pink', minutes: 2, needsDefinitions: false },
-  'wheel-rush': { poster: '/mascot/teacher/modes/wheel-rush.webp', accent: 'purple', minutes: Math.ceil(fixedRoundSeconds('wheel-rush')! / 60), needsDefinitions: false },
-  [VOCAB_QUIZ_MODE]: { poster: '/mascot/teacher/modes/vocab-quiz.webp', accent: 'cyan', minutes: 3, needsDefinitions: true },
-  wordcraft: { poster: '/mascot/teacher/modes/wordcraft.webp', accent: 'lime', minutes: 5, needsDefinitions: false },
-  crossword: { poster: '/mascot/teacher/modes/crossword.webp', accent: 'cyan', minutes: Math.ceil(fixedRoundSeconds('crossword')! / 60), needsDefinitions: true },
+  'wheel-rush': { poster: '/mascot/teacher/modes/wheel-rush.webp', accent: 'purple', minutes: Math.ceil(classroomRoundSeconds('wheel-rush')! / 60), needsDefinitions: false },
+  [VOCAB_QUIZ_MODE]: { poster: '/mascot/teacher/modes/vocab-quiz.webp', accent: 'cyan', minutes: 2, needsDefinitions: true },
+  wordcraft: { poster: '/mascot/teacher/modes/wordcraft.webp', accent: 'lime', minutes: 2, needsDefinitions: false },
+  crossword: { poster: '/mascot/teacher/modes/crossword.webp', accent: 'cyan', minutes: Math.ceil(classroomRoundSeconds('crossword')! / 60), needsDefinitions: true },
 };
 
 /** A round with no catalog entry still needs a plannable number on screen. */
-export const FALLBACK_MODE_MINUTES = 3;
+export const FALLBACK_MODE_MINUTES = EDU_MAX_ROUND_SEC / 60;
 
 /**
  * Built FROM `CLASSROOM_GAME_MODES` rather than retyped beside it: when a sixth
@@ -198,8 +199,8 @@ export function configuredRoundMinutes(
     if (!count || !seconds) return modeDurationMinutes(id);
     return Math.max(1, Math.round((count * (seconds + VOCAB_QUIZ_REVEAL_MS / 1000)) / 60));
   }
-  const fixed = fixedRoundSeconds(id);
+  const fixed = classroomRoundSeconds(id);
   if (fixed) return Math.max(1, Math.ceil(fixed / 60));
   if (settings.timerMinutes === undefined) return modeDurationMinutes(id);
-  return Math.max(1, Math.round(settings.timerMinutes));
+  return Math.max(1, Math.min(EDU_MAX_ROUND_SEC / 60, Math.round(settings.timerMinutes)));
 }

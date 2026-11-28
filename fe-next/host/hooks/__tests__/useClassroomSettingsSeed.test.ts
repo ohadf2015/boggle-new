@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useClassroomSettingsSeed, __resetClassroomSettingsSeeds } from '../useClassroomSettingsSeed';
 
-const TEMPLATE = { timerSeconds: 180, difficulty: 'large', minWordLength: 4, allowLateJoin: true };
+const TEMPLATE = { timerSeconds: 60, difficulty: 'large', minWordLength: 4, allowLateJoin: true };
 
 describe('useClassroomSettingsSeed — the projector lobby honours the teacher\'s round settings', () => {
   beforeEach(() => __resetClassroomSettingsSeeds());
@@ -15,7 +15,7 @@ describe('useClassroomSettingsSeed — the projector lobby honours the teacher\'
     const { rerender } = renderHook((props) => useClassroomSettingsSeed(props), {
       initialProps: { isClassroomMode: true, gameCode: 'VV8MPY', templateSettings: TEMPLATE, setTimerValue, setDifficulty, setMinWordLength },
     });
-    expect(setTimerValue).toHaveBeenCalledWith(3);
+    expect(setTimerValue).toHaveBeenCalledWith(1);
     expect(setDifficulty).toHaveBeenCalledWith('HARD');
     expect(setMinWordLength).toHaveBeenCalledWith(4);
     rerender({ isClassroomMode: true, gameCode: 'VV8MPY', templateSettings: TEMPLATE, setTimerValue, setDifficulty, setMinWordLength });
@@ -29,7 +29,7 @@ describe('useClassroomSettingsSeed — the projector lobby honours the teacher\'
     });
     expect(setTimerValue).not.toHaveBeenCalled();
     rerender({ isClassroomMode: true, gameCode: 'VV8MPY', templateSettings: TEMPLATE, setTimerValue, setDifficulty: vi.fn(), setMinWordLength: vi.fn() });
-    expect(setTimerValue).toHaveBeenCalledWith(3);
+    expect(setTimerValue).toHaveBeenCalledWith(1);
   });
 
   it('leaves a non-classroom room alone', () => {

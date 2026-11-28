@@ -141,7 +141,7 @@ describe('ClassroomGameHandler', () => {
         language: 'en',
         studyCards: [{ word: 'cat' }, { word: 'dog' }],
         settings: {
-          timerMinutes: gameData.settings.timerMinutes,
+          timerMinutes: 2,
           boardSize: gameData.settings.boardSize,
           allowLateJoin: undefined,
           gameMode: 'classic',

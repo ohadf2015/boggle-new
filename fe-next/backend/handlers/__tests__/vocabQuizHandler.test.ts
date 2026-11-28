@@ -196,6 +196,18 @@ describe('startVocabQuizForClassroom', () => {
     expect(session.limitMs).toBe(10_000);
   });
 
+  it('trims a stale long quiz setup to fit the two-minute classroom round', async () => {
+    (classroomGameManager.getClassroomGame as Mock).mockResolvedValue(
+      classroomGame('vocab-quiz', { vocabQuizQuestionCount: 20, vocabQuizSeconds: 30 })
+    );
+    const { io } = makeIo();
+    await startVocabQuizForClassroom(io, GAME_CODE);
+
+    const session = getActiveQuiz(GAME_CODE)!;
+    expect(session.limitMs).toBe(30_000);
+    expect(session.questions.length).toBeLessThanOrEqual(4);
+  });
+
   it('refuses to start — loudly, not silently — when the lesson has nothing playable', async () => {
     (lessonWords.loadLessonVocabulary as Mock).mockResolvedValue({ words: [word({ word: 'orphan' })], language: 'en' });
     (classroomGameManager.getClassroomGame as Mock).mockResolvedValue(classroomGame('vocab-quiz'));

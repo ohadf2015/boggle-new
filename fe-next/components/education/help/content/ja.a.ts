@@ -86,7 +86,7 @@ export const jaA: HelpLocaleContent = {
       {
         t: 'list',
         items: [
-          '[[academy.hq.modes.classic]]：みんなで1つの文字盤を使い、見つけた単語をなぞります。どんなリストでもつづりや語の組み立ての練習に最適。標準は3分です。',
+          '[[academy.hq.modes.classic]]：みんなで1つの文字盤を使い、見つけた単語をなぞります。どんなリストでもつづりや語の組み立ての練習に最適。標準は2分です。',
           '[[academy.hq.modes.vocabQuiz]]：4つの選択肢から意味を選び、速く正解するほど高得点。意味の確認にいちばん向いています。意味つきのリストが必要です。',
           '[[academy.hq.modes.blast]]：単語で連鎖コンボを起こすスピード勝負。金曜日や授業の最後の10分を盛り上げます。',
           '[[academy.hq.modes.wordHunt]]：リストの単語を文字盤からいち早く見つける競争。出会ったばかりの新出単語に向いています。',

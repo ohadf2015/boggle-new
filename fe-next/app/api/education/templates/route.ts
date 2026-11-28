@@ -4,6 +4,7 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { z } from 'zod';
 import logger from '@/utils/logger';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 
 // ==================== RBAC Helper ====================
 
@@ -56,7 +57,7 @@ const TEMPLATE_COLUMNS =
 const createTemplateSchema = z.object({
   lessonId: z.string().uuid(),
   name: z.string().min(1).max(100),
-  timerSeconds: z.number().min(30).max(600).default(180),
+  timerSeconds: z.number().min(30).max(600).default(EDU_MAX_ROUND_SEC),
   difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']).default('MEDIUM'),
   minWordLength: z.number().min(2).max(5).default(2),
   allowLateJoin: z.boolean().default(true),

@@ -16,6 +16,7 @@
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Swords, Check, X, Trophy, Flame, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -61,8 +62,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
   const { t } = useLanguage();
   const { submitScore, createChallenge, onDuelCompleted, onScoreSubmitted, onError } = useDuelSocket();
 
-  // G4 fix: Async duel timer (3 minutes default)
-  const DUEL_TIME_LIMIT_SECONDS = 180;
+  const DUEL_TIME_LIMIT_SECONDS = EDU_MAX_ROUND_SEC;
 
   // State
   const [phase, setPhase] = useState<GamePhase>('loading');

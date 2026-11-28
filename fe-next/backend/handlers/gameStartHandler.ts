@@ -56,6 +56,7 @@ import { armLessonClaims } from '../modules/lessonClaims.js';
 import { startRivalRound } from '../modules/rivalSocket.js';
 import { resetRoundSocial } from '../modules/roundSocial.js';
 import { embeddableLessonWords } from '@/shared/utils/classroomGameLanguage';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 import { getGameModeModule, getGameModeRules } from '../modes/index.js';
 import { buildRoundPayload } from '../modes/roundPayload.js';
 import {
@@ -193,9 +194,11 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
       // Host timer clamped to 30..600s (mode default when none given). Event-driven
       // modes run on a fixed backstop sized to their natural length instead.
+      // A classroom round never outlasts the edu cap, whatever a stale client sends.
       const rawTimer = parseInt(String(timerSeconds), 10);
-      const validTimer = rules.fixedTimerSec
+      const roomTimer = rules.fixedTimerSec
         ?? Math.max(30, Math.min(600, rawTimer || priorTimerSeconds || rules.defaultTimerSec));
+      const validTimer = game.isClassroom ? Math.min(roomTimer, EDU_MAX_ROUND_SEC) : roomTimer;
 
       // Beta modes: enforced server-side even if a client crafts the emit.
       const refusal = await checkInWorkModeAccess(socket, game, resolvedMode, language || game.language || 'en');

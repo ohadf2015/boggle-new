@@ -51,11 +51,11 @@ describe('ClassroomGameLobby remembered round defaults', () => {
     window.localStorage.clear();
   });
 
-  it('given the teacher last ran a 5-minute large board with late join off, when they go live without touching options, then the room gets the same round', () => {
+  it('given the teacher last ran a 1-minute large board with late join off, when they go live without touching options, then the room gets the same round', () => {
     window.localStorage.setItem('lexiclash_recent_game_settings', JSON.stringify([
-      { id: '1', classroomId: 'c1', classroomName: '5B', lessonIds: ['1'], lessonNames: ['Cells'], savedAt: 1, settings: { timerMinutes: 5, boardSize: 'large', allowLateJoin: false } },
+      { id: '1', classroomId: 'c1', classroomName: '5B', lessonIds: ['1'], lessonNames: ['Cells'], savedAt: 1, settings: { timerMinutes: 1, boardSize: 'large', allowLateJoin: false } },
     ]));
-    expect(mount()).toMatchObject({ timerMinutes: 5, boardSize: 'large', allowLateJoin: false });
+    expect(mount()).toMatchObject({ timerMinutes: 1, boardSize: 'large', allowLateJoin: false });
   });
 
   it('given a first-time teacher, when they go live, then the sane defaults apply', () => {

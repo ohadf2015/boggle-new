@@ -8,6 +8,7 @@
  */
 
 import type { DifficultyLevel } from '@/shared/constants/gameConstants';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 
 export interface ClassroomTemplateSettings {
   timerSeconds: number;
@@ -39,7 +40,7 @@ export function classroomHostPreset(
   // Round UP: a sub-minute leftover must never become a zero-minute game.
   const minutes =
     settings.timerSeconds > 0
-      ? Math.ceil(settings.timerSeconds / 60)
+      ? Math.ceil(Math.min(settings.timerSeconds, EDU_MAX_ROUND_SEC) / 60)
       : DEFAULT_TIMER_MINUTES;
 
   return {

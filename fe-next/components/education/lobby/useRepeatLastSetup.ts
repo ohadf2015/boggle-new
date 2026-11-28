@@ -19,6 +19,7 @@
 import { useEffect, useState } from 'react';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import type { VocabularyLesson, Classroom } from '@/lib/supabase/education';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 
 export const REPEAT_LAST_FLOW = 'repeatLast';
 
@@ -64,7 +65,7 @@ export function useRepeatLastSetup({
       }
       const validLessonIds = last.lessonIds.filter((id) => lessons.some((l) => l.id === id));
       if (validLessonIds.length > 0) setSelectedLessonIds(validLessonIds);
-      if (last.settings?.timerMinutes) setTimerMinutes(last.settings.timerMinutes);
+      if (last.settings?.timerMinutes) setTimerMinutes(Math.min(last.settings.timerMinutes, EDU_MAX_ROUND_SEC / 60));
       if (last.settings?.boardSize) setBoardSize(last.settings.boardSize);
     }
     setApplied(true);

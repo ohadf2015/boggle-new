@@ -23,7 +23,7 @@ describe('teacherLessonReminder', () => {
     expect(subject).toContain('7B English');
     expect(html).toContain('Hi Ada,');
     expect(html).toContain('7B English starts Thursday 9:00');
-    expect(html).toContain('5-minute warm-up is ready');
+    expect(html).toContain('2-minute warm-up is ready');
   });
 
   it('given a join code, when rendered, then shows it as left-to-right letter tiles for the board', () => {
@@ -85,8 +85,8 @@ describe('teacherLessonReminder', () => {
     expect(html).toContain('Thursday 7:00');
   });
 
-  it('given the warm-up template, then it still runs the 5 minutes the email promises', () => {
-    expect(sessionMinutes(SESSION_TEMPLATES.find((s) => s.id === 'warm-up')!)).toBe(5);
+  it('given the warm-up template, then it still runs the 2 minutes the email promises', () => {
+    expect(sessionMinutes(SESSION_TEMPLATES.find((s) => s.id === 'warm-up')!)).toBe(2);
   });
 
   it('given the class board language, when building the game link, then it carries the same seasonal list the session card would', () => {

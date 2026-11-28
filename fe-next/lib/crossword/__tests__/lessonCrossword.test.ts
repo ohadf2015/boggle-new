@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildLessonCrossword, lessonClueOf, MIN_LESSON_CROSSWORD_WORDS } from '../lessonCrossword';
+import { buildLessonCrossword, lessonClueOf, MIN_LESSON_CROSSWORD_WORDS, MAX_LESSON_CROSSWORD_WORDS } from '../lessonCrossword';
 import type { CrosswordPuzzle } from '../types';
 
 const EN = [
@@ -22,6 +22,16 @@ function readSlot(p: CrosswordPuzzle, slotId: string): string {
 }
 
 describe('buildLessonCrossword', () => {
+  it('keeps a long lesson to a grid a class can finish in the two-minute race', () => {
+    const LONG = [...EN, { word: 'rocket', clue: 'It flies to space' }, { word: 'meteor', clue: 'A shooting star' },
+      { word: 'nebula', clue: 'A cloud of gas in space' }, { word: 'solar', clue: 'Of the sun' }, { word: 'crater', clue: 'A hole on the moon' }];
+    for (let seed = 0; seed < 10; seed++) {
+      const result = buildLessonCrossword({ entries: LONG, locale: 'en', seed, id: `l${seed}` });
+      if (result.ok) expect(result.puzzle.slots.length).toBeLessThanOrEqual(MAX_LESSON_CROSSWORD_WORDS);
+    }
+    expect(MAX_LESSON_CROSSWORD_WORDS).toBeLessThanOrEqual(6);
+  });
+
   it('builds a grid from the lesson words only, each clued with its own lesson clue', () => {
     const result = buildLessonCrossword({ entries: EN, locale: 'en', seed: 7, id: 'lesson-1' });
     expect(result.ok).toBe(true);

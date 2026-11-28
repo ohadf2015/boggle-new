@@ -47,6 +47,8 @@ import { createClassroomGameSchema, startClassroomGameSchema, getActiveGamesSche
 import { refuseClassroomJoin } from './classroomJoinRefusal.js';
 import { resolveBossForTeacher } from '../services/classroomBoss/bossEntitlement.js';
 import { captureLiveRoundStarted } from '../utils/eduLiveEvents';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
+import { capQuizToRound } from '@/shared/types/vocabQuiz';
 
 /**
  * Register classroom game socket event handlers
@@ -163,6 +165,14 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
           ...(payload.settings?.rehearsal ? { rehearsal: true } : {}),
         },
       };
+
+      const s = gameData.settings;
+      if (s.timerMinutes) s.timerMinutes = Math.min(s.timerMinutes, EDU_MAX_ROUND_SEC / 60);
+      if (s.vocabQuizQuestionCount && s.vocabQuizSeconds) {
+        const quiz = capQuizToRound(s.vocabQuizQuestionCount, s.vocabQuizSeconds);
+        s.vocabQuizQuestionCount = quiz.questionCount;
+        s.vocabQuizSeconds = quiz.secondsPerQuestion;
+      }
 
       // Create the game in Redis
       await createClassroomGame(gameData);

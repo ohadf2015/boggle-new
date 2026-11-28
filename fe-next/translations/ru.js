@@ -1003,7 +1003,7 @@ const ru = {
       "heading": "Режимы для обучения",
       "subhead": "Выберите подходящий формат для класса — быстрые дуэли 1 на 1 или живой мультиплеер для всего класса.",
       "duelsTitle": "Словарные дуэли (1 на 1)",
-      "duelsDesc": "Объедините учеников в пары для словесных баталий по 2–3 минуты один на один.",
+      "duelsDesc": "Объедините учеников в пары для словесных баталий по 2 минуты один на один.",
       "classroomTitle": "Живая игра для класса",
       "classroomDesc": "Мультиплеер для всего класса; ученики заходят по коду класса, без электронной почты."
     },
@@ -5174,10 +5174,10 @@ const ru = {
       "shareGapPracticeHome": "Слова для практики дома",
       "shareGapEmpty": "Пока нет пробела класса для публикации. Сыграйте классную игру, затем поделитесь этой карточкой с родителями.",
       "shareGapEmptyText": "{{lesson}} — пока нет пробела класса для публикации",
-      "startReteachLive": "Начать 3-минутное повторение Live",
-      "postReteachGoogleClassroom": "Опубликовать 3-мин повторение в Google Classroom",
-      "postReteachGoogleClassroomTitle": "3-минутное повторение в игре: {{lesson}}",
-      "postReteachGoogleClassroomBody": "Откройте ссылку и запустите 3-минутную игру по пропущенным словам: {{missed}}. Ученики заходят из ленты класса.",
+      "startReteachLive": "Начать 2-минутное повторение Live",
+      "postReteachGoogleClassroom": "Опубликовать 2-мин повторение в Google Classroom",
+      "postReteachGoogleClassroomTitle": "2-минутное повторение в игре: {{lesson}}",
+      "postReteachGoogleClassroomBody": "Откройте ссылку и запустите 2-минутную игру по пропущенным словам: {{missed}}. Ученики заходят из ленты класса.",
       "assignPracticeGoogleClassroom": "Назначить практику в Google Classroom",
       "assignPracticeGoogleClassroomTitle": "Практика пропущенных слов — {{lesson}}",
       "assignPracticeGoogleClassroomBody": "Откройте ссылку и потренируйте дома пропущенные слова: {{missed}}. Сдайте, когда закончите.",
@@ -5230,8 +5230,8 @@ const ru = {
       "assignUnpluggedGoogleClassroomTitle": "Повторение без устройств, домашнее задание: {{lesson}}",
       "assignUnpluggedGoogleClassroomBody": "Домашнее задание без устройств: откройте ссылку, распечатайте лист с пропущенными словами и потренируйтесь: {{missed}}. Устройства ученикам не нужны. Сдайте, когда закончите.",
       "assignMissGapLiveGoogleClassroom": "Отправить в Google Classroom игру по пропущенным словам",
-      "assignMissGapLiveGoogleClassroomTitle": "3-минутная игра по пропущенным словам: {{lesson}}",
-      "assignMissGapLiveGoogleClassroomBody": "Откройте ссылку и запустите 3-минутную игру по пропущенным словам: {{missed}}. Ученики заходят из Google Classroom. Работает на бесплатном Google Workspace for Education, без Education Plus.",
+      "assignMissGapLiveGoogleClassroomTitle": "2-минутная игра по пропущенным словам: {{lesson}}",
+      "assignMissGapLiveGoogleClassroomBody": "Откройте ссылку и запустите 2-минутную игру по пропущенным словам: {{missed}}. Ученики заходят из Google Classroom. Работает на бесплатном Google Workspace for Education, без Education Plus.",
       "launchMissGapQuestionPackLive": "Запустить игру с вопросами по пропущенным словам",
       "missGapQuestionPackTitle": "Вопросы по пропущенным словам: {{lesson}}",
       "unpluggedReteachHint": "Ученики отвечают на распечатанном листе — без устройств",
@@ -5351,7 +5351,7 @@ const ru = {
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
       "title": "Назначить miss-gap Live",
-      "subtitle": "Назначение в Classwork в один клик: 3-мин Live по пропущенным словам. Работает на бесплатном Google Workspace for Education, а Classroom add-on Quizlet требует Education Plus. Только слова класса, без имён учеников.",
+      "subtitle": "Назначение в Classwork в один клик: 2-мин Live по пропущенным словам. Работает на бесплатном Google Workspace for Education, а Classroom add-on Quizlet требует Education Plus. Только слова класса, без имён учеников.",
       "assignLive": "Назначить miss-gap Live в Classroom",
       "freeWorkspaceFoil": "Работает на бесплатном Google Workspace for Education — add-on Quizlet требует Education Plus. LexiClash использует диалог Google Share, Plus не нужен.",
       "lessonLabel": "Название урока",
@@ -5372,7 +5372,7 @@ const ru = {
         "modeClassic": "Classic Unplugged — класс/команды обсуждают на проекторе",
         "modeTeam": "Team Tiles Unplugged — общая плиточная доска, учитель отмечает",
         "modeReteach": "Unplugged reteach Live — распечатка + проектор",
-        "modeLive3min": "3-мин reteach Live — проектор + возврат оценок",
+        "modeLive3min": "2-мин reteach Live — проектор + возврат оценок",
         "timerNote": "Таймер {{seconds}} с",
         "cefrNote": "Пробелы CEFR {{level}}",
         "openLive": "Открыть запланированный Live",
@@ -6251,7 +6251,7 @@ const ru = {
         "blooketTitle": "Blooket — ручной 「Gaps Set」",
         "blooketBody": "Отсортируйте отчёт Questions по Incorrect%, просмотрите Opportunities for Growth (Plus), отметьте топ-пробелы и в Edit / Question Bank соберите 「Gaps Set」 для домашки или точечного повторения. Диагностика быстрая; набор для reteach всё ещё собирают вручную.",
         "lexiTitle": "LexiClash — автоматический deep-link из miss-gap (#1124)",
-        "lexiBody": "Чипы misses после последнего урока и прогресс учителя уже ведут в Unplugged / 3-мин reteach Live. Один клик засевает пропущенные слова в Live — без 「Gaps Set」 и без Question Bank.",
+        "lexiBody": "Чипы misses после последнего урока и прогресс учителя уже ведут в Unplugged / 2-мин reteach Live. Один клик засевает пропущенные слова в Live — без 「Gaps Set」 и без Question Bank.",
         "citePrefix": "Гид Blooket для учителей:",
         "citeLabel": "Identify knowledge gaps in Blooket reports",
         "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
@@ -6400,18 +6400,18 @@ const ru = {
       },
       "session": {
         "warmUp": {
-          "name": "Разминка на 5 минут",
+          "name": "Разминка на 2 минуты",
           "when": "Начало урока. Одно быстрое поле со словами сезона, и все уже включились.",
           "whenShort": "Начать урок"
         },
         "exitTicket": {
           "name": "Проверка в конце урока",
-          "when": "Последние 3 минуты. Короткая викторина покажет, кто усвоил слова урока.",
+          "when": "Последние 2 минуты. Короткая викторина покажет, кто усвоил слова урока.",
           "whenShort": "Перед уходом из класса"
         },
         "brainBreak": {
           "name": "Перемена для головы",
-          "when": "Когда класс устал. Три быстрые минуты Blast, список готовить не нужно.",
+          "when": "Когда класс устал. Две быстрые минуты Blast, список готовить не нужно.",
           "whenShort": "Когда падает энергия"
         },
         "icebreaker": {
@@ -15463,7 +15463,7 @@ const ru = {
       "scheduleReteachConfirm": "Reteach Live запланирован на {{date}} (~{{days}} дн.). Приглашение в календарь открыто.",
       "scheduleReteachHint": "Соберите трудные слова заново и сыграйте ещё раз примерно через две недели — интервальное повторение, которое закрепляет.",
       "unpluggedReteachLiveCta": "Начать Unplugged reteach Live",
-      "reteachLiveCta": "Начать 3-мин reteach Live",
+      "reteachLiveCta": "Начать 2-мин reteach Live",
       "unpluggedReteachLiveFoil": "Сегодня у учеников нет устройств? Выведите ошибки на экран — ученики отвечают на бумаге.",
       "moodGreat_one": "{{count}} ученик оценил последний раунд как отличный.",
       "moodGreat_other": "{{count}} учеников оценили последний раунд как отличный.",
@@ -15716,7 +15716,7 @@ const ru = {
         },
         "sped": {
           "name": "Поддержка (SPED)",
-          "desc": "Меньше слов, больше времени и крупные буквы"
+          "desc": "Меньше слов, буквы крупнее"
         },
         "standard": {
           "name": "Стандарт",
@@ -23274,14 +23274,14 @@ const ru = {
         "language": "Язык игры"
       },
       "cue": {
-        "first": "Первая игра? Начните с разминки на 5 минут.",
-        "closeOut": "Сегодня уже играли. Закончим с классом проверкой на 3 минуты?",
+        "first": "Первая игра? Начните с разминки на 2 минуты.",
+        "closeOut": "Сегодня уже играли. Закончим с классом проверкой на 2 минуты?",
         "season": {
-          "school": "Слова к началу учебного года готовы. Разминка на 5 минут?",
-          "autumn": "Осенние слова готовы. Разминка на 5 минут?",
-          "winter": "Зимние слова готовы. Разминка на 5 минут?",
-          "spring": "Весенние слова готовы. Разминка на 5 минут?",
-          "summer": "Летние слова готовы. Разминка на 5 минут?"
+          "school": "Слова к началу учебного года готовы. Разминка на 2 минуты?",
+          "autumn": "Осенние слова готовы. Разминка на 2 минуты?",
+          "winter": "Зимние слова готовы. Разминка на 2 минуты?",
+          "spring": "Весенние слова готовы. Разминка на 2 минуты?",
+          "summer": "Летние слова готовы. Разминка на 2 минуты?"
         }
       }
     },
@@ -23303,7 +23303,7 @@ const ru = {
       "streak": "дней подряд вы проводите уроки. Так держать!",
       "busiest": "— день, когда ваши классы играют больше всего",
       "topClass": "игр на этой неделе у «{{name}}», вашего самого активного класса",
-      "quiet": "дней с последней игры. Один раунд на 3 минуты вернёт класс в игру.",
+      "quiet": "дней с последней игры. Один раунд на 2 минуты вернёт класс в игру.",
       "reach": "учеников в одном коде от игры",
       "month": "игр за последние 30 дней"
     },

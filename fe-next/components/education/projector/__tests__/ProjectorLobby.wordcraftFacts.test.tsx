@@ -42,6 +42,6 @@ describe('ProjectorLobby — Wordcraft deals its own fixed board', () => {
       />
     );
     expect(screen.queryByText('6×6')).not.toBeInTheDocument();
-    expect(screen.getByText('eduLiveRoom.lobby.minutes:3')).toBeInTheDocument();
+    expect(screen.getByText('eduLiveRoom.lobby.minutes:2')).toBeInTheDocument();
   });
 });

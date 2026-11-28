@@ -57,10 +57,10 @@ describe('useProjectorLobbyMode — the settings the wall prints', () => {
   it('GIVEN a board game THEN it lists round length, board size and late join from the teacher template first', () => {
     liveGame = { gameMode: 'classic', settings: { timerMinutes: 9, boardSize: 'small', allowLateJoin: true } };
     const { result } = renderHook(() =>
-      useProjectorLobbyMode({ gameCode: 'AB12', classroomGameMode: 'classic', templateSettings: { timerSeconds: 180, difficulty: 'large', allowLateJoin: false }, t })
+      useProjectorLobbyMode({ gameCode: 'AB12', classroomGameMode: 'classic', templateSettings: { timerSeconds: 60, difficulty: 'large', allowLateJoin: false }, t })
     );
     expect(result.current.facts).toEqual([
-      { key: 'timer', text: 'eduLiveRoom.lobby.minutes:{"count":3}' },
+      { key: 'timer', text: 'eduLiveRoom.lobby.minutes:{"count":1}' },
       { key: 'board', text: '7×7' },
       { key: 'late', text: 'education.projectorLobby.lateJoinOff' },
     ]);

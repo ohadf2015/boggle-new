@@ -403,7 +403,7 @@ describe('Real-Time Duel Handlers', () => {
       expect(gameState?.challengerId).toBe('user-1');
       expect(gameState?.opponentId).toBe('user-2');
       expect(gameState?.language).toBe('en');
-      expect(gameState?.timeLimit).toBe(180);
+      expect(gameState?.timeLimit).toBe(120);
 
       // Verify duel:started emitted to room
       const startedEvent = roomEmittedEvents.find((e) => e.event === 'duel:started');
@@ -412,7 +412,7 @@ describe('Real-Time Duel Handlers', () => {
       expect(startedEvent?.data).toMatchObject({
         duelId,
         boardState: [['T', 'E', 'S', 'T']],
-        timeLimit: 180,
+        timeLimit: 120,
         players: ['user-1', 'user-2'],
       });
     });

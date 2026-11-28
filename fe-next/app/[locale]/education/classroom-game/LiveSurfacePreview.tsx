@@ -45,6 +45,7 @@ import { SetupInvitePreview } from './SetupInvitePreview';
 import { CrosswordPreview } from './CrosswordPreview';
 import { VersusPhonePreview } from './VersusPhonePreview';
 import { GamePausedOverlay } from '@/components/education/GamePausedOverlay';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 
 export type { LiveSurfacePreviewKind };
 
@@ -99,7 +100,7 @@ function ProjectorPreview() {
       lessonName="Weekly Vocabulary"
       wordCount={14}
       classroomGameMode="classic"
-      templateSettings={{ timerSeconds: 180, difficulty: 'medium', minWordLength: 3, allowLateJoin: true }}
+      templateSettings={{ timerSeconds: EDU_MAX_ROUND_SEC, difficulty: 'medium', minWordLength: 3, allowLateJoin: true }}
     />
   );
 }

@@ -18,7 +18,7 @@ describe('Wheel Rush round length — one source for tile, lobby and timer', () 
     expect(teacherGameMode('wheel-rush')?.minutes).toBe(1);
   });
 
-  it('GIVEN a timed mode WHEN the teacher sets 3 minutes THEN the tile still follows the teacher', () => {
-    expect(configuredRoundMinutes('classic', { timerMinutes: 3 })).toBe(3);
+  it('GIVEN a timed mode WHEN the teacher sets 1 minute THEN the tile still follows the teacher', () => {
+    expect(configuredRoundMinutes('classic', { timerMinutes: 1 })).toBe(1);
   });
 });

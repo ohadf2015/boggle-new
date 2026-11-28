@@ -50,10 +50,10 @@ export const CLASSROOM_PRESETS: Record<ClassroomPresetId, ClassroomPresetValues>
     accessibility: {},
     vocabularyCap: 0,
   },
-  // Support/SPED: fewer words, longer timer, larger type, audio cues, and a
-  // flat participation bonus so every student scores.
+  // Support/SPED: fewer words, larger type, audio cues, and a flat
+  // participation bonus so every student scores.
   sped: {
-    timerMinutes: 4,
+    timerMinutes: 2,
     boardSize: 'small',
     minWordLength: 2,
     playStyle: 'ffa',

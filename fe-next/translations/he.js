@@ -999,7 +999,7 @@ const he = {
       "heading": "גלו מצבי לימוד",
       "subhead": "בחרו את מצב המשחק המתאים לכיתה: דו-קרב מהיר אחד על אחד, או משחק חי לכל הכיתה בבת אחת.",
       "duelsTitle": "דו-קרב אוצר מילים (אחד על אחד)",
-      "duelsDesc": "זוגות תלמידים מתמודדים בקרבות מילים של 2-3 דקות, פנים מול פנים.",
+      "duelsDesc": "זוגות תלמידים מתמודדים בקרבות מילים של 2 דקות, פנים מול פנים.",
       "classroomTitle": "משחק כיתתי חי",
       "classroomDesc": "משחק לכל הכיתה בבת אחת. התלמידים מצטרפים עם קוד כיתה, בלי אימייל."
     },
@@ -15667,7 +15667,7 @@ const he = {
       "scheduleReteachConfirm": "Live לחזרה נקבע ל־{{date}} (~{{days}} ימים). הזמנה ליומן נפתחה.",
       "scheduleReteachHint": "בונים מחדש את המילים הקשות ומשחקים שוב בעוד כשבועיים: חזרה מרווחת שנשארת בראש.",
       "unpluggedReteachLiveCta": "התחלת Unplugged Live לחיזוק",
-      "reteachLiveCta": "התחלת Live חיזוק ל־3 דקות",
+      "reteachLiveCta": "התחלת Live חיזוק ל־2 דקות",
       "unpluggedReteachLiveFoil": "אין היום מכשירים לתלמידים? מקרינים את הפספוסים והתלמידים עונים על דף.",
       "moodGreat_one": "תלמיד אחד דירג את הסיבוב האחרון כמצוין.",
       "moodGreat_other": "{{count}} תלמידים דירגו את הסיבוב האחרון כמצוין.",
@@ -15916,7 +15916,7 @@ const he = {
         },
         "sped": {
           "name": "תמיכה (SPED)",
-          "desc": "פחות מילים, יותר זמן ואותיות גדולות"
+          "desc": "פחות מילים ואותיות גדולות יותר"
         },
         "standard": {
           "name": "רגיל",
@@ -17387,10 +17387,10 @@ const he = {
       "shareGapPracticeHome": "מילים לתרגול בבית",
       "shareGapEmpty": "אין עדיין פער כיתה לשיתוף. שחקו משחק כיתה ואז שתפו את הכרטיס עם הורים.",
       "shareGapEmptyText": "{{lesson}}: אין עדיין פער כיתה לשיתוף",
-      "startReteachLive": "התחלת Live חזרה ל-3 דקות",
-      "postReteachGoogleClassroom": "פרסום חזרה ל-3 דקות ב-Google Classroom",
-      "postReteachGoogleClassroomTitle": "חזרה במשחק חי של 3 דקות: {{lesson}}",
-      "postReteachGoogleClassroomBody": "פתחו את הקישור והתחילו משחק חי של 3 דקות על המילים שפספסו: {{missed}}. התלמידים מצטרפים מעמוד הכיתה.",
+      "startReteachLive": "התחלת Live חזרה ל-2 דקות",
+      "postReteachGoogleClassroom": "פרסום חזרה ל-2 דקות ב-Google Classroom",
+      "postReteachGoogleClassroomTitle": "חזרה במשחק חי של 2 דקות: {{lesson}}",
+      "postReteachGoogleClassroomBody": "פתחו את הקישור והתחילו משחק חי של 2 דקות על המילים שפספסו: {{missed}}. התלמידים מצטרפים מעמוד הכיתה.",
       "assignPracticeGoogleClassroom": "שיבוץ תרגול ב-Google Classroom",
       "assignPracticeGoogleClassroomTitle": "תרגול מילים חסרות: {{lesson}}",
       "assignPracticeGoogleClassroomBody": "פתחו את הקישור ותרגלו בבית את המילים החסרות: {{missed}}. הגישו כשתסיימו.",
@@ -17443,8 +17443,8 @@ const he = {
       "assignUnpluggedGoogleClassroomTitle": "שיעורי בית בלי מסכים: {{lesson}}",
       "assignUnpluggedGoogleClassroomBody": "שיעורי בית בלי מכשירים: פתחו את הקישור, הדפיסו את דף התרגול של המילים שפספסו ותרגלו: {{missed}}. התלמידים לא צריכים מכשיר. הגישו כשתסיימו.",
       "assignMissGapLiveGoogleClassroom": "שיבוץ משחק חי על המילים שפספסו ב-Google Classroom",
-      "assignMissGapLiveGoogleClassroomTitle": "משחק חי של 3 דקות על המילים שפספסו: {{lesson}}",
-      "assignMissGapLiveGoogleClassroomBody": "פתחו את הקישור והתחילו משחק חי של 3 דקות על המילים שפספסו: {{missed}}. התלמידים מצטרפים מ-Google Classroom. עובד בגרסה החינמית של Google Workspace for Education, בלי Education Plus.",
+      "assignMissGapLiveGoogleClassroomTitle": "משחק חי של 2 דקות על המילים שפספסו: {{lesson}}",
+      "assignMissGapLiveGoogleClassroomBody": "פתחו את הקישור והתחילו משחק חי של 2 דקות על המילים שפספסו: {{missed}}. התלמידים מצטרפים מ-Google Classroom. עובד בגרסה החינמית של Google Workspace for Education, בלי Education Plus.",
       "launchMissGapQuestionPackLive": "משחק חי עם שאלות על המילים שפספסו",
       "missGapQuestionPackTitle": "שאלות על המילים שפספסו: {{lesson}}",
       "unpluggedReteachHint": "התלמידים עונים על דף התרגול המודפס, בלי מכשירים",
@@ -17564,7 +17564,7 @@ const he = {
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
       "title": "שיבוץ Live לפי miss-gap",
-      "subtitle": "שיבוץ Classwork בלחיצה ל-Live של 3 דקות על מילים שפספסו. עובד ב-Workspace for Education החינמי. ה-add-on של Quizlet דורש Education Plus. רק מילות כיתה, בלי שמות תלמידים.",
+      "subtitle": "שיבוץ Classwork בלחיצה ל-Live של 2 דקות על מילים שפספסו. עובד ב-Workspace for Education החינמי. ה-add-on של Quizlet דורש Education Plus. רק מילות כיתה, בלי שמות תלמידים.",
       "assignLive": "שבצו Live miss-gap ל-Classroom",
       "freeWorkspaceFoil": "עובד ב-Google Workspace for Education החינמי. ה-add-on של Quizlet דורש Education Plus. LexiClash משתמש בדיאלוג השיתוף של Google, בלי Plus.",
       "lessonLabel": "שם השיעור",
@@ -17585,7 +17585,7 @@ const he = {
         "modeClassic": "Classic Unplugged: הכיתה או הקבוצות דנות על המקרן",
         "modeTeam": "Team Tiles Unplugged: לוח משותף, המורה מסמן",
         "modeReteach": "Unplugged reteach Live: להדפסה + מקרן",
-        "modeLive3min": "reteach Live של 3 דק׳: מקרן + החזרת ציון",
+        "modeLive3min": "reteach Live של 2 דק׳: מקרן + החזרת ציון",
         "timerNote": "טיימר {{seconds}} שנ׳",
         "cefrNote": "פערי CEFR {{level}}",
         "openLive": "פתחו Live מתוכנן",
@@ -18471,7 +18471,7 @@ const he = {
         "blooketTitle": "Blooket: 「Gaps Set」 ידני",
         "blooketBody": "ממיינים את דוח השאלות לפי Incorrect%, בודקים Opportunities for Growth (Plus), רושמים את הפערים, ואז פותחים Edit / Question Bank ובונים 「Gaps Set」 לשיעורי בית או חזרה ממוקדת. האבחון מהיר; סט ה-reteach עדיין נבנה ביד.",
         "lexiTitle": "LexiClash: קישור עמוק אוטומטי מ-miss-gap (#1124)",
-        "lexiBody": "שבבי misses מהשיעור האחרון וכרטיס התקדמות המורה כבר נושאים קישורי Unplugged / 3-דק׳ reteach Live. לחיצה אחת זורעת את המילים החסרות ל-Live, בלי 「Gaps Set」, בלי Question Bank.",
+        "lexiBody": "שבבי misses מהשיעור האחרון וכרטיס התקדמות המורה כבר נושאים קישורי Unplugged / 2-דק׳ reteach Live. לחיצה אחת זורעת את המילים החסרות ל-Live, בלי 「Gaps Set」, בלי Question Bank.",
         "citePrefix": "מדריך מורים של Blooket:",
         "citeLabel": "Identify knowledge gaps in Blooket reports",
         "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
@@ -18619,18 +18619,18 @@ const he = {
       },
       "session": {
         "warmUp": {
-          "name": "חימום של 5 דקות",
+          "name": "חימום של 2 דקות",
           "when": "תחילת השיעור. לוח אחד מהיר עם מילים של העונה, וכולם כבר חושבים.",
           "whenShort": "לפתוח את השיעור"
         },
         "exitTicket": {
           "name": "כרטיס יציאה",
-          "when": "3 הדקות האחרונות. חידון קצר שמראה מי הבין את המילים של היום.",
+          "when": "שתי הדקות האחרונות. חידון קצר שמראה מי הבין את המילים של היום.",
           "whenShort": "בדיקה לפני היציאה"
         },
         "brainBreak": {
           "name": "הפסקת מוח",
-          "when": "כשהאנרגיה יורדת. שלוש דקות מהירות של Blast, בלי להכין רשימה.",
+          "when": "כשהאנרגיה יורדת. שתי דקות מהירות של Blast, בלי להכין רשימה.",
           "whenShort": "כשהאנרגיה יורדת"
         },
         "icebreaker": {
@@ -23505,14 +23505,14 @@ const he = {
         "language": "שפת המשחק"
       },
       "cue": {
-        "first": "משחק ראשון? חימום של 5 דקות זו ההתחלה הכי קלה.",
-        "closeOut": "כבר שיחקתם היום. לסיים עם הכיתה בכרטיס יציאה של 3 דקות?",
+        "first": "משחק ראשון? חימום של 2 דקות זו ההתחלה הכי קלה.",
+        "closeOut": "כבר שיחקתם היום. לסיים עם הכיתה בכרטיס יציאה של 2 דקות?",
         "season": {
-          "school": "המילים של חזרה לבית הספר מחכות. חימום של 5 דקות?",
-          "autumn": "מילים של סתיו מחכות. חימום של 5 דקות?",
-          "winter": "מילים של חורף מחכות. חימום של 5 דקות?",
-          "spring": "מילים של אביב מחכות. חימום של 5 דקות?",
-          "summer": "מילים של קיץ מחכות. חימום של 5 דקות?"
+          "school": "המילים של חזרה לבית הספר מחכות. חימום של 2 דקות?",
+          "autumn": "מילים של סתיו מחכות. חימום של 2 דקות?",
+          "winter": "מילים של חורף מחכות. חימום של 2 דקות?",
+          "spring": "מילים של אביב מחכות. חימום של 2 דקות?",
+          "summer": "מילים של קיץ מחכות. חימום של 2 דקות?"
         }
       }
     },
@@ -23534,7 +23534,7 @@ const he = {
       "streak": "ימים ברצף שלימדת. ממשיכים!",
       "busiest": "הוא היום שבו הכיתות שלך משחקות הכי הרבה",
       "topClass": "משחקים השבוע ב{{name}}, הכיתה הפעילה ביותר שלך",
-      "quiet": "ימים מאז המשחק האחרון. סבב של 3 דקות מחזיר אותם.",
+      "quiet": "ימים מאז המשחק האחרון. סבב של 2 דקות מחזיר אותם.",
       "reach": "תלמידים במרחק קוד אחד ממשחק",
       "month": "משחקים ב-30 הימים האחרונים"
     },

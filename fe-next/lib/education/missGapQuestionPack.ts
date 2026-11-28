@@ -6,7 +6,7 @@
  * tap writes a quickLaunch `paste` intent and opens the classroom-game lobby
  * pre-filled with the missed words, one GO LIVE tap from a round.
  *
- * Reuses quickLaunchIntent and its 3-minute timer. Class-level missed words only — no student names.
+ * Reuses quickLaunchIntent and its timer. Class-level missed words only — no student names.
  */
 
 import {

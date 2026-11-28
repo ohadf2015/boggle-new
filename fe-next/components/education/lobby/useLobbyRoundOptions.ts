@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { VOCAB_QUIZ_DEFAULT_QUESTION_COUNT, VOCAB_QUIZ_DEFAULT_SECONDS, type PracticeFocusSetting } from '@/shared/types/vocabQuiz';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
+import { VOCAB_QUIZ_DEFAULT_QUESTION_COUNT, VOCAB_QUIZ_DEFAULT_SECONDS, capQuizToRound, type PracticeFocusSetting } from '@/shared/types/vocabQuiz';
 import { getPresetValues, type ClassroomPresetId } from '@/lib/education/classroomPresets';
 import type { PlayStyle } from '@/shared/utils/teamBattle';
 import type { ClassroomAccessibility, ClassroomPressure } from '@/shared/types/classroom';
@@ -30,12 +31,13 @@ export function useLobbyRoundOptions({ initialMinutes, initialQuestions, initial
   const [remembered] = useState(readRememberedRoundDefaults);
   const [bossId, setBossId] = useRotatingBoss();
   const [vocabQuizFocus, setVocabQuizFocus] = useState<PracticeFocusSetting>('any');
-  const [vocabQuizQuestionCount, setVocabQuizQuestionCount] = useState(initialQuestions ?? VOCAB_QUIZ_DEFAULT_QUESTION_COUNT);
-  const [vocabQuizSeconds, setVocabQuizSeconds] = useState(initialSeconds ?? VOCAB_QUIZ_DEFAULT_SECONDS);
+  const [initialQuiz] = useState(() => capQuizToRound(initialQuestions ?? VOCAB_QUIZ_DEFAULT_QUESTION_COUNT, initialSeconds ?? VOCAB_QUIZ_DEFAULT_SECONDS));
+  const [vocabQuizQuestionCount, setVocabQuizQuestionCount] = useState(initialQuiz.questionCount);
+  const [vocabQuizSeconds, setVocabQuizSeconds] = useState(initialQuiz.secondsPerQuestion);
   const [treasureChestsEnabled, setTreasureChestsEnabled] = useState(true);
   const [targetWord, setTargetWord] = useState('');
   const [minWordLength, setMinWordLength] = useState(3);
-  const [timerMinutes, setTimerMinutes] = useState(initialMinutes ?? remembered?.timerMinutes ?? 2);
+  const [timerMinutes, setTimerMinutes] = useState(Math.min(initialMinutes ?? remembered?.timerMinutes ?? 2, EDU_MAX_ROUND_SEC / 60));
   const [allowLateJoin, setAllowLateJoin] = useState(remembered?.allowLateJoin ?? true);
   const [economy, setEconomy] = useState<ClassroomEconomyConfig>(ZERO_ECONOMY_SNAPSHOT.config);
   const [rivalry, setRivalry] = useState(true);

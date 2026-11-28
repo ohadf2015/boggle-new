@@ -24,9 +24,11 @@ import { focusAvailability } from '@/lib/education/vocabQuizQuestions';
 import { VOCAB_FOCUSES } from '@/lib/education/vocabFocus';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import { CALM_SELECTED, CALM_IDLE, CALM_FOCUS } from '../lobby/LobbyChoiceRow';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 import {
   VOCAB_QUIZ_MIN_QUESTION_COUNT,
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
+  VOCAB_QUIZ_REVEAL_MS,
   type PracticeFocusSetting,
   type VocabFocus,
   type TranslateFn,
@@ -52,8 +54,9 @@ const FOCUS_CHIPS: { key: VocabFocus; icon: typeof BookOpen }[] = VOCAB_FOCUSES.
   icon: FOCUS_ICONS[key] ?? HelpCircle,
 }));
 
-const QUESTION_COUNTS = [5, 8, 12, 20] as const;
-const SECONDS_CHOICES = [10, 15, 20, 30] as const;
+export const QUIZ_QUESTION_COUNTS = [4, 6, 8] as const;
+export const QUIZ_SECONDS_CHOICES = [10, 15] as const;
+const overCap = (count: number, seconds: number) => count * (seconds + VOCAB_QUIZ_REVEAL_MS / 1000) > EDU_MAX_ROUND_SEC;
 
 export interface VocabQuizFocusPickerProps {
   /** The teacher's selected lesson words, with whatever per-word data they hold. */
@@ -184,16 +187,17 @@ export function VocabQuizFocusPicker({
           <ListOrdered className="me-2 inline size-4 text-edu-ink/70" />
           {t('vocabQuiz.setup.questionCount')}
         </div>
-        <div role="radiogroup" aria-labelledby="vocab-quiz-count-label" className="grid grid-cols-4 gap-3">
-          {QUESTION_COUNTS.map((count) => (
+        <div role="radiogroup" aria-labelledby="vocab-quiz-count-label" className="grid grid-cols-3 gap-3">
+          {QUIZ_QUESTION_COUNTS.map((count) => (
             <button
               key={count}
               type="button"
               role="radio"
               aria-checked={questionCount === count}
+              disabled={overCap(count, secondsPerQuestion)}
               onClick={() => onQuestionCountChange(count)}
               className={cn(
-                'inline-flex items-center justify-center gap-1.5 rounded-neo border-2 px-3 py-2.5 font-neo-display text-sm font-bold transition-colors',
+                'inline-flex items-center justify-center gap-1.5 rounded-neo border-2 px-3 py-2.5 font-neo-display text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60',
                 CALM_FOCUS,
                 questionCount === count ? CALM_SELECTED : CALM_IDLE
               )}
@@ -215,16 +219,17 @@ export function VocabQuizFocusPicker({
           <Timer className="me-2 inline size-4 text-edu-ink/70" />
           {t('vocabQuiz.setup.secondsPerQuestion')}
         </div>
-        <div role="radiogroup" aria-labelledby="vocab-quiz-seconds-label" className="grid grid-cols-4 gap-3">
-          {SECONDS_CHOICES.map((seconds) => (
+        <div role="radiogroup" aria-labelledby="vocab-quiz-seconds-label" className="grid grid-cols-2 gap-3">
+          {QUIZ_SECONDS_CHOICES.map((seconds) => (
             <button
               key={seconds}
               type="button"
               role="radio"
               aria-checked={secondsPerQuestion === seconds}
+              disabled={overCap(questionCount, seconds)}
               onClick={() => onSecondsChange(seconds)}
               className={cn(
-                'inline-flex items-center justify-center gap-1.5 rounded-neo border-2 px-3 py-2.5 font-neo-display text-sm font-bold transition-colors',
+                'inline-flex items-center justify-center gap-1.5 rounded-neo border-2 px-3 py-2.5 font-neo-display text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60',
                 CALM_FOCUS,
                 secondsPerQuestion === seconds ? CALM_SELECTED : CALM_IDLE
               )}

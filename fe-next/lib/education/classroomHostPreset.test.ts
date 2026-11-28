@@ -21,7 +21,7 @@ describe('classroomHostPreset', () => {
   });
 
   it('converts the stored seconds back to the minutes the host timer expects', () => {
-    expect(classroomHostPreset({ timerSeconds: 300, difficulty: 'medium' })?.timerMinutes).toBe(5);
+    expect(classroomHostPreset({ timerSeconds: 300, difficulty: 'medium' })?.timerMinutes).toBe(2);
     expect(classroomHostPreset({ timerSeconds: 60, difficulty: 'medium' })?.timerMinutes).toBe(1);
   });
 
