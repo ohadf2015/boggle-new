@@ -6,6 +6,10 @@ const trackEduProCheckoutReturnLanded = vi.fn();
 vi.mock('@/lib/education/proFunnelTelemetry', () => ({
   trackEduProCheckoutReturnLanded: () => trackEduProCheckoutReturnLanded(),
   checkoutReturnBeaconPromise: () => null,
+  claimCheckoutReturn: async () => undefined,
+}));
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => authState,
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
@@ -17,6 +21,7 @@ vi.mock('next/navigation', () => ({
 }));
 
 let proState: { hasPro: boolean; loading: boolean; refresh: ReturnType<typeof vi.fn>; status?: string };
+let authState: { user: { id: string } | null; loading: boolean };
 vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => proState,
 }));
@@ -31,6 +36,7 @@ describe('<CheckoutReturnCapture>', () => {
     localStorage.clear();
     window.history.pushState({}, '', '/en/teacher');
     proState = { hasPro: false, loading: false, refresh: vi.fn().mockResolvedValue(undefined) };
+    authState = { user: { id: 'teacher-1' }, loading: false };
   });
   afterEach(() => {
     vi.useRealTimers();
@@ -68,6 +74,16 @@ describe('<CheckoutReturnCapture>', () => {
     act(() => { screen.getByTestId('checkout-return-retry').click(); });
     expect(proState.refresh).toHaveBeenCalled();
     expect(screen.getByTestId('checkout-return-status')).toHaveAttribute('data-phase', 'activating');
+  });
+
+  it('asks a signed-out teacher to sign in and does not treat them as a failed grant', () => {
+    authState = { user: null, loading: false };
+    window.history.pushState({}, '', '/en/teacher?checkout=success&checkout_id=52e32342-5f87-49e6-ac1c-7c636b5192ff');
+    render(<CheckoutReturnCapture />);
+    const banner = screen.getByTestId('checkout-return-status');
+    expect(banner).toHaveAttribute('data-phase', 'signin');
+    expect(screen.getByTestId('checkout-return-signin')).toBeInTheDocument();
+    expect(screen.queryByTestId('checkout-return-retry')).not.toBeInTheDocument();
   });
 
   const ID = '52e32342-5f87-49e6-ac1c-7c636b5192ff';

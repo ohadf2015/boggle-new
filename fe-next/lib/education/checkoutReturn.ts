@@ -238,6 +238,54 @@ export function clearReturnIntent(storage: ClearStorage): void {
 }
 
 /**
+ * A completed Polar checkout waiting for the teacher to sign back in.
+ * Lives in localStorage so a magic-link or OAuth round-trip in another tab
+ * can still claim it. The URL `checkout_id` is the other source of truth.
+ */
+export const PENDING_RETURN_CHECKOUT_KEY = 'lexi_edu_pending_return_checkout';
+export const PENDING_RETURN_CHECKOUT_TTL_MS = 24 * 60 * 60 * 1000;
+
+export function rememberPendingReturnCheckout(
+  storage: SetStorage,
+  checkoutId: string,
+  now: number = Date.now(),
+): void {
+  const id = normalizeCheckoutId(checkoutId);
+  if (!id) return;
+  try {
+    storage.setItem(PENDING_RETURN_CHECKOUT_KEY, JSON.stringify({ id, at: now }));
+  } catch {
+    /* private mode — the success URL still carries checkout_id */
+  }
+}
+
+export function readPendingReturnCheckout(storage: GetStorage, now: number = Date.now()): string | null {
+  try {
+    const raw = storage.getItem(PENDING_RETURN_CHECKOUT_KEY);
+    if (!raw) return null;
+    const stored = JSON.parse(raw) as { id?: unknown; at?: unknown };
+    const at = typeof stored.at === 'number' ? stored.at : NaN;
+    if (!Number.isFinite(at) || now < at || now - at > PENDING_RETURN_CHECKOUT_TTL_MS) return null;
+    return normalizeCheckoutId(stored.id);
+  } catch {
+    return null;
+  }
+}
+
+export function clearPendingReturnCheckout(storage: ClearStorage): void {
+  try {
+    storage.removeItem(PENDING_RETURN_CHECKOUT_KEY);
+  } catch {
+    /* already gone */
+  }
+}
+
+/** Checkout id from the success URL, else the one we stored for a later sign-in. */
+export function pendingReturnCheckoutId(search: string, storage: GetStorage, now: number = Date.now()): string | null {
+  return checkoutIdFromSearch(search) ?? readPendingReturnCheckout(storage, now);
+}
+
+/**
  * `success` means the server grant is already visible. This function does not
  * grant, and a later poll that finds `hasPro` replaces failure — the webhook
  * won, so we must not keep telling the teacher it failed.

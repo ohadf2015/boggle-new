@@ -15653,7 +15653,10 @@ const ja = {
       "failureTitle": "Pro はまだ確認できていません",
       "failureBody": "請求済みの場合、アクセスは通常1分以内に届きます。もう一度確認するか、まだ無いときはご連絡ください。",
       "retry": "もう一度確認",
-      "close": "閉じる"
+      "close": "閉じる",
+      "signInTitle": "ログインして Teacher Pro の有効化を完了してください",
+      "signInBody": "お支払いが完了しています。同じ教師アカウントでログインすると Pro が有効になります。",
+      "signInCta": "ログイン"
     },
     "plan": {
       "pro": "Pro",

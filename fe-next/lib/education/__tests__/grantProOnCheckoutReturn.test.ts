@@ -55,10 +55,42 @@ describe('planGrantFromPolarCheckout', () => {
     });
   });
 
-  it('does not grant when Polar sent no owner id', () => {
+  it('does not grant when Polar sent no owner id and no email', () => {
     const plan = planGrantFromPolarCheckout(
       checkout({ external_customer_id: undefined, metadata: {}, customer: {} }),
-      { authedUserId: USER, proProductId: PRO },
+      { authedUserId: USER, authedEmail: 'teacher@school.org', proProductId: PRO },
+    );
+    expect(plan).toEqual({ ok: false, reason: 'not_owner' });
+  });
+
+  it('grants when Polar has no external id but the customer email matches the signed-in teacher', () => {
+    const plan = planGrantFromPolarCheckout(
+      checkout({
+        external_customer_id: undefined,
+        metadata: {},
+        customer: { email: 'Teacher@School.org' },
+      }),
+      { authedUserId: USER, authedEmail: ' teacher@school.org ', proProductId: PRO },
+    );
+    expect(plan.ok).toBe(true);
+  });
+
+  it('does not grant a succeeded checkout whose email belongs to someone else', () => {
+    const plan = planGrantFromPolarCheckout(
+      checkout({
+        external_customer_id: 'someone-else',
+        metadata: {},
+        customer: { email: 'other@school.org' },
+      }),
+      { authedUserId: USER, authedEmail: 'teacher@school.org', proProductId: PRO },
+    );
+    expect(plan).toEqual({ ok: false, reason: 'not_owner' });
+  });
+
+  it('does not grant to an empty signed-in id even if an email is present', () => {
+    const plan = planGrantFromPolarCheckout(
+      checkout({ customer: { email: 'teacher@school.org' } }),
+      { authedUserId: '', authedEmail: 'teacher@school.org', proProductId: PRO },
     );
     expect(plan).toEqual({ ok: false, reason: 'not_owner' });
   });

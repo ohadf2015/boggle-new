@@ -15600,7 +15600,10 @@ const es = {
       "failureTitle": "Aún no confirmamos Pro",
       "failureBody": "Si te cobramos, el acceso suele llegar en un minuto. Vuelve a comprobarlo, o escríbenos si sigue faltando.",
       "retry": "Comprobar de nuevo",
-      "close": "Cerrar"
+      "close": "Cerrar",
+      "signInTitle": "Inicia sesión para terminar de activar Teacher Pro",
+      "signInBody": "Tu pago se realizó. Inicia sesión con la misma cuenta de docente para activar Pro.",
+      "signInCta": "Iniciar sesión"
     },
     "plan": {
       "pro": "Pro",

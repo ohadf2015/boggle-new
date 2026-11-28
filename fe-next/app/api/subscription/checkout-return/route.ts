@@ -150,6 +150,7 @@ export async function POST(request: NextRequest) {
           grantProOnCheckoutReturn({
             checkout: attribution.checkout,
             authedUserId: user.id,
+            authedEmail: user.email ?? null,
             proProductId: process.env.POLAR_PRO_PRODUCT_ID,
           }),
           GRANT_TIMEOUT_MS,

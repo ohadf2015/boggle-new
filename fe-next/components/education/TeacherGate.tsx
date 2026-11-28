@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
+import { isCheckoutSuccessSearch } from '@/lib/education/checkoutReturn';
 import { useExperiment } from '@/hooks/useExperiment';
 
 /**
@@ -78,10 +79,12 @@ export function TeacherGate({
 
   useEffect(() => {
     if (!isLoading && !hasAccess && pathname) {
-      const locale = pathname.split('/')[1] || 'en';
-      // Keep ?checkout=success. Dropping it here is how a paid return never
-      // recorded: the dashboard that fires the event never mounts.
       const search = typeof window !== 'undefined' ? window.location.search : '';
+      // Stay on the return page when Polar just sent the teacher back: they
+      // may need to sign in again before Pro can turn on. Redirecting to
+      // /education/access unmounts the sign-in prompt.
+      if (isCheckoutSuccessSearch(search)) return;
+      const locale = pathname.split('/')[1] || 'en';
       const from = encodeURIComponent(`${pathname}${search}`);
       router.replace(`/${locale}/education/access?from=${from}`);
     }

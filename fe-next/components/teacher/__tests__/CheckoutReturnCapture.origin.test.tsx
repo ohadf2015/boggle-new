@@ -6,6 +6,10 @@ const landed = vi.fn();
 vi.mock('@/lib/education/proFunnelTelemetry', () => ({
   trackEduProCheckoutReturnLanded: () => landed(),
   checkoutReturnBeaconPromise: () => null,
+  claimCheckoutReturn: async () => undefined,
+}));
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ user: { id: 'teacher-1' }, loading: false }),
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'he' }),

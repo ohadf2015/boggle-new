@@ -249,6 +249,7 @@ describe('POST /api/subscription/checkout-return', () => {
     expect(grantProOnCheckoutReturn).toHaveBeenCalledWith({
       checkout,
       authedUserId: 'u1',
+      authedEmail: 'teacher@school.org',
       proProductId: 'prod_pro',
     });
     expect(logSubscriptionEvent.mock.calls[0][0].payload).toMatchObject({
