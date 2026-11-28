@@ -82,7 +82,6 @@ export function LibraryPreview({ v }: { v?: string }) {
             <section className="space-y-3">
               <h1 className="font-neo-display text-4xl font-black leading-none text-edu-ink sm:text-5xl">{t('eduLibrary.title')}</h1>
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="max-w-prose font-neo-body text-base font-semibold text-edu-ink/85 max-sm:hidden">{t('teacher.lesson.sectionHint')}</p>
                 <button type="button" className={NB_PRIMARY}>
                   <Plus className="size-5" strokeWidth={3} aria-hidden="true" />
                   {t('eduLibrary.editor.newList')}

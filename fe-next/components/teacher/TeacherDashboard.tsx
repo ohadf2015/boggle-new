@@ -28,6 +28,7 @@ import { HomeReportsDialog, HomeReviewDialog } from './home/HomeDialogs';
 import { useAssignCreator } from './home/useAssignCreator';
 import { useCheckoutReturn } from './home/useCheckoutReturn';
 import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
+import { TryAsStudentLink } from './home/TryAsStudentLink';
 import { HomeSessionRail } from './home/HomeSessionRail';
 import { HERO_SECONDARY, HERO_SECONDARY_WRAP } from './home/homeStyles';
 import { WaitingStudentsNudge } from './home/WaitingStudentsNudge';
@@ -347,7 +348,7 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
               language={language}
               t={t}
               eyebrow={greeting}
-              rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} className={HERO_SECONDARY_WRAP} buttonClassName={HERO_SECONDARY} />}
+              rehearse={effectiveId ? <TryAsStudentLink classroomId={effectiveId} language={language} t={t} /> : <RehearseWithBotsButton classroomId={undefined} source="hq" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} className={HERO_SECONDARY_WRAP} buttonClassName={HERO_SECONDARY} />}
               newClassHref={newClassHref}
               classesHref={`/${language}/teacher/classroom`}
               capLabel={!proLoading && !hasPro ? t('eduShell.setup.capMeter', { count: classrooms.length, limit: FREE_TIER_LIMITS.classes }) : undefined}

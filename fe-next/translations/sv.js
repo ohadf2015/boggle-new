@@ -15693,7 +15693,6 @@ const sv = {
   },
   "teacher": {
     "studentView": {
-      "open": "Se elevappen",
       "banner": "Du ser det eleverna ser",
       "bannerShort": "Elevvy",
       "exit": "Avsluta",
@@ -16055,7 +16054,6 @@ const sv = {
       "weeklyPracticeCta": "Uppgradera till Teacher Pro — {{price}}/mån",
       "weeklyPracticeHint": "Dina elever övade denna vecka! Håll farten uppe med obegränsade klasser och analys.",
       "classroomWeekTitle": "Den här veckan i klassrummet",
-      "classroomWeekSubtitle": "Övningstotaler för elever som varit aktiva de senaste 7 dagarna.",
       "classroomWeekRegion": "Den här veckan i {{classroom}}",
       "classroomWeekStudents": "Elever som övat",
       "classroomWeekSessions": "Övningspass",
@@ -16337,7 +16335,6 @@ const sv = {
       "cardRosterTitle": "Elever i {{name}}",
       "cardClassReport": "Klassrapport",
       "assignTitle": "Läxa",
-      "assignBody": "Välj en ordlista och ett datum. Eleverna spelar på sina egna mobiler.",
       "assignCta": "Ge en läxa",
       "presets": {
         "title": "Hur ska klassen spela?",
@@ -16554,7 +16551,6 @@ const sv = {
     },
     "lesson": {
       "sectionTitle": "Dina lektioner",
-      "sectionHint": "En lektion är en ordlista. Kör den live med hela klassen, eller dela den så att eleverna kan öva på egen hand.",
       "pasteWords": "Klistra in din ordlista",
       "pasteWordsPlaceholder": "Ett ord per rad – eller separerade med kommatecken",
       "pasteWordsParsed": "{count} ord klara",
@@ -16851,7 +16847,6 @@ const sv = {
     },
     "reports": {
       "freeOtherClasses": "Gratisplanen gäller din första klass. Med Pro ser du även de här:",
-      "valueLine": "Efter varje spel ser du vilka ord varje klass missade, vem som behöver hjälp och vad ni ska öva på härnäst.",
       "homeworkShortcut": "Läxresultat",
       "lockedValue": "Orden som klassen missade visas gratis på resultatskärmen efter varje spel. Rapporterna visar dessutom vem som behöver hjälp, elev för elev, i alla dina spel.",
       "emptyClass": {
@@ -23446,7 +23441,7 @@ const sv = {
       "challenge": {
         "title": "Veckans klassutmaning",
         "lastTitle": "Förra veckans utmaning: resultaten är klara",
-        "emptyHint": "Låt en ordlista vara öppen hela veckan. Eleverna spelar när de vill från sin klassida, utan livespel.",
+        "emptyHint": "Eleverna spelar när de vill den här veckan, utan livespel.",
         "start": "Öppna \"{list}\" i 7 dagar",
         "pick": "Välj en ordlista",
         "untitled": "Ordlista",

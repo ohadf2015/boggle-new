@@ -126,10 +126,10 @@ describe('LessonBuilder — lesson card actions', () => {
     expect(screen.queryByTestId('lesson-classroom-lesson-1')).not.toBeInTheDocument();
   });
 
-  it('says what a lesson is and what to do with it, above the list', () => {
+  it('titles the list without an explainer paragraph', () => {
     render(<LessonBuilder />);
     expect(screen.getByRole('heading', { name: 'teacher.lesson.sectionTitle' })).toBeInTheDocument();
-    expect(screen.getByText('teacher.lesson.sectionHint')).toBeInTheDocument();
+    expect(screen.queryByText('teacher.lesson.sectionHint')).toBeNull();
   });
 
   it('drops the assign and template-settings icon buttons', () => {

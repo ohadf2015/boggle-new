@@ -120,8 +120,10 @@ describe('Teacher Home', () => {
     expect(screen.queryByTestId('home-see-results')).toBeNull();
     expect(screen.getAllByTestId('home-weekly-reports')).toHaveLength(1);
     expect(hero).not.toContainElement(screen.getByTestId('home-weekly-reports'));
-    expect(screen.getAllByTestId('rehearse-with-bots')).toHaveLength(1);
-    expect(within(hero).getByTestId('rehearse-with-bots')).toHaveTextContent('eduShell.home.practice.cta');
+    expect(screen.getAllByTestId('try-as-student')).toHaveLength(1);
+    const tryIt = within(hero).getByTestId('try-as-student');
+    expect(tryIt).toHaveTextContent('eduShell.home.practice.cta');
+    expect(tryIt).toHaveAttribute('href', '/en/teacher/classroom/c5b/student-view');
     expect(screen.queryByTestId('home-practice-card')).toBeNull();
   });
 
@@ -347,7 +349,7 @@ describe('Teacher Home', () => {
     render(<TeacherDashboard />);
     expect(screen.queryByTestId('home-onboarding')).toBeNull();
     expect(screen.getByTestId('home-start-live')).toBeInTheDocument();
-    expect(within(screen.getByTestId('home-hero')).getByTestId('rehearse-with-bots')).toBeInTheDocument();
+    expect(within(screen.getByTestId('home-hero')).getByTestId('try-as-student')).toBeInTheDocument();
   });
 
   it('Given a class that already played but the activation flag never landed, Then no setup nudge shows', () => {

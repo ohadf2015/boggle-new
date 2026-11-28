@@ -357,9 +357,9 @@ describe('ReportsPageClient', () => {
       delete (mockClassrooms[0] as { member_count?: number }).member_count;
     });
 
-    it('Given the class list, Then one line says what a report is for, in plain words', () => {
+    it('Given the class list, Then the title stands alone: the report panels explain themselves', () => {
       render(<ReportsPageClient />);
-      expect(screen.getByTestId('reports-value-line')).toHaveTextContent('teacher.reports.valueLine');
+      expect(screen.queryByTestId('reports-value-line')).toBeNull();
     });
 
     it('Given the class list, Then the header carries no plan pill', () => {

@@ -71,4 +71,12 @@ describe('ClassroomWeekSection', () => {
     await userEvent.click(screen.getByTestId('classroom-week-retry'));
     expect(onRetry).toHaveBeenCalledOnce();
   });
+
+  it('GIVEN the week totals WHEN rendered THEN the title needs no subtitle and the tiles sit on the light card, not dark-theme grey', () => {
+    renderSection();
+    expect(screen.queryByText('teacher.digest.classroomWeekSubtitle')).not.toBeInTheDocument();
+    const tile = screen.getByTestId('classroom-week-students').firstElementChild!;
+    expect(tile.className).not.toMatch(/bg-neo-navy|text-neo-white/);
+    expect(tile.className).toContain('text-edu-ink');
+  });
 });

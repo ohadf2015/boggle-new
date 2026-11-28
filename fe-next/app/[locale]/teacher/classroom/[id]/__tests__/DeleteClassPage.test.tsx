@@ -85,4 +85,14 @@ describe('Class page', () => {
     fireEvent.click(screen.getByTestId('class-page-retry'));
     expect(classes.refresh).toHaveBeenCalledTimes(1);
   });
+
+  it('Then the class has one way to try it as a student, and it opens the student app for this class', () => {
+    classes.list = [{ id: 'c1', name: 'Room 4', join_code: 'KITE43', language: 'en', member_count: 2 }];
+    classes.error = null;
+    render(<ClassPageClient classroomId="c1" />);
+    expect(screen.getAllByTestId('try-as-student')).toHaveLength(1);
+    expect(screen.getByTestId('try-as-student')).toHaveAttribute('href', '/en/teacher/classroom/c1/student-view');
+    expect(screen.queryByTestId('class-page-student-view')).toBeNull();
+    expect(screen.queryByTestId('rehearse-with-bots')).toBeNull();
+  });
 });

@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
@@ -20,8 +19,7 @@ import { useHomeRoster } from '@/components/teacher/home/HomeRosterLive';
 import { HomeRosterFold } from '@/components/teacher/home/HomeRosterFold';
 import { useHomeWeekLoop } from '@/components/teacher/home/useHomeWeekLoop';
 import { HomeJoinGoal } from '@/components/teacher/home/HomeJoinGoal';
-import { RehearseWithBotsButton } from '@/components/teacher/home/RehearseWithBotsButton';
-import { HERO_SECONDARY, HERO_SECONDARY_WRAP } from '@/components/teacher/home/homeStyles';
+import { TryAsStudentLink } from '@/components/teacher/home/TryAsStudentLink';
 import { belowStudentGoal } from '@/components/teacher/hq/studentGoal';
 import { HomeShareSheet } from '@/components/teacher/home/HomeShareSheet';
 import { ClassPageView } from '@/components/teacher/classroom/page/ClassPageView';
@@ -128,15 +126,7 @@ function ClassPageLoaded({ classroom, t, language }: LoadedProps) {
         listsLoading={assignmentsLoading || lessonsLoading}
         lastGame={loop.last}
         replay={loop.replay}
-        rehearse={(
-          <>
-            <RehearseWithBotsButton classroomId={classroom.id} source="class" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} className={HERO_SECONDARY_WRAP} buttonClassName={HERO_SECONDARY} />
-            <Link href={`/${language}/teacher/classroom/${classroom.id}/student-view`} data-testid="class-page-student-view" className={cn(HERO_SECONDARY, 'inline-flex items-center justify-center gap-2')}>
-              <Eye className="size-5" strokeWidth={2.75} aria-hidden="true" />
-              {t('teacher.studentView.open')}
-            </Link>
-          </>
-        )}
+        rehearse={<TryAsStudentLink classroomId={classroom.id} language={language} t={t} />}
         joinGoal={belowStudentGoal(classroom.member_count ?? undefined) ? <HomeJoinGoal classroom={classroom} track={false} /> : undefined}
         onShare={() => setShareOpen(true)}
         onRequestDelete={() => setConfirmOpen(true)}

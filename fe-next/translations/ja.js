@@ -15382,7 +15382,6 @@ const ja = {
   },
   "teacher": {
     "studentView": {
-      "open": "生徒の画面を見る",
       "banner": "生徒に見える画面を表示中",
       "bannerShort": "生徒ビュー",
       "exit": "終了",
@@ -15744,7 +15743,6 @@ const ja = {
       "weeklyPracticeCta": "Teacher Proにアップグレード — {{price}}/月",
       "weeklyPracticeHint": "今週生徒が練習しました！無制限のクラスと詳細な分析で学習を継続しましょう。",
       "classroomWeekTitle": "今週のクラス",
-      "classroomWeekSubtitle": "過去7日に練習した生徒の累計です。",
       "classroomWeekRegion": "{{classroom}}の今週",
       "classroomWeekStudents": "練習した生徒",
       "classroomWeekSessions": "練習回数",
@@ -16026,7 +16024,6 @@ const ja = {
       "cardRosterTitle": "{{name}} の生徒",
       "cardClassReport": "クラスのレポート",
       "assignTitle": "宿題",
-      "assignBody": "単語リストと期限を選ぶだけ。生徒は自分のスマホで遊べます。",
       "assignCta": "宿題を出す",
       "presets": {
         "title": "クラスでどう遊ぶ？",
@@ -16243,7 +16240,6 @@ const ja = {
     },
     "lesson": {
       "sectionTitle": "あなたのレッスン",
-      "sectionHint": "レッスンは単語リストです。クラス全員でライブで遊ぶことも、生徒が自分で練習できるように共有することもできます。",
       "pasteWords": "単語リストを貼り付け",
       "pasteWordsPlaceholder": "1行に1単語、またはカンマ区切り",
       "pasteWordsParsed": "{count}語を読み込みました",
@@ -16540,7 +16536,6 @@ const ja = {
     },
     "reports": {
       "freeOtherClasses": "無料プランで見られるのは最初のクラスです。Proならこちらも見られます：",
-      "valueLine": "毎回のゲームのあとに、各クラスが見逃した単語、手助けが必要な生徒、次に練習することがわかります。",
       "homeworkShortcut": "宿題の結果",
       "lockedValue": "クラスが見逃した単語は、毎回のゲーム結果画面で無料で見られます。レポートでは、すべてのゲームを通して、手助けが必要な生徒を一人ずつ確認できます。",
       "emptyClass": {
@@ -23446,7 +23441,7 @@ const ja = {
       "challenge": {
         "title": "今週のクラスチャレンジ",
         "lastTitle": "先週のチャレンジ：結果が出ています",
-        "emptyHint": "単語リストを1週間開いておきましょう。生徒はライブゲームなしで、クラスページからいつでも遊べます。",
+        "emptyHint": "生徒はライブゲームなしで、今週いつでも遊べます。",
         "start": "「{list}」を7日間開く",
         "pick": "単語リストを選ぶ",
         "untitled": "単語リスト",

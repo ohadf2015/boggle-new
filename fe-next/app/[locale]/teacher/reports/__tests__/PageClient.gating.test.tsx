@@ -376,7 +376,7 @@ describe('ReportsPageClient', () => {
       const frame = strip.parentElement!;
       expect(frame.className).toMatch(/max-sm:flex-col/);
       expect(frame.className).toContain('max-sm:[&>[data-testid=pro-trial-preview]]:order-last');
-      expect(strip.nextElementSibling).toContainElement(screen.getByTestId('reports-value-line'));
+      expect(strip.nextElementSibling).toContainElement(screen.getByTestId('reports-heading-mascot'));
       expect(strip.nextElementSibling!.className).toMatch(/\bw-full\b/);
     });
 

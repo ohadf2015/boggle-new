@@ -68,7 +68,7 @@ describe('Teacher Home first frame: the class desk leads', () => {
 
   it('Then the secondary tile presses too, and is shorter than Start', () => {
     render(<TeacherDashboard />);
-    const rehearse = screen.getByTestId('rehearse-with-bots');
+    const rehearse = screen.getByTestId('try-as-student');
     fireEvent.pointerDown(rehearse, { button: 0 });
     expect(rehearse).toHaveAttribute('data-pressed', 'true');
     expect(rehearse.className).toContain('min-h-14');
