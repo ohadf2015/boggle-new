@@ -11,6 +11,7 @@ import { BLAST_MP_DEFAULT_TIMER, DEFAULT_TIMER } from '@/shared/constants/gameCo
 import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
 import { WORD_TOWER_VERSUS_MATCH_S } from '@/shared/constants/wordTowerConstants';
 import { CROSSWORD_RACE_DURATION_SEC } from '@/shared/constants/crosswordConstants';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 
 export interface GameModeRules {
   /** Round length when the host supplied none. */
@@ -57,9 +58,9 @@ export const GAME_MODE_RULES: Record<GameMode, GameModeRules> = {
   'word-tower': { ...BOARD, betaName: 'Word Tower', fixedTimerSec: WORD_TOWER_VERSUS_MATCH_S, humanOnly: true },
   // Generous race cap (a 5x5 can take minutes).
   crossword: { ...BOARD, betaName: 'Crossword', classroomOpen: true, fixedTimerSec: CROSSWORD_RACE_DURATION_SEC, humanOnly: true, languages: ['en', 'he', 'sv', 'ja', 'es', 'ru'] },
-  // Per-student lesson-dealt race: 5min clock, no classic bots, shared list
+  // Per-student lesson-dealt race: 2min clock, no classic bots, shared list
   // words bank at full value for everyone who crafts them.
-  wordcraft: { ...BOARD, defaultTimerSec: 300, humanOnly: true, duplicatesAllowed: true, rarityScoring: false },
+  wordcraft: { ...BOARD, defaultTimerSec: EDU_MAX_ROUND_SEC, humanOnly: true, duplicatesAllowed: true, rarityScoring: false },
 };
 
 export function getGameModeRules(mode: string | null | undefined): GameModeRules {

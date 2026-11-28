@@ -135,7 +135,8 @@ describe('recommendedModeForWords — "recommended for this lesson"', () => {
 describe('configuredRoundMinutes — the poster quotes the room, not the catalog', () => {
   it('quotes the timer the teacher set, for every timed board mode', () => {
     for (const mode of ['classic', 'word-hunt', 'blast'] as const) {
-      expect(configuredRoundMinutes(mode, { timerMinutes: 7 })).toBe(7);
+      expect(configuredRoundMinutes(mode, { timerMinutes: 1 })).toBe(1);
+      expect(configuredRoundMinutes(mode, { timerMinutes: 7 })).toBe(2);
       expect(configuredRoundMinutes(mode, { timerMinutes: 2 })).toBe(2);
     }
   });

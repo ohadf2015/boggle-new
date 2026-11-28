@@ -42,11 +42,11 @@ describe('ready-to-run session catalog', () => {
     expect(EDU_MASCOT[s.mascot!]).toMatch(/\.webp$/);
   });
 
-  it('labels the warm-up 5 min and the exit ticket and brain break 3 min, derived from the lobby round math', () => {
+  it('labels the warm-up, exit ticket and brain break 2 min, derived from the lobby round math', () => {
     const minutes = (id: SessionId) => sessionMinutes(SESSION_TEMPLATES.find((s) => s.id === id)!);
-    expect(minutes('warm-up')).toBe(5);
-    expect(minutes('exit-ticket')).toBe(3);
-    expect(minutes('brain-break')).toBe(3);
+    expect(minutes('warm-up')).toBe(2);
+    expect(minutes('exit-ticket')).toBe(2);
+    expect(minutes('brain-break')).toBe(2);
   });
 
   it('every pack a session names exists as a real curriculum list in every language it is offered in', () => {

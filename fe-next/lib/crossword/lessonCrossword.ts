@@ -7,7 +7,8 @@ import type { CrosswordPuzzle, Direction, PuzzleLocale } from './types';
 
 export const MIN_LESSON_CROSSWORD_WORDS = 3;
 export const MAX_LESSON_CROSSWORD_SIZE = 13;
-const MAX_LESSON_CROSSWORD_WORDS = 14;
+// Six clues fit the two-minute classroom race.
+export const MAX_LESSON_CROSSWORD_WORDS = 6;
 
 export interface LessonCrosswordEntry {
   word: string;

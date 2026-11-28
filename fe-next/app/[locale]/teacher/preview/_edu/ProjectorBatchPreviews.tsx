@@ -17,6 +17,7 @@ import { RIVAL_EVENTS } from '@/shared/types/rivalry';
 import type { Language } from '@/shared/types/game';
 import { FakeSocket } from './fakeSocket';
 import { fixtureFor, gridOf, raceView, type PreviewFixture } from './fixtures';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -143,7 +144,7 @@ function ProjectorLobbyPreview({ empty }: { empty: boolean }) {
       startLabelKey="hostView.startClassGame"
       lessonName={f.className}
       classroomGameMode="classic"
-      templateSettings={{ timerSeconds: 180, difficulty: 'normal', minWordLength: 3, allowLateJoin: true }}
+      templateSettings={{ timerSeconds: EDU_MAX_ROUND_SEC, difficulty: 'normal', minWordLength: 3, allowLateJoin: true }}
     />
   );
 }

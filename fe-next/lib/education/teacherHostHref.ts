@@ -4,7 +4,7 @@ import { catalogueEntry } from '@/components/education/ClassroomModeCatalogueDat
 import type { ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
 
 /** The lobby's own timer choices; anything else on the URL is ignored. */
-export const HOST_TIMER_MINUTES = [1, 2, 3, 5] as const;
+export const HOST_TIMER_MINUTES = [1, 2] as const;
 
 export interface TeacherHostTarget {
   classroomId?: string;

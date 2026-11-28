@@ -120,10 +120,13 @@ describe('VocabQuizFocusPicker', () => {
 
   it('lets the teacher set the round length and the per-question clock', async () => {
     const { onQuestionCountChange, onSecondsChange } = setup(ENRICHED);
-    await userEvent.click(screen.getByRole('radio', { name: '12' }));
-    expect(onQuestionCountChange).toHaveBeenCalledWith(12);
-    await userEvent.click(screen.getByRole('radio', { name: 'vocabQuiz.setup.seconds:30' }));
-    expect(onSecondsChange).toHaveBeenCalledWith(30);
+    await userEvent.click(screen.getByRole('radio', { name: '5' }));
+    expect(onQuestionCountChange).toHaveBeenCalledWith(5);
+    await userEvent.click(screen.getByRole('radio', { name: 'vocabQuiz.setup.seconds:10' }));
+    expect(onSecondsChange).toHaveBeenCalledWith(10);
+    // 8 x 15 is the default; anything past two minutes of questions is off the table.
+    expect(screen.getByRole('radio', { name: '12' })).toBeDisabled();
+    expect(screen.getByRole('radio', { name: 'vocabQuiz.setup.seconds:20' })).toBeDisabled();
   });
 
   it('marks the selected focus for assistive tech', () => {

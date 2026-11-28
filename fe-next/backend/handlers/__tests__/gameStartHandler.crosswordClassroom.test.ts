@@ -171,4 +171,20 @@ describe('starting a crossword round in a classroom room', () => {
     expect(game.lessonCrossword).toBeNull();
     expect(mockSetPlaced).not.toHaveBeenCalled();
   });
+
+  it('caps a classroom round at two minutes, the crossword backstop included', async () => {
+    mockStage.mockResolvedValue('staged');
+    await startHandlers()['startGame'](START_PAYLOAD);
+    expect(game.timerSeconds).toBe(120);
+
+    game.gameState = 'waiting';
+    await startHandlers()['startGame']({ ...START_PAYLOAD, gameMode: 'classic', timerSeconds: 300 });
+    expect(game.timerSeconds).toBe(120);
+  });
+
+  it('leaves a non-classroom round on the host timer', async () => {
+    game.isClassroom = false;
+    await startHandlers()['startGame']({ ...START_PAYLOAD, gameMode: 'classic', timerSeconds: 300 });
+    expect(game.timerSeconds).toBe(300);
+  });
 });

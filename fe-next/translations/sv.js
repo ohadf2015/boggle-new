@@ -999,7 +999,7 @@ const sv = {
       "heading": "Utforska utbildningslägen",
       "subhead": "Välj rätt format för ditt klassrum — snabba 1v1-dueller eller live-multiplayer för hela klassen.",
       "duelsTitle": "Ordförrådsdueller (1v1)",
-      "duelsDesc": "Para ihop elever för 2-3 minuters ordstrider mot varandra.",
+      "duelsDesc": "Para ihop elever för 2 minuters ordstrider mot varandra.",
       "classroomTitle": "Live klassrumsspel",
       "classroomDesc": "Multiplayer för hela klassen; eleverna ansluter med en klasskod, ingen e-post behövs."
     },
@@ -16093,7 +16093,7 @@ const sv = {
       "scheduleReteachConfirm": "Reteach-Live schemalagd till {{date}} (~{{days}} dagar). Kalenderinbjudan öppnades.",
       "scheduleReteachHint": "Bygg om de svåra orden och spela igen om ungefär två veckor – utspridd repetition som fastnar.",
       "unpluggedReteachLiveCta": "Starta Unplugged reteach Live",
-      "reteachLiveCta": "Starta 3-minuters reteach Live",
+      "reteachLiveCta": "Starta 2-minuters reteach Live",
       "unpluggedReteachLiveFoil": "Inga elevenheter i dag? Projicera missarna – eleverna svarar på papper.",
       "moodGreat_one": "{{count}} elev betygsatte senaste omgången som toppen.",
       "moodGreat_other": "{{count}} elever betygsatte senaste omgången som toppen.",
@@ -16342,7 +16342,7 @@ const sv = {
         },
         "sped": {
           "name": "Stöd (SPED)",
-          "desc": "Färre ord, mer tid och större bokstäver"
+          "desc": "Färre ord och större bokstäver"
         },
         "standard": {
           "name": "Standard",
@@ -17813,10 +17813,10 @@ const sv = {
       "shareGapPracticeHome": "Ord att öva hemma",
       "shareGapEmpty": "Ingen klasslucka att dela ännu. Spela ett klassspel och dela sedan kortet med föräldrar.",
       "shareGapEmptyText": "{{lesson}}: ingen klasslucka att dela ännu",
-      "startReteachLive": "Starta 3-minuters reteach Live",
-      "postReteachGoogleClassroom": "Publicera 3-minuters reteach i Google Classroom",
-      "postReteachGoogleClassroomTitle": "3-minuters repetition i livespel: {{lesson}}",
-      "postReteachGoogleClassroomBody": "Öppna länken och starta ett 3-minuters livespel på de missade orden: {{missed}}. Eleverna går med från klassens flöde.",
+      "startReteachLive": "Starta 2-minuters reteach Live",
+      "postReteachGoogleClassroom": "Publicera 2-minuters reteach i Google Classroom",
+      "postReteachGoogleClassroomTitle": "2-minuters repetition i livespel: {{lesson}}",
+      "postReteachGoogleClassroomBody": "Öppna länken och starta ett 2-minuters livespel på de missade orden: {{missed}}. Eleverna går med från klassens flöde.",
       "assignPracticeGoogleClassroom": "Tilldela hemövning i Google Classroom",
       "assignPracticeGoogleClassroomTitle": "Öva missade ord: {{lesson}}",
       "assignPracticeGoogleClassroomBody": "Öppna länken och öva dessa missade ord hemma: {{missed}}. Lämna in när du är klar.",
@@ -17869,8 +17869,8 @@ const sv = {
       "assignUnpluggedGoogleClassroomTitle": "Repetitionsläxa utan skärmar: {{lesson}}",
       "assignUnpluggedGoogleClassroomBody": "Läxa utan skärmar: öppna länken, skriv ut övningsbladet med de missade orden och öva: {{missed}}. Eleverna behöver ingen enhet. Lämna in när du är klar.",
       "assignMissGapLiveGoogleClassroom": "Lägg ut ett livespel på de missade orden i Google Classroom",
-      "assignMissGapLiveGoogleClassroomTitle": "3-minuters livespel på missade ord: {{lesson}}",
-      "assignMissGapLiveGoogleClassroomBody": "Öppna länken och starta ett 3-minuters livespel på de missade orden: {{missed}}. Eleverna går med från Google Classroom. Fungerar med gratis Google Workspace for Education, ingen Education Plus krävs.",
+      "assignMissGapLiveGoogleClassroomTitle": "2-minuters livespel på missade ord: {{lesson}}",
+      "assignMissGapLiveGoogleClassroomBody": "Öppna länken och starta ett 2-minuters livespel på de missade orden: {{missed}}. Eleverna går med från Google Classroom. Fungerar med gratis Google Workspace for Education, ingen Education Plus krävs.",
       "launchMissGapQuestionPackLive": "Starta ett livespel med frågor om de missade orden",
       "missGapQuestionPackTitle": "Frågor om de missade orden: {{lesson}}",
       "unpluggedReteachHint": "Eleverna svarar på det utskrivna övningsbladet. Inga enheter behövs",
@@ -17990,7 +17990,7 @@ const sv = {
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
       "title": "Tilldela miss-gap Live",
-      "subtitle": "Tilldela i Classwork med ett klick: 3-min Live på missade ord. Fungerar på gratis Google Workspace for Education. Quizlets Classroom-tillägg kräver Education Plus. Endast klassord, inga elevnamn.",
+      "subtitle": "Tilldela i Classwork med ett klick: 2-min Live på missade ord. Fungerar på gratis Google Workspace for Education. Quizlets Classroom-tillägg kräver Education Plus. Endast klassord, inga elevnamn.",
       "assignLive": "Tilldela miss-gap Live till Classroom",
       "freeWorkspaceFoil": "Fungerar på gratis Google Workspace for Education. Quizlets Classroom-tillägg kräver Education Plus. LexiClash använder Googles delningsdialog, så Plus behövs inte.",
       "lessonLabel": "Lektionsnamn",
@@ -18011,7 +18011,7 @@ const sv = {
         "modeClassic": "Classic Unplugged: klass/lag diskuterar på projektorn",
         "modeTeam": "Team Tiles Unplugged: delad brickbräda, läraren markerar",
         "modeReteach": "Unplugged reteach Live: utskrift + projektor",
-        "modeLive3min": "3-min reteach Live: projektor + betygsåterkoppling",
+        "modeLive3min": "2-min reteach Live: projektor + betygsåterkoppling",
         "timerNote": "{{seconds}}s timer",
         "cefrNote": "CEFR {{level}}-luckor",
         "openLive": "Öppna planerad Live",
@@ -18897,7 +18897,7 @@ const sv = {
         "blooketTitle": "Blooket – manuell 「Gaps Set」",
         "blooketBody": "Sortera Questions-rapporten efter Incorrect%, skumma Opportunities for Growth (Plus), notera toppluckorna och öppna Edit / Question Bank för att bygga en 「Gaps Set」 som läxa eller fokuserad repetition. Diagnosen är snabb; reteach-setet byggs fortfarande för hand.",
         "lexiTitle": "LexiClash – automatisk miss-gap-djuplänk (#1124)",
-        "lexiBody": "Miss-chip från senaste lektionen och lärarens progress visar redan Unplugged / 3-min reteach Live-djuplänkar. Ett klick lägger in de missade orden i Live, ingen 「Gaps Set」, ingen Question Bank.",
+        "lexiBody": "Miss-chip från senaste lektionen och lärarens progress visar redan Unplugged / 2-min reteach Live-djuplänkar. Ett klick lägger in de missade orden i Live, ingen 「Gaps Set」, ingen Question Bank.",
         "citePrefix": "Blookets lärarguide:",
         "citeLabel": "Identify knowledge gaps in Blooket reports",
         "citeSuffix": " – Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
@@ -19045,18 +19045,18 @@ const sv = {
       },
       "session": {
         "warmUp": {
-          "name": "Uppvärmning på 5 minuter",
+          "name": "Uppvärmning på 2 minuter",
           "when": "Lektionsstart. En snabb bricka med säsongens ord får igång alla.",
           "whenShort": "Starta lektionen"
         },
         "exitTicket": {
           "name": "Exit ticket",
-          "when": "De sista 3 minuterna. Ett kort quiz visar vem som fått koll på dagens ord.",
+          "when": "De sista 2 minuterna. Ett kort quiz visar vem som fått koll på dagens ord.",
           "whenShort": "Innan de går"
         },
         "brainBreak": {
           "name": "Hjärnpaus",
-          "when": "När orken tryter. Tre snabba minuter Blast, ingen lista att förbereda.",
+          "when": "När orken tryter. Två snabba minuter Blast, ingen lista att förbereda.",
           "whenShort": "När energin sjunker"
         },
         "icebreaker": {
@@ -23544,14 +23544,14 @@ const sv = {
         "language": "Spelets språk"
       },
       "cue": {
-        "first": "Första spelet? En uppvärmning på 5 minuter är en enkel start.",
-        "closeOut": "Ni har spelat i dag. Runda av med klassen med en exit ticket på 3 minuter?",
+        "first": "Första spelet? En uppvärmning på 2 minuter är en enkel start.",
+        "closeOut": "Ni har spelat i dag. Runda av med klassen med en exit ticket på 2 minuter?",
         "season": {
-          "school": "Skolstartsorden är redo. Sugen på en uppvärmning på 5 minuter?",
-          "autumn": "Höstorden är redo. Sugen på en uppvärmning på 5 minuter?",
-          "winter": "Vinterorden är redo. Sugen på en uppvärmning på 5 minuter?",
-          "spring": "Vårorden är redo. Sugen på en uppvärmning på 5 minuter?",
-          "summer": "Sommarorden är redo. Sugen på en uppvärmning på 5 minuter?"
+          "school": "Skolstartsorden är redo. Sugen på en uppvärmning på 2 minuter?",
+          "autumn": "Höstorden är redo. Sugen på en uppvärmning på 2 minuter?",
+          "winter": "Vinterorden är redo. Sugen på en uppvärmning på 2 minuter?",
+          "spring": "Vårorden är redo. Sugen på en uppvärmning på 2 minuter?",
+          "summer": "Sommarorden är redo. Sugen på en uppvärmning på 2 minuter?"
         }
       }
     },
@@ -23573,7 +23573,7 @@ const sv = {
       "streak": "dagar i rad du har undervisat. Fortsätt så!",
       "busiest": "är dagen då dina klasser spelar mest",
       "topClass": "spel den här veckan för {{name}}, din mest aktiva klass",
-      "quiet": "dagar sedan senaste spelet. En runda på 3 minuter får igång dem igen.",
+      "quiet": "dagar sedan senaste spelet. En runda på 2 minuter får igång dem igen.",
       "reach": "elever är en kod från att spela",
       "month": "spel de senaste 30 dagarna"
     },

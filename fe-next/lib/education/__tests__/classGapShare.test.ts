@@ -168,7 +168,7 @@ describe('buildClassGapReteachLiveData', () => {
     ).toBeNull();
   });
 
-  it('seeds only missed words with a fixed 3-minute Live timer', () => {
+  it('seeds only missed words with a fixed 2-minute Live timer', () => {
     const data = buildClassGapReteachLiveData({
       locale: 'en',
       lesson: 'Physics 101',
@@ -190,7 +190,7 @@ describe('buildClassGapReteachLiveData', () => {
         allowLateJoin: true,
       },
     });
-    expect(CLASS_GAP_RETEACH_TIMER_SECONDS).toBe(180);
+    expect(CLASS_GAP_RETEACH_TIMER_SECONDS).toBe(120);
   });
 
   it('points autoCreate Live at fromLesson so sessionStorage is read', () => {

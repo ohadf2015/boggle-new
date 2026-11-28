@@ -3,7 +3,7 @@
  *
  * Kahoot launched a free ChatGPT app on 2026-09-03 (quiz generation).
  * This Action is the wedge they cannot copy from a chat transcript: take
- * missed words from ChatGPT materials and create or host a 3-minute
+ * missed words from ChatGPT materials and create or host a 2-minute
  * reteach Live. Class-level only — no student accounts, no student names.
  *
  * Reuses class-gap share URL (#899) + lessonGameData reteach shape (#896)
@@ -192,8 +192,8 @@ export function buildChatGptReteach(body: unknown): ChatGptReteachResult {
     student_names: false,
     instructions:
       action === 'host'
-        ? 'Open host_url to start a 3-minute reteach Live seeded with the missed words. Share share_url with the class. No student accounts or names.'
-        : 'Share share_url (class-gap card). Anyone who opens it can start a 3-minute reteach Live. Open host_url to host immediately. No student accounts or names.',
+        ? 'Open host_url to start a 2-minute reteach Live seeded with the missed words. Share share_url with the class. No student accounts or names.'
+        : 'Share share_url (class-gap card). Anyone who opens it can start a 2-minute reteach Live. Open host_url to host immediately. No student accounts or names.',
   };
 }
 
@@ -203,7 +203,7 @@ info:
   title: LexiClash ChatGPT Action — 3-min reteach Live
   description: |
     Turn ChatGPT lesson materials (missed words from homework, a vocab list,
-    a recap) into a 3-minute LexiClash reteach Live. Teachers and students
+    a recap) into a 2-minute LexiClash reteach Live. Teachers and students
     can create a share link or host immediately.
 
     NEVER send student names, rosters, emails, or account identifiers.
@@ -231,7 +231,7 @@ paths:
       operationId: createOrHostReteachLive
       summary: Create or host a 3-min reteach Live
       description: |
-        Create a class-gap share card and a host URL for a 3-minute reteach Live
+        Create a class-gap share card and a host URL for a 2-minute reteach Live
         seeded with missed words from ChatGPT materials. Use action=create when
         the teacher wants a link to share. Use action=host when they want to
         start the Live room now. Do not include student names.

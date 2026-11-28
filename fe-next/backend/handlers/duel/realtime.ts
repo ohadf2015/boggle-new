@@ -13,6 +13,7 @@ import { getSupabase } from '@/backend/modules/supabase/client';
 import { validateAndScoreWord } from '@/backend/utils/wordValidation';
 import { EDUCATION_XP_CONFIG } from '@/backend/modules/educationXpManager';
 import logger from '@/backend/utils/logger';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 import timerManager from '@/backend/utils/timerManager';
 import { checkRateLimit } from '../../utils/rateLimiter';
 import {
@@ -236,7 +237,7 @@ export async function startRealtimeDuel(
       lessonId: duel.lesson_id,
       boardState: duel.board_state as string[][],
       language: lesson.language,
-      timeLimit: duel.time_limit || 180,
+      timeLimit: Math.min(duel.time_limit || EDU_MAX_ROUND_SEC, EDU_MAX_ROUND_SEC),
       startTime,
       challengerWords: [],
       opponentWords: [],

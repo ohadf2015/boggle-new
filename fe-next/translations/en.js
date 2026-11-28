@@ -999,7 +999,7 @@ const en = {
       "heading": "Explore Education Modes",
       "subhead": "Pick a format: quick 1v1 duels or live whole-class multiplayer.",
       "duelsTitle": "Vocabulary Duels (1v1)",
-      "duelsDesc": "Pair students for 2-3 minute head-to-head word battles.",
+      "duelsDesc": "Pair students for 2-minute head-to-head word battles.",
       "classroomTitle": "Live Classroom Game",
       "classroomDesc": "Whole-class multiplayer; students join with a class code, no email needed."
     },
@@ -14047,7 +14047,7 @@ const en = {
         },
         "sped": {
           "name": "Support (SPED)",
-          "desc": "Fewer words, more time and bigger letters"
+          "desc": "Fewer words and bigger letters"
         },
         "standard": {
           "name": "Standard",
@@ -15022,7 +15022,7 @@ const en = {
       "scheduleReteachConfirm": "Reteach Live scheduled for {{date}} (~{{days}} days). Calendar invite opened.",
       "scheduleReteachHint": "Rebuild the hard words and replay in about two weeks. Spaced reteach that sticks.",
       "unpluggedReteachLiveCta": "Start Unplugged reteach Live",
-      "reteachLiveCta": "Start 3-min reteach Live",
+      "reteachLiveCta": "Start 2-min reteach Live",
       "unpluggedReteachLiveFoil": "No student devices today? Project the misses. Students answer on paper.",
       "moodGreat_one": "{{count}} student rated the last round great.",
       "moodGreat_other": "{{count}} students rated the last round great.",
@@ -15787,10 +15787,10 @@ const en = {
       "shareGapPracticeHome": "Words to practice at home",
       "shareGapEmpty": "No class gap to share yet. Play a class game, then share this card with parents.",
       "shareGapEmptyText": "{{lesson}}: no class gap to share yet",
-      "startReteachLive": "Start 3-min reteach Live",
-      "postReteachGoogleClassroom": "Post 3-min reteach to Google Classroom",
-      "postReteachGoogleClassroomTitle": "3-min reteach Live: {{lesson}}",
-      "postReteachGoogleClassroomBody": "Open the link and start the 3-min Live on these missed words: {{missed}}. Students join from the Stream.",
+      "startReteachLive": "Start 2-min reteach Live",
+      "postReteachGoogleClassroom": "Post 2-min reteach to Google Classroom",
+      "postReteachGoogleClassroomTitle": "2-min reteach Live: {{lesson}}",
+      "postReteachGoogleClassroomBody": "Open the link and start the 2-min Live on these missed words: {{missed}}. Students join from the Stream.",
       "assignPracticeGoogleClassroom": "Assign practice homework to Google Classroom",
       "assignPracticeGoogleClassroomTitle": "Practice missed words: {{lesson}}",
       "assignPracticeGoogleClassroomBody": "Open the link and practice these missed words at home: {{missed}}. Turn in when done.",
@@ -15843,8 +15843,8 @@ const en = {
       "assignUnpluggedGoogleClassroomTitle": "Unplugged reteach homework: {{lesson}}",
       "assignUnpluggedGoogleClassroomBody": "Device-free homework: open the Unplugged Live link, print the missed-words practice sheet, and practice: {{missed}}. No student devices needed. Turn in when done.",
       "assignMissGapLiveGoogleClassroom": "Assign miss-gap Live to Google Classroom",
-      "assignMissGapLiveGoogleClassroomTitle": "3-min miss-gap Live: {{lesson}}",
-      "assignMissGapLiveGoogleClassroomBody": "Open the link and start the 3-min Live on these missed words: {{missed}}. Students join from Classwork. Works on free Google Workspace for Education, no Education Plus required.",
+      "assignMissGapLiveGoogleClassroomTitle": "2-min miss-gap Live: {{lesson}}",
+      "assignMissGapLiveGoogleClassroomBody": "Open the link and start the 2-min Live on these missed words: {{missed}}. Students join from Classwork. Works on free Google Workspace for Education, no Education Plus required.",
       "launchMissGapQuestionPackLive": "Launch Live question pack: missed words",
       "missGapQuestionPackTitle": "Miss-gap question pack: {{lesson}}",
       "unpluggedReteachHint": "Students answer on the printed practice sheet. No devices needed",
@@ -15964,7 +15964,7 @@ const en = {
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
       "title": "Assign miss-gap Live",
-      "subtitle": "One-click Classwork assign for a 3-min Live on missed words. Works on free Google Workspace for Education. Quizlet's Classroom add-on needs Education Plus. Class words only, no student names.",
+      "subtitle": "One-click Classwork assign for a 2-min Live on missed words. Works on free Google Workspace for Education. Quizlet's Classroom add-on needs Education Plus. Class words only, no student names.",
       "assignLive": "Assign miss-gap Live to Classroom",
       "freeWorkspaceFoil": "Works on free Google Workspace for Education. Quizlet's Classroom add-on requires Education Plus. LexiClash uses Google's share dialog, so no Plus is needed.",
       "lessonLabel": "Lesson name",
@@ -15985,7 +15985,7 @@ const en = {
         "modeClassic": "Classic Unplugged: class/teams discuss on the projector",
         "modeTeam": "Team Tiles Unplugged: shared tileboard, teacher marks",
         "modeReteach": "Unplugged reteach Live: printable + projector",
-        "modeLive3min": "3-min reteach Live: projector + grade passback",
+        "modeLive3min": "2-min reteach Live: projector + grade passback",
         "timerNote": "{{seconds}}s timer",
         "cefrNote": "CEFR {{level}} gaps",
         "openLive": "Open planned Live",
@@ -16862,7 +16862,7 @@ const en = {
         "blooketTitle": "Blooket: manual “Gaps Set”",
         "blooketBody": "Sort the Questions report by Incorrect%, skim Opportunities for Growth (Plus), note the top misses, then open Edit / Question Bank and rebuild a “Gaps Set” to assign as homework or a focused review. Diagnosis is fast; the reteach set is still hand-built.",
         "lexiTitle": "LexiClash: auto miss-gap deep-link",
-        "lexiBody": "Last-lesson miss chips and miss-gap teacher progress already carry Unplugged / 3-min reteach Live deep-links. One click seeds the missed words into Live. No “Gaps Set” rebuild, no Question Bank hop.",
+        "lexiBody": "Last-lesson miss chips and miss-gap teacher progress already carry Unplugged / 2-min reteach Live deep-links. One click seeds the missed words into Live. No “Gaps Set” rebuild, no Question Bank hop.",
         "citePrefix": "Blooket teacher guide:",
         "citeLabel": "Identify knowledge gaps in Blooket reports",
         "citeSuffix": ": Workflow 2: Build a Targeted Follow-Up Set (“Gaps Set”).",
@@ -17011,18 +17011,18 @@ const en = {
       },
       "session": {
         "warmUp": {
-          "name": "5-minute warm-up",
+          "name": "2-minute warm-up",
           "when": "Start of class. One quick board with this season’s words gets everyone thinking.",
           "whenShort": "Kick off the lesson"
         },
         "exitTicket": {
           "name": "Exit ticket",
-          "when": "Last 3 minutes. A short quiz shows who got today’s words before they leave.",
+          "when": "Last 2 minutes. A short quiz shows who got today’s words before they leave.",
           "whenShort": "Check before they leave"
         },
         "brainBreak": {
           "name": "Brain break",
-          "when": "When energy drops. Three fast minutes of Blast, no list to prepare.",
+          "when": "When energy drops. Two fast minutes of Blast, no list to prepare.",
           "whenShort": "When energy drops"
         },
         "icebreaker": {
@@ -22565,14 +22565,14 @@ const en = {
         "language": "Game language"
       },
       "cue": {
-        "first": "First game? A 5-minute warm-up is the easy start.",
-        "closeOut": "You played today. Wrap up the class with a 3-minute exit ticket?",
+        "first": "First game? A 2-minute warm-up is the easy start.",
+        "closeOut": "You played today. Wrap up the class with a 2-minute exit ticket?",
         "season": {
-          "school": "Back-to-school words are ready. Up for a 5-minute warm-up?",
-          "autumn": "Autumn words are ready. Up for a 5-minute warm-up?",
-          "winter": "Winter words are ready. Up for a 5-minute warm-up?",
-          "spring": "Spring words are ready. Up for a 5-minute warm-up?",
-          "summer": "Summer words are ready. Up for a 5-minute warm-up?"
+          "school": "Back-to-school words are ready. Up for a 2-minute warm-up?",
+          "autumn": "Autumn words are ready. Up for a 2-minute warm-up?",
+          "winter": "Winter words are ready. Up for a 2-minute warm-up?",
+          "spring": "Spring words are ready. Up for a 2-minute warm-up?",
+          "summer": "Summer words are ready. Up for a 2-minute warm-up?"
         }
       }
     },
@@ -22594,7 +22594,7 @@ const en = {
       "streak": "days in a row you've taught. Keep it going!",
       "busiest": "is when your classes play most",
       "topClass": "games this week for {{name}}, your busiest class",
-      "quiet": "days since the last game. One 3-minute round brings them back.",
+      "quiet": "days since the last game. One 2-minute round brings them back.",
       "reach": "students are one code away from playing",
       "month": "games played in the last 30 days"
     },

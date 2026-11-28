@@ -6,6 +6,8 @@
  * words nobody found. CLASS-level only — student names never leave the results screen.
  */
 
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
+
 export const CLASS_GAP_ORIGIN = 'https://www.lexiclash.live';
 
 export const MAX_MISSED_WORDS = 12;
@@ -163,8 +165,8 @@ export function interpClassGapTemplate(
 /** Session-storage lesson id for a class-gap → Live handoff. Not a real lesson row. */
 export const CLASS_GAP_RETEACH_LIVE_LESSON_ID = 'class-gap-reteach';
 
-/** Fixed 3-minute reteach Live timer (Google Classroom add-on MVP). */
-export const CLASS_GAP_RETEACH_TIMER_SECONDS = 180;
+/** Fixed reteach Live timer (Google Classroom add-on MVP). */
+export const CLASS_GAP_RETEACH_TIMER_SECONDS = EDU_MAX_ROUND_SEC;
 
 /**
  * Payload the multiplayer session reader accepts (`lessonId` + `lessonName` +
@@ -172,7 +174,7 @@ export const CLASS_GAP_RETEACH_TIMER_SECONDS = 180;
  * never student names. Returns null when there is nothing to seed — staging an
  * empty list would start a Live room with the wrong (empty/full) board.
  *
- * Timer is always 3 minutes so a Google Classroom Stream post is a short reteach,
+ * Timer is always the classroom round cap so a Google Classroom Stream post is a short reteach,
  * not a full lesson rematch. Reuses the lessonGameData shape from reteach #896.
  */
 export interface ClassGapReteachLiveData {

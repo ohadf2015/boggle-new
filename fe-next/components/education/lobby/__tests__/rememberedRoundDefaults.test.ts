@@ -10,12 +10,12 @@ const entry = (savedAt: number, settings: Record<string, unknown>) => ({
 describe('readRememberedRoundDefaults', () => {
   beforeEach(() => window.localStorage.clear());
 
-  it('given a teacher who ran a 5-minute large-board game last, when the lobby opens, then those are the defaults', () => {
+  it('given a teacher who ran a 1-minute large-board game last, when the lobby opens, then those are the defaults', () => {
     window.localStorage.setItem(KEY, JSON.stringify([
       entry(100, { timerMinutes: 2, boardSize: 'small', allowLateJoin: true }),
-      entry(200, { timerMinutes: 5, boardSize: 'large', allowLateJoin: false }),
+      entry(200, { timerMinutes: 1, boardSize: 'large', allowLateJoin: false }),
     ]));
-    expect(readRememberedRoundDefaults()).toEqual({ timerMinutes: 5, boardSize: 'large', allowLateJoin: false });
+    expect(readRememberedRoundDefaults()).toEqual({ timerMinutes: 1, boardSize: 'large', allowLateJoin: false });
   });
 
   it('given nothing saved, when the lobby opens, then there are no remembered defaults', () => {

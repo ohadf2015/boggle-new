@@ -999,7 +999,7 @@ const ja = {
       "heading": "教育モードを探索",
       "subhead": "クラスに最適なフォーマットを選択 — クイック1対1デュエルまたはクラス全体のライブマルチプレイヤー。",
       "duelsTitle": "語彙デュエル (1対1)",
-      "duelsDesc": "生徒をペアリングして2〜3分の単語バトルを実施。",
+      "duelsDesc": "生徒をペアリングして2分の単語バトルを実施。",
       "classroomTitle": "ライブクラスルームゲーム",
       "classroomDesc": "クラス全体のマルチプレイヤー。生徒はクラスコードで参加でき、メールアドレスは不要です。"
     },
@@ -15782,7 +15782,7 @@ const ja = {
       "scheduleReteachConfirm": "{{date}}（約{{days}}日後）に再指導Liveを予定しました。カレンダー招待を開きました。",
       "scheduleReteachHint": "苦手な語を組み直して、約2週間後にもう一度。間隔を空けると定着します。",
       "unpluggedReteachLiveCta": "端末なしの再指導Liveを開始",
-      "reteachLiveCta": "3分の再指導Liveを開始",
+      "reteachLiveCta": "2分の再指導Liveを開始",
       "unpluggedReteachLiveFoil": "今日は生徒の端末が使えませんか？ ミスした語を映して、紙で答えてもらいましょう。",
       "moodGreat_one": "{{count}}人の生徒が、最後のラウンドは最高だったと答えました。",
       "moodGreat_other": "{{count}}人の生徒が、最後のラウンドは最高だったと答えました。",
@@ -16031,7 +16031,7 @@ const ja = {
         },
         "sped": {
           "name": "サポート (SPED)",
-          "desc": "少ない単語・長めの時間・大きな文字"
+          "desc": "単語が少なめで、文字が大きい"
         },
         "standard": {
           "name": "標準",
@@ -17502,10 +17502,10 @@ const ja = {
       "shareGapPracticeHome": "家庭で練習する単語",
       "shareGapEmpty": "まだ共有するクラスギャップはありません。クラスゲームをプレイしてから、このカードを保護者と共有してください。",
       "shareGapEmptyText": "{{lesson}}：まだ共有するクラスギャップはありません",
-      "startReteachLive": "3分再指導ライブを開始",
-      "postReteachGoogleClassroom": "3分再指導を Google Classroom に投稿",
-      "postReteachGoogleClassroomTitle": "3分間の復習ライブ：{{lesson}}",
-      "postReteachGoogleClassroomBody": "リンクを開いて、取りこぼした単語で3分間のライブを始めましょう：{{missed}}。生徒はクラスのストリームから参加します。",
+      "startReteachLive": "2分再指導ライブを開始",
+      "postReteachGoogleClassroom": "2分再指導を Google Classroom に投稿",
+      "postReteachGoogleClassroomTitle": "2分間の復習ライブ：{{lesson}}",
+      "postReteachGoogleClassroomBody": "リンクを開いて、取りこぼした単語で2分間のライブを始めましょう：{{missed}}。生徒はクラスのストリームから参加します。",
       "assignPracticeGoogleClassroom": "練習課題を Google Classroom に割り当て",
       "assignPracticeGoogleClassroomTitle": "見逃した単語の練習：{{lesson}}",
       "assignPracticeGoogleClassroomBody": "リンクを開き、見逃した単語を家庭で練習: {{missed}}。終わったら提出してください。",
@@ -17557,9 +17557,9 @@ const ja = {
       "assignUnpluggedGoogleClassroom": "デバイスなしの復習をGoogle Classroomで出す",
       "assignUnpluggedGoogleClassroomTitle": "デバイスなしの復習宿題：{{lesson}}",
       "assignUnpluggedGoogleClassroomBody": "デバイスなしの宿題：リンクを開き、取りこぼした単語の練習シートを印刷して練習しましょう：{{missed}}。生徒のデバイスは不要です。終わったら提出してください。",
-      "assignMissGapLiveGoogleClassroom": "取りこぼした単語の3分ライブをGoogle Classroomで出す",
-      "assignMissGapLiveGoogleClassroomTitle": "取りこぼした単語の3分ライブ：{{lesson}}",
-      "assignMissGapLiveGoogleClassroomBody": "リンクを開いて、取りこぼした単語で3分間のライブを始めましょう：{{missed}}。生徒はGoogle Classroomから参加します。無料のGoogle Workspace for Educationで使え、Education Plusは不要です。",
+      "assignMissGapLiveGoogleClassroom": "取りこぼした単語の2分ライブをGoogle Classroomで出す",
+      "assignMissGapLiveGoogleClassroomTitle": "取りこぼした単語の2分ライブ：{{lesson}}",
+      "assignMissGapLiveGoogleClassroomBody": "リンクを開いて、取りこぼした単語で2分間のライブを始めましょう：{{missed}}。生徒はGoogle Classroomから参加します。無料のGoogle Workspace for Educationで使え、Education Plusは不要です。",
       "launchMissGapQuestionPackLive": "取りこぼした単語の問題でライブを始める",
       "missGapQuestionPackTitle": "取りこぼした単語の問題集：{{lesson}}",
       "unpluggedReteachHint": "生徒は印刷した練習シートで答えます。端末は不要です",
@@ -17679,7 +17679,7 @@ const ja = {
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
       "title": "miss-gap Liveを割り当て",
-      "subtitle": "取りこぼした語の3分LiveをClassworkにワンクリックで割り当て。無料のGoogle Workspace for Educationで使えます。QuizletのClassroomアドオンはEducation Plus必須。クラス語のみで、生徒名は含みません。",
+      "subtitle": "取りこぼした語の2分LiveをClassworkにワンクリックで割り当て。無料のGoogle Workspace for Educationで使えます。QuizletのClassroomアドオンはEducation Plus必須。クラス語のみで、生徒名は含みません。",
       "assignLive": "miss-gap LiveをClassroomに割り当て",
       "freeWorkspaceFoil": "無料のGoogle Workspace for Educationで動作。QuizletのClassroomアドオンはEducation Plus必須ですが、LexiClashはGoogle共有ダイアログを使うのでPlus不要です。",
       "lessonLabel": "レッスン名",
@@ -17700,7 +17700,7 @@ const ja = {
         "modeClassic": "Classic Unplugged：クラス/チームがプロジェクターで相談",
         "modeTeam": "Team Tiles Unplugged：共有タイルボード、教師が採点",
         "modeReteach": "Unplugged reteach Live：プリント + プロジェクター",
-        "modeLive3min": "3分 reteach Live：プロジェクター + 成績連携",
+        "modeLive3min": "2分 reteach Live：プロジェクター + 成績連携",
         "timerNote": "{{seconds}}秒タイマー",
         "cefrNote": "CEFR {{level}} ギャップ",
         "openLive": "計画した Live を開く",
@@ -18586,7 +18586,7 @@ const ja = {
         "blooketTitle": "Blooket：手動の「Gaps Set」",
         "blooketBody": "Questionsレポートを Incorrect% で並べ替え、Opportunities for Growth（Plus）を確認し、上位のmissをメモしてから Edit / Question Bank で「Gaps Set」を作り、宿題や集中復習として出します。診断は速いですが、reteachセットは手作業です。",
         "lexiTitle": "LexiClash：miss-gapからの自動ディープリンク（#1124）",
-        "lexiBody": "前回レッスンのmissチップと教師の進捗には、すでに Unplugged / 3分 reteach Live のディープリンクがあります。ワンクリックでmiss単語をLiveに渡せます。「Gaps Set」も Question Bank も不要です。",
+        "lexiBody": "前回レッスンのmissチップと教師の進捗には、すでに Unplugged / 2分 reteach Live のディープリンクがあります。ワンクリックでmiss単語をLiveに渡せます。「Gaps Set」も Question Bank も不要です。",
         "citePrefix": "Blooket教師ガイド:",
         "citeLabel": "Identify knowledge gaps in Blooket reports",
         "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
@@ -18914,18 +18914,18 @@ const ja = {
       },
       "session": {
         "warmUp": {
-          "name": "5分ウォームアップ",
+          "name": "2分ウォームアップ",
           "when": "授業のはじめに。季節のことばで1ボード遊べば、みんなの頭が動き出します。",
           "whenShort": "授業のはじめに"
         },
         "exitTicket": {
           "name": "振り返りクイズ",
-          "when": "最後の3分で。短いクイズで、今日のことばが身についたかがわかります。",
+          "when": "最後の2分で。短いクイズで、今日のことばが身についたかがわかります。",
           "whenShort": "授業の終わりに"
         },
         "brainBreak": {
           "name": "気分転換タイム",
-          "when": "集中が切れてきたら。Blastを3分、準備するリストはありません。",
+          "when": "集中が切れてきたら。Blastを2分、準備するリストはありません。",
           "whenShort": "集中が切れたときに"
         },
         "icebreaker": {
@@ -23544,14 +23544,14 @@ const ja = {
         "language": "ゲームの言語"
       },
       "cue": {
-        "first": "はじめてのゲームなら、5分のウォームアップが気軽です。",
-        "closeOut": "今日はもう遊びました。3分の振り返りクイズでクラスをしめくくりませんか？",
+        "first": "はじめてのゲームなら、2分のウォームアップが気軽です。",
+        "closeOut": "今日はもう遊びました。2分の振り返りクイズでクラスをしめくくりませんか？",
         "season": {
-          "school": "新学期のことばを用意しました。5分のウォームアップはいかが？",
-          "autumn": "秋のことばを用意しました。5分のウォームアップはいかが？",
-          "winter": "冬のことばを用意しました。5分のウォームアップはいかが？",
-          "spring": "春のことばを用意しました。5分のウォームアップはいかが？",
-          "summer": "夏のことばを用意しました。5分のウォームアップはいかが？"
+          "school": "新学期のことばを用意しました。2分のウォームアップはいかが？",
+          "autumn": "秋のことばを用意しました。2分のウォームアップはいかが？",
+          "winter": "冬のことばを用意しました。2分のウォームアップはいかが？",
+          "spring": "春のことばを用意しました。2分のウォームアップはいかが？",
+          "summer": "夏のことばを用意しました。2分のウォームアップはいかが？"
         }
       }
     },
@@ -23573,7 +23573,7 @@ const ja = {
       "streak": "日連続で授業をしました。この調子！",
       "busiest": "はクラスが一番よく遊ぶ曜日です",
       "topClass": "{{name}}の今週のゲーム数。一番アクティブなクラスです",
-      "quiet": "日間ゲームなし。3分のラウンドで盛り上がります。",
+      "quiet": "日間ゲームなし。2分のラウンドで盛り上がります。",
       "reach": "人の生徒がコード1つで参加できます",
       "month": "直近30日のゲーム数"
     },

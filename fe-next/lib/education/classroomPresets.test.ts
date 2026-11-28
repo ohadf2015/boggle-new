@@ -15,9 +15,9 @@ describe('classroom presets', () => {
     expect(CLASSROOM_PRESETS['friday-battle'].playStyle).toBe('teams');
   });
 
-  it('sped preset: longer timer, smaller board, shorter words, full accessibility', () => {
+  it('sped preset: two-minute cap, smaller board, shorter words, full accessibility', () => {
     const sped = CLASSROOM_PRESETS.sped;
-    expect(sped.timerMinutes).toBeGreaterThan(CLASSROOM_PRESETS.standard.timerMinutes);
+    expect(sped.timerMinutes).toBeLessThanOrEqual(2);
     expect(sped.boardSize).toBe('small');
     expect(sped.minWordLength).toBeLessThan(CLASSROOM_PRESETS.standard.minWordLength);
     expect(sped.accessibility).toEqual({

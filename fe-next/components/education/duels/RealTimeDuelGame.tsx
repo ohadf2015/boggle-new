@@ -53,6 +53,7 @@ import { ForfeitConfirmDialog } from './ForfeitConfirmDialog';
 import { DuelPlayPanel, type DuelWordStatus } from './DuelPlayPanel';
 import { DuelSeriesTally } from './DuelSeriesTally';
 import { DuelRevealScreen, type DuelOutcome } from './DuelRevealScreen';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 
 export interface RealTimeDuelGameProps {
   duelId: string;
@@ -104,8 +105,8 @@ export function RealTimeDuelGame({
   const [phase, setPhase] = useState<GamePhase>('waiting');
   const [boardState, setBoardState] = useState<string[][]>([]);
   const [startTime, setStartTime] = useState<string>('');
-  const [timeLimit, setTimeLimit] = useState<number>(180);
-  const [timeRemaining, setTimeRemaining] = useState<number>(180);
+  const [timeLimit, setTimeLimit] = useState<number>(EDU_MAX_ROUND_SEC);
+  const [timeRemaining, setTimeRemaining] = useState<number>(EDU_MAX_ROUND_SEC);
   const {
     isEmpty: currentWordEmpty,
     getValue: getCurrentWord,

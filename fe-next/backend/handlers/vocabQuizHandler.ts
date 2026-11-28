@@ -66,6 +66,7 @@ import {
   VOCAB_QUIZ_CHEST_HOLD_MS,
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
   VOCAB_QUIZ_DEFAULT_SECONDS,
+  capQuizToRound,
 } from '@/shared/types/vocabQuiz';
 import { isPracticeFocusSetting } from '@/lib/education/vocabFocus';
 import { readClassroomPressure } from '@/shared/utils/classroomPressure';
@@ -184,8 +185,10 @@ function readQuizSettings(settings: Record<string, unknown> | undefined) {
   return {
     boss,
     focus,
-    questionCount: Number.isFinite(count) && count > 0 ? count : VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
-    secondsPerQuestion: Number.isFinite(seconds) && seconds > 0 ? seconds : VOCAB_QUIZ_DEFAULT_SECONDS,
+    ...capQuizToRound(
+      Number.isFinite(count) && count > 0 ? count : VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
+      Number.isFinite(seconds) && seconds > 0 ? seconds : VOCAB_QUIZ_DEFAULT_SECONDS,
+    ),
     treasureChestsEnabled: treasureChestsEnabled === true,
   };
 }

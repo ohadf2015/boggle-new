@@ -60,3 +60,6 @@ export const LESSON_RACE_MODES: ReadonlySet<string> = new Set(['classic', 'blast
 
 /** Once the class has found every lesson word on the board, the round holds this long for the cheer, then ends. */
 export const LIST_CLEARED_END_MS = 5000;
+
+/** Owner rule: no classroom or education round runs longer than two minutes. */
+export const EDU_MAX_ROUND_SEC = 120;

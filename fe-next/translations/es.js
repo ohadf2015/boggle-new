@@ -999,7 +999,7 @@ const es = {
       "heading": "Explora los modos educativos",
       "subhead": "Elige el formato adecuado para tu aula — duelos 1v1 rápidos o multijugador en vivo para toda la clase.",
       "duelsTitle": "Duelos de vocabulario (1v1)",
-      "duelsDesc": "Empareja estudiantes para batallas de palabras cara a cara de 2-3 minutos.",
+      "duelsDesc": "Empareja estudiantes para batallas de palabras cara a cara de 2 minutos.",
       "classroomTitle": "Juego de aula en vivo",
       "classroomDesc": "Multijugador para toda la clase; el alumnado entra con un código de clase, sin correo electrónico."
     },
@@ -15730,7 +15730,7 @@ const es = {
       "scheduleReteachConfirm": "Live de repaso programado para {{date}} (~{{days}} días). Se abrió la invitación del calendario.",
       "scheduleReteachHint": "Reconstruye las palabras difíciles y vuelve a jugar en unas dos semanas: repaso espaciado que se queda.",
       "unpluggedReteachLiveCta": "Empezar Unplugged reteach Live",
-      "reteachLiveCta": "Empezar reteach Live de 3 min",
+      "reteachLiveCta": "Empezar reteach Live de 2 min",
       "unpluggedReteachLiveFoil": "¿Hoy sin dispositivos para el alumnado? Proyecta los fallos y que respondan en papel.",
       "moodGreat_one": "{{count}} estudiante calificó la última ronda como genial.",
       "moodGreat_other": "{{count}} estudiantes calificaron la última ronda como genial.",
@@ -15958,7 +15958,7 @@ const es = {
         },
         "sped": {
           "name": "Apoyo (SPED)",
-          "desc": "Menos palabras, más tiempo y letras más grandes"
+          "desc": "Menos palabras y letras más grandes"
         },
         "standard": {
           "name": "Estándar",
@@ -17450,10 +17450,10 @@ const es = {
       "shareGapPracticeHome": "Palabras para practicar en casa",
       "shareGapEmpty": "Aún no hay hueco de clase para compartir. Juega un juego de clase y luego comparte esta tarjeta con los padres.",
       "shareGapEmptyText": "{{lesson}}: aún no hay hueco de clase para compartir",
-      "startReteachLive": "Empezar reteach Live de 3 min",
-      "postReteachGoogleClassroom": "Publicar reteach de 3 min en Google Classroom",
-      "postReteachGoogleClassroomTitle": "Repaso en vivo de 3 min: {{lesson}}",
-      "postReteachGoogleClassroomBody": "Abre el enlace y empieza un juego en vivo de 3 min con las palabras falladas: {{missed}}. Los alumnos entran desde el tablón de la clase.",
+      "startReteachLive": "Empezar reteach Live de 2 min",
+      "postReteachGoogleClassroom": "Publicar reteach de 2 min en Google Classroom",
+      "postReteachGoogleClassroomTitle": "Repaso en vivo de 2 min: {{lesson}}",
+      "postReteachGoogleClassroomBody": "Abre el enlace y empieza un juego en vivo de 2 min con las palabras falladas: {{missed}}. Los alumnos entran desde el tablón de la clase.",
       "assignPracticeGoogleClassroom": "Asignar práctica en Google Classroom",
       "assignPracticeGoogleClassroomTitle": "Practicar palabras falladas: {{lesson}}",
       "assignPracticeGoogleClassroomBody": "Abre el enlace y practica en casa estas palabras: {{missed}}. Entrégalo cuando termines.",
@@ -17506,8 +17506,8 @@ const es = {
       "assignUnpluggedGoogleClassroomTitle": "Tarea de repaso sin pantallas: {{lesson}}",
       "assignUnpluggedGoogleClassroomBody": "Tarea sin dispositivos: abre el enlace, imprime la hoja con las palabras falladas y practica: {{missed}}. Los alumnos no necesitan dispositivo. Entrégala cuando termines.",
       "assignMissGapLiveGoogleClassroom": "Asignar en Google Classroom un juego en vivo con las palabras falladas",
-      "assignMissGapLiveGoogleClassroomTitle": "Juego en vivo de 3 min con las palabras falladas: {{lesson}}",
-      "assignMissGapLiveGoogleClassroomBody": "Abre el enlace y empieza un juego en vivo de 3 min con las palabras falladas: {{missed}}. Los alumnos entran desde Google Classroom. Funciona con Google Workspace for Education gratis, sin Education Plus.",
+      "assignMissGapLiveGoogleClassroomTitle": "Juego en vivo de 2 min con las palabras falladas: {{lesson}}",
+      "assignMissGapLiveGoogleClassroomBody": "Abre el enlace y empieza un juego en vivo de 2 min con las palabras falladas: {{missed}}. Los alumnos entran desde Google Classroom. Funciona con Google Workspace for Education gratis, sin Education Plus.",
       "launchMissGapQuestionPackLive": "Empezar un juego en vivo con preguntas sobre las palabras falladas",
       "missGapQuestionPackTitle": "Preguntas sobre las palabras falladas: {{lesson}}",
       "unpluggedReteachHint": "Los alumnos responden en la hoja impresa, sin dispositivos",
@@ -17627,7 +17627,7 @@ const es = {
     "classroomAddon": {
       "eyebrow": "Marketplace de Google Classroom",
       "title": "Asignar Live de miss-gap",
-      "subtitle": "Asigna en Classwork un Live de 3 min con las palabras falladas. Funciona en Google Workspace for Education gratis. El add-on de Classroom de Quizlet exige Education Plus. Solo palabras de clase, sin nombres de alumnos.",
+      "subtitle": "Asigna en Classwork un Live de 2 min con las palabras falladas. Funciona en Google Workspace for Education gratis. El add-on de Classroom de Quizlet exige Education Plus. Solo palabras de clase, sin nombres de alumnos.",
       "assignLive": "Asignar Live de miss-gap a Classroom",
       "freeWorkspaceFoil": "Funciona en Google Workspace for Education gratis. El add-on de Classroom de Quizlet exige Education Plus. LexiClash usa el diálogo de compartir de Google, así que no hace falta Plus.",
       "lessonLabel": "Nombre de la lección",
@@ -17648,7 +17648,7 @@ const es = {
         "modeClassic": "Classic Unplugged: la clase o los equipos debaten en el proyector",
         "modeTeam": "Team Tiles Unplugged: tablero compartido, el docente marca",
         "modeReteach": "Unplugged reteach Live: imprimible + proyector",
-        "modeLive3min": "Reteach Live de 3 min: proyector + devolución de notas",
+        "modeLive3min": "Reteach Live de 2 min: proyector + devolución de notas",
         "timerNote": "Temporizador de {{seconds}}s",
         "cefrNote": "Huecos CEFR {{level}}",
         "openLive": "Abrir Live planificado",
@@ -18534,7 +18534,7 @@ const es = {
         "blooketTitle": "Blooket: 「Gaps Set」 manual",
         "blooketBody": "Ordena el informe de Questions por Incorrect%, revisa Opportunities for Growth (Plus), anota los misses y abre Edit / Question Bank para reconstruir un 「Gaps Set」 de deberes o repaso. El diagnóstico es rápido; el set de reteach se sigue armando a mano.",
         "lexiTitle": "LexiClash: deep-link automático desde miss-gap (#1124)",
-        "lexiBody": "Los chips de misses de la última lección y el progreso del profesor ya llevan deep-links a Unplugged / reteach Live de 3 min. Un clic carga las palabras falladas en Live. Sin reconstruir un 「Gaps Set」, sin pasar por Question Bank.",
+        "lexiBody": "Los chips de misses de la última lección y el progreso del profesor ya llevan deep-links a Unplugged / reteach Live de 2 min. Un clic carga las palabras falladas en Live. Sin reconstruir un 「Gaps Set」, sin pasar por Question Bank.",
         "citePrefix": "Guía docente de Blooket:",
         "citeLabel": "Identify knowledge gaps in Blooket reports",
         "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
@@ -18682,18 +18682,18 @@ const es = {
       },
       "session": {
         "warmUp": {
-          "name": "Calentamiento de 5 minutos",
+          "name": "Calentamiento de 2 minutos",
           "when": "Al empezar la clase. Un tablero rápido con palabras de la temporada pone a todos a pensar.",
           "whenShort": "Para empezar la clase"
         },
         "exitTicket": {
           "name": "Ticket de salida",
-          "when": "Los últimos 3 minutos. Un quiz corto muestra quién domina las palabras de hoy.",
+          "when": "Los últimos 2 minutos. Un quiz corto muestra quién domina las palabras de hoy.",
           "whenShort": "Antes de que se vayan"
         },
         "brainBreak": {
           "name": "Pausa activa",
-          "when": "Cuando baja la energía. Tres minutos rápidos de Blast, sin preparar lista.",
+          "when": "Cuando baja la energía. Dos minutos rápidos de Blast, sin preparar lista.",
           "whenShort": "Cuando baja la energía"
         },
         "icebreaker": {
@@ -23556,14 +23556,14 @@ const es = {
         "language": "Idioma del juego"
       },
       "cue": {
-        "first": "¿Primer juego? Un calentamiento de 5 minutos es el comienzo más fácil.",
-        "closeOut": "Hoy ya jugaron. ¿Cierran la clase con un ticket de salida de 3 minutos?",
+        "first": "¿Primer juego? Un calentamiento de 2 minutos es el comienzo más fácil.",
+        "closeOut": "Hoy ya jugaron. ¿Cierran la clase con un ticket de salida de 2 minutos?",
         "season": {
-          "school": "Las palabras de vuelta al cole están listas. ¿Un calentamiento de 5 minutos?",
-          "autumn": "Las palabras de otoño están listas. ¿Un calentamiento de 5 minutos?",
-          "winter": "Las palabras de invierno están listas. ¿Un calentamiento de 5 minutos?",
-          "spring": "Las palabras de primavera están listas. ¿Un calentamiento de 5 minutos?",
-          "summer": "Las palabras de verano están listas. ¿Un calentamiento de 5 minutos?"
+          "school": "Las palabras de vuelta al cole están listas. ¿Un calentamiento de 2 minutos?",
+          "autumn": "Las palabras de otoño están listas. ¿Un calentamiento de 2 minutos?",
+          "winter": "Las palabras de invierno están listas. ¿Un calentamiento de 2 minutos?",
+          "spring": "Las palabras de primavera están listas. ¿Un calentamiento de 2 minutos?",
+          "summer": "Las palabras de verano están listas. ¿Un calentamiento de 2 minutos?"
         }
       }
     },
@@ -23585,7 +23585,7 @@ const es = {
       "streak": "días seguidos enseñando. ¡Sigue así!",
       "busiest": "es cuando tus clases juegan más",
       "topClass": "partidas esta semana en {{name}}, tu clase más activa",
-      "quiet": "días desde la última partida. Una ronda de 3 minutos los trae de vuelta.",
+      "quiet": "días desde la última partida. Una ronda de 2 minutos los trae de vuelta.",
       "reach": "estudiantes a un código de jugar",
       "month": "partidas en los últimos 30 días"
     },

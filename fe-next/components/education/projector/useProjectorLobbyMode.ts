@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { fixedRoundSeconds } from '@/shared/utils/fixedRoundTimer';
+import { classroomRoundSeconds } from '@/shared/utils/fixedRoundTimer';
+import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 import { useLiveClassroomGameInfo } from '@/hooks/useLiveClassroomGameInfo';
 import { useProjectorStudyCards } from '@/hooks/useProjectorStudyCards';
 import { BOSS_BATTLE_ID, catalogueIdOf, launchOf, readLocalBossId, readLocalQuizPlayable, readLocalQuizVariant, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
@@ -49,10 +50,11 @@ export function useProjectorLobbyMode({ gameCode, classroomGameMode, templateSet
   const [quizPlayable] = useState(readLocalQuizPlayable);
   const settings = liveGame?.settings ?? null;
   const timerOff = settings?.pressure ? isStudentTimerHidden(settings.pressure) : false;
-  const fixedSeconds = fixedRoundSeconds(mode);
+  const fixedSeconds = classroomRoundSeconds(mode);
+  const configuredMinutes = templateSettings ? Math.round(templateSettings.timerSeconds / 60) : settings?.timerMinutes ?? null;
   const timerMinutes = fixedSeconds
     ? Math.ceil(fixedSeconds / 60)
-    : templateSettings ? Math.round(templateSettings.timerSeconds / 60) : settings?.timerMinutes ?? null;
+    : configuredMinutes == null ? null : Math.min(configuredMinutes, EDU_MAX_ROUND_SEC / 60);
 
   const facts: LobbyFact[] = [];
   if (isQuiz) {

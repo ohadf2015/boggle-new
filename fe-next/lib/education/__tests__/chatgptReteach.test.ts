@@ -46,7 +46,7 @@ describe('buildChatGptReteach', () => {
     });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.timer_seconds).toBe(180);
+    expect(result.timer_seconds).toBe(120);
     expect(result.timer_seconds).toBe(CLASS_GAP_RETEACH_TIMER_SECONDS);
     expect(result.timer_seconds).toBe(CHATGPT_RETEACH_TIMER_SECONDS);
     expect(result.missed_words).toEqual(['photosynthesis', 'chlorophyll']);
