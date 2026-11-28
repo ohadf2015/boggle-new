@@ -17244,11 +17244,7 @@ const sv = {
       "homeCta": "Se veckan"
     },
     "proPowered": {"hint": "Ingår i din Teacher Pro-plan"},
-    "trialUsage": {"lead": "Under din provperiod:", "games_one": "{count} klassmatch", "games_other": "{count} klassmatcher", "students_one": "{count} elev följs", "students_other": "{count} elever följs", "practice_one": "{count} övningspass", "practice_other": "{count} övningspass"},
-    "schoolBulkCta": {
-      "text": "Kör ni det här för hela skolan?",
-      "link": "Se prissättning för skolor"
-    }
+    "trialUsage": {"lead": "Under din provperiod:", "games_one": "{count} klassmatch", "games_other": "{count} klassmatcher", "students_one": "{count} elev följs", "students_other": "{count} elever följs", "practice_one": "{count} övningspass", "practice_other": "{count} övningspass"}
   },
   "education": {
     "race": {

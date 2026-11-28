@@ -36,6 +36,13 @@ describe('<HomeHero> week-two replay', () => {
     expect(screen.queryByTestId('home-play-again')).toBeNull();
   });
 
+  it('Given the last game is still being read, Then the picker chip slot is held so Play again landing does not push the page down', () => {
+    render(<HomeHero classrooms={[CLASS]} selectedId="c1" onSelect={vi.fn()} language="en" t={t} replay={{ kind: 'pending' }} />);
+    const slot = screen.getByTestId('home-pick-game-pending');
+    expect(slot).toHaveAttribute('aria-hidden', 'true');
+    expect(slot).toHaveClass('invisible');
+  });
+
   it('Given no replay, Then Start live game stays the primary', () => {
     render(<HomeHero classrooms={[CLASS]} selectedId="c1" onSelect={vi.fn()} language="en" t={t} />);
     expect(screen.getByTestId('home-start-live')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c1');

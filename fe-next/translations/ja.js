@@ -16933,11 +16933,7 @@ const ja = {
       "homeCta": "今週を見る"
     },
     "proPowered": {"hint": "Teacher Pro プランの機能です"},
-    "trialUsage": {"lead": "お試し期間中の利用:", "games_one": "クラスゲーム{count}回", "games_other": "クラスゲーム{count}回", "students_one": "生徒{count}人を記録", "students_other": "生徒{count}人を記録", "practice_one": "練習{count}回", "practice_other": "練習{count}回"},
-    "schoolBulkCta": {
-      "text": "学校全体で使っていますか？",
-      "link": "学校向け価格を見る"
-    }
+    "trialUsage": {"lead": "お試し期間中の利用:", "games_one": "クラスゲーム{count}回", "games_other": "クラスゲーム{count}回", "students_one": "生徒{count}人を記録", "students_other": "生徒{count}人を記録", "practice_one": "練習{count}回", "practice_other": "練習{count}回"}
   },
   "education": {
     "race": {

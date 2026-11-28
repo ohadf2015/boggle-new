@@ -59,3 +59,15 @@ describe('student home first frame: one thing to do', () => {
     expect(screen.queryByTestId('academy-cta')).toBeNull();
   });
 });
+
+describe('student home loading frame', () => {
+  it('Given the hub still reading a class student data, Then the waiting line slot is held above the pending action so it does not grow on arrival', async () => {
+    knobs.lessons = [lesson('1', 'completed')];
+    knobs.reviewLessonId = '1';
+    knobs.reviewCount = 5;
+    knobs.reviewSilent = true;
+    render(<StudentPageClient />);
+    const pending = await screen.findByTestId('academy-cta-pending');
+    expect(pending.previousElementSibling).toHaveAttribute('data-testid', 'academy-waiting-slot');
+  });
+});

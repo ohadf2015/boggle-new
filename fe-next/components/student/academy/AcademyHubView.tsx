@@ -405,14 +405,17 @@ export function AcademyHubView(props: AcademyHubViewProps) {
                 size={wide ? 'big' : rail ? 'compact' : 'normal'}
               />
             ) : (
-              <div
-                data-testid="academy-cta-pending"
-                aria-busy="true"
-                className={cn(
-                  'w-full animate-pulse rounded-[20px] border-3 border-edu-line bg-edu-surface',
-                  rail ? 'h-14' : wide ? 'h-[92px]' : 'h-[68px] sm:h-[76px]',
-                )}
-              />
+              <>
+                <div aria-hidden="true" data-testid="academy-waiting-slot" className="h-9" />
+                <div
+                  data-testid="academy-cta-pending"
+                  aria-busy="true"
+                  className={cn(
+                    'w-full animate-pulse rounded-[20px] border-3 border-edu-line bg-edu-surface',
+                    rail ? 'h-14' : wide ? 'h-[104px]' : 'h-[88px]',
+                  )}
+                />
+              </>
             )}
           </div>
           <div className={cn(wide && 'shrink-0 justify-self-end', rail && 'shrink-0')}>

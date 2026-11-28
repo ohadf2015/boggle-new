@@ -170,7 +170,7 @@ export function HomeHero({
               </Link>
             </PressSurface>
           )}
-          {rehearse || replay?.kind === 'ready' ? (
+          {rehearse || replay?.kind === 'ready' || replay?.kind === 'pending' ? (
             <div data-testid="home-hero-chips" className={cn('flex min-w-0 flex-wrap items-stretch gap-3 [&>*]:grow [&>*]:basis-56', desk && 'lg:grid lg:flex-[2] lg:auto-cols-fr lg:grid-flow-col')}>
               {rehearse}
               {replay?.kind === 'ready' ? (
@@ -179,6 +179,13 @@ export function HomeHero({
                     <Gamepad2 aria-hidden="true" />
                     <span className="min-w-0">{t('eduShell.home.loop.pickGame')}</span>
                   </Link>
+                </PressSurface>
+              ) : replay?.kind === 'pending' ? (
+                <PressSurface asChild lip={4} className={cn(HERO_PICK, 'invisible')}>
+                  <span data-testid="home-pick-game-pending" aria-hidden="true">
+                    <Gamepad2 />
+                    <span className="min-w-0">{t('eduShell.home.loop.pickGame')}</span>
+                  </span>
                 </PressSurface>
               ) : null}
             </div>
