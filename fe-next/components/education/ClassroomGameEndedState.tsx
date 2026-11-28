@@ -13,12 +13,14 @@ interface ClassroomGameEndedStateProps {
   message: string;
   hubHref: string;
   onRetry: (roomCode: string) => void;
+  /** One-tap restart using the same roster and words when state is unrecoverable. */
+  onRestart?: (roomCode: string) => void;
 }
 
 const SECONDARY =
   'flex min-h-12 w-full items-center justify-center rounded-neo border-[3px] border-neo-black bg-edu-paper px-6 py-3 font-neo-display font-black text-neo-black shadow-edu-lip-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-black';
 
-export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }: ClassroomGameEndedStateProps) {
+export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry, onRestart }: ClassroomGameEndedStateProps) {
   const { t, language } = useLanguage();
   const { classroomId, isLoading } = useStudentClassroom();
 
@@ -41,6 +43,17 @@ export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }:
         </h1>
         <p className="mb-5 font-neo-body text-neo-black/80">{message}</p>
         <div className="flex flex-col gap-3">
+          {onRestart && roomCode && (
+            <button
+              type="button"
+              data-testid="ended-restart"
+              onClick={() => onRestart(roomCode)}
+              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-6 py-3 font-neo-display font-black text-neo-black shadow-edu-lip-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-black"
+            >
+              <RotateCcw className="h-5 w-5" aria-hidden="true" />
+              {t('common.restart') || 'Restart Game'}
+            </button>
+          )}
           <DeadEndPracticeLink state="room_gone" className="bg-neo-lime text-neo-black focus-visible:outline-neo-black" />
           {!isLoading && classroomId && (
             <Link data-testid="ended-primary" href={hubHref} className={SECONDARY}>

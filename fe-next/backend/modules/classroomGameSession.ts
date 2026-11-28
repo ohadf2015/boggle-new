@@ -48,6 +48,8 @@ import logger from '../utils/logger';
 import { getClassroomGame, updateClassroomGameStatus } from './classroomGameManager';
 import { isClassroomSessionEnded } from './classroomGameSessionState';
 
+import { markLiveRoomEnded } from './classroomLiveRoomPersistence';
+
 export { isClassroomSessionEnded } from './classroomGameSessionState';
 export type { ClassroomSessionState } from './classroomGameSessionState';
 
@@ -71,6 +73,7 @@ export async function endClassroomGameSession(gameCode: string): Promise<void> {
     if (isClassroomSessionEnded(game)) return; // idempotent: two sweeps, one write
 
     await updateClassroomGameStatus(gameCode, 'ended');
+    void markLiveRoomEnded(gameCode);
   } catch (error) {
     // Loud, not silent: a swallowed failure here leaves a projector code
     // joinable for the rest of its four-hour TTL.
