@@ -49,7 +49,7 @@ const EXPECTED_EN: Record<string, string> = {
   'eg2Modes.complexity.tricky': 'Tricky rules',
   'teacher.classroom.playStyle.ffa': 'Everyone vs everyone',
   'eduShell.host.lateJoinHint': 'Students can still join after the round starts.',
-  'teacher.classroom.presets.title': 'Quick setups',
+  'teacher.classroom.presets.title': 'How should the class play?',
 };
 
 describe('teacher home and Pick-a-game copy says what each label does', () => {

@@ -33,7 +33,10 @@ export function TeacherStudentModeLayer({ children }: { children: ReactNode }) {
       {active ? (
         <div data-testid="teacher-student-mode-bar" className={cn(BAR_H, 'fixed inset-x-0 top-0 z-[70] flex items-center gap-2 border-b-[3px] border-neo-black bg-neo-yellow px-3 pt-[env(safe-area-inset-top,0px)] text-neo-black')}>
           <Eye className="size-5 shrink-0" strokeWidth={2.75} aria-hidden="true" />
-          <p className="min-w-0 flex-1 truncate font-neo-display text-sm font-black sm:text-base">{t('teacher.studentView.banner')}</p>
+          <p className="min-w-0 flex-1 truncate font-neo-display text-sm font-black sm:text-base">
+            <span className="sm:hidden">{t('teacher.studentView.bannerShort')}</span>
+            <span className="hidden sm:inline">{t('teacher.studentView.banner')}</span>
+          </p>
           <button
             type="button"
             data-testid="teacher-student-mode-live"

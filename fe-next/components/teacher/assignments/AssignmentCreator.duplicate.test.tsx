@@ -59,7 +59,7 @@ describe('AssignmentCreator — same lesson twice', () => {
     mockCreateAssignment.mockReturnValue(new Promise((r) => { resolve = r; }));
     renderCreator();
     fillForm();
-    const button = screen.getByText('teacher.assignment.create');
+    const button = screen.getByText('teacher.assignment.assignTo:Period 1');
     fireEvent.click(button);
     fireEvent.click(button);
     fireEvent.click(button);
@@ -72,7 +72,7 @@ describe('AssignmentCreator — same lesson twice', () => {
     const onClose = vi.fn();
     renderCreator(onClose);
     fillForm();
-    fireEvent.click(screen.getByText('teacher.assignment.create'));
+    fireEvent.click(screen.getByText('teacher.assignment.assignTo:Period 1'));
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith('teacher.assignment.alreadyAssignedUpdated'));
     expect(toast.error).not.toHaveBeenCalled();
     expect(onClose).toHaveBeenCalled();
@@ -82,7 +82,7 @@ describe('AssignmentCreator — same lesson twice', () => {
     mockCreateAssignment.mockResolvedValue({ success: false, alreadyAssigned: true, error: 'already_assigned' });
     renderCreator();
     fillForm();
-    fireEvent.click(screen.getByText('teacher.assignment.create'));
+    fireEvent.click(screen.getByText('teacher.assignment.assignTo:Period 1'));
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('teacher.assignment.alreadyAssigned'));
   });
 
@@ -91,7 +91,7 @@ describe('AssignmentCreator — same lesson twice', () => {
     fireEvent.click(screen.getByTestId('assignment-mode-word-list'));
     fireEvent.change(screen.getByTestId('word-list-goal'), { target: { value: 'cat, Rely on, dog, Hospice care' } });
     fireEvent.click(screen.getByRole('button', { name: 'teacher.assignment.nextWeek' }));
-    fireEvent.click(screen.getByText('teacher.assignment.create'));
+    fireEvent.click(screen.getByText('teacher.assignment.assignTo:Period 1'));
     await waitFor(() =>
       expect(toast.error).toHaveBeenCalledWith('teacher.lesson.singleWordsOnly:"Rely on", "Hospice care"'),
     );

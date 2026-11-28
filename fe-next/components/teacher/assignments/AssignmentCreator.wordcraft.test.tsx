@@ -36,7 +36,6 @@ const renderIt = () =>
 
 async function submit() {
   pickLesson('lesson-1');
-  fireEvent.click(screen.getByText('teacher.assignment.selectDate'));
   fireEvent.click(screen.getByText('teacher.assignment.tomorrow'));
   fireEvent.click(screen.getByText('teacher.assignment.create'));
   await waitFor(() => expect(mockCreateAssignment).toHaveBeenCalled());
@@ -65,6 +64,11 @@ describe('AssignmentCreator — Word Craft', () => {
     }));
   });
 
+  it('Given the class is not in the classroom list, Then the submit button falls back to the generic label', () => {
+    renderIt();
+    expect(screen.getByRole('button', { name: 'teacher.assignment.create' })).toBeInTheDocument();
+  });
+
   it('Given Word Craft, Then no focus drill picker is shown (no decision overload)', () => {
     renderIt();
     pickLesson('lesson-1');
@@ -73,14 +77,14 @@ describe('AssignmentCreator — Word Craft', () => {
 
   it("Given Practice with the student-picks default, When created, Then practice_focus is 'any' (unchanged legacy behaviour)", async () => {
     renderIt();
-    fireEvent.click(screen.getByText('teacher.assignment.practiceMode'));
+    fireEvent.click(screen.getByTestId('assignment-mode-practice'));
     const payload = await submit();
     expect(payload.practice_focus).toBe('any');
   });
 
   it('Given Duel, When created, Then practice_focus is null — a duel never reads as Word Craft', async () => {
     renderIt();
-    fireEvent.click(screen.getByText('teacher.assignment.duelChallenge'));
+    fireEvent.click(screen.getByTestId('assignment-mode-duel'));
     const payload = await submit();
     expect(payload.practice_focus).toBeNull();
   });

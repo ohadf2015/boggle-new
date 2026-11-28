@@ -9,7 +9,7 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { HomeHero, type HomeReplay } from '../../home/HomeHero';
 import { HomeClassMeta } from '../../home/HomeClassList';
 import { NB_LINK } from '../../nb/nbStyles';
-import { ClassDangerZone, ClassLastGame, ClassWordLists, type ClassLastGameState } from './ClassPageBlocks';
+import { ClassDangerZone, ClassLastGame, ClassWordLists, type ClassLastGameState, ClassAssignCard } from './ClassPageBlocks';
 import type { ClassWordList } from './classWordLists';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -77,6 +77,8 @@ export function ClassPageView(props: ClassPageViewProps) {
           />
         }
       />
+
+      <ClassAssignCard classroomId={classroom.id} language={language} t={t} />
 
       {props.proOffer}
 

@@ -6,6 +6,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ loading: false, isAuthenticated: false, user: null, profile: null }) }));
 vi.mock('@/hooks/useWinStreak', () => ({ useWinStreak: () => ({ currentStreak: 0 }) }));
 vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({ playTileSelectSound: vi.fn(), playStreakMilestoneSound: vi.fn() }) }));
+const confetti = vi.hoisted(() => vi.fn());
+vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: confetti }));
 const studyCompleted = vi.hoisted(() => vi.fn());
 vi.mock('@/lib/education/studyTelemetry', () => ({ trackEduStudyCompleted: studyCompleted }));
 vi.mock('@/components/Avatar', () => ({ default: () => <span /> }));
@@ -61,6 +63,7 @@ describe('EduStudentLobby learn then recall', () => {
   beforeEach(() => {
     sessionStorage.clear();
     studyCompleted.mockClear();
+    confetti.mockClear();
     act(() => useStudyDeck.getState().clear());
   });
 
@@ -141,11 +144,11 @@ describe('EduStudentLobby learn then recall', () => {
     expect(screen.getByTestId('ready-slot')).toBeInTheDocument();
   });
 
-  it('given only one word with a meaning, when the lobby opens, then the flip-through cards stay as before', () => {
+  it('given only one word with a meaning, when the lobby opens, then the words are built from letters instead of quizzed', () => {
     act(() => useStudyDeck.getState().setDeck('ROOM1', [{ word: 'xylem', definition: 'Carries water' }, { word: 'sun' }]));
     render(<EduStudentLobby {...base} />);
-    expect(screen.getByTestId('study-word')).toHaveTextContent('xylem');
-    expect(screen.queryByTestId('recall-meet')).not.toBeInTheDocument();
+    expect(screen.getByTestId('recall-start')).toHaveTextContent('eduStudent.recall.buildStart');
+    expect(screen.queryByTestId('study-word')).not.toBeInTheDocument();
     expect(screen.getByTestId('study-ready-locked')).toHaveTextContent('eduStudent.lobby.studyReadyLocked');
   });
 
@@ -183,5 +186,85 @@ describe('EduStudentLobby learn then recall', () => {
 
     expect(within(screen.getByTestId('recall-feedback-wrong')).getByText(answer)).toBeInTheDocument();
     expect(screen.getByTestId('recall-progress')).toHaveTextContent('"mastered":0');
+  });
+
+  it('given the meet phase, when chips are peeked, then the counter tracks how many were opened', () => {
+    act(() => useStudyDeck.getState().setDeck('ROOM1', deck));
+    render(<EduStudentLobby {...base} />);
+    expect(screen.getByTestId('recall-peeked')).toHaveTextContent('"count":0,"total":4');
+    fireEvent.click(within(screen.getByTestId('recall-meet')).getByRole('button', { name: /xylem/ }));
+    fireEvent.click(within(screen.getByTestId('recall-meet')).getByRole('button', { name: /phloem/ }));
+    fireEvent.click(within(screen.getByTestId('recall-meet')).getByRole('button', { name: /xylem/ }));
+    expect(screen.getByTestId('recall-peeked')).toHaveTextContent('"count":2,"total":4');
+  });
+
+  it('given the quiz, then the answers are four tiles in four different colours', () => {
+    act(() => useStudyDeck.getState().setDeck('ROOM1', deck));
+    render(<EduStudentLobby {...base} />);
+    fireEvent.click(screen.getByTestId('recall-start'));
+    const fills = within(screen.getByTestId('recall-options')).getAllByRole('button').map((b) => b.className.match(/\bbg-neo-(pink|cyan|yellow|lime)\b/)?.[1]);
+    expect(fills).toHaveLength(4);
+    expect(new Set(fills).size).toBe(4);
+  });
+
+  it('given right answers in a row, then points float up, the score grows and the combo multiplier shows', () => {
+    act(() => useStudyDeck.getState().setDeck('ROOM1', deck));
+    render(<EduStudentLobby {...base} />);
+    fireEvent.click(screen.getByTestId('recall-start'));
+    expect(screen.getByTestId('recall-score')).toHaveTextContent('0');
+    answerRight();
+    expect(screen.getByTestId('recall-points-float')).toHaveTextContent(/\+\d+/);
+    const first = Number(screen.getByTestId('recall-score').textContent!.replace(/\D/g, ''));
+    expect(first).toBeGreaterThanOrEqual(100);
+    expect(screen.queryByTestId('recall-multiplier')).not.toBeInTheDocument();
+    answerRight();
+    expect(screen.getByTestId('recall-multiplier')).toHaveTextContent('"count":2');
+    expect(Number(screen.getByTestId('recall-score').textContent!.replace(/\D/g, ''))).toBeGreaterThanOrEqual(first + 200);
+  });
+
+  it('given a wrong answer, then it says the word comes back and the combo resets', () => {
+    act(() => useStudyDeck.getState().setDeck('ROOM1', deck));
+    render(<EduStudentLobby {...base} />);
+    fireEvent.click(screen.getByTestId('recall-start'));
+    answerRight();
+    answerRight();
+    answerWrong();
+    expect(screen.getByTestId('recall-feedback-wrong')).toHaveTextContent('eduStudent.recall.wrongComeback');
+    fireEvent.click(screen.getByTestId('recall-next'));
+    expect(screen.queryByTestId('recall-multiplier')).not.toBeInTheDocument();
+  });
+
+  it('given a clean run, when it ends, then a celebration shows score, best combo and three stars, with confetti', () => {
+    act(() => useStudyDeck.getState().setDeck('ROOM1', deck));
+    render(<EduStudentLobby {...base} />);
+    fireEvent.click(screen.getByTestId('recall-start'));
+    for (let i = 0; i < 6; i++) answerRight();
+
+    const finish = screen.getByTestId('recall-finish');
+    expect(finish).toHaveAttribute('data-stars', '3');
+    expect(finish).toHaveTextContent('eduStudent.recall.finishTitle_other:{"count":3}');
+    expect(finish).toHaveTextContent('eduStudent.recall.bestCombo:{"count":6}');
+    expect(confetti).toHaveBeenCalled();
+    expect(screen.getByTestId('recall-practice-again')).toHaveTextContent('eduStudent.recall.beatScore');
+  });
+
+  it('given a second, sloppier run, when it ends, then the best score from the first run stays the one to beat', () => {
+    act(() => useStudyDeck.getState().setDeck('ROOM1', deck));
+    render(<EduStudentLobby {...base} />);
+    fireEvent.click(screen.getByTestId('recall-start'));
+    for (let i = 0; i < 6; i++) answerRight();
+    const best = screen.getByTestId('recall-finish').getAttribute('data-score')!;
+
+    fireEvent.click(screen.getByTestId('recall-practice-again'));
+    let answered = 0;
+    for (let i = 0; i < 60 && screen.queryByTestId('recall-quiz'); i++) {
+      if (screen.queryByTestId('recall-next')) fireEvent.click(screen.getByTestId('recall-next'));
+      else if (answered++ % 2 === 0) answerWrong();
+      else answerRight();
+    }
+    const finish = screen.getByTestId('recall-finish');
+    expect(Number(finish.getAttribute('data-score'))).toBeLessThan(Number(best));
+    expect(Number(finish.getAttribute('data-stars'))).toBeLessThan(3);
+    expect(screen.getByTestId('recall-practice-again')).toHaveTextContent(`"score":${best}`);
   });
 });

@@ -56,7 +56,7 @@ describe('AssignmentCreator — the database refuses a fourth free assignment', 
     renderCreator();
     pickLesson('lesson-1');
     fireEvent.click(screen.getByRole('button', { name: 'teacher.assignment.nextWeek' }));
-    fireEvent.click(screen.getByText('teacher.assignment.create'));
+    fireEvent.click(screen.getByText('teacher.assignment.assignTo:Period 1'));
     await waitFor(() => expect(screen.getByTestId('assignment-limit-upsell')).toBeInTheDocument());
     expect(toast.error).not.toHaveBeenCalled();
   });
@@ -71,7 +71,7 @@ describe('AssignmentCreator — the database refuses a fourth free assignment', 
     fireEvent.click(screen.getByTestId('assignment-mode-word-list'));
     fireEvent.change(screen.getByTestId('word-list-goal'), { target: { value: 'cat, dog, bird' } });
     fireEvent.click(screen.getByRole('button', { name: 'teacher.assignment.nextWeek' }));
-    fireEvent.click(screen.getByText('teacher.assignment.create'));
+    fireEvent.click(screen.getByText('teacher.assignment.assignTo:Period 1'));
     await waitFor(() => expect(screen.getByTestId('assignment-limit-upsell')).toBeInTheDocument());
     expect(toast.error).not.toHaveBeenCalled();
   });

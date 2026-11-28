@@ -60,7 +60,7 @@ describe('AssignmentCreator — practice focus', () => {
   it('shows the focus picker only once a lesson is selected for a practice assignment', () => {
     renderIt();
     // Word Craft is the default mode; the focus drill lives under Practice.
-    fireEvent.click(screen.getByText('teacher.assignment.practiceMode'));
+    fireEvent.click(screen.getByTestId('assignment-mode-practice'));
     expect(screen.queryByRole('radiogroup', { name: 'teacher.assignment.focus.label' })).not.toBeInTheDocument();
 
     pickLesson('lesson-rich');
@@ -68,14 +68,14 @@ describe('AssignmentCreator — practice focus', () => {
     expect(within(group).getByRole('radio', { name: /teacher.assignment.focus.any/ })).toHaveAttribute('aria-checked', 'true');
 
     // duel assignments have no focus
-    fireEvent.click(screen.getByText('teacher.assignment.duelChallenge'));
+    fireEvent.click(screen.getByTestId('assignment-mode-duel'));
     expect(screen.queryByRole('radiogroup', { name: 'teacher.assignment.focus.label' })).not.toBeInTheDocument();
   });
 
   it('enables only the focuses the lesson supports and explains the rest', () => {
     renderIt();
     // Word Craft is the default mode; the focus drill lives under Practice.
-    fireEvent.click(screen.getByText('teacher.assignment.practiceMode'));
+    fireEvent.click(screen.getByTestId('assignment-mode-practice'));
     pickLesson('lesson-rich');
     const group = screen.getByRole('radiogroup', { name: 'teacher.assignment.focus.label' });
 
@@ -89,10 +89,9 @@ describe('AssignmentCreator — practice focus', () => {
   it('submits the chosen focus as practice_focus', async () => {
     renderIt();
     // Word Craft is the default mode; the focus drill lives under Practice.
-    fireEvent.click(screen.getByText('teacher.assignment.practiceMode'));
+    fireEvent.click(screen.getByTestId('assignment-mode-practice'));
     pickLesson('lesson-rich');
     fireEvent.click(screen.getByRole('radio', { name: /education.vocabFocus.focus.synonym/ }));
-    fireEvent.click(screen.getByText('teacher.assignment.selectDate'));
     fireEvent.click(screen.getByText('teacher.assignment.today'));
     fireEvent.click(screen.getByText('teacher.assignment.create'));
 
@@ -105,13 +104,12 @@ describe('AssignmentCreator — practice focus', () => {
   it('resets the focus to any when the lesson changes to one that cannot support it', async () => {
     renderIt();
     // Word Craft is the default mode; the focus drill lives under Practice.
-    fireEvent.click(screen.getByText('teacher.assignment.practiceMode'));
+    fireEvent.click(screen.getByTestId('assignment-mode-practice'));
     pickLesson('lesson-rich');
     fireEvent.click(screen.getByRole('radio', { name: /education.vocabFocus.focus.synonym/ }));
     pickLesson('lesson-bare');
     expect(screen.getByRole('radio', { name: /teacher.assignment.focus.any/ })).toHaveAttribute('aria-checked', 'true');
 
-    fireEvent.click(screen.getByText('teacher.assignment.selectDate'));
     fireEvent.click(screen.getByText('teacher.assignment.today'));
     fireEvent.click(screen.getByText('teacher.assignment.create'));
     await waitFor(() => expect(mockCreateAssignment).toHaveBeenCalled());

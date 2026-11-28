@@ -1,8 +1,9 @@
 import React from 'react';
 import { pickLesson } from './__tests__/pickLesson';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AssignmentCreator from './AssignmentCreator';
+import { localDayPlus } from './AssignmentCreatorDueDate';
 import { useAssignments } from '@/hooks/useAssignments';
 import type { Mock } from 'vitest';
 
@@ -75,13 +76,36 @@ describe('AssignmentCreator — Wayground-order flow', () => {
     expect(screen.getByTestId('assignment-who').closest('[data-nb-dialog-header]')).not.toBeNull();
   });
 
-  it('keeps other modes, focus and the note behind one collapsed row', () => {
+  it('Given the dialog opens, Then Practice and Duel sit beside Word Craft in step 2 and the closed fold holds only word goals and the note', () => {
     renderCreator();
     const toggle = screen.getByTestId('assignment-advanced-toggle');
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByRole('button', { name: 'teacher.assignment.practiceMode' })).toBeNull();
+    const modeStep = screen.getAllByTestId('assignment-step').find((st) => st.getAttribute('data-step') === 'mode')!;
+    expect(within(modeStep).getByTestId('assignment-mode-wordcraft')).toBeVisible();
+    expect(within(modeStep).getByTestId('assignment-mode-practice')).toBeVisible();
+    expect(within(modeStep).getByTestId('assignment-mode-duel')).toBeVisible();
+    expect(screen.getByTestId('assignment-mode-word-list')).not.toBeVisible();
+    expect(screen.getByLabelText('teacher.assignment.instructionsLabel')).not.toBeVisible();
+
     fireEvent.click(toggle);
-    expect(screen.getByRole('button', { name: 'teacher.assignment.practiceMode' })).toBeVisible();
+    expect(screen.getByTestId('assignment-mode-word-list')).toBeVisible();
+    expect(screen.getByLabelText('teacher.assignment.instructionsLabel')).toBeVisible();
+  });
+
+  it('Given Practice is picked from step 2, Then the fold stays closed and the focus picker shows under step 2', () => {
+    renderCreator();
+    pickLesson('lesson-1');
+    fireEvent.click(screen.getByTestId('assignment-mode-practice'));
+    expect(screen.getByTestId('assignment-advanced-toggle')).toHaveAttribute('aria-expanded', 'false');
+    const modeStep = screen.getAllByTestId('assignment-step').find((st) => st.getAttribute('data-step') === 'mode')!;
+    expect(within(modeStep).getByRole('radiogroup', { name: 'teacher.assignment.focus.label' })).toBeVisible();
+  });
+
+  it('Given Duel is picked from step 2, Then the fold stays closed', () => {
+    renderCreator();
+    fireEvent.click(screen.getByTestId('assignment-mode-duel'));
+    expect(screen.getByTestId('assignment-mode-duel')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('assignment-advanced-toggle')).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('names the class and its size so the teacher knows who gets it', () => {
@@ -90,14 +114,48 @@ describe('AssignmentCreator — Wayground-order flow', () => {
     expect(screen.getByTestId('assignment-who')).toHaveTextContent('eg2Rep.assign.students:5');
   });
 
-  it('shows due-date chips up front, so list + chip + assign is three taps', async () => {
+  it('Given the default due date, When the teacher picks a list and assigns, Then it is two taps and the due date is a week out', async () => {
+    renderCreator();
+    expect(screen.getByRole('button', { name: 'teacher.assignment.nextWeek' })).toHaveAttribute('aria-pressed', 'true');
+    pickLesson('lesson-1');
+    fireEvent.click(screen.getByText('teacher.assignment.assignTo:Period 1'));
+    await waitFor(() => expect(mockCreateAssignment).toHaveBeenCalled());
+    expect(mockCreateAssignment.mock.calls[0][0]).toMatchObject({
+      lesson_id: 'lesson-1',
+      classroom_id: 'classroom-1',
+      due_date: localDayPlus(7),
+    });
+  });
+
+  it('Given the due-date chips up front, When the teacher picks another chip, Then that date is saved', async () => {
     renderCreator();
     pickLesson('lesson-1');
-    const chip = screen.getByRole('button', { name: 'teacher.assignment.nextWeek' });
+    const chip = screen.getByRole('button', { name: 'teacher.assignment.tomorrow' });
     fireEvent.click(chip);
     expect(chip).toHaveAttribute('aria-pressed', 'true');
-    fireEvent.click(screen.getByText('teacher.assignment.create'));
+    expect(screen.getByRole('button', { name: 'teacher.assignment.nextWeek' })).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(screen.getByText('teacher.assignment.assignTo:Period 1'));
     await waitFor(() => expect(mockCreateAssignment).toHaveBeenCalled());
-    expect(mockCreateAssignment.mock.calls[0][0]).toMatchObject({ lesson_id: 'lesson-1', classroom_id: 'classroom-1' });
+    expect(mockCreateAssignment.mock.calls[0][0].due_date).toBe(localDayPlus(1));
+  });
+
+  it('Given the class is known, Then the submit button names it', () => {
+    renderCreator();
+    expect(screen.getByRole('button', { name: 'teacher.assignment.assignTo:Period 1' })).toBeInTheDocument();
+    expect(screen.queryByText('teacher.assignment.create')).not.toBeInTheDocument();
+  });
+
+  it('Given the class already has a lesson, When the teacher picks that lesson, Then the already-assigned note shows, and not for a new lesson', () => {
+    (useAssignments as Mock).mockReturnValue({
+      createAssignment: mockCreateAssignment,
+      assignments: [{ id: 'a1', classroom_id: 'classroom-1', lesson_id: 'lesson-1' }],
+    });
+    renderCreator();
+    expect(screen.queryByTestId('assignment-already-note')).not.toBeInTheDocument();
+    pickLesson('lesson-2');
+    expect(screen.queryByTestId('assignment-already-note')).not.toBeInTheDocument();
+    pickLesson('lesson-1');
+    expect(screen.getByTestId('assignment-already-note')).toHaveTextContent('teacher.assignment.alreadyAssignedNote');
+    expect(screen.getByTestId('assignment-already-note')).toHaveAttribute('role', 'status');
   });
 });

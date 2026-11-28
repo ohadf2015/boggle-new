@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronDown, ChevronRight, ClipboardList, Plus, Trash2, Trophy } from 'lucide-react';
+import { CalendarCheck, ChevronDown, ChevronRight, ClipboardList, Plus, Trash2, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { HOME_ROW, ICON_SQUARE, OUTLINE_BUTTON, PANEL, QUIET_LINK } from '../../home/homeStyles';
@@ -9,6 +9,7 @@ import { PressSurface } from '@/components/motion/PressSurface';
 import type { ClassWordList } from './classWordLists';
 import ListNameButton from '@/components/teacher/lesson-creation/ListNameButton';
 import { pluralKeyOf } from '@/lib/i18n/pluralKey';
+import { teacherAssignHref } from '@/hooks/useTeacherDashboardDeepLink';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -98,6 +99,27 @@ export function ClassWordLists({ lists, loading, libraryHref, language, t }: { l
       ) : (
         create
       )}
+    </section>
+  );
+}
+
+/** Homework sits on the class page itself, one tap from the dialog that already knows which class it is for. */
+export function ClassAssignCard({ classroomId, language, t }: { classroomId: string; language: string; t: T }) {
+  return (
+    <section aria-labelledby="class-assign-title" className={cn(PANEL, 'flex flex-wrap items-center gap-3 px-4 py-3 sm:flex-nowrap')}>
+      <CalendarCheck className={cn(ICON_SQUARE, 'bg-neo-yellow')} strokeWidth={2.5} aria-hidden="true" />
+      <span className="min-w-0 flex-1">
+        <h2 id="class-assign-title" className={TITLE}>{t('teacher.classroom.assignTitle')}</h2>
+        <p className="font-neo-body text-sm text-edu-ink/80">{t('teacher.classroom.assignBody')}</p>
+      </span>
+      <Link
+        href={teacherAssignHref(language, classroomId)}
+        data-testid="class-page-assign"
+        className="inline-flex min-h-12 w-full shrink-0 items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-cyan px-5 font-neo-display text-base font-black text-neo-black shadow-hard-sm transition-transform active:translate-y-0.5 motion-reduce:transition-none sm:w-auto [@media(hover:hover)]:hover:-translate-y-0.5"
+      >
+        <Plus className="size-5" strokeWidth={3} aria-hidden="true" />
+        {t('teacher.classroom.assignCta')}
+      </Link>
     </section>
   );
 }
