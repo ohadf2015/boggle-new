@@ -48,7 +48,7 @@ export function TeacherStudentModeLayer({ children }: { children: ReactNode }) {
       ) : null}
       <div
         data-teacher-student-mode={active ? 'on' : undefined}
-        className={active ? 'fixed inset-x-0 bottom-0 top-[calc(3.25rem+env(safe-area-inset-top,0px))] overflow-y-auto [contain:paint] [&>*]:max-h-full' : 'contents'}
+        className={active ? 'fixed inset-x-0 bottom-0 flex flex-col top-[calc(3.25rem+env(safe-area-inset-top,0px))] overflow-y-auto [contain:paint] [&>*]:max-h-full' : 'contents'}
       >
         {children}
       </div>

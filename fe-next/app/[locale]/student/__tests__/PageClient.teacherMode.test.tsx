@@ -13,6 +13,8 @@ vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div data-testi
 vi.mock('@/components/student/academy/AcademyHub', () => ({ AcademyHub: () => <div data-testid="hub" /> }));
 vi.mock('@/lib/education/studentDisplayName', () => ({ resolveStudentDisplayName: () => 'Maya' }));
 vi.mock('@/lib/supabase', () => ({ signOut: vi.fn() }));
+const { capture } = vi.hoisted(() => ({ capture: vi.fn() }));
+vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture } }));
 vi.mock('@/components/teacher/classroom/TeacherStudentView', () => ({
   StudentView: ({ classroomId, onMissing }: { classroomId: string; onMissing: () => void }) => (
     <button type="button" data-testid="teacher-student-hub" onClick={onMissing}>{classroomId}</button>
@@ -47,6 +49,7 @@ describe('StudentPageClient — teacher student mode', () => {
     await waitFor(() => expect(screen.getByTestId('teacher-student-hub')).toHaveTextContent('c1'));
     expect(mockPush).not.toHaveBeenCalled();
     expect(screen.queryByTestId('hub')).toBeNull();
+    expect(capture).not.toHaveBeenCalledWith('student_no_classroom_prompt_viewed', expect.anything());
   });
 
   it('Given the flagged class is not theirs, Then student mode ends and they go to /teacher', async () => {

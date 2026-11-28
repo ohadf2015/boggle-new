@@ -75,14 +75,14 @@ export default function StudentPageClient() {
   // read has answered: before that every student, class or not, has a null id
   // (Nov 9: all 26 students who joined a class fired it, then saw the class).
   useEffect(() => {
-    if (isChecking || loading || classroomLoading) return;
+    if (isChecking || loading || classroomLoading || teacherClassId) return;
     if (!classroomId) {
       posthog.capture('student_no_classroom_prompt_viewed', {
         class_id: null,
         has_class: false,
       });
     }
-  }, [isChecking, loading, classroomLoading, classroomId]);
+  }, [isChecking, loading, classroomLoading, classroomId, teacherClassId]);
 
   // The wait above is correct but it had no floor. A profile read that fails any
   // way other than PGRST116 never resolves and never logs, and the guest join
