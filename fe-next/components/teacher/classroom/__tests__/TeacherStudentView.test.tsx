@@ -28,7 +28,7 @@ import { StudentView, StudentViewFrame, TeacherStudentView } from '../TeacherStu
 import { readTeacherStudentMode } from '@/lib/education/teacherStudentMode';
 
 const t = (k: string) => k;
-const base = { userId: 'u1', classroomId: 'c1', classroomName: '7B English', teacherName: 'Ms Cohen', lessons: [{ lessonId: 'l1', status: 'assigned' as const }], error: false, onRetry: vi.fn(), onJoin: vi.fn(), isJoining: false, t };
+const base = { userId: 'u1', classroomId: 'c1', classroomName: '7B English', lessons: [{ lessonId: 'l1', status: 'assigned' as const }], error: false, onRetry: vi.fn(), t };
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -39,12 +39,10 @@ beforeEach(() => {
 });
 
 describe('StudentViewFrame', () => {
-  it('Given a class with lessons, Then the teacher sees the real student academy for that class with the live game open to try', () => {
+  it('Given a class with lessons, Then the teacher sees the real student academy for that class, led by the next lesson like a student, not a made-up live game', () => {
     render(<StudentViewFrame {...base} />);
     expect(screen.getByTestId('academy-hub')).toHaveTextContent('7B English:1');
-    expect(screen.getByTestId('academy-hub')).toHaveAttribute('data-live', 'Ms Cohen');
-    fireEvent.click(screen.getByTestId('academy-hub'));
-    expect(base.onJoin).toHaveBeenCalled();
+    expect(screen.getByTestId('academy-hub')).toHaveAttribute('data-live', '');
   });
 
   it('Given the lessons failed to load, Then it says so with a retry instead of an empty map', () => {
@@ -82,10 +80,4 @@ describe('StudentView (the student hub in student mode)', () => {
     expect(onMissing).not.toHaveBeenCalled();
   });
 
-  it('Given the teacher taps the live game, Then a practice run with bots opens with the teacher in a seat', async () => {
-    render(<StudentView classroomId="c1" onMissing={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('academy-hub'));
-    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/en/education/classroom-game?flow=x'));
-    expect(prepareRehearsal).toHaveBeenCalledWith(expect.objectContaining({ userId: 'T', classroomId: 'c1', source: 'class', withSeat: true }));
-  });
 });

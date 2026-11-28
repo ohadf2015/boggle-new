@@ -5,7 +5,9 @@ const { mockPush, auth } = vi.hoisted(() => ({ mockPush: vi.fn(), auth: { profil
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }), usePathname: () => '/en/student/review' }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k, language: 'en' }) }));
-vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => auth }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ ...auth, user: { id: 'u1' } }) }));
+const { prepareRehearsal } = vi.hoisted(() => ({ prepareRehearsal: vi.fn(async () => '/en/education/classroom-game?flow=quick') }));
+vi.mock('@/components/teacher/home/RehearseWithBotsButton', () => ({ prepareRehearsal }));
 
 import { TeacherStudentModeLayer } from '../TeacherStudentModeLayer';
 import { readTeacherStudentMode, startTeacherStudentMode } from '@/lib/education/teacherStudentMode';
@@ -32,6 +34,14 @@ describe('TeacherStudentModeLayer', () => {
     fireEvent.click(screen.getByTestId('teacher-student-mode-exit'));
     expect(readTeacherStudentMode()).toBeNull();
     expect(mockPush).toHaveBeenCalledWith('/en/teacher/classroom/c1');
+  });
+
+  it('Given a teacher in student mode taps Live game, Then a bot round for that class starts with the teacher in a seat', async () => {
+    startTeacherStudentMode('c1');
+    render(<TeacherStudentModeLayer>{page}</TeacherStudentModeLayer>);
+    fireEvent.click(screen.getByTestId('teacher-student-mode-live'));
+    await vi.waitFor(() => expect(mockPush).toHaveBeenCalledWith('/en/education/classroom-game?flow=quick'));
+    expect(prepareRehearsal).toHaveBeenCalledWith(expect.objectContaining({ userId: 'u1', classroomId: 'c1', source: 'class', withSeat: true }));
   });
 
   it('Given a student, or a teacher without student mode, Then the page renders untouched', () => {

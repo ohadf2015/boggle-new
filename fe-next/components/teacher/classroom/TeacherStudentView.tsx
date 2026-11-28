@@ -8,7 +8,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { AcademyHubView } from '@/components/student/academy/AcademyHubView';
-import { prepareRehearsal } from '@/components/teacher/home/RehearseWithBotsButton';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useAssignments } from '@/hooks/useAssignments';
 import { assignmentsToStudentLessons } from '@/lib/education/teacherStudentView';
@@ -40,15 +39,13 @@ function EnterStudentMode({ classroomId }: { classroomId: string }) {
 
 /** The student hub for a teacher in student mode: the class's lessons as a brand-new student of that class gets them. */
 export function StudentView({ classroomId, onMissing }: { classroomId: string; onMissing: () => void }) {
-  const { t, language } = useLanguage();
-  const { user, profile } = useAuth();
-  const router = useRouter();
+  const { t } = useLanguage();
+  const { user } = useAuth();
   const { classrooms, isLoading: classesLoading, error: classesError, refresh: refreshClasses } = useClassrooms();
   const classroom = classrooms.find((c) => c.id === classroomId);
   const missing = !classesLoading && !classesError && !classroom;
   const { assignments, isLoading, error, refresh } = useAssignments(classroomId);
   const lessons = useMemo(() => assignmentsToStudentLessons(assignments, classroomId), [assignments, classroomId]);
-  const [isJoining, setIsJoining] = useState(false);
 
   useEffect(() => {
     if (missing) onMissing();
@@ -56,23 +53,14 @@ export function StudentView({ classroomId, onMissing }: { classroomId: string; o
 
   if ((!classroom && !classesError) || (isLoading && assignments.length === 0)) return <PageLoader nested />;
 
-  const join = async () => {
-    if (isJoining) return;
-    setIsJoining(true);
-    router.push(await prepareRehearsal({ userId: user?.id, classroomId, source: 'class', language, t, withSeat: true }));
-  };
-
   return (
     <StudentViewFrame
       userId={user?.id ?? 'teacher-preview'}
       classroomId={classroomId}
       classroomName={classroom?.name ?? null}
-      teacherName={(profile as { display_name?: string | null } | null)?.display_name ?? ''}
       lessons={lessons}
       error={!!error || !!classesError}
       onRetry={() => void Promise.all([refresh(), refreshClasses()])}
-      onJoin={() => void join()}
-      isJoining={isJoining}
       t={t}
     />
   );
@@ -82,17 +70,14 @@ export interface StudentViewFrameProps {
   userId: string;
   classroomId: string;
   classroomName: string | null;
-  teacherName: string;
   lessons: StudentLesson[];
   error: boolean;
   onRetry: () => void;
   /** The live-game island: a practice run with bots, the teacher in a student seat. */
-  onJoin: () => void;
-  isJoining: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
-export function StudentViewFrame({ userId, classroomId, classroomName, teacherName, lessons, error, onRetry, onJoin, isJoining, t }: StudentViewFrameProps) {
+export function StudentViewFrame({ userId, classroomId, classroomName, lessons, error, onRetry, t }: StudentViewFrameProps) {
   if (error) {
     return (
       <div role="alert" className="m-4 flex flex-col items-center gap-3 rounded-neo-lg border-[3px] border-neo-black bg-edu-surface p-6 text-center text-edu-ink">
@@ -126,9 +111,9 @@ export function StudentViewFrame({ userId, classroomId, classroomName, teacherNa
           streakDoneToday: false,
           stars: 0,
         }}
-        liveGame={{ gameCode: 'rehearsal', teacherName, lessonNames: [], classroomId, classroomName, rehearsal: true }}
-        join={onJoin}
-        isJoining={isJoining}
+        liveGame={null}
+        join={noop}
+        isJoining={false}
         joinError={null}
         reward={null}
         clearReward={noop}

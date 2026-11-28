@@ -15696,6 +15696,7 @@ const sv = {
       "open": "Se elevappen",
       "banner": "Du ser det eleverna ser",
       "exit": "Avsluta",
+      "liveRound": "Livespel med bottar",
       "error": "Vi kunde inte ladda klassens lektioner.",
       "retry": "Försök igen",
       "studentName": "Du"

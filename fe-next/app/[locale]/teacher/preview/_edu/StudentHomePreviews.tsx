@@ -84,5 +84,5 @@ export function StudentHomePreview({ v }: { v?: string }) {
 export function TeacherStudentViewPreview() {
   const { t } = useLanguage();
   const fresh = [SPACE, WEATHER, ANIMALS].map((l) => ({ ...l, status: 'assigned' as const, progress: { words_mastered: [] } as unknown as StudentLesson['progress'] }));
-  return <StudentViewFrame userId="preview-teacher" classroomId={CLASS_ID} classroomName="7B English" teacherName="Ms Cohen" lessons={fresh} error={false} onRetry={noop} onJoin={noop} isJoining={false} t={t} />;
+  return <StudentViewFrame userId="preview-teacher" classroomId={CLASS_ID} classroomName="7B English" lessons={fresh} error={false} onRetry={noop} t={t} />;
 }
