@@ -23,7 +23,7 @@ afterEach(() => {
 });
 
 describe('HeroQuickLinks', () => {
-  it('given the hero row, then friends (pink) and daily (orange) sit side by side as equal half-width cards', () => {
+  it('given the hero row, then multiplayer (pink) and daily (orange) sit side by side as equal half-width cards', () => {
     renderRail({ lang: 'he' });
     const row = screen.getByTestId('hp-secondary');
     const friends = screen.getByTestId('hp-play-friends');
@@ -33,7 +33,7 @@ describe('HeroQuickLinks', () => {
     expect(daily.getAttribute('href')).toBe('/he/daily');
     expect(friends.className).toContain('bg-neo-pink');
     expect(daily.className).toContain('bg-neo-orange');
-    expect(friends.textContent).toBe(en.homePlay.chipFriends);
+    expect(friends.textContent).toBe(en.homePlay.chipMultiplayer);
   });
 
   it('given a card tap, then each fires its own event', () => {

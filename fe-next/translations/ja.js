@@ -2191,7 +2191,7 @@ const ja = {
     "bubbleBack": "おかえり！もう1回やる？",
     "bubbleBackName": "おかえり、{name}！",
     "bubbleStreak": "{n}日連続！この調子！",
-    "chipFriends": "友達と",
+    "chipMultiplayer": "マルチ対戦",
     "orFriends": "または友達とあそぶ",
     "tag": {
       "classic": "定番",

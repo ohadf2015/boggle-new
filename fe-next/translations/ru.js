@@ -2198,7 +2198,7 @@ const ru = {
     "bubbleBack": "С возвращением! Ещё раунд?",
     "bubbleBackName": "С возвращением, {name}!",
     "bubbleStreak": "Серия: {n} дн. подряд! Так держать.",
-    "chipFriends": "С друзьями",
+    "chipMultiplayer": "Онлайн",
     "orFriends": "или играй с друзьями",
     "tag": {
       "classic": "Оригинал",

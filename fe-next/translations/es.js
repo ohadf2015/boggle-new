@@ -2191,7 +2191,7 @@ const es = {
     "bubbleBack": "¡Hola de nuevo! ¿Otra ronda?",
     "bubbleBackName": "¡Qué bueno verte, {name}!",
     "bubbleStreak": "¡Racha de {n} días! Sigue así.",
-    "chipFriends": "Amigos",
+    "chipMultiplayer": "En línea",
     "orFriends": "o juega con amigos",
     "tag": {
       "classic": "Original",
