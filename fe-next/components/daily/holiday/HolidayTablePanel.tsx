@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { HolidayKey } from '@/lib/holidays/calendar';
+import { holidayAccentBg } from '@/components/holidays/holidayAccent';
 import { cn } from '@/lib/utils';
 import HolidayCandles from './HolidayCandles';
 import HolidayGifts from './HolidayGifts';
@@ -60,7 +61,7 @@ export default function HolidayTablePanel({ holiday }: { holiday: HolidayKey }) 
         <img src={`/holidays/together-${holiday}.webp`} alt="" width={512} height={300} className="h-14 w-auto" />
         <div className="flex-1">
           <p className="text-xs font-bold">{t('holiday.table.pitch', 'Play together: up to 8 friends, one shared goal every night.')}</p>
-          <button type="button" disabled={busy} onClick={() => act('create')} className={cn(BTN, 'mt-1.5 bg-neo-holiday-gold text-neo-navy')}>
+          <button type="button" disabled={busy} onClick={() => act('create')} className={cn(BTN, 'mt-1.5 text-neo-white', holidayAccentBg(holiday))}>
             {t('holiday.table.create', 'Start a holiday table')}
           </button>
         </div>
@@ -85,7 +86,7 @@ export default function HolidayTablePanel({ holiday }: { holiday: HolidayKey }) 
         <HolidayGifts total={table.board.nights.length} opened={lit} className="mt-2" />
       )}
       {lit === table.board.nights.length && (
-        <p data-testid="holiday-table-finale" className={cn('mt-2 rounded-lg border-2 border-black bg-neo-holiday-gold px-2 py-1 text-center font-neo-display text-xs font-bold text-neo-navy', styles.pop)}>
+        <p data-testid="holiday-table-finale" className={cn('mt-2 rounded-lg border-2 border-black px-2 py-1 text-center font-neo-display text-xs font-bold text-neo-white', holidayAccentBg(holiday), styles.pop)}>
           {holiday === 'hanukkah'
             ? t('holiday.table.finaleHanukkah', 'Full menorah! Your table lit every night together.')
             : t('holiday.table.finaleChristmas', 'Every gift opened! Your table played all 12 days together.')}
@@ -94,7 +95,7 @@ export default function HolidayTablePanel({ holiday }: { holiday: HolidayKey }) 
       <div className="mt-2" aria-label={t('holiday.table.goalLabel', 'Tonight’s group goal')}>
         <div className="h-3 overflow-hidden rounded-full border-2 border-black bg-neo-navy-light">
           <div
-            className="h-full w-full origin-left bg-neo-holiday-gold transition-transform duration-700 rtl:origin-right"
+            className={cn('h-full w-full origin-left transition-transform duration-700 rtl:origin-right', holidayAccentBg(holiday))}
             style={{ transform: `scaleX(${progress})` }}
           />
         </div>
@@ -104,11 +105,11 @@ export default function HolidayTablePanel({ holiday }: { holiday: HolidayKey }) 
       </div>
       <ol className="mt-2 space-y-1">
         {table.members.map((m) => (
-          <li key={m.userId} className={cn('flex items-center gap-2 rounded-lg px-2 py-1 text-xs', m.isYou ? 'bg-neo-holiday-gold/20' : 'bg-neo-navy-light')}>
+          <li key={m.userId} className={cn('flex items-center gap-2 rounded-lg px-2 py-1 text-xs', m.isYou ? 'bg-neo-cream/15' : 'bg-neo-navy-light')}>
             <span className="w-4 font-neo-display font-bold tabular-nums">{m.rank}</span>
             <span aria-hidden="true">{m.avatarEmoji ?? '🙂'}</span>
             <span className="flex-1 truncate font-bold">{m.isYou ? t('mp.rivals.you', 'You') : (m.name ?? t('holiday.table.player', 'Player'))}</span>
-            {m.playedToday && <span className="text-neo-holiday-gold">{t('holiday.table.playedToday', 'played')}</span>}
+            {m.playedToday && <span className="text-neo-cream">{t('holiday.table.playedToday', 'played')}</span>}
             <span className="font-neo-display font-bold tabular-nums">{m.total}</span>
           </li>
         ))}

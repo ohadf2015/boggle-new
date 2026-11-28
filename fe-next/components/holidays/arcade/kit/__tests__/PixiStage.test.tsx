@@ -109,4 +109,15 @@ describe('PixiStage tween safety', () => {
     expect(warn).toHaveBeenCalledTimes(1);
     warn.mockRestore();
   });
+
+  it('Given a Hebrew page, when a score floats up, then it reads +50 instead of flipping to 50+', async () => {
+    const create = vi.fn((ctx: { float: (x: number, y: number, text: string) => void }) => {
+      ctx.float(10, 10, '+50');
+      return { update: vi.fn() };
+    });
+    const { container } = render(<PixiStage art={[]} create={create as never} paused={false} reduced={false} sfx={sfx} label="game" />);
+    await waitFor(() => expect(create).toHaveBeenCalled());
+    const span = [...container.querySelectorAll('span')].find((s) => s.textContent === '+50');
+    expect(span).toHaveAttribute('dir', 'auto');
+  });
 });

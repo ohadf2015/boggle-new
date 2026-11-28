@@ -40,7 +40,6 @@ export async function holidayShareCard(i: {
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
   const navy = token('--neo-navy') || token('--neo-navy-light');
-  const gold = token('--neo-holiday-gold');
   const accent = token(i.holiday === 'hanukkah' ? '--neo-holiday-blue' : '--neo-holiday-red');
   const snow = token('--neo-holiday-snow');
   const black = rgbToken('--neo-black');
@@ -75,7 +74,7 @@ export async function holidayShareCard(i: {
   }
 
   ctx.textAlign = 'center';
-  ctx.fillStyle = gold;
+  ctx.fillStyle = snow;
   ctx.font = 'bold 76px Fredoka, Rubik, system-ui, sans-serif';
   ctx.fillText(i.headline, SIZE / 2, 820, SIZE - 120);
   ctx.fillStyle = snow;

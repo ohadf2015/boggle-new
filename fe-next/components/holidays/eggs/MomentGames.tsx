@@ -90,12 +90,12 @@ export function BellTap() {
 
   return (
     <div className="flex items-center gap-3">
-      <button type="button" onClick={strike} aria-label={t('holiday.moment.bells.label')} className="size-16 shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-holiday-gold">
+      <button type="button" onClick={strike} aria-label={t('holiday.moment.bells.label')} className="size-16 shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img key={ring} src="/holidays/gold-bell.webp" alt="" width={64} height={64} className={cn('size-full object-contain', ring > 0 && 'holiday-bell-ring')} />
       </button>
       <div>
-        <p className="font-neo-display text-2xl font-bold tabular-nums text-neo-holiday-gold" aria-live="polite">{count}/{BELLS}</p>
+        <p className="font-neo-display text-2xl font-bold tabular-nums text-neo-cream" aria-live="polite">{count}/{BELLS}</p>
         <p className="text-xs">{count >= BELLS ? t('holiday.moment.bells.done') : t('holiday.moment.bells.hint')}</p>
       </div>
     </div>
@@ -165,21 +165,21 @@ export function ChimesWish() {
     return (
       <div className="flex flex-col items-start gap-2">
         <p className="text-xs">{t(phase === 'lost' ? 'holiday.moment.chimes.lost' : 'holiday.moment.chimes.intro')}</p>
-        <button type="button" onClick={start} className={cn(btn, 'bg-neo-holiday-gold text-neo-navy')}>{t('holiday.moment.chimes.start')}</button>
+        <button type="button" onClick={start} className={cn(btn, 'bg-neo-holiday-red text-neo-white')}>{t('holiday.moment.chimes.start')}</button>
       </div>
     );
   }
-  if (phase === 'won') return <p className="holiday-pop-in font-neo-display text-sm font-bold text-neo-holiday-gold">{t('holiday.moment.chimes.won', { word: word.current })}</p>;
+  if (phase === 'won') return <p className="holiday-pop-in font-neo-display text-sm font-bold text-neo-cream">{t('holiday.moment.chimes.won', { word: word.current })}</p>;
   return (
     <div className="flex flex-col gap-2">
-      <p className="holiday-chime font-neo-display text-3xl font-bold tabular-nums text-neo-holiday-gold" aria-live="assertive">{left}</p>
+      <p className="holiday-chime font-neo-display text-3xl font-bold tabular-nums text-neo-cream" aria-live="assertive">{left}</p>
       <div className="flex flex-wrap gap-1.5">
         {tiles.current.map((ch, i) => (
           <button
             key={i}
             type="button"
             onClick={() => pick(i)}
-            className={cn('size-10 rounded-lg border-2 border-black font-neo-display text-lg font-bold', picked.includes(i) ? 'bg-neo-holiday-gold text-neo-navy' : 'bg-neo-cream text-neo-navy')}
+            className={cn('size-10 rounded-lg border-2 border-black font-neo-display text-lg font-bold', picked.includes(i) ? 'bg-neo-holiday-red text-neo-white' : 'bg-neo-cream text-neo-navy')}
           >
             {ch}
           </button>
@@ -230,7 +230,7 @@ export function RosconPick() {
             disabled={busy}
             onClick={() => pick(i)}
             aria-label={t('holiday.moment.roscon.slice', { n: i + 1 })}
-            className="absolute start-1/2 top-1/2 -ms-5 -mt-5 size-10 rounded-full border-2 border-black bg-neo-holiday-gold shadow-hard-sm active:scale-95"
+            className="absolute start-1/2 top-1/2 -ms-5 -mt-5 size-10 rounded-full border-2 border-black bg-neo-orange shadow-hard-sm active:scale-95"
             style={{ transform: `rotate(${i * 45}deg) translateY(-56px) rotate(${-i * 45}deg)` }}
           >
             <span className="block size-3 translate-x-3 rounded-full bg-neo-holiday-red" aria-hidden="true" />

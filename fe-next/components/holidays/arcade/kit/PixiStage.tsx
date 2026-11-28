@@ -119,6 +119,7 @@ export default function PixiStage({ className, label, ...props }: Props) {
       const float = (x: number, y: number, text: string, tone: FloatTone = 'gold') => {
         const span = document.createElement('span');
         span.className = cn(styles.float, TONE[tone], 'font-neo-display text-2xl font-black [text-shadow:2px_2px_0_rgb(var(--neo-black)),-1px_-1px_0_rgb(var(--neo-black))]');
+        span.dir = 'auto';
         span.textContent = text;
         span.style.left = `${view.x + x * view.scale}px`;
         span.style.top = `${view.y + y * view.scale}px`;

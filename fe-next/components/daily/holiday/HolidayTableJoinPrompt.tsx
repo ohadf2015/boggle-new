@@ -5,6 +5,8 @@ import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { HolidayKey } from '@/lib/holidays/calendar';
+import { holidayAccentBg } from '@/components/holidays/holidayAccent';
+import { cn } from '@/lib/utils';
 import { holidayApi } from './holidayApi';
 import { captureHolidayInvite, tableCodeFrom } from './holidayShare';
 
@@ -58,7 +60,7 @@ export default function HolidayTableJoinPrompt({ holiday }: { holiday: HolidayKe
         <button
           type="button"
           onClick={user ? join : () => setAuthOpen(true)}
-          className="mt-2 w-full rounded-xl border-[3px] border-black bg-neo-holiday-gold px-3 py-2 font-neo-display text-sm font-bold text-neo-navy shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed"
+          className={cn('mt-2 w-full rounded-xl border-[3px] border-black px-3 py-2 font-neo-display text-sm font-bold text-neo-white shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed', holidayAccentBg(holiday))}
         >
           {user ? t('holiday.table.join', 'Take my seat') : t('holiday.table.signInToJoin', 'Sign in to take your seat')}
         </button>

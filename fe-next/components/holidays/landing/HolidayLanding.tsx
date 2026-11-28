@@ -12,7 +12,7 @@ interface Props {
 }
 
 const ACCENT = {
-  hanukkah: { cta: 'bg-neo-holiday-gold text-neo-navy', ring: 'border-neo-holiday-blue', chip: 'bg-neo-holiday-blue text-neo-white', spark: '/holidays/props-star.webp' },
+  hanukkah: { cta: 'bg-neo-holiday-blue text-neo-white', ring: 'border-neo-holiday-blue', chip: 'bg-neo-holiday-blue text-neo-white', spark: '/holidays/props-star.webp' },
   christmas: { cta: 'bg-neo-holiday-red text-neo-white', ring: 'border-neo-holiday-pine', chip: 'bg-neo-holiday-pine text-neo-white', spark: '/holidays/props-snowflake.webp' },
 } as const;
 

@@ -42,7 +42,7 @@ function Banner({ art, children, onClose, tone = 'cream' }: { art: string; child
   const { t } = useLanguage();
   return (
     <div role="status" className="holiday-fx-dock pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+64px)] z-[80] flex justify-center px-4">
-      <div className={cn('holiday-banner-in pointer-events-auto flex max-w-md items-center gap-2 rounded-2xl border-[3px] border-black px-3 py-2 text-neo-navy shadow-hard', tone === 'gold' ? 'bg-neo-holiday-gold' : 'bg-neo-cream')}>
+      <div className={cn('holiday-banner-in pointer-events-auto flex max-w-md items-center gap-2 rounded-2xl border-[3px] border-black px-3 py-2 text-neo-navy shadow-hard', tone === 'gold' ? 'bg-neo-cyan' : 'bg-neo-cream')}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={art} alt="" width={36} height={36} className="size-9 shrink-0 object-contain" />
         <div className="min-w-0 flex-1 text-sm font-bold">{children}</div>

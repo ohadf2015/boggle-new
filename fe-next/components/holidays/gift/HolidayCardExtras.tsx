@@ -16,6 +16,7 @@ import type { HolidayProgressView } from '@/lib/holidayEvent/progressView';
 import { cn } from '@/lib/utils';
 import MysteryGift from './MysteryGift';
 import '../holidayFx.css';
+import { holidayAccentBg } from '@/components/holidays/holidayAccent';
 
 const HolidayWrapped = dynamic(() => import('../wrapped/HolidayWrapped'), { ssr: false });
 
@@ -47,7 +48,7 @@ function ZotHanukkah() {
       type="button"
       data-testid="holiday-zot"
       onClick={cheer}
-      className="holiday-pop-in flex items-center gap-3 rounded-xl border-[3px] border-black bg-neo-holiday-gold p-2 text-start text-neo-navy shadow-hard-sm"
+      className="holiday-pop-in flex items-center gap-3 rounded-xl border-[3px] border-black bg-neo-holiday-blue p-2 text-start text-neo-white shadow-hard-sm"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/holidays/props-menorah.webp" alt="" width={48} height={48} className="holiday-chime size-12 object-contain" />
@@ -77,7 +78,7 @@ function DreidelEgg() {
           celebrateHolidayEgg('dreidel_pe');
         }}
         onAnimationEnd={() => setSpin(false)}
-        className={cn('size-9 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-holiday-gold', spin && 'holiday-mascot-spin')}
+        className={cn('size-9 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream', spin && 'holiday-mascot-spin')}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/holidays/peek-dreidel.webp" alt="" width={36} height={36} className="size-full object-contain" />
@@ -174,8 +175,8 @@ export default function HolidayCardExtras({ holiday, win, today, view, locale }:
       )}
 
       {gift && missed !== null && !gift.comebackUsed && !openable && (
-        <p data-testid="holiday-comeback" className="flex items-center gap-2 rounded-lg border-2 border-dashed border-neo-holiday-gold px-2 py-1.5 text-xs">
-          <span className="font-bold text-neo-holiday-gold tabular-nums">{Math.min(gift.gamesToday, COMEBACK_GAMES)}/{COMEBACK_GAMES}</span>
+        <p data-testid="holiday-comeback" className="flex items-center gap-2 rounded-lg border-2 border-dashed border-neo-cream/60 px-2 py-1.5 text-xs">
+          <span className="font-bold text-neo-cream tabular-nums">{Math.min(gift.gamesToday, COMEBACK_GAMES)}/{COMEBACK_GAMES}</span>
           <span>{t(`holiday.comeback.${holiday}`, { day: missed + 1, count: Math.max(0, COMEBACK_GAMES - gift.gamesToday) })}</span>
         </p>
       )}
@@ -185,18 +186,18 @@ export default function HolidayCardExtras({ holiday, win, today, view, locale }:
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/holidays/gold-magnifier.webp" alt="" width={20} height={20} className="size-5 shrink-0 object-contain" />
           <span className="min-w-0 flex-1">{hunt.foundToday ? t('holiday.hunt.foundToday') : t(`holiday.hunt.hint.${hunt.slot}`)}</span>
-          <span className="shrink-0 font-bold tabular-nums text-neo-holiday-gold">{t('holiday.hunt.progress', { count: hunt.count, goal: hunt.goal })}</span>
+          <span className="shrink-0 font-bold tabular-nums text-neo-cream">{t('holiday.hunt.progress', { count: hunt.count, goal: hunt.goal })}</span>
         </p>
       )}
 
       <div className="flex flex-wrap items-center gap-1.5">
         {titles.map((id) => (
-          <span key={id} data-testid="holiday-title-badge" className="rounded-full border-2 border-black bg-neo-holiday-gold px-2 py-0.5 font-neo-display text-[11px] font-bold text-neo-navy">
+          <span key={id} data-testid="holiday-title-badge" className={cn('rounded-full border-2 border-black px-2 py-0.5 font-neo-display text-[11px] font-bold text-neo-white', holidayAccentBg(holiday))}>
             {t(`holiday.title.${id}`)}
           </span>
         ))}
         {holiday === 'hanukkah' && (
-          <span data-testid="holiday-candles" className="text-[11px] font-bold tabular-nums text-neo-holiday-gold">
+          <span data-testid="holiday-candles" className="text-[11px] font-bold tabular-nums text-neo-cream">
             {t('holiday.eggs.candles', { count: candles, total: FULL_MENORAH })}
           </span>
         )}

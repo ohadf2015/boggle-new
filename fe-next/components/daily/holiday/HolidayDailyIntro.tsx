@@ -75,7 +75,7 @@ export default function HolidayDailyIntro({ puzzleDate, language }: Props) {
         <h2 className="font-neo-display text-base font-bold">
           {hanukkah ? t('holiday.daily.nightlyTitle', 'Nightly Board') : t('holiday.daily.adventTitle', 'Advent Board')}
         </h2>
-        <span className="rounded-full border-2 border-black bg-neo-holiday-gold px-2 font-neo-display text-xs font-bold text-neo-navy">
+        <span className={cn('rounded-full border-2 border-black px-2 font-neo-display text-xs font-bold text-neo-white', hanukkah ? 'bg-neo-holiday-blue' : 'bg-neo-holiday-red')}>
           {hanukkah ? t('holiday.daily.nightN', 'Night {n}', { n: day }) : t('holiday.daily.giftN', 'Gift {n}', { n: day })}
         </span>
       </div>

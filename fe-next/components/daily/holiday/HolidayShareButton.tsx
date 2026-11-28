@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { avatarPngSrc } from '@/components/AvatarLite';
+import { holidayAccentBg } from '@/components/holidays/holidayAccent';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { HolidayKey } from '@/lib/holidays/calendar';
+import { cn } from '@/lib/utils';
 import { trackShareCompleted } from '@/utils/share';
 import { holidayShareCard, shareHolidayCard } from './holidayShareCard';
 
@@ -49,7 +51,7 @@ export default function HolidayShareButton({ holiday, day }: { holiday: HolidayK
       data-testid="holiday-share-card"
       disabled={busy}
       onClick={share}
-      className="w-full rounded-xl border-[3px] border-black bg-neo-holiday-gold px-3 py-2 font-neo-display text-sm font-bold text-neo-navy shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed disabled:opacity-60"
+      className={cn('w-full rounded-xl border-[3px] border-black px-3 py-2 font-neo-display text-sm font-bold text-neo-white shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed disabled:opacity-60', holidayAccentBg(holiday))}
     >
       {hanukkah ? t('holiday.shareCard.buttonHanukkah', 'Share my menorah') : t('holiday.shareCard.buttonChristmas', 'Share my gifts')}
     </button>

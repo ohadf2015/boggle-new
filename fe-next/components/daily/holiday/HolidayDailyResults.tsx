@@ -121,7 +121,7 @@ function HolidayDailyResultsBody({ puzzleDate, language }: { puzzleDate: string;
       )}
 
       {relit && (
-        <p role="status" className="rounded-xl border-2 border-black bg-neo-holiday-gold px-3 py-2 font-neo-display text-sm font-bold text-neo-navy">
+        <p role="status" className="rounded-xl border-2 border-black bg-neo-cyan px-3 py-2 font-neo-display text-sm font-bold text-neo-navy">
           {hanukkah
             ? t('holiday.rescue.relitHanukkah', 'You relit night {n} for your friend!', { n: relit })
             : t('holiday.rescue.relitChristmas', 'You filled your friend’s stocking for day {n}!', { n: relit })}

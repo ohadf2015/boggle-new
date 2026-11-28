@@ -81,7 +81,7 @@ export default function HolidayCracker({ puzzleDate, initial }: { puzzleDate: st
           style={popped ? undefined : { transform: `translateX(${-pull / 2}px) rotate(${-pull / 10}deg)` }}
         />
         <span
-          className={cn('absolute start-1/2 h-10 w-24 rounded-e-full border-[3px] border-black bg-neo-holiday-gold shadow-hard-sm', styles.tug, popped && styles.snapRight)}
+          className={cn('absolute start-1/2 h-10 w-24 rounded-e-full border-[3px] border-black bg-neo-holiday-pine shadow-hard-sm', styles.tug, popped && styles.snapRight)}
           style={popped ? undefined : { transform: `translateX(${pull / 2}px) rotate(${pull / 10}deg)` }}
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}

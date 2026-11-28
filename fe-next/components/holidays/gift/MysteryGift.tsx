@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { HolidayKey } from '@/lib/holidays/calendar';
+import { holidayAccentBg } from '@/components/holidays/holidayAccent';
 import { giftHintIndex, type GiftReward } from '@/lib/holidays/gift';
 import { cn } from '@/lib/utils';
 import '../holidayFx.css';
@@ -38,7 +39,7 @@ export function RewardLine({ reward }: { reward: GiftReward }) {
   const { t } = useLanguage();
   return (
     <div data-testid="mystery-gift-reward" className="holiday-pop-in flex flex-wrap items-center justify-center gap-1.5 font-neo-display text-sm font-bold">
-      <span className="rounded-full border-2 border-black bg-neo-holiday-gold px-2 py-0.5 text-neo-navy">{t('holiday.reward.coins', { count: reward.coins })}</span>
+      <span className="rounded-full border-2 border-black bg-neo-cream px-2 py-0.5 text-neo-navy">{t('holiday.reward.coins', { count: reward.coins })}</span>
       {reward.partKey && (
         <span className="rounded-full border-2 border-black bg-neo-cream px-2 py-0.5 text-neo-navy">
           {t(`holiday.part.${reward.partKey.slice(reward.partKey.indexOf(':') + 1)}`)}
@@ -93,7 +94,7 @@ export default function MysteryGift({ holiday, tier, openable, opened, finale, s
   if (reward) {
     return (
       <div data-testid="mystery-gift" data-state="opened" className="flex flex-col items-center gap-2 rounded-xl border-2 border-black bg-neo-navy p-3 text-center">
-        <p className="font-neo-display text-sm font-bold text-neo-holiday-gold">{t('holiday.gift.openedTitle')}</p>
+        <p className="font-neo-display text-sm font-bold text-neo-cream">{t('holiday.gift.openedTitle')}</p>
         <RewardLine reward={reward} />
       </div>
     );
@@ -111,7 +112,7 @@ export default function MysteryGift({ holiday, tier, openable, opened, finale, s
           setGrew(false);
         }}
         className={cn(
-          'relative size-20 shrink-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-holiday-gold',
+          'relative size-20 shrink-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream',
           phase === 'opening' ? 'holiday-gift-burst' : shaking ? 'holiday-gift-shake' : grew ? 'holiday-gift-grow' : 'holiday-gift-idle',
         )}
       >
@@ -134,12 +135,12 @@ export default function MysteryGift({ holiday, tier, openable, opened, finale, s
             type="button"
             onClick={open}
             disabled={phase === 'opening'}
-            className="mt-2 rounded-lg border-2 border-black bg-neo-holiday-gold px-3 py-1 font-neo-display text-xs font-bold text-neo-navy shadow-hard-sm holiday-chime active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+            className={cn('mt-2 rounded-lg border-2 border-black px-3 py-1 font-neo-display text-xs font-bold text-neo-white shadow-hard-sm holiday-chime active:translate-x-0.5 active:translate-y-0.5 active:shadow-none', holidayAccentBg(holiday))}
           >
             {t('holiday.gift.openCta')}
           </button>
         ) : (
-          <p className="mt-1 text-[11px] font-bold text-neo-holiday-gold">{t('holiday.gift.opensOn', { day: formatDay(finale, language) })}</p>
+          <p className="mt-1 text-[11px] font-bold text-neo-cream">{t('holiday.gift.opensOn', { day: formatDay(finale, language) })}</p>
         )}
       </div>
     </div>

@@ -6,7 +6,7 @@
 html.holiday-hanukkah.holiday-live .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) {
   outline: 3px solid var(--neo-holiday-blue);
   outline-offset: 4px;
-  box-shadow: 6px 6px 0 var(--neo-holiday-gold);
+  box-shadow: 6px 6px 0 var(--neo-holiday-blue-dark);
   border-radius: 1rem;
 }
 
@@ -29,7 +29,7 @@ html.holiday-christmas.holiday-live .game-board-frame:not([class*='cosmetic-boar
 }
 
 html.holiday-hanukkah.holiday-live .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) [data-board]:not([data-ghost]) [data-tile]:not([data-empty])::before {
-  background: linear-gradient(to top, var(--neo-holiday-blue) 0 12%, var(--neo-holiday-gold) 12% 16%, transparent 16%);
+  background: linear-gradient(to top, var(--neo-holiday-blue) 0 12%, var(--neo-holiday-snow) 12% 16%, transparent 16%);
 }
 
 html.holiday-christmas.holiday-live .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) [data-board]:not([data-ghost]) [data-tile]:not([data-empty])::before {
@@ -47,8 +47,8 @@ html.holiday-christmas.holiday-live .game-board-frame:not([class*='cosmetic-boar
 
 html.holiday-christmas.holiday-live .holiday-bonus-tile:not([data-sel]):not([data-fx]) {
   background:
-    linear-gradient(90deg, transparent 42%, var(--neo-holiday-gold) 42% 58%, transparent 58%),
-    linear-gradient(0deg, transparent 42%, var(--neo-holiday-gold) 42% 58%, transparent 58%),
+    linear-gradient(90deg, transparent 42%, var(--neo-holiday-pine) 42% 58%, transparent 58%),
+    linear-gradient(0deg, transparent 42%, var(--neo-holiday-pine) 42% 58%, transparent 58%),
     var(--neo-holiday-red) !important;
   border-color: var(--neo-holiday-red-dark) !important;
   color: var(--neo-holiday-snow) !important;
@@ -92,7 +92,7 @@ html.holiday-christmas .holiday-mascot-christmas {
 
   html.holiday-hanukkah.holiday-live body:not([data-lc-heavy-game]):not([data-holiday-calm])::after {
     background-image:
-      radial-gradient(circle, color-mix(in srgb, var(--neo-holiday-gold) 50%, transparent) 0 1.2px, transparent 2.2px),
+      radial-gradient(circle, color-mix(in srgb, var(--neo-holiday-snow) 50%, transparent) 0 1.2px, transparent 2.2px),
       radial-gradient(circle, color-mix(in srgb, var(--neo-holiday-blue) 35%, transparent) 0 1px, transparent 2px);
     background-size: 160px 160px, 96px 96px;
     background-position: 0 0, 70px 30px;
@@ -135,7 +135,7 @@ html.holiday-christmas.holiday-preview .holiday-hero-glow::before {
 
 html.holiday-hanukkah.holiday-preview .holiday-hero-glow::before {
   background-image:
-    radial-gradient(circle, color-mix(in srgb, var(--neo-holiday-gold) 45%, transparent) 0 1.2px, transparent 2.2px),
+    radial-gradient(circle, color-mix(in srgb, var(--neo-holiday-snow) 45%, transparent) 0 1.2px, transparent 2.2px),
     radial-gradient(circle, color-mix(in srgb, var(--neo-holiday-blue) 30%, transparent) 0 1px, transparent 2px);
   background-size: 150px 150px, 90px 90px;
   background-position: 0 0, 60px 25px;

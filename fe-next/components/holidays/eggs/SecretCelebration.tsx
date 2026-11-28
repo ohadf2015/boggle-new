@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { HolidayKey } from '@/lib/holidays/calendar';
+import { holidayAccentBg } from '@/components/holidays/holidayAccent';
+import { cn } from '@/lib/utils';
 import { secretWordIds } from '@/lib/holidays/eggs';
 import { HOLIDAY_EGG_EVENT, holidayGet, holidayQuery } from '@/lib/holidays/holidayClient';
 import { hasSupabaseSession } from '@/utils/onboardingStorage';
@@ -54,7 +56,7 @@ export default function SecretCelebration({ holiday }: { holiday: HolidayKey }) 
   const left = ids.filter((id) => !found.has(id)).length;
   return (
     <div role="status" className="holiday-fx-dock pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+72px)] z-[85] flex justify-center px-4">
-      <div className="holiday-banner-in flex items-center gap-3 rounded-2xl border-[3px] border-black bg-neo-holiday-gold px-4 py-2 text-neo-navy shadow-hard">
+      <div className={cn('holiday-banner-in flex items-center gap-3 rounded-2xl border-[3px] border-black px-4 py-2 text-neo-white shadow-hard', holidayAccentBg(holiday))}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/holidays/gold-key.webp" alt="" width={40} height={40} className="size-10 object-contain" />
         <div>
