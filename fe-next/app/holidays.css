@@ -6,7 +6,7 @@
 html.holiday-hanukkah.holiday-live .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) {
   outline: 3px solid var(--neo-holiday-blue);
   outline-offset: 4px;
-  box-shadow: 6px 6px 0 var(--neo-holiday-blue-dark);
+  box-shadow: 6px 6px 0 var(--neo-holiday-snow);
   border-radius: 1rem;
 }
 
