@@ -14,12 +14,9 @@ describe('Pick-a-game on a tall screen: the tiles grow into the leftover height'
     expect(scroll.className).toContain('overflow-y-auto');
   });
 
-  it('Given leftover height, Then each cover grows by the space left (never taller than square, the covers are 4:5 portraits), and a laptop or 1080p wall gets a 4:1 strip so the first row clears the Start bar', () => {
+  it('Given any lobby height, Then the colour header keeps a fixed height, with no viewport-height rule a TV zoom would misread', () => {
     render(<LobbyModeGrid selected="vocab-quiz" onPick={() => {}} t={(k) => k} />);
     const cover = screen.getAllByTestId('mode-card-cover')[0].closest('[data-accent-decor]')!;
-    expect(cover.className).toMatch(/@2xl:min-h-\[min\(calc\(50cqh-[\d.]+rem\),calc\(25cqw-[\d.]+rem\)\)\]/);
-    expect(cover.className).toContain('@2xl:aspect-[16/9]');
-    expect(cover.className).toContain('@2xl:[@media(max-height:1100px)]:aspect-[4/1]');
-    expect(cover.className).toContain('@2xl:[@media(max-height:1100px)]:min-h-0');
+    expect(cover.className).not.toMatch(/@media|cqh|aspect-\[/);
   });
 });

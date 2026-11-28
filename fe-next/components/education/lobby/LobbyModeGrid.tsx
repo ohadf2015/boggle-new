@@ -143,55 +143,48 @@ function ModeTile({
         if (!selected && !blockedReason) onPick(mode.id);
       }}
       className={cn(
-        'group relative flex min-w-0 items-center gap-2 overflow-hidden rounded-neo border-2 bg-edu-surface p-1.5 text-start text-edu-ink',
+        'group relative flex min-w-0 flex-col overflow-hidden rounded-neo-lg border-2 bg-edu-surface text-start text-edu-ink shadow-hard-sm',
         'motion-safe:animate-[lc-mode-in_360ms_cubic-bezier(0.23,1,0.32,1)_backwards]',
         mode.category === 'together' && 'col-span-2 @2xl:col-span-1',
         blockedReason && 'cursor-not-allowed border-dashed [&_img]:grayscale',
-        '@2xl:flex-col @2xl:items-stretch @2xl:gap-0 @2xl:p-0',
         'transition-[border-color,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.98] motion-reduce:transition-none',
         'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface disabled:cursor-wait',
         selected
           ? 'border-neo-black ring-[3px] ring-neo-pink ring-offset-2 ring-offset-edu-page'
-          : blockedReason
-            ? 'border-edu-line'
-            : 'border-edu-line [@media(hover:hover)]:hover:border-edu-line',
+          : 'border-edu-line',
       )}
     >
       <span
         data-accent-decor
         className={cn(
-          'relative grid shrink-0 place-items-center overflow-hidden rounded-[6px] p-1 @2xl:aspect-[16/9] @2xl:size-auto @2xl:w-full @2xl:rounded-none @2xl:border-b-2 @2xl:border-neo-black @2xl:p-2',
+          'relative w-full shrink-0 overflow-hidden border-b-2 border-neo-black',
           ARCADE_BLOCK[accent],
-          dense
-            ? 'size-10 @2xl:[@media(max-height:800px)]:aspect-[3/1]'
-            : 'size-12 @2xl:min-h-[min(calc(50cqh-12rem),calc(25cqw-0.75rem))] @2xl:[@media(max-height:1100px)]:aspect-[4/1] @2xl:[@media(max-height:1100px)]:min-h-0',
+          dense ? 'h-20 @2xl:h-24' : 'h-24 @2xl:h-28',
         )}
       >
-        <span className="relative block h-full w-full -rotate-2 overflow-hidden rounded-[4px] border-2 border-neo-black shadow-hard transition-transform duration-150 group-hover:rotate-0 motion-reduce:transition-none">
-          {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover, same file as the catalogue */}
-          <img
-            data-testid="mode-card-cover"
-            src={mode.cover}
-            alt=""
-            aria-hidden="true"
-            loading="eager"
-            decoding="async"
-            className="pointer-events-none h-full w-full select-none object-cover object-[50%_28%]"
-          />
-        </span>
+        {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover, same file as the catalogue */}
+        <img
+          data-testid="mode-card-cover"
+          src={mode.sticker}
+          alt=""
+          aria-hidden="true"
+          loading="eager"
+          decoding="async"
+          className="pointer-events-none absolute inset-x-0 inset-y-[6%] mx-auto h-[88%] w-full select-none object-contain drop-shadow-[2px_3px_0_rgb(0_0_0/0.18)] transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] [@media(hover:hover)]:group-hover:-translate-y-1 [@media(hover:hover)]:group-hover:scale-105 motion-reduce:transition-none"
+        />
         {selected ? (
           <span
             data-testid="mode-selected-check"
             aria-hidden="true"
-            className="absolute end-1 top-1 grid size-6 place-items-center rounded-full border-2 border-neo-black bg-edu-surface"
+            className="absolute end-1.5 top-1.5 grid size-7 place-items-center rounded-full border-2 border-neo-black bg-edu-surface"
           >
-            <Check className="size-3.5 text-edu-pink-ink" strokeWidth={4} />
+            <Check className="size-4 text-edu-pink-ink" strokeWidth={4} />
           </span>
         ) : null}
       </span>
-      <span className="flex min-w-0 flex-1 flex-col gap-1 @2xl:px-2.5 @2xl:py-2">
+      <span className="flex min-w-0 flex-1 flex-col gap-1 px-2.5 py-2 @2xl:gap-1.5 @2xl:px-3 @2xl:py-2.5">
         <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
-          <span className="font-neo-display text-sm font-bold leading-tight @2xl:text-base">{name}</span>
+          <span className="font-neo-display text-base font-bold leading-tight @2xl:text-lg">{name}</span>
           {newLabel ? (
             <span data-testid="mode-suggestion" data-mode={mode.id} title={t('eduShell.host.untriedHint')} className={STICKER}>
               <Sparkles className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
@@ -204,7 +197,7 @@ function ModeTile({
             </span>
           ) : null}
         </span>
-        <span className="flex min-w-0 flex-nowrap items-center gap-x-2 whitespace-nowrap font-neo-body text-xs font-bold text-edu-ink/70 [@media(max-height:860px)]:@2xl:hidden">
+        <span className="flex min-w-0 flex-nowrap items-center gap-x-2 whitespace-nowrap font-neo-body text-xs font-bold text-edu-ink/70">
           <span className="inline-flex items-center gap-1 whitespace-nowrap">
             <Clock className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
             {minutesLabel}
@@ -220,7 +213,7 @@ function ModeTile({
             {blockedReason}
           </span>
         ) : hint ? (
-          <span data-testid="mode-hint" className={cn('font-neo-body text-xs leading-snug text-edu-ink/80 [@media(max-height:1100px)]:@2xl:hidden', mode.category !== 'together' && 'hidden @2xl:block')}>
+          <span data-testid="mode-hint" className={cn('font-neo-body text-xs leading-snug text-edu-ink/80', mode.category !== 'together' && 'hidden @2xl:block')}>
             {hint}
           </span>
         ) : null}

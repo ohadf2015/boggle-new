@@ -45,10 +45,12 @@ export interface CatalogueMode {
   poster: string;
   /** Full poster for the mode's picker card and Home tile; `poster` stays the transparent sticker. */
   cover: string;
+  /** Transparent cube-mascot sticker for the lobby's mode cards and ready panel. */
+  sticker: string;
   accent: ModeAccent;
 }
 
-type Row = Omit<CatalogueMode, 'suffix' | 'stepsKey' | 'poster' | 'cover' | 'accent' | 'launch' | 'nameKey' | 'howKey'>;
+type Row = Omit<CatalogueMode, 'suffix' | 'stepsKey' | 'poster' | 'cover' | 'sticker' | 'accent' | 'launch' | 'nameKey' | 'howKey'>;
 
 // Classic and Vocab Quiz lead: classroom rooms that actually start a round and that students finish.
 // Wordcraft and Crossword are played one board per student but raced on one class leaderboard, so they are offered as "play together".
@@ -72,12 +74,13 @@ const STEPS_KEY: Record<string, string> = { crossword: 'eduCrossword.steps' };
 const MODES: readonly CatalogueMode[] = ROWS.flatMap((row): CatalogueMode[] => {
   const launch = launchOf(row.id);
   const cover = `/mascot/teacher/modes/covers-v3/${row.id}.webp`;
+  const sticker = `/mascot/teacher/modes/stickers/${row.id}.webp`;
   if (row.id === BOSS_BATTLE_ID) {
-    return [{ ...row, launch, suffix: 'bossBattle', stepsKey: 'eg2Modes.steps.bossBattle', nameKey: 'eg2Modes.boss.name', howKey: 'classroomBoss.cardHow', poster: BOSS_CARD_POSTER, cover, accent: 'pink' }];
+    return [{ ...row, launch, suffix: 'bossBattle', stepsKey: 'eg2Modes.steps.bossBattle', nameKey: 'eg2Modes.boss.name', howKey: 'classroomBoss.cardHow', poster: BOSS_CARD_POSTER, cover, sticker, accent: 'pink' }];
   }
   const base = teacherGameMode(launch.gameMode);
   if (!base) return [];
-  return [{ ...row, launch, suffix: base.nameKeySuffix, stepsKey: STEPS_KEY[row.id] ?? `eg2Modes.steps.${base.nameKeySuffix}`, nameKey: base.nameKey, howKey: base.howKey, poster: base.poster, cover, accent: base.accent }];
+  return [{ ...row, launch, suffix: base.nameKeySuffix, stepsKey: STEPS_KEY[row.id] ?? `eg2Modes.steps.${base.nameKeySuffix}`, nameKey: base.nameKey, howKey: base.howKey, poster: base.poster, cover, sticker, accent: base.accent }];
 });
 
 /** The three modes classes play most; they get a "Most popular" tag and lead the landing. */
