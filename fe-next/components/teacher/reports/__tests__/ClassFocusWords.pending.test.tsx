@@ -25,4 +25,11 @@ describe('ClassFocusWords while the class metrics are still loading', () => {
     render(<ClassFocusWords classroomId="c1" classroomName="7B" fallback={[]} surface="reports" />);
     expect(screen.getByTestId('class-focus-start')).toBeInTheDocument();
   });
+
+  it('swaps in a new element when the words arrive, so the browser does not score the placeholder as moving into the second column', () => {
+    const { rerender } = render(<ClassFocusWords classroomId="c1" classroomName="7B" fallback={[]} fallbackPending surface="reports" />);
+    const placeholder = screen.getByTestId('class-focus-loading');
+    rerender(<ClassFocusWords classroomId="c1" classroomName="7B" fallback={[{ word: 'earth', errorRate: 1, studentCount: 1 }]} surface="reports" />);
+    expect(placeholder.isConnected).toBe(false);
+  });
 });
