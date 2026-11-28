@@ -16335,8 +16335,15 @@ const sv = {
       "cardSeeAllStudents": "Visa alla {{count}} elever",
       "cardRosterTitle": "Elever i {{name}}",
       "cardClassReport": "Klassrapport",
+      "assignTitle": "Läxa",
+      "assignBody": "Välj en ordlista och ett datum. Eleverna spelar på sina egna mobiler.",
+      "assignCta": "Ge en läxa",
       "presets": {
-        "title": "Snabbinställningar",
+        "title": "Hur ska klassen spela?",
+        "traitSolo": "Var för sig",
+        "traitTeams": "{{count}} lag",
+        "traitAllWords": "Alla ord i lektionen",
+        "traitWords": "Upp till {{count}} ord",
         "fridayBattle": {
           "name": "Fredagens ordkamp",
           "desc": "Två lag tävlar om att hitta lektionsorden"
@@ -16661,6 +16668,10 @@ const sv = {
       "typeLabel": "Uppgiftstyp",
       "practiceMode": "Övningsläge",
       "duelChallenge": "Duellutmaning",
+      "practiceHint": "Kort, quiz och stavning med listan",
+      "duelHint": "Eleverna utmanar en klasskompis på orden",
+      "alreadyAssignedNote": "Klassen har redan den här listan. Om du delar ut den igen uppdateras bara datum och aktivitet.",
+      "assignTo": "Dela ut till {{name}}",
       "lessonLabel": "Välj lektion",
       "selectLesson": "Välj en lektion",
       "words": "ord",

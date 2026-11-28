@@ -16,12 +16,11 @@ import { cn } from '@/lib/utils';
 import { Dialog } from '@/components/ui/dialog';
 import { NbDialogBody, NbDialogContent, NbDialogFooter, NbDialogHeader } from '@/components/teacher/nb/NbDialog';
 import { NbAdvanced } from '@/components/teacher/nb/NbAdvanced';
-import { NB_BLOCK, NB_INPUT, NB_PRIMARY, NB_SECONDARY, NB_SMALL } from '@/components/teacher/nb/nbStyles';
-import { Swords, BookOpen } from 'lucide-react';
-import { AssignmentWordcraftOption } from './AssignmentWordcraftOption';
+import { NB_INPUT, NB_PRIMARY, NB_SECONDARY } from '@/components/teacher/nb/nbStyles';
+import { AssignmentModeStep } from './AssignmentModeStep';
 import { contentLanguagesFor } from '@/components/education/pickers/ContentLanguageChips';
 import { wordCraftHomeworkSupports } from '@/lib/word-craft/lessonBag';
-import { AssignmentCreatorDueDate, assignmentSubmitHintKey } from './AssignmentCreatorDueDate';
+import { AssignmentCreatorDueDate, assignmentSubmitHintKey, localDayPlus } from './AssignmentCreatorDueDate';
 import { AssignmentStep } from './AssignmentStep';
 import { AssignmentLessonStep } from './AssignmentLessonStep';
 import toast from 'react-hot-toast';
@@ -56,6 +55,9 @@ import {
   type WordGoalKind,
 } from '@/lib/education/wordGoalAssignment';
 import { pluralKeyOf } from '@/lib/i18n/pluralKey';
+
+/** A week out: the usual homework rhythm, so the dialog is ready to send the moment a list is picked. */
+const DEFAULT_DUE_DAYS = 7;
 
 interface AssignmentCreatorProps {
   classroomId: string;
@@ -139,7 +141,7 @@ export default function AssignmentCreator({
       setSelectedType('wordcraft');
       setGalleryLanguage(null);
       setSelectedLessonId(initialLessonId ?? '');
-      setDueDate('');
+      setDueDate(localDayPlus(DEFAULT_DUE_DAYS));
       setInstructions('');
       setFocus('any');
       setWordCount(WORD_COUNT_DEFAULT);
@@ -309,9 +311,8 @@ export default function AssignmentCreator({
     showFailure(result.assignmentError || result.error);
   };
 
-  const modeButton = (on: boolean, color: 'cyan' | 'pink') =>
-    cn(NB_SMALL, 'min-h-12 w-full gap-2 whitespace-normal px-3 text-start', on ? NB_BLOCK[color] : NB_BLOCK.navy);
-  const advancedInUse = selectedType !== 'wordcraft' || instructions.trim() !== '';
+  const advancedInUse = isWordGoal || instructions.trim() !== '';
+  const alreadyAssigned = !isWordGoal && !!selectedLessonId && (assignments ?? []).some((a) => a.lesson_id === selectedLessonId);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
@@ -370,8 +371,20 @@ export default function AssignmentCreator({
                 {t('teacher.assignment.galleryBrowse')}
               </button>
 
+              {alreadyAssigned ? (
+                <p data-testid="assignment-already-note" role="status" className="rounded-neo border-2 border-edu-line bg-edu-tile px-3 py-2 font-neo-body text-sm font-bold text-edu-ink">
+                  {t('teacher.assignment.alreadyAssignedNote')}
+                </p>
+              ) : null}
+
               <AssignmentStep step="mode" n={2} label={t('teacher.assignment.typeLabel')}>
-                <AssignmentWordcraftOption selected={selectedType === 'wordcraft'} disabled={!wordcraftOk} onSelect={() => setSelectedType('wordcraft')} t={t} />
+                <AssignmentModeStep selected={selectedType} wordcraftOk={wordcraftOk} onSelect={setSelectedType} t={t}>
+                  {selectedType === 'practice' && selectedLesson && (
+                    <div className="mt-3">
+                      <AssignmentFocusPicker focus={focus} onFocus={setFocus} supportedFocuses={supportedFocuses} focusCounts={focusCounts} language={language} t={t} />
+                    </div>
+                  )}
+                </AssignmentModeStep>
               </AssignmentStep>
 
               <AssignmentStep step="due" n={3} label={t('teacher.assignment.dueDate')}>
@@ -384,16 +397,6 @@ export default function AssignmentCreator({
                 label={t('teacher.assignment.moreOptions')}
                 closeLabel={t('eduShell.setup.advancedClose')}
               >
-                <div className="grid grid-cols-2 gap-3">
-                  <button type="button" aria-pressed={selectedType === 'practice'} onClick={() => setSelectedType('practice')} className={modeButton(selectedType === 'practice', 'cyan')}>
-                    <BookOpen className="size-5 shrink-0" aria-hidden="true" />
-                    <span>{t('teacher.assignment.practiceMode')}</span>
-                  </button>
-                  <button type="button" aria-pressed={selectedType === 'duel'} onClick={() => setSelectedType('duel')} className={modeButton(selectedType === 'duel', 'pink')}>
-                    <Swords className="size-5 shrink-0" aria-hidden="true" />
-                    <span>{t('teacher.assignment.duelChallenge')}</span>
-                  </button>
-                </div>
                 <AssignmentGoalModes
                   selectedType={selectedType}
                   onSelect={(kind) => setSelectedType(kind)}
@@ -403,9 +406,6 @@ export default function AssignmentCreator({
                   onWordListRaw={setWordListRaw}
                   t={t}
                 />
-                {selectedType === 'practice' && selectedLesson && (
-                  <AssignmentFocusPicker focus={focus} onFocus={setFocus} supportedFocuses={supportedFocuses} focusCounts={focusCounts} language={language} t={t} />
-                )}
                 <div>
                   <label htmlFor="assignment-instructions" className="mb-2 block font-neo-body text-sm font-bold text-edu-ink">
                     {t('teacher.assignment.instructionsLabel')} {t('common.optional')}
@@ -444,7 +444,11 @@ export default function AssignmentCreator({
                 disabled={isSubmitting || (!isWordGoal && !selectedLessonId) || !dueDate}
                 className={cn(NB_PRIMARY, 'sm:min-w-44')}
               >
-                {isSubmitting ? t('teacher.assignment.creating') : t('teacher.assignment.create')}
+                {isSubmitting
+                  ? t('teacher.assignment.creating')
+                  : classroom
+                    ? t('teacher.assignment.assignTo', { name: classroom.name })
+                    : t('teacher.assignment.create')}
               </button>
             </NbDialogFooter>
           </>

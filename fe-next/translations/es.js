@@ -15951,8 +15951,15 @@ const es = {
       "cardSeeAllStudents": "Ver los {{count}} alumnos",
       "cardRosterTitle": "Alumnos de {{name}}",
       "cardClassReport": "Informe de la clase",
+      "assignTitle": "Tareas",
+      "assignBody": "Elige una lista de palabras y una fecha. Los alumnos juegan en su propio móvil.",
+      "assignCta": "Asignar tarea",
       "presets": {
-        "title": "Ajustes rápidos",
+        "title": "¿Cómo va a jugar la clase?",
+        "traitSolo": "Cada uno por su cuenta",
+        "traitTeams": "{{count}} equipos",
+        "traitAllWords": "Todas las palabras de la lección",
+        "traitWords": "Hasta {{count}} palabras",
         "fridayBattle": {
           "name": "Batalla de vocabulario del viernes",
           "desc": "Dos equipos compiten por encontrar las palabras de la lección"
@@ -16707,6 +16714,10 @@ const es = {
       "typeLabel": "Tipo de tarea",
       "practiceMode": "Modo práctica",
       "duelChallenge": "Desafío de duelo",
+      "practiceHint": "Tarjetas, cuestionarios y ortografía con la lista",
+      "duelHint": "Los alumnos retan a un compañero con las palabras",
+      "alreadyAssignedNote": "Esta clase ya tiene esta lista. Si la vuelves a asignar, solo se actualizan la fecha y la actividad.",
+      "assignTo": "Asignar a {{name}}",
       "lessonLabel": "Elegir lección",
       "selectLesson": "Elige una lección",
       "words": "palabras",

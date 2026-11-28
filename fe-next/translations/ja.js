@@ -16024,8 +16024,15 @@ const ja = {
       "cardSeeAllStudents": "生徒 {{count}} 人をすべて見る",
       "cardRosterTitle": "{{name}} の生徒",
       "cardClassReport": "クラスのレポート",
+      "assignTitle": "宿題",
+      "assignBody": "単語リストと期限を選ぶだけ。生徒は自分のスマホで遊べます。",
+      "assignCta": "宿題を出す",
       "presets": {
-        "title": "クイック設定",
+        "title": "クラスでどう遊ぶ？",
+        "traitSolo": "ひとりずつ",
+        "traitTeams": "{{count}}チーム",
+        "traitAllWords": "レッスンの単語すべて",
+        "traitWords": "最大{{count}}語",
         "fridayBattle": {
           "name": "金曜単語バトル",
           "desc": "2チームで授業の単語を探して競争"
@@ -16350,6 +16357,10 @@ const ja = {
       "typeLabel": "課題タイプ",
       "practiceMode": "練習モード",
       "duelChallenge": "デュエルチャレンジ",
+      "practiceHint": "単語カード、クイズ、スペル練習",
+      "duelHint": "クラスメートと単語で対戦",
+      "alreadyAssignedNote": "このクラスにはもうこのリストがあります。もう一度出すと、期限とアクティビティだけが更新されます。",
+      "assignTo": "{{name}}に出す",
       "lessonLabel": "レッスンを選択",
       "selectLesson": "レッスンを選択",
       "words": "単語",

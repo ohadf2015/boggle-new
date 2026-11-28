@@ -3,6 +3,7 @@ import { pickLesson } from './__tests__/pickLesson';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AssignmentCreator from './AssignmentCreator';
+import { localDayPlus } from './AssignmentCreatorDueDate';
 import { useAssignments } from '@/hooks/useAssignments';
 import type { Mock } from 'vitest';
 
@@ -93,7 +94,7 @@ describe('AssignmentCreator', () => {
     expect(within(group).getByRole('radio', { name: /Advanced Words/ })).toHaveAccessibleName(/2/);
   });
 
-  it('allows selecting assignment type', () => {
+  it('Given the dialog opens, When the teacher taps Practice then Duel, Then each mode button shows as pressed in turn', () => {
     render(
       <AssignmentCreator
         classroomId="classroom-1"
@@ -103,14 +104,16 @@ describe('AssignmentCreator', () => {
       />
     );
 
-    const practiceButton = screen.getByText('teacher.assignment.practiceMode');
-    const duelButton = screen.getByText('teacher.assignment.duelChallenge');
+    const practiceButton = screen.getByTestId('assignment-mode-practice');
+    const duelButton = screen.getByTestId('assignment-mode-duel');
 
     fireEvent.click(practiceButton);
-    expect(practiceButton.parentElement).toHaveClass('bg-neo-cyan');
+    expect(practiceButton).toHaveAttribute('aria-pressed', 'true');
+    expect(duelButton).toHaveAttribute('aria-pressed', 'false');
 
     fireEvent.click(duelButton);
-    expect(duelButton.parentElement).toHaveClass('bg-neo-pink');
+    expect(duelButton).toHaveAttribute('aria-pressed', 'true');
+    expect(practiceButton).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('disables create button when no lesson selected', () => {
@@ -123,7 +126,7 @@ describe('AssignmentCreator', () => {
       />
     );
 
-    const createButton = screen.getByText('teacher.assignment.create');
+    const createButton = screen.getByText('teacher.assignment.assignTo');
     expect(createButton).toBeDisabled();
   });
 
@@ -145,16 +148,11 @@ describe('AssignmentCreator', () => {
     // Select lesson
     pickLesson('lesson-1');
 
-    // Open date picker
-    const datePicker = screen.getByText('teacher.assignment.selectDate');
-    fireEvent.click(datePicker);
-
-    // Set due date using quick shortcut
     const tomorrowButton = screen.getByText('teacher.assignment.tomorrow');
     fireEvent.click(tomorrowButton);
 
     // Submit
-    const createButton = screen.getByText('teacher.assignment.create');
+    const createButton = screen.getByText('teacher.assignment.assignTo');
     fireEvent.click(createButton);
 
     await waitFor(() => {
@@ -163,6 +161,7 @@ describe('AssignmentCreator', () => {
           classroom_id: 'classroom-1',
           lesson_id: 'lesson-1',
           assignment_type: 'practice',
+          due_date: localDayPlus(1),
         })
       );
     });
@@ -187,13 +186,11 @@ describe('AssignmentCreator', () => {
     fireEvent.click(screen.getByText('teacher.assignment.practiceMode'));
     pickLesson('lesson-1');
 
-    // Open date picker and select today
-    const datePicker = screen.getByText('teacher.assignment.selectDate');
-    fireEvent.click(datePicker);
+    // Select today
     fireEvent.click(screen.getByText('teacher.assignment.today'));
 
     // Submit
-    fireEvent.click(screen.getByText('teacher.assignment.create'));
+    fireEvent.click(screen.getByText('teacher.assignment.assignTo'));
 
     await waitFor(() => {
       expect(mockCreateAssignment).toHaveBeenCalled();

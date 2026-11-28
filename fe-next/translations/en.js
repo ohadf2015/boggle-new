@@ -14039,8 +14039,15 @@ const en = {
       "cardSeeAllStudents": "See all {{count}} students",
       "cardRosterTitle": "Students in {{name}}",
       "cardClassReport": "Class report",
+      "assignTitle": "Homework",
+      "assignBody": "Pick a word list and a due date. Students play it on their own phones.",
+      "assignCta": "Assign homework",
       "presets": {
-        "title": "Quick setups",
+        "title": "How should the class play?",
+        "traitSolo": "On their own",
+        "traitTeams": "{{count}} teams",
+        "traitAllWords": "Every lesson word",
+        "traitWords": "Up to {{count}} words",
         "fridayBattle": {
           "name": "Friday Vocab Battle",
           "desc": "Two teams race to find the lesson words"
@@ -14365,6 +14372,10 @@ const en = {
       "typeLabel": "Assignment type",
       "practiceMode": "Practice mode",
       "duelChallenge": "Duel challenge",
+      "practiceHint": "Flashcards, quizzes and spelling with the list",
+      "duelHint": "Students challenge a classmate on the words",
+      "alreadyAssignedNote": "This class already has this list. Assigning it again just updates the due date and activity.",
+      "assignTo": "Assign to {{name}}",
       "lessonLabel": "Select lesson",
       "selectLesson": "Choose a lesson",
       "words": "words",

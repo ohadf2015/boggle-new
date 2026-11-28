@@ -15909,8 +15909,15 @@ const he = {
       "cardSeeAllStudents": "לכל {{count}} התלמידים",
       "cardRosterTitle": "התלמידים של {{name}}",
       "cardClassReport": "דוח הכיתה",
+      "assignTitle": "שיעורי בית",
+      "assignBody": "בוחרים רשימת מילים ותאריך הגשה, והתלמידים משחקים בטלפון שלהם.",
+      "assignCta": "שיוך שיעורי בית",
       "presets": {
-        "title": "הגדרות מהירות",
+        "title": "איך הכיתה תשחק?",
+        "traitSolo": "כל אחד לעצמו",
+        "traitTeams": "{{count}} קבוצות",
+        "traitAllWords": "כל מילות השיעור",
+        "traitWords": "עד {{count}} מילים",
         "fridayBattle": {
           "name": "קרב אוצר המילים של שישי",
           "desc": "שתי קבוצות מתחרות מי תמצא את מילות השיעור"
@@ -16235,6 +16242,10 @@ const he = {
       "typeLabel": "סוג משימה",
       "practiceMode": "מצב תרגול",
       "duelChallenge": "אתגר דו-קרב",
+      "practiceHint": "כרטיסיות, חידונים ואיות עם הרשימה",
+      "duelHint": "התלמידים מאתגרים חבר לכיתה על המילים",
+      "alreadyAssignedNote": "הרשימה הזאת כבר משויכת לכיתה. שיוך מחדש רק יעדכן את תאריך ההגשה והפעילות.",
+      "assignTo": "שיוך ל{{name}}",
       "lessonLabel": "בחרו שיעור",
       "selectLesson": "בחרו שיעור",
       "words": "מילים",
