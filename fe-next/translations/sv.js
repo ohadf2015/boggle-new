@@ -16341,10 +16341,6 @@ const sv = {
       "assignCta": "Ge en läxa",
       "presets": {
         "title": "Hur ska klassen spela?",
-        "traitSolo": "Var för sig",
-        "traitTeams": "{{count}} lag",
-        "traitAllWords": "Alla ord i lektionen",
-        "traitWords": "Upp till {{count}} ord",
         "fridayBattle": {
           "name": "Fredagens ordkamp",
           "desc": "Två lag tävlar om att hitta lektionsorden"

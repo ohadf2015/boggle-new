@@ -15715,10 +15715,6 @@ const ru = {
       "assignCta": "Задать домашку",
       "presets": {
         "title": "Как будет играть класс?",
-        "traitSolo": "Каждый сам за себя",
-        "traitTeams": "{{count}} команды",
-        "traitAllWords": "Все слова урока",
-        "traitWords": "До {{count}} слов",
         "fridayBattle": {
           "name": "Пятничная битва слов",
           "desc": "Две команды соревнуются, кто найдёт слова урока"

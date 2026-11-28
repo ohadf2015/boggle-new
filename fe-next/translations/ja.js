@@ -16030,10 +16030,6 @@ const ja = {
       "assignCta": "宿題を出す",
       "presets": {
         "title": "クラスでどう遊ぶ？",
-        "traitSolo": "ひとりずつ",
-        "traitTeams": "{{count}}チーム",
-        "traitAllWords": "レッスンの単語すべて",
-        "traitWords": "最大{{count}}語",
         "fridayBattle": {
           "name": "金曜単語バトル",
           "desc": "2チームで授業の単語を探して競争"

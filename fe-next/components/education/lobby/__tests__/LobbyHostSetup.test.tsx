@@ -67,20 +67,14 @@ describe('LobbyHostSetup first frame', () => {
     expect(onApplyPreset).toHaveBeenCalledWith('friday-battle');
   });
 
-  it('Given the presets, Then each card is filled in its own colour with its own mascot and says what it changes, and the chosen card is marked in ink, not lime', () => {
+  it('Given the presets, Then each card leads with its own mascot art on an accent panel, states its facts once, and the chosen card is marked in ink and pink, not lime', () => {
     renderSetup();
     const ids = ['standard', 'friday-battle', 'sped'] as const;
-    const cards = ids.map((id) => screen.getByTestId(`preset-${id}`));
-    expect(cards.map((c) => ['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-yellow'].find((k) => c.classList.contains(k)))).toEqual(['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-yellow']);
-    ids.forEach((id, i) => expect(within(cards[i]).getByTestId('preset-icon')).toHaveAttribute('src', `/mascot/teacher/presets/${id}.webp`));
-    const facts = (i: number) => within(cards[i]).getByTestId('preset-values').textContent;
-    expect(facts(0)).toContain('teacher.classroom.presets.traitSolo');
-    expect(facts(0)).toContain('teacher.classroom.presets.traitAllWords');
-    expect(facts(1)).toContain('teacher.classroom.presets.traitTeams:2');
-    expect(facts(2)).toContain('teacher.classroom.presets.traitWords:12');
-    expect(facts(2)?.startsWith('teacher.classroom.support.largeText')).toBe(true);
-    expect(facts(2)).not.toContain('education.modePicker.minutes');
-    const on = cards[0];
+    const panels = ids.map((id) => within(screen.getByTestId(`preset-${id}`)).getByTestId('preset-icon'));
+    expect(panels.map((f) => ['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-yellow'].find((c) => f.classList.contains(c)))).toEqual(['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-yellow']);
+    ids.forEach((id, i) => expect(panels[i].querySelector('img')).toHaveAttribute('src', `/mascot/teacher/presets/${id}.webp`));
+    expect(within(screen.getByTestId('preset-sped')).getByTestId('preset-values').textContent).toContain('education.modePicker.minutes');
+    const on = screen.getByTestId('preset-standard');
     expect(on.className).not.toMatch(/neo-lime/);
     expect(on).toHaveClass('border-neo-black');
     expect(within(on).getByTestId('preset-check').outerHTML).not.toMatch(/lime/);

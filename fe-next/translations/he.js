@@ -15915,10 +15915,6 @@ const he = {
       "assignCta": "שיוך שיעורי בית",
       "presets": {
         "title": "איך הכיתה תשחק?",
-        "traitSolo": "כל אחד לעצמו",
-        "traitTeams": "{{count}} קבוצות",
-        "traitAllWords": "כל מילות השיעור",
-        "traitWords": "עד {{count}} מילים",
         "fridayBattle": {
           "name": "קרב אוצר המילים של שישי",
           "desc": "שתי קבוצות מתחרות מי תמצא את מילות השיעור"

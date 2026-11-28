@@ -15957,10 +15957,6 @@ const es = {
       "assignCta": "Asignar tarea",
       "presets": {
         "title": "¿Cómo va a jugar la clase?",
-        "traitSolo": "Cada uno por su cuenta",
-        "traitTeams": "{{count}} equipos",
-        "traitAllWords": "Todas las palabras de la lección",
-        "traitWords": "Hasta {{count}} palabras",
         "fridayBattle": {
           "name": "Batalla de vocabulario del viernes",
           "desc": "Dos equipos compiten por encontrar las palabras de la lección"

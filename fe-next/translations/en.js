@@ -14045,10 +14045,6 @@ const en = {
       "assignCta": "Assign homework",
       "presets": {
         "title": "How should the class play?",
-        "traitSolo": "On their own",
-        "traitTeams": "{{count}} teams",
-        "traitAllWords": "Every lesson word",
-        "traitWords": "Up to {{count}} words",
         "fridayBattle": {
           "name": "Friday Vocab Battle",
           "desc": "Two teams race to find the lesson words"
