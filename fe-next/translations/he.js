@@ -2191,7 +2191,7 @@ const he = {
     "bubbleBack": "ברוכים השבים! עוד סיבוב?",
     "bubbleBackName": "איזה כיף שחזרת, {name}!",
     "bubbleStreak": "רצף של {n} ימים! ממשיכים ככה.",
-    "chipFriends": "חברים",
+    "chipMultiplayer": "מולטיפלייר",
     "orFriends": "או לשחק עם חברים",
     "tag": {
       "classic": "המקורי",

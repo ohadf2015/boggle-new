@@ -44,7 +44,7 @@ function NextDailyIn({ t }: Pick<HeroQuickLinksProps, 't'>) {
   );
 }
 
-/** Tier 3 of the hero: friends and today's daily, two equal colour-coded cards under PLAY. */
+/** Tier 3 of the hero: multiplayer and today's daily, two equal colour-coded cards under PLAY. */
 export function HeroQuickLinks({ lang, t, animate, streak, streakLoading, atRisk = false, playedToday = false }: HeroQuickLinksProps) {
   const dailyRef = useRef<HTMLAnchorElement>(null);
   const pulsed = useRef(false);
@@ -72,7 +72,7 @@ export function HeroQuickLinks({ lang, t, animate, streak, streakLoading, atRisk
           <span className={`${ICON} bg-black text-neo-pink`}>
             <Users className="h-5 w-5" strokeWidth={2.75} aria-hidden="true" />
           </span>
-          <span className={LABEL}>{t('homePlay.chipFriends')}</span>
+          <span className={LABEL}>{t('homePlay.chipMultiplayer')}</span>
         </Link>
       </PressSurface>
 

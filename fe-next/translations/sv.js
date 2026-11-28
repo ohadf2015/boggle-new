@@ -2191,7 +2191,7 @@ const sv = {
     "bubbleBack": "Välkommen tillbaka! En runda till?",
     "bubbleBackName": "Välkommen tillbaka, {name}!",
     "bubbleStreak": "{n} dagar i rad! Kör vidare.",
-    "chipFriends": "Vänner",
+    "chipMultiplayer": "Flerspelare",
     "orFriends": "eller spela med vänner",
     "tag": {
       "classic": "Originalet",

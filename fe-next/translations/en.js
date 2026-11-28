@@ -2191,7 +2191,7 @@ const en = {
     "bubbleBack": "Welcome back! One more round?",
     "bubbleBackName": "Welcome back, {name}!",
     "bubbleStreak": "{n}-day streak! Keep it going.",
-    "chipFriends": "Friends",
+    "chipMultiplayer": "Multiplayer",
     "orFriends": "or play with friends",
     "tag": {
       "classic": "Original",
