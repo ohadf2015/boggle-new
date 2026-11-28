@@ -40,7 +40,7 @@ const STRUCTURE_INSET: Record<PyramidSize, string> = {
 
 // Space between the capstone and the base row, where the pyramid's faces show.
 const BODY_RISE: Record<PyramidSize, string> = {
-  play: 'mt-6 [@container(max-height:42rem)]:mt-2',
+  play: 'mt-6 [@container(42rem<height<=48rem)]:mt-3 [@container(max-height:42rem)]:mt-2',
   trophy: 'mt-8',
 };
 

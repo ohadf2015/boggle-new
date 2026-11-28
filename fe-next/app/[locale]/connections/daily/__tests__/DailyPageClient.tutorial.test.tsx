@@ -71,12 +71,23 @@ describe('DailyPageClient — first-run tutorial', () => {
     expect(screen.getByTestId('regular-daily')).toBeTruthy();
     expect(mounts.game).toBe(1);
   });
-  it('Given a 320px phone, Then the "How to play" label collapses to icon-only but keeps its accessible name', () => {
+  it('Given a phone, Then the "How to play" label collapses to icon-only but keeps its accessible name', () => {
     localStorage.setItem(SEEN, '1');
     render(<DailyPageClient locale="en" />);
     const btn = screen.getByTestId('connections-how-to-play');
     const label = btn.querySelector('span');
-    expect(label?.className).toContain('max-[359px]:sr-only');
+    expect(label?.className).toContain('max-[479px]:sr-only');
     expect(btn.textContent?.trim().length).toBeGreaterThan(0);
+  });
+
+  it('Given a run in progress (2026-11-28 report), Then how to play and mute sit in the nav row, not floating over the title', () => {
+    localStorage.setItem(SEEN, '1');
+    render(<DailyPageClient locale="en" />);
+    const nav = screen.getByTestId('daily-flow-nav');
+    const end = screen.getByTestId('daily-flow-nav-end');
+    expect(nav.contains(end)).toBe(true);
+    expect(end.contains(screen.getByTestId('connections-how-to-play'))).toBe(true);
+    expect(end.contains(screen.getByTestId('daily-flow-mute'))).toBe(true);
+    expect(screen.getByTestId('connections-how-to-play').className).not.toMatch(/\babsolute\b/);
   });
 });

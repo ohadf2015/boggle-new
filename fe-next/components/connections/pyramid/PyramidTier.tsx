@@ -10,7 +10,7 @@ export type TierState = 'solved' | 'gaveUp' | 'current' | 'locked';
 // Written out in full so Tailwind's scanner sees them. The container variants
 // apply only inside the phone play screen's size container.
 const BRICK_HEIGHT: Record<PyramidSize, string> = {
-  play: 'h-10 [@container(max-height:42rem)]:h-9',
+  play: 'h-10 [@container(max-height:48rem)]:h-9 [@container(max-height:42rem)]:h-9',
   trophy: 'h-14',
 };
 

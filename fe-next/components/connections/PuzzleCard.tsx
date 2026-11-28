@@ -242,7 +242,7 @@ export default function PuzzleCard({
             <div
               ref={stageRef}
               data-testid="puzzle-stage"
-              className="relative flex min-h-[11rem] flex-1 flex-col [@media(max-height:700px)]:min-h-[7rem] [@container(42rem<height<=54rem)]:min-h-[8.5rem] [@container(36rem<height<=42rem)]:min-h-[7rem] [@container(height<=36rem)]:min-h-[6rem] justify-center-safe py-2 group-has-[input:focus]/card:py-0 shell:py-4"
+              className="relative flex min-h-[11rem] flex-1 flex-col [@media(max-height:700px)]:min-h-[7rem] [@container(42rem<height<=54rem)]:min-h-[8.5rem] [@container(36rem<height<=42rem)]:min-h-[7rem] [@container(height<=36rem)]:min-h-[6rem] justify-center-safe py-2 [@media(max-height:700px)]:py-0.5 [@container(height<=42rem)]:py-0.5 group-has-[input:focus]/card:py-0 shell:py-4"
               style={{ containerType: 'size' }}
             >
               <BridgeStage word1={puzzle.word1} word2={puzzle.word2} isCorrect={isCorrect} isGaveUp={isGaveUp} isRTL={isRTL}>
@@ -266,11 +266,12 @@ export default function PuzzleCard({
               {isCorrect && <BridgeCelebration streak={state.streak} points={solvePoints} />}
             </div>
 
-            {/* Hint: its own full-width row between the stage and the keyboard dock. The
-                min-height reserves two wrapped lines up front (so revealing it never moves
-                the dock) and the bottom margin keeps the pill off the keys. */}
+            {/* Hint: its own full-width row between the stage and the keyboard dock. Tall
+                screens reserve two wrapped lines up front; on phones the empty row takes no
+                room (the dock is pinned to the bottom either way, and a revealed hint takes
+                its height from the bridge's scenery). The bottom margin keeps the pill off the keys. */}
             {puzzle.hint && !isResolved && (
-              <div data-testid="puzzle-hint-row" className="mb-2 flex min-h-[3rem] w-full shrink-0 items-center justify-center [@media(max-height:700px)]:mb-1 [@media(max-height:700px)]:min-h-[2.5rem] [@container(max-height:36rem)]:min-h-0 [@container(max-height:36rem)]:mb-1">
+              <div data-testid="puzzle-hint-row" className="mb-1 flex w-full shrink-0 items-center justify-center [@media(max-height:859px)]:empty:mb-0 [@media(min-height:860px)]:mb-2 [@media(min-height:860px)]:min-h-[3rem] [@container(max-height:36rem)]:min-h-0 [@container(max-height:36rem)]:mb-1">
                 <AnimatePresence>
                 {showHint && !isResolved && (
                   <m.p

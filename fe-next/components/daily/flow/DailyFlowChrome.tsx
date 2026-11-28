@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -27,6 +27,8 @@ interface DailyFlowChromeProps {
   inline?: boolean;
   /** Offer "skip" on optional modes. Hosts withdraw it once the run is over — the results own the way on. */
   skip?: boolean;
+  /** Inline nav only: the host's own controls (how to play, mute), at the row's inline end. */
+  end?: ReactNode;
 }
 
 const INTRO_MS = 1600;
@@ -41,7 +43,7 @@ const introKey = (id: DailyModeId) => `lc:daily-intro:${id}:${getDailyChallengeD
  *  - an always-available "back to daily" pill, plus "skip" for optional modes,
  *    so the player can return to the daily hub from any challenge.
  */
-export function DailyFlowChrome({ modeId, intro = true, introDeferred = false, backLink = true, inline = false, skip = true }: DailyFlowChromeProps) {
+export function DailyFlowChrome({ modeId, intro = true, introDeferred = false, backLink = true, inline = false, skip = true, end }: DailyFlowChromeProps) {
   const { t, language } = useLanguage();
   const played = useDailyPlayedStatus();
   const index = DAILY_MODES.findIndex((md) => md.id === modeId);
@@ -89,25 +91,30 @@ export function DailyFlowChrome({ modeId, intro = true, introDeferred = false, b
   return (
     <>
       {backLink && (
-        <div className={cn(inline ? 'relative z-10 flex w-full gap-1.5 px-3 pt-2 pb-1' : 'fixed top-[max(env(safe-area-inset-top),0.5rem)] start-2 z-40 flex gap-1.5')} data-testid="daily-flow-nav" data-inline={inline ? 'true' : 'false'}>
+        <div className={cn(inline ? 'relative z-10 flex w-full items-center gap-1.5 px-3 pt-2 pb-1' : 'fixed top-[max(env(safe-area-inset-top),0.5rem)] start-2 z-40 flex gap-1.5')} data-testid="daily-flow-nav" data-inline={inline ? 'true' : 'false'}>
           <Link
             href={hubHref}
             data-testid="back-to-daily"
-            className="flex items-center gap-1 h-9 px-3 rounded-full border-2 border-neo-black bg-neo-navy/90 text-neo-white text-xs font-black shadow-hard-sm backdrop-blur"
+            className="flex h-9 min-w-0 items-center gap-1 rounded-full border-2 border-neo-black bg-neo-navy/90 px-3 text-xs font-black text-neo-white shadow-hard-sm backdrop-blur"
           >
             <span aria-hidden className="ltr:rotate-180 inline-block">›</span>
-            {t('daily.backToDailyHub')}
+            <span className="truncate">{t('daily.backToDailyHub')}</span>
           </Link>
           {mode.optional && skip && !played.loading && (
             <Link
               href={skipHref}
               onClick={() => { if (nextMode) markDailyHandoff(nextMode.id); }}
               data-testid="skip-optional"
-              className="flex items-center gap-1 h-9 px-3 rounded-full border-2 border-neo-black bg-white/10 text-neo-cream text-xs font-black backdrop-blur"
+              className="flex h-9 shrink-0 items-center gap-1 rounded-full border-2 border-neo-black bg-neo-navy-light px-3 text-xs font-black text-neo-cream shadow-hard-sm backdrop-blur"
             >
               <span aria-hidden className="rtl:rotate-180 inline-block">⏭</span>
               {t('daily.skipOptional')}
             </Link>
+          )}
+          {inline && end && (
+            <div data-testid="daily-flow-nav-end" className="ms-auto flex shrink-0 items-center gap-1.5">
+              {end}
+            </div>
           )}
         </div>
       )}

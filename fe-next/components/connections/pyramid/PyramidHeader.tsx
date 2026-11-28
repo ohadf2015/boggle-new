@@ -26,13 +26,20 @@ export default function PyramidHeader({ state, metaAnswer, className, testId, ra
   const left = pyramidAttemptsLeft(state);
   return (
     <header data-testid={testId} className={cn('flex shrink-0 flex-col gap-2 [@container(height<=36rem)]:gap-1', className)}>
-      {showTitle &&
-        (daily ? (
-          // pe-10: the global in-game mute button floats over the inline-end corner.
-          <DailyQuestHeading className="pe-10 [@container(height<=36rem)]:hidden" />
-        ) : (
-          <h1 className="text-center font-neo-display text-lg font-black text-neo-white">{t('connections.pyramid.title')}</h1>
-        ))}
+      {showTitle && daily && (
+        // The daily title and the lifetime rank share one row on phones: a row of its
+        // own for the rank cost the riddle below the room it needed. Short phones (the
+        // play screen's size container) drop the rank, then the title.
+        <div data-testid="pyramid-title-row" className="flex items-center gap-3 [@container(height<=36rem)]:hidden">
+          <DailyQuestHeading className="flex-1" />
+          {rankSlot && (
+            <div data-testid="pyramid-rank-slot" className="w-[8.5rem] shrink-0 [@container(max-height:42rem)]:hidden">
+              {rankSlot}
+            </div>
+          )}
+        </div>
+      )}
+      {showTitle && !daily && <h1 className="text-center font-neo-display text-lg font-black text-neo-white">{t('connections.pyramid.title')}</h1>}
       {/* Taught once, on the first riddle; the finale card states its own goal. Short
           phones (inside the play screen's size container) drop it, then the rank. */}
       {state.stage === 0 && (
@@ -40,7 +47,7 @@ export default function PyramidHeader({ state, metaAnswer, className, testId, ra
           {t('connections.pyramid.explainer')}
         </p>
       )}
-      {rankSlot && (
+      {rankSlot && !(showTitle && daily) && (
         <div data-testid="pyramid-rank-slot" className="[@container(max-height:42rem)]:hidden">
           {rankSlot}
         </div>

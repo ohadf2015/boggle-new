@@ -90,8 +90,8 @@ export default function DailyHeader({
           : 'flex shrink-0 flex-col gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2.5 shadow-hard-sm'
       }
     >
-      {/* pe-10 in the bar: the global in-game mute button floats over the inline-end corner. */}
-      <div className={`flex items-center justify-between gap-2 ${variant === 'bar' ? 'pe-10' : ''}`}>
+      {/* No end padding: the daily page's nav row hosts mute, so the floating button stands down. */}
+      <div className="flex items-center justify-between gap-2">
         <DailyQuestHeading />
         <div className="flex shrink-0 items-center gap-3" dir="ltr">
           <m.span

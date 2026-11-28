@@ -6,7 +6,7 @@ import { PYRAMID_ART, type PyramidSize } from './pyramidArt';
 import { carvedWordSize } from './pyramidFit';
 
 const APEX_SIZE: Record<PyramidSize, string> = {
-  play: 'h-[3.25rem] [@container(max-height:42rem)]:h-11',
+  play: 'h-[3.25rem] [@container(max-height:48rem)]:h-11 [@container(max-height:42rem)]:h-11',
   trophy: 'h-20',
 };
 
