@@ -86,7 +86,7 @@ export const svA: HelpLocaleContent = {
       {
         t: 'list',
         items: [
-          '[[academy.hq.modes.classic]]: ett gemensamt bokstavsrutnät där eleverna drar fram alla ord de hittar. Perfekt för stavning och ordbyggande med vilken lista som helst. Tre minuter som standard.',
+          '[[academy.hq.modes.classic]]: ett gemensamt bokstavsrutnät där eleverna drar fram alla ord de hittar. Perfekt för stavning och ordbyggande med vilken lista som helst. Två minuter som standard.',
           '[[academy.hq.modes.vocabQuiz]]: fyra alternativ, en betydelse; snabbaste rätta svaret ger mest poäng. Bäst för att kolla betydelse. Kräver en lista med förklaringar.',
           '[[academy.hq.modes.blast]]: snabba rundor där orden sätter igång kedjereaktioner. Ren energi en fredag eller de sista tio minuterna.',
           '[[academy.hq.modes.wordHunt]]: klassen tävlar om att gräva fram listans ord i rutnätet. Bra för helt nya ord.',

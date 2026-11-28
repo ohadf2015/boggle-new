@@ -86,7 +86,7 @@ export const esA: HelpLocaleContent = {
       {
         t: 'list',
         items: [
-          '[[academy.hq.modes.classic]]: una cuadrícula de letras compartida; el alumnado traza cada palabra que encuentra. Ideal para ortografía y formación de palabras con cualquier lista. Tres minutos por defecto.',
+          '[[academy.hq.modes.classic]]: una cuadrícula de letras compartida; el alumnado traza cada palabra que encuentra. Ideal para ortografía y formación de palabras con cualquier lista. Dos minutos por defecto.',
           '[[academy.hq.modes.vocabQuiz]]: cuatro opciones, un significado; la respuesta correcta más rápida suma más. Lo mejor para comprobar el significado. Necesita una lista con definiciones.',
           '[[academy.hq.modes.blast]]: rondas rápidas en las que las palabras desatan combos en cadena. Pura energía para un viernes o los últimos diez minutos.',
           '[[academy.hq.modes.wordHunt]]: la clase compite por sacar las palabras de la lista de la cuadrícula. Bueno para palabras recién presentadas.',

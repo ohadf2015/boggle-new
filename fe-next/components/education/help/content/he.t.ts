@@ -14,7 +14,7 @@ export const heT: HelpLocaleContent = {
           { time: '0:30', title: 'בוחרים משחק ומילים', body: 'הקישו על [[academy.hq.modes.classic]] ועל אחת מרשימות הפתיחה שמתחת לפוסטרים. הן מוכנות למשחק.', shot: 'hq-start-game' },
           { time: '1:00', title: 'מתחילים משחק חי ומקרינים', body: 'לחצו על [[teacher.playNow.goLive]] והקרינו את המסך על הלוח. הלובי מציג קוד גדול, את הקישור וקוד QR.', shot: 'lobby' },
           { time: '1:30', title: 'התלמידים מצטרפים', body: 'הם סורקים את ה-QR או מקלידים את הקוד ב-lexiclash.live/join, ובוחרים שם. תראו את השמות עפים פנימה.' },
-          { time: '2:00', title: 'משחקים סיבוב', body: 'לחצו על [[hostView.startClassGame]]. סיבוב של [[academy.hq.modes.classic]] נמשך שלוש דקות. המסך שלכם מציג את השעון ואת טבלת המובילים החיה.', shot: 'live-host' },
+          { time: '2:00', title: 'משחקים סיבוב', body: 'לחצו על [[hostView.startClassGame]]. סיבוב של [[academy.hq.modes.classic]] נמשך שתי דקות. המסך שלכם מציג את השעון ואת טבלת המובילים החיה.', shot: 'live-host' },
           { time: '5:00', title: 'חוגגים, ושוב', body: 'הפודיום מופיע. לחצו על [[education.results.playAgain]] לסיבוב שני עם אותו קוד, או על [[eduLive.results.backToClass]] כדי לסיים.' },
         ],
       },
