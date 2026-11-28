@@ -139,10 +139,20 @@ describe('analyticsRoutes', () => {
   });
 
   describe('fetchDrilldown', () => {
-    it('passes kind and week to admin_drilldown', async () => {
+    it('passes kind, week and timezone to admin_drilldown', async () => {
       mockRpc.mockResolvedValue({ data: [{ id: 'u1' }], error: null });
-      expect(await fetchDrilldown(mockSupabase as never, 'signups', '2026-11-02')).toEqual([{ id: 'u1' }]);
-      expect(mockRpc).toHaveBeenCalledWith('admin_drilldown', { kind: 'signups', week: '2026-11-02' });
+      expect(await fetchDrilldown(mockSupabase as never, 'signups', '2026-11-02', 'Asia/Jerusalem')).toEqual([{ id: 'u1' }]);
+      expect(mockRpc).toHaveBeenCalledWith('admin_drilldown', {
+        kind: 'signups',
+        week: '2026-11-02',
+        p_tz: 'Asia/Jerusalem',
+      });
+    });
+
+    it('defaults the timezone to UTC', async () => {
+      mockRpc.mockResolvedValue({ data: [], error: null });
+      await fetchDrilldown(mockSupabase as never, 'signups', null);
+      expect(mockRpc).toHaveBeenCalledWith('admin_drilldown', { kind: 'signups', week: null, p_tz: 'UTC' });
     });
 
     it('returns an empty list on error', async () => {
