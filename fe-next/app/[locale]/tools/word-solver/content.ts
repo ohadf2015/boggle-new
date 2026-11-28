@@ -295,7 +295,7 @@ const content: Record<Locale, ToolContent> = {
   },
   ja: {
     title: 'ワードソルバー＆アナグラムファインダー',
-    subtitle: '文字を解読してすべての可能な単語を見つけよう',
+    subtitle: '文字を入力するだけで、並べ替えて作れる単語をすべて表示します。日本語だけでなく、英語のアナグラム解析にも使えます（辞書で「English」を選択）。',
     description:
       '無料オンラインアナグラムソルバーとワードアンスクランブラー。文字を入力してすべての可能な単語を瞬時に見つけましょう。LexiClashに最適です。',
     metaDescription:
@@ -315,7 +315,7 @@ const content: Record<Locale, ToolContent> = {
     ctaButton: 'LexiClashを無料でプレイ',
     ctaDescription: 'リアルタイムのワードバトルで友達に挑戦。脳を鍛えよう！',
     fullDictionaryNote: '長い単語から順に最大500語を表示。LexiClashのゲームと同じ辞書で判定しています。',
-    howToTitle: 'ワードソルバーの使い方',
+    howToTitle: 'アナグラム解析ツールの使い方',
     howToSteps: [
       '上の欄に文字を入れます。ひらがな・カタカナ・漢字のどれでもよく、わからない文字は「?」にします。',
       '「単語を検索」をクリックするかEnterキーを押して検索します。',
