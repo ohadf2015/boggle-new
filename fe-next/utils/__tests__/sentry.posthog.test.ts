@@ -67,7 +67,7 @@ describe('PostHog error forwarding (Sentry-outage backstop)', () => {
       });
       await flush();
       expect(serverCapture).toHaveBeenCalledTimes(1);
-      const [fwdErr, distinctId, props] = serverCapture.mock.calls[0];
+      const [fwdErr, { distinctId, properties: props }] = serverCapture.mock.calls[0];
       expect(fwdErr).toBe(err);
       expect(distinctId).toBe('user-1');
       expect(props['error.type']).toBe('api_error');
@@ -79,7 +79,7 @@ describe('PostHog error forwarding (Sentry-outage backstop)', () => {
       captureSocketError(err, { event: 'submitWord', gameCode: 'ABCD' });
       await flush();
       expect(serverCapture).toHaveBeenCalledTimes(1);
-      expect(serverCapture.mock.calls[0][2]['socket.event']).toBe('submitWord');
+      expect(serverCapture.mock.calls[0][1].properties['socket.event']).toBe('submitWord');
     });
 
     it('captureBackgroundError forwards with operation context', async () => {
@@ -90,7 +90,7 @@ describe('PostHog error forwarding (Sentry-outage backstop)', () => {
       });
       await flush();
       expect(serverCapture).toHaveBeenCalledTimes(1);
-      expect(serverCapture.mock.calls[0][1]).toBe('u2');
+      expect(serverCapture.mock.calls[0][1].distinctId).toBe('u2');
     });
 
     it('does NOT forward expected errors (rate limit)', async () => {
