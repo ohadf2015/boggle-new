@@ -69,11 +69,15 @@ describe('LobbyHostSetup first frame', () => {
     expect(onApplyPreset).toHaveBeenCalledWith('friday-battle');
   });
 
-  it('Given the fold is open, Then each preset icon is a filled accent square and the chosen card is marked in ink and pink, not lime', () => {
+  it('Given the fold is open, Then each preset card leads with its own mascot art on an accent panel, states its facts once, and the chosen card is marked in ink and pink, not lime', () => {
     renderSetup({ gamesOpen: true });
-    const fills = ['standard', 'friday-battle', 'sped'].map((id) => within(screen.getByTestId(`preset-${id}`)).getByTestId('preset-icon'));
-    expect(fills.map((f) => ['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-yellow'].find((c) => f.classList.contains(c)))).toEqual(['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-yellow']);
-    for (const f of fills) expect(f).toHaveClass('border-neo-black', 'text-neo-black');
+    const ids = ['standard', 'friday-battle', 'sped'] as const;
+    const panels = ids.map((id) => within(screen.getByTestId(`preset-${id}`)).getByTestId('preset-icon'));
+    expect(panels.map((f) => ['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-yellow'].find((c) => f.classList.contains(c)))).toEqual(['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-yellow']);
+    ids.forEach((id, i) => expect(panels[i].querySelector('img')).toHaveAttribute('src', `/mascot/teacher/presets/${id}.webp`));
+    const sped = screen.getByTestId('preset-sped');
+    expect(within(sped).getByTestId('preset-values').textContent).toContain('education.modePicker.minutes');
+    expect(within(sped).queryByText(/teacher\.classroom\.board\./)).toBeNull();
     const on = screen.getByTestId('preset-standard');
     expect(on.className).not.toMatch(/neo-lime/);
     expect(on).toHaveClass('border-neo-black');
