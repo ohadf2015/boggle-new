@@ -68,7 +68,7 @@ const faqs = [
   },
   {
     q: 'Which online puzzle games have an active leaderboard or competitive element?',
-    a: "LexiClash does, and it runs free in the browser with no download. There is a global leaderboard with a monthly season and an all-time ranking, a leaderboard for each daily puzzle where everyone gets the same board, and live standings inside every multiplayer room, where you race other players on the same letter grid in real time.",
+    a: "LexiClash does, and it is free in the browser with no download. Each daily puzzle gives everyone the same board and ranks them on its own leaderboard, and those scores feed a global ranking with a monthly season. In a multiplayer room you race other players on the same letter grid and watch the standings change live.",
   },
   {
     q: 'Is there a free competitive word game I can play in the browser?',
