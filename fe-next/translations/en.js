@@ -21547,7 +21547,7 @@ const en = {
       "peeked": "{count} of {total} peeked",
       "multiplier": "×{count}",
       "scoreLabel": "{score} points",
-      "finishTitle_one": "You know this word!",
+      "finishTitle_one": "You know {count} word!",
       "finishTitle": "You know these {count} words!",
       "finishTitle_other": "You know these {count} words!",
       "finishScore": "{score} points",
