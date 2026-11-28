@@ -459,6 +459,12 @@ describe('PolarClient.getCheckoutStatus', () => {
     expect(fetchMock.mock.calls[0][1].method ?? 'GET').toBe('GET')
   })
 
+  it('returns the full checkout so the return beacon can grant without a second Polar call', async () => {
+    const body = { id: 'abc', status: 'succeeded', external_customer_id: 'u1', product_id: 'prod_pro' }
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => body }))
+    await expect(new PolarClient('token-123', 'production').getCheckout('abc')).resolves.toEqual(body)
+  })
+
   it('returns null on a Polar error so the beacon records status unknown', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 404, text: async () => 'not found' }))
     await expect(new PolarClient('tok', 'sandbox').getCheckoutStatus('missing')).resolves.toBeNull()

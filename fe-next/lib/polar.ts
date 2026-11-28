@@ -232,22 +232,33 @@ export class PolarClient {
   }
 
   /**
-   * Best-effort status of one checkout session ('open' | 'confirmed' |
-   * 'succeeded' | 'failed' | 'expired'). Used by the return beacon to tell a
-   * completed checkout whose webhook never landed apart from a stale
-   * success-URL revisit. Returns null — never throws — on any error so the
-   * beacon can record `status: 'unknown'` and move on.
+   * Best-effort Polar checkout session. Used by the return beacon both to
+   * attribute the landing and, when Polar already says the checkout
+   * succeeded, to unlock Teacher Pro without waiting for the webhook.
+   * Returns null — never throws — on any error so the beacon can record
+   * `status: 'unknown'` and move on.
    */
-  async getCheckoutStatus(checkoutId: string): Promise<string | null> {
+  async getCheckout(checkoutId: string): Promise<Record<string, unknown> | null> {
     try {
-      const response = await this.request<{ status?: unknown }>(
+      const response = await this.request<Record<string, unknown>>(
         `/v1/checkouts/${encodeURIComponent(checkoutId)}`,
         { signal: AbortSignal.timeout(1_500) },
       )
-      return typeof response.status === 'string' && response.status ? response.status : null
+      return response && typeof response === 'object' ? response : null
     } catch {
       return null
     }
+  }
+
+  /**
+   * Best-effort status of one checkout session ('open' | 'confirmed' |
+   * 'succeeded' | 'failed' | 'expired'). Returns null — never throws — on
+   * any error so the beacon can record `status: 'unknown'` and move on.
+   */
+  async getCheckoutStatus(checkoutId: string): Promise<string | null> {
+    const checkout = await this.getCheckout(checkoutId)
+    const status = checkout?.status
+    return typeof status === 'string' && status ? status : null
   }
 
   /**

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { isFreshCheckoutLanding } from '@/lib/education/checkoutReturn';
 import type { useTeacherPro } from '@/hooks/useTeacherPro';
 import { polarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
-import { trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTelemetry';
+import { checkoutReturnBeaconPromise, trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTelemetry';
 
 type Pro = ReturnType<typeof useTeacherPro>;
 
@@ -27,13 +27,25 @@ export function useCheckoutReturn(landedFromCheckout: boolean, pro: Pro) {
 
   useEffect(() => {
     if (!checkoutSuccess || proLoading || hasPro || !refreshPro) return;
+    let cancelled = false;
     let tries = 0;
-    const id = setInterval(() => {
-      tries += 1;
+    let id: ReturnType<typeof setInterval> | undefined;
+    const startPolling = () => {
+      if (cancelled) return;
       void refreshPro();
-      if (tries >= 8) clearInterval(id);
-    }, 2000);
-    return () => clearInterval(id);
+      id = setInterval(() => {
+        tries += 1;
+        void refreshPro();
+        if (tries >= 8) clearInterval(id);
+      }, 2000);
+    };
+    const beacon = checkoutReturnBeaconPromise();
+    if (beacon) void beacon.finally(startPolling);
+    else startPolling();
+    return () => {
+      cancelled = true;
+      if (id) clearInterval(id);
+    };
   }, [checkoutSuccess, proLoading, hasPro, refreshPro]);
 
   return polarCheckoutWelcomeKind({

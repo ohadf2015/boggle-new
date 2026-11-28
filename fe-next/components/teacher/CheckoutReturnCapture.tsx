@@ -20,7 +20,7 @@ import {
   rememberReturnIntent,
   takeCheckoutOrigin,
 } from '@/lib/education/checkoutReturn';
-import { trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTelemetry';
+import { checkoutReturnBeaconPromise, trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTelemetry';
 import { ProWelcomeCelebration } from '@/components/teacher/ProWelcomeCelebration';
 import { TeacherTrialWelcome } from '@/components/teacher/TeacherTrialWelcome';
 import { polarCheckoutWelcomeKind, type PolarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
@@ -32,7 +32,8 @@ const TEACHER_HOME = /^\/[a-z]{2}\/teacher\/?$/;
  * the webhook grant has landed. Mounted from the /teacher layout so
  * /teacher and /teacher/upgrade both see `?checkout=success`.
  *
- * Does not grant. `useTeacherPro` only GETs /api/subscription/status.
+ * The return beacon grants when Polar already says the checkout succeeded;
+ * this component then re-reads /api/subscription/status until Pro shows.
  */
 export function CheckoutReturnCapture() {
   const [active, setActive] = useState(false);
@@ -87,14 +88,26 @@ function CheckoutReturnBanner() {
 
   useEffect(() => {
     if (dismissed || pro.hasPro) return;
+    let cancelled = false;
     let tries = 0;
-    const id = setInterval(() => {
-      tries += 1;
-      setAttempts(tries);
+    let id: ReturnType<typeof setInterval> | undefined;
+    const startPolling = () => {
+      if (cancelled) return;
       void refreshPro();
-      if (tries >= GRANT_POLL_MAX_TRIES) clearInterval(id);
-    }, GRANT_POLL_INTERVAL_MS);
-    return () => clearInterval(id);
+      id = setInterval(() => {
+        tries += 1;
+        setAttempts(tries);
+        void refreshPro();
+        if (tries >= GRANT_POLL_MAX_TRIES) clearInterval(id);
+      }, GRANT_POLL_INTERVAL_MS);
+    };
+    const beacon = checkoutReturnBeaconPromise();
+    if (beacon) void beacon.finally(startPolling);
+    else startPolling();
+    return () => {
+      cancelled = true;
+      if (id) clearInterval(id);
+    };
   }, [dismissed, pro.hasPro, refreshPro, pollGen]);
 
   const phase = checkoutReturnPhase({
