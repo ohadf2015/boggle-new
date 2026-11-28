@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
-import { CheckCircle2, Play, RotateCcw } from 'lucide-react';
+import { Check, CheckCircle2, Play, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { StudyCard } from '@/shared/utils/studyCards';
 import type { EduT } from '@/components/education/lobby/eduText';
@@ -9,6 +9,9 @@ import { quizzableCards, recallTarget } from '@/lib/education/recallQuiz';
 import { WaitingWarmUp } from '@/components/education/lobby/WaitingWarmUp';
 import { LobbyWordStudy } from './LobbyWordStudy';
 import { RecallQuiz } from './RecallQuiz';
+import { RecallFinishCard } from './RecallFinishCard';
+import { RECALL_FILLS, RECALL_KEYFRAMES } from './recallStyles';
+import type { RecallSummary } from '@/lib/education/recallScore';
 import { trackEduStudyCompleted } from '@/lib/education/studyTelemetry';
 import { PRESS } from './eduLiveStyles';
 import { pluralKeyOf } from '@/lib/i18n/pluralKey';
@@ -42,11 +45,16 @@ export function LobbyLearnRecall({ cards, studied, onDone, quiet = false, userna
   const [phase, setPhase] = useState<Phase>(studied ? 'learned' : 'meet');
   const [round, setRound] = useState(0);
   const [open, setOpen] = useState<string | null>(null);
+  const [peeked, setPeeked] = useState<ReadonlySet<string>>(() => new Set());
+  const [run, setRun] = useState<{ summary: RecallSummary; newBest: boolean } | null>(null);
+  const [best, setBest] = useState(0);
   const startedAt = useRef(0);
 
   if (items.length < 2) return <LobbyWordStudy cards={cards} studied={studied} onDone={onDone} quiet={quiet} t={t} />;
 
-  const finish = () => {
+  const finish = (summary: RecallSummary) => {
+    setRun({ summary, newBest: best > 0 && summary.score > best });
+    setBest((b) => Math.max(b, summary.score));
     if (!studied) {
       trackEduStudyCompleted({ words: items.length, seconds: Math.round((Date.now() - startedAt.current) / 1000) });
       onDone();
@@ -56,6 +64,7 @@ export function LobbyLearnRecall({ cards, studied, onDone, quiet = false, userna
 
   return (
     <section data-testid="lobby-word-study" aria-labelledby="lobby-word-study-title" className="flex w-full flex-col gap-3">
+      <style>{RECALL_KEYFRAMES}</style>
       <div className="flex items-center justify-between gap-2">
         <h2 id="lobby-word-study-title" className="font-neo-display text-2xl font-black text-neo-cream edu-sky:text-edu-ink lg:text-4xl">
           {t('eduStudent.lobby.studyTitle')}
@@ -70,24 +79,38 @@ export function LobbyLearnRecall({ cards, studied, onDone, quiet = false, userna
 
       {phase === 'meet' && (
         <>
-          <p className="font-neo-body text-base text-neo-cream/80 edu-sky:text-edu-ink/80">{t('eduStudent.recall.intro')}</p>
+          <div className="flex items-baseline justify-between gap-2">
+            <p className="font-neo-body text-base text-neo-cream/80 edu-sky:text-edu-ink/80">{t('eduStudent.recall.intro')}</p>
+            <span data-testid="recall-peeked" className="shrink-0 font-neo-display text-sm font-bold tabular-nums text-neo-cream/75 edu-sky:text-edu-ink/75">
+              {t('eduStudent.recall.peeked', { count: peeked.size, total: cards.length })}
+            </span>
+          </div>
           <ul data-testid="recall-meet" className="flex max-h-[40cqh] min-h-24 flex-wrap content-start gap-2 overflow-y-auto">
-            {cards.map((card) => {
+            {cards.map((card, i) => {
               const isOpen = open === card.word;
+              const seen = peeked.has(card.word);
               return (
                 <li key={card.word} className={isOpen ? 'w-full' : undefined}>
                   <button
                     type="button"
                     aria-expanded={isOpen}
-                    onClick={() => setOpen(isOpen ? null : card.word)}
+                    onClick={() => {
+                      setOpen(isOpen ? null : card.word);
+                      if (!seen) setPeeked((p) => new Set(p).add(card.word));
+                    }}
                     className={cn(
-                      'flex w-full flex-col items-start gap-1 rounded-neo-lg border-[3px] border-neo-black px-4 py-2 text-start text-neo-black shadow-hard-sm',
+                      'w-full rounded-neo-lg border-[3px] border-neo-black text-start text-neo-black transition-[transform,box-shadow] duration-100 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none motion-reduce:transition-none',
                       PRESS,
-                      isOpen ? 'bg-neo-yellow' : 'bg-neo-cream',
+                      isOpen ? 'bg-neo-cream shadow-hard' : cn(RECALL_FILLS[i % RECALL_FILLS.length], 'shadow-hard-sm'),
                     )}
                   >
-                    <span dir="auto" className="break-words font-neo-display text-xl font-black leading-tight">{card.word}</span>
-                    {isOpen && card.definition && <span dir="auto" className="font-neo-body text-base leading-snug">{card.definition}</span>}
+                    <span key={isOpen ? 'open' : 'shut'} className="flex flex-col items-start gap-1 px-4 py-2 motion-safe:animate-[recall-flip_240ms_cubic-bezier(0.23,1,0.32,1)_both]">
+                      <span className="flex items-center gap-1.5">
+                        <span dir="auto" className="break-words font-neo-display text-xl font-black leading-tight">{card.word}</span>
+                        {seen && !isOpen && <Check className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />}
+                      </span>
+                      {isOpen && card.definition && <span dir="auto" className="font-neo-body text-base leading-snug">{card.definition}</span>}
+                    </span>
                   </button>
                 </li>
               );
@@ -105,6 +128,8 @@ export function LobbyLearnRecall({ cards, studied, onDone, quiet = false, userna
 
       {phase === 'quiz' && <RecallQuiz key={round} items={items} pool={pool} target={recallTarget(items.length)} onFinish={finish} t={t} />}
 
+      {phase === 'learned' && run && <RecallFinishCard run={run.summary} words={items.length} newBest={run.newBest} t={t} />}
+
       {phase === 'learned' && username && <WaitingWarmUp username={username} t={t} hero />}
 
       {phase === 'learned' && (
@@ -118,7 +143,7 @@ export function LobbyLearnRecall({ cards, studied, onDone, quiet = false, userna
           className={cn(BUTTON, PRESS, SECONDARY)}
         >
           <RotateCcw className="size-5" aria-hidden="true" />
-          {t('eduStudent.recall.practiceAgain')}
+          {best > 0 ? t('eduStudent.recall.beatScore', { score: best }) : t('eduStudent.recall.practiceAgain')}
         </button>
       )}
     </section>
