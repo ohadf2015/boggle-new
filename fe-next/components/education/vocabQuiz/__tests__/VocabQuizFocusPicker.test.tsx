@@ -55,7 +55,7 @@ function setup(words: VocabularyWord[], overrides: Record<string, unknown> = {})
     <VocabQuizFocusPicker
       words={words}
       focus="any"
-      questionCount={8}
+      questionCount={6}
       secondsPerQuestion={15}
       onFocusChange={onFocusChange}
       onQuestionCountChange={onQuestionCountChange}
@@ -120,13 +120,12 @@ describe('VocabQuizFocusPicker', () => {
 
   it('lets the teacher set the round length and the per-question clock', async () => {
     const { onQuestionCountChange, onSecondsChange } = setup(ENRICHED);
-    await userEvent.click(screen.getByRole('radio', { name: '5' }));
-    expect(onQuestionCountChange).toHaveBeenCalledWith(5);
+    await userEvent.click(screen.getByRole('radio', { name: '4' }));
+    expect(onQuestionCountChange).toHaveBeenCalledWith(4);
     await userEvent.click(screen.getByRole('radio', { name: 'vocabQuiz.setup.seconds:10' }));
     expect(onSecondsChange).toHaveBeenCalledWith(10);
-    // 8 x 15 is the default; anything past two minutes of questions is off the table.
-    expect(screen.getByRole('radio', { name: '12' })).toBeDisabled();
-    expect(screen.getByRole('radio', { name: 'vocabQuiz.setup.seconds:20' })).toBeDisabled();
+    // 6 x 15 is the default; 8 x (15 + reveal) would run past two minutes.
+    expect(screen.getByRole('radio', { name: '8' })).toBeDisabled();
   });
 
   it('marks the selected focus for assistive tech', () => {

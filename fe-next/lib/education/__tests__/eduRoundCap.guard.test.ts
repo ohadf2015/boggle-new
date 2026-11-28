@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 import { classroomRoundSeconds } from '@/shared/utils/fixedRoundTimer';
-import { capQuizToRound } from '@/shared/types/vocabQuiz';
+import { capQuizToRound, VOCAB_QUIZ_REVEAL_MS, VOCAB_QUIZ_DEFAULT_QUESTION_COUNT, VOCAB_QUIZ_DEFAULT_SECONDS } from '@/shared/types/vocabQuiz';
 import { TEACHER_GAME_MODES, FALLBACK_MODE_MINUTES, configuredRoundMinutes } from '@/lib/education/gameModes';
 import { CLASSROOM_PRESETS } from '@/lib/education/classroomPresets';
 import { HOST_TIMER_MINUTES } from '@/lib/education/teacherHostHref';
@@ -14,6 +14,7 @@ import { QUIZ_QUESTION_COUNTS, QUIZ_SECONDS_CHOICES } from '@/components/educati
 import { getGameModeRules } from '@/backend/modes/rules';
 
 const MAX_MIN = EDU_MAX_ROUND_SEC / 60;
+const quizSec = (count: number, seconds: number) => count * (seconds + VOCAB_QUIZ_REVEAL_MS / 1000);
 
 describe('every classroom game lasts at most 2 minutes', () => {
   it('caps the shared constant at 120s', () => {
@@ -33,20 +34,23 @@ describe('every classroom game lasts at most 2 minutes', () => {
     for (const [id, preset] of Object.entries(CLASSROOM_PRESETS)) expect(preset.timerMinutes, id).toBeLessThanOrEqual(MAX_MIN);
     for (const s of SESSION_TEMPLATES) {
       expect(s.timerMinutes, s.id).toBeLessThanOrEqual(MAX_MIN);
-      if (s.quiz) expect(s.quiz.questionCount * s.quiz.seconds, s.id).toBeLessThanOrEqual(EDU_MAX_ROUND_SEC);
+      if (s.quiz) expect(quizSec(s.quiz.questionCount, s.quiz.seconds), s.id).toBeLessThanOrEqual(EDU_MAX_ROUND_SEC);
     }
   });
 
   it('keeps quiz chips, defaults and stale combos within the cap', () => {
     for (const count of QUIZ_QUESTION_COUNTS) {
-      expect(QUIZ_SECONDS_CHOICES.some((s) => s * count <= EDU_MAX_ROUND_SEC), `count ${count}`).toBe(true);
+      expect(QUIZ_SECONDS_CHOICES.some((s) => quizSec(count, s) <= EDU_MAX_ROUND_SEC), `count ${count}`).toBe(true);
     }
     for (const s of QUIZ_SECONDS_CHOICES) {
-      expect(QUIZ_QUESTION_COUNTS.some((c) => s * c <= EDU_MAX_ROUND_SEC), `seconds ${s}`).toBe(true);
+      expect(QUIZ_QUESTION_COUNTS.some((c) => quizSec(c, s) <= EDU_MAX_ROUND_SEC), `seconds ${s}`).toBe(true);
     }
     const stale = capQuizToRound(20, 30);
-    expect(stale.questionCount * stale.secondsPerQuestion).toBeLessThanOrEqual(EDU_MAX_ROUND_SEC);
-    expect(capQuizToRound(8, 15)).toEqual({ questionCount: 8, secondsPerQuestion: 15 });
+    expect(quizSec(stale.questionCount, stale.secondsPerQuestion)).toBeLessThanOrEqual(EDU_MAX_ROUND_SEC);
+    expect([VOCAB_QUIZ_DEFAULT_QUESTION_COUNT, VOCAB_QUIZ_DEFAULT_SECONDS]).toEqual([6, 15]);
+    expect(capQuizToRound(6, 15)).toEqual({ questionCount: 6, secondsPerQuestion: 15 });
+    expect(capQuizToRound(8, 15).questionCount).toBe(6);
+    expect(configuredRoundMinutes('vocab-quiz', { vocabQuizQuestionCount: 6, vocabQuizSeconds: 15 })).toBeLessThanOrEqual(MAX_MIN);
   });
 
   it('caps stored and built-in timers read for play', () => {

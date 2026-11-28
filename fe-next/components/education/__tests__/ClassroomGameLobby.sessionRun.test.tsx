@@ -76,7 +76,7 @@ describe('ClassroomGameLobby: one-tap ready-to-run sessions', () => {
     const payload = await goLive();
     expect(payload.lessonIds).toEqual(['lesson-pack']);
     // A link saved before the two-minute cap still runs a two-minute round.
-    expect(payload.settings).toMatchObject({ gameMode: 'vocab-quiz', timerMinutes: 2, vocabQuizQuestionCount: 6, vocabQuizSeconds: 20 });
+    expect(payload.settings).toMatchObject({ gameMode: 'vocab-quiz', timerMinutes: 2, vocabQuizQuestionCount: 5, vocabQuizSeconds: 20 });
   });
 
   it('Given the pack already exists as a list, Then it is selected, not created again', async () => {
@@ -97,7 +97,7 @@ describe('ClassroomGameLobby: one-tap ready-to-run sessions', () => {
   it('Given a teacher with no lists, When Run this is tapped, Then the lobby takes the session in place and launches it', async () => {
     (educationApi.getLessons as ReturnType<typeof vi.fn>).mockResolvedValue({ data: [] });
     runRef.current = {
-      session: { id: 'exit-ticket', mode: 'vocab-quiz', timerMinutes: 2, quiz: { questionCount: 8, seconds: 15 } },
+      session: { id: 'exit-ticket', mode: 'vocab-quiz', timerMinutes: 2, quiz: { questionCount: 6, seconds: 15 } },
       packCode: PACK.code,
       pack: { name: PACK.name, description: PACK.description, language: 'en', words: DEFINED_WORDS },
       href: '/en/education/classroom-game?pack=LC-EN-PK-AUTUMN',
@@ -108,7 +108,7 @@ describe('ClassroomGameLobby: one-tap ready-to-run sessions', () => {
     const payload = await goLive();
     expect(educationApi.createLesson).toHaveBeenCalledTimes(1);
     expect(payload.lessonIds).toEqual(['lesson-pack']);
-    expect(payload.settings).toMatchObject({ gameMode: 'vocab-quiz', timerMinutes: 2, vocabQuizQuestionCount: 8, vocabQuizSeconds: 15 });
+    expect(payload.settings).toMatchObject({ gameMode: 'vocab-quiz', timerMinutes: 2, vocabQuizQuestionCount: 6, vocabQuizSeconds: 15 });
     expect(stableRouter.push).not.toHaveBeenCalled();
   });
 

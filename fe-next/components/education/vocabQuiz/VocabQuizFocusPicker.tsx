@@ -28,6 +28,7 @@ import { EDU_MAX_ROUND_SEC } from '@/shared/constants/lessonScoring';
 import {
   VOCAB_QUIZ_MIN_QUESTION_COUNT,
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
+  VOCAB_QUIZ_REVEAL_MS,
   type PracticeFocusSetting,
   type VocabFocus,
   type TranslateFn,
@@ -53,9 +54,9 @@ const FOCUS_CHIPS: { key: VocabFocus; icon: typeof BookOpen }[] = VOCAB_FOCUSES.
   icon: FOCUS_ICONS[key] ?? HelpCircle,
 }));
 
-export const QUIZ_QUESTION_COUNTS = [5, 8, 12] as const;
-export const QUIZ_SECONDS_CHOICES = [10, 15, 20] as const;
-const overCap = (count: number, seconds: number) => count * seconds > EDU_MAX_ROUND_SEC;
+export const QUIZ_QUESTION_COUNTS = [4, 6, 8] as const;
+export const QUIZ_SECONDS_CHOICES = [10, 15] as const;
+const overCap = (count: number, seconds: number) => count * (seconds + VOCAB_QUIZ_REVEAL_MS / 1000) > EDU_MAX_ROUND_SEC;
 
 export interface VocabQuizFocusPickerProps {
   /** The teacher's selected lesson words, with whatever per-word data they hold. */
@@ -218,7 +219,7 @@ export function VocabQuizFocusPicker({
           <Timer className="me-2 inline size-4 text-edu-ink/70" />
           {t('vocabQuiz.setup.secondsPerQuestion')}
         </div>
-        <div role="radiogroup" aria-labelledby="vocab-quiz-seconds-label" className="grid grid-cols-3 gap-3">
+        <div role="radiogroup" aria-labelledby="vocab-quiz-seconds-label" className="grid grid-cols-2 gap-3">
           {QUIZ_SECONDS_CHOICES.map((seconds) => (
             <button
               key={seconds}

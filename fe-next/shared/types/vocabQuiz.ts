@@ -69,7 +69,7 @@ export interface VocabQuizBoss {
 // Round shape
 // ---------------------------------------------------------------------------
 
-export const VOCAB_QUIZ_DEFAULT_QUESTION_COUNT = 8;
+export const VOCAB_QUIZ_DEFAULT_QUESTION_COUNT = 6;
 export const VOCAB_QUIZ_MIN_QUESTION_COUNT = 4;
 export const VOCAB_QUIZ_MAX_QUESTION_COUNT = 30;
 
@@ -77,10 +77,11 @@ export const VOCAB_QUIZ_DEFAULT_SECONDS = 15;
 export const VOCAB_QUIZ_MIN_SECONDS = 5;
 export const VOCAB_QUIZ_MAX_SECONDS = 90;
 
-/** Fewer questions, never shorter ones: a stale 20 x 30 setup still fits the classroom round cap. */
+/** Fewer questions, never shorter ones: a stale 20 x 30 setup, reveals included, still fits the classroom round cap. */
 export function capQuizToRound(questionCount: number, secondsPerQuestion: number): { questionCount: number; secondsPerQuestion: number } {
-  const seconds = Math.min(secondsPerQuestion, EDU_MAX_ROUND_SEC);
-  return { questionCount: Math.max(1, Math.min(questionCount, Math.floor(EDU_MAX_ROUND_SEC / seconds))), secondsPerQuestion: seconds };
+  const reveal = VOCAB_QUIZ_REVEAL_MS / 1000;
+  const seconds = Math.min(secondsPerQuestion, EDU_MAX_ROUND_SEC - reveal);
+  return { questionCount: Math.max(1, Math.min(questionCount, Math.floor(EDU_MAX_ROUND_SEC / (seconds + reveal)))), secondsPerQuestion: seconds };
 }
 
 /** The "answer reveal + standings" beat between questions. */

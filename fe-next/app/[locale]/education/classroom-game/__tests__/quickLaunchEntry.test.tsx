@@ -102,11 +102,11 @@ describe('classroom-game: the quick-launch entry path', () => {
   });
 
   it('Given a "Run this" session link, Then the pack, preset and quiz shape reach the lobby', async () => {
-    search = new URLSearchParams('mode=vocab-quiz&minutes=2&session=exit-ticket&pack=LC-EN-PK-AUTUMN&preset=friday-battle&questions=8&seconds=15');
+    search = new URLSearchParams('mode=vocab-quiz&minutes=2&session=exit-ticket&pack=LC-EN-PK-AUTUMN&preset=friday-battle&questions=6&seconds=15');
     render(<ClassroomGamePage />);
     expect(await screen.findByTestId('lobby')).toBeInTheDocument();
     expect(lobbyProps).toHaveBeenLastCalledWith(
-      expect.objectContaining({ sessionPack: 'LC-EN-PK-AUTUMN', initialPreset: 'friday-battle', initialQuestions: 8, initialSeconds: 15, initialMinutes: 2 })
+      expect.objectContaining({ sessionPack: 'LC-EN-PK-AUTUMN', initialPreset: 'friday-battle', initialQuestions: 6, initialSeconds: 15, initialMinutes: 2 })
     );
   });
 
