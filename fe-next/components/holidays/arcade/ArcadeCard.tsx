@@ -1,6 +1,7 @@
 'use client';
 
-import { Users } from 'lucide-react';
+import { Tv, Users } from 'lucide-react';
+import { isPartyGame } from '@/lib/holidays/arcade/party/games';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ARCADE_GAMES, type ArcadeGameId } from '@/lib/holidays/arcade/games';
 import { cn } from '@/lib/utils';
@@ -33,6 +34,12 @@ export default function ArcadeCard({ game, wide, onPick, onWarm }: { game: Arcad
           <Users className="size-3" aria-hidden="true" />
           {t('holiday.arcade.family.badge')}
         </span>
+        {isPartyGame(game) && (
+          <span className="absolute end-2 top-2 inline-flex items-center gap-1 rounded-full border-2 border-black bg-neo-cyan px-2 py-0.5 font-neo-display text-[11px] font-black uppercase text-neo-navy shadow-hard-sm">
+            <Tv className="size-3" aria-hidden="true" />
+            {t('holiday.arcade.party.badge')}
+          </span>
+        )}
       </span>
       <span className="block flex-1 p-3">
         <span className="block font-neo-display text-lg font-black leading-tight text-neo-white">{t(`holiday.arcade.${game}.title`)}</span>

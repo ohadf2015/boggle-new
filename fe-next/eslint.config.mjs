@@ -22,6 +22,7 @@ const PIXI_ALLOWED = [
   "components/adventure/play/arena/**",
   "components/holidays/arcade/kit/**",
   "components/holidays/arcade/family/**",
+  "components/holidays/arcade/party/scenes/**",
 ];
 const TEST_FILES = ["**/__tests__/**", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "e2e/**"];
 

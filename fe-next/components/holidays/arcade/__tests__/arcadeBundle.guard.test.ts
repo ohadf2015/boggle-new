@@ -28,7 +28,7 @@ describe('holiday arcade bundle boundary', () => {
   });
 
   it('Given the kit and family scenes, then pixi is only imported at runtime by the stage', () => {
-    for (const f of [...files('kit'), ...files('family')]) expect(read(f), f).not.toMatch(staticImport);
+    for (const f of [...files('kit'), ...files('family'), ...files('party')]) expect(read(f), f).not.toMatch(staticImport);
     expect(read('kit/PixiStage.tsx')).toContain("await import('pixi.js')");
   });
 });

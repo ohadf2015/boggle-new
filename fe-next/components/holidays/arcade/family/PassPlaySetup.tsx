@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Users } from 'lucide-react';
+import Link from 'next/link';
+import { Tv, Users } from 'lucide-react';
+import { isPartyGame } from '@/lib/holidays/arcade/party/games';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ARCADE_GAMES, type ArcadeGameId } from '@/lib/holidays/arcade/games';
 import { MAX_PLAYERS, PLAYER_COLORS } from '@/lib/holidays/arcade/kit/passPlay';
@@ -80,6 +82,16 @@ export default function PassPlaySetup({ game, onStart }: Props) {
       >
         {t(count > 1 ? 'holiday.arcade.family.startTogether' : 'holiday.arcade.family.start')}
       </button>
+      {isPartyGame(game) && (
+        <Link
+          href={`?g=${game}&mode=tv`}
+          data-testid="family-bigscreen"
+          className="flex h-12 w-full max-w-xs items-center justify-center gap-2 rounded-2xl border-[3px] border-black bg-neo-cyan font-neo-display text-lg font-black text-neo-navy shadow-hard active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-sm"
+        >
+          <Tv className="size-5" aria-hidden="true" />
+          {t('holiday.arcade.party.bigScreen')}
+        </Link>
+      )}
     </div>
   );
 }

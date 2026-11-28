@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { ArrowLeft, Users } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,10 +12,16 @@ import { cn } from '@/lib/utils';
 import ArcadeGameHost from './ArcadeGameHost';
 import ArcadeCard from './ArcadeCard';
 import { prefetchGame } from './gameLoaders';
+import { isPartyGame } from '@/lib/holidays/arcade/party/games';
+
 import ArcadeMoreFun from './ArcadeMoreFun';
 import HolidayEventCard from '@/components/holidays/HolidayEventCard';
+import PartyCodeJoin from './party/PartyCodeJoin';
 import { localDateIn, trackIndex, windowFor } from '@/lib/holidays/calendar';
 import styles from './arcade.module.css';
+
+const PartyTv = dynamic(() => import('./party/PartyTv'), { ssr: false });
+const PartyPhone = dynamic(() => import('./party/PartyPhone'), { ssr: false });
 
 const LOOK = {
   hanukkah: { hero: '/holidays/hero-hanukkah.webp', stripe: 'bg-neo-holiday-blue', bulbs: ['bg-neo-holiday-blue', 'bg-neo-holiday-snow', 'bg-neo-cyan'], chip: 'bg-neo-holiday-blue text-neo-white' },
@@ -29,10 +36,12 @@ export default function ArcadeHub() {
   const params = useSearchParams();
   const raw = params.get('g');
   const selected: ArcadeGameId | null = holiday && isArcadeGame(raw) && ARCADE_GAMES[raw].holiday === holiday ? raw : null;
+  const rawParty = params.get('party');
+  const party = rawParty && /^[A-Za-z0-9]{4}$/.test(rawParty) ? rawParty.toUpperCase() : null;
 
   useEffect(() => {
-    if (resolved && !holiday) router.replace(`/${language}`);
-  }, [resolved, holiday, router, language]);
+    if (resolved && !holiday && !party) router.replace(`/${language}`);
+  }, [resolved, holiday, party, router, language]);
 
   const go = useCallback(
     (g: ArcadeGameId | null) => {
@@ -45,10 +54,13 @@ export default function ArcadeHub() {
     [params, pathname, router],
   );
 
+  if (party) return <PartyPhone code={party} />;
+
   if (!resolved || !holiday) {
     return <div className="mx-auto mt-6 h-96 w-full max-w-lg animate-pulse rounded-2xl bg-neo-navy-light/60" role="status" aria-label={t('holiday.arcade.loading')} />;
   }
 
+  if (selected && params.get('mode') === 'tv' && isPartyGame(selected)) return <PartyTv game={selected} holiday={holiday} onExit={() => go(null)} />;
   if (selected) return <ArcadeGameHost key={selected} holiday={holiday} game={selected} onExit={() => go(null)} />;
 
   const games = gamesFor(holiday);
@@ -108,6 +120,7 @@ export default function ArcadeHub() {
         </ul>
       </div>
       <p className="-mt-2 text-center text-xs text-neo-white/60">{t('holiday.arcade.coinNote')}</p>
+      <PartyCodeJoin label={t('holiday.arcade.party.haveCode')} cta={t('holiday.arcade.party.join')} onJoin={(code) => router.push(`${pathname}?party=${code}`)} />
 
       <ArcadeMoreFun holiday={holiday} lang={language} t={t} />
     </section>

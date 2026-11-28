@@ -216,7 +216,43 @@ const sv = {
       "newBest": "Nytt rekord!",
       "tieBest": "Du tangerade ditt rekord!",
       "soClose": "Så nära! Bara {gap} från ditt rekord",
-      "bestScore": "Ditt rekord: {score}"
+      "bestScore": "Ditt rekord: {score}",
+      "party": {
+        "tie": "Oavgjort!",
+        "scanToJoin": "Skanna för att vara med",
+        "needPlayer": "Väntar på första spelaren…",
+        "haveCode": "Ska du vara med på storbildsfest? Skriv koden",
+        "badge": "TV",
+        "bigScreen": "Storbild + mobiler",
+        "waiting": "Väntar på spelare…",
+        "start": "Kör!",
+        "again": "En runda till",
+        "players": "Spelare: {n}",
+        "winner": "{name} vinner!",
+        "fullscreen": "Helskärm",
+        "joinTitle": "Häng med på festen",
+        "namePlaceholder": "Ditt namn",
+        "join": "Gå med",
+        "youreIn": "Du är med! Titta på storbilden",
+        "missing": "Den festen är slut. Fråga efter den nya koden på storbilden",
+        "full": "Festen är full (8 spelare)",
+        "reconnecting": "Ansluter igen…",
+        "holdToFly": "HÅLL FÖR ATT FLYGA",
+        "slide": "Dra för att flytta din tallrik",
+        "tapToThrow": "Tryck där du vill kasta",
+        "cough": "*host* {name} fångade en bränd latke!",
+        "frenzy": "{name} hittade guldmunken!",
+        "oops": "{name} träffade maskoten!",
+        "turbo": "{name} tog turbon!",
+        "codeLabel": "Kod",
+        "grabPhones": "Ta fram mobilerna och häng med på festen!",
+        "fort": "Fäste {n}",
+        "howTo": {
+          "catch": "Dra tallriken på mobilen och fånga munkarna. Undvik de brända latkesarna!",
+          "splat": "Tryck på ett snöfäste på mobilen för att kasta på den som tittar fram. Inte maskoten!",
+          "dash": "Håll på skärmen för att stiga, släpp för att glida. Ta julklapparna!"
+        }
+      }
     },
     // @holiday-arcade:end
     "event": {

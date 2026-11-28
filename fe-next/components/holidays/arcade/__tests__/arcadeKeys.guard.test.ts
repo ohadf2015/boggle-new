@@ -23,6 +23,9 @@ const dynamic = [
   ...['nun', 'gimel', 'hei', 'shin', 'pe'].map((s) => `spin.side.${s}`),
   'newBest',
   'tieBest',
+  'party.missing',
+  ...['catch', 'splat', 'dash'].map((g) => `party.howTo.${g}`),
+  'party.full',
 ];
 
 const get = (tree: unknown, key: string) => key.split('.').reduce<unknown>((o, k) => (o as Record<string, unknown> | undefined)?.[k], tree);

@@ -22,6 +22,7 @@ interface Props {
   focus?: { x: number; y: number };
   className?: string;
   onInput?: () => void;
+  world?: { w: number; h: number };
 }
 
 const TONE: Record<FloatTone, string> = {
@@ -104,9 +105,10 @@ export default function PixiStage({ className, label, ...props }: Props) {
 
       const layout = () => {
         const { width: w, height: h } = created.screen;
-        view.scale = Math.max(w / ART_W, h / ART_H);
-        view.x = (w - ART_W * view.scale) * focus.x;
-        view.y = (h - ART_H * view.scale) * focus.y;
+        const { w: ww, h: wh } = propsRef.current.world ?? { w: ART_W, h: ART_H };
+        view.scale = Math.max(w / ww, h / wh);
+        view.x = (w - ww * view.scale) * focus.x;
+        view.y = (h - wh * view.scale) * focus.y;
         world.scale.set(view.scale);
         world.position.set(view.x, view.y);
       };
