@@ -25,7 +25,8 @@ import { trackEduReportsViewed } from '@/lib/education/telemetry';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { ClassroomPicker } from '@/components/teacher/reports/ClassroomPicker';
 import { ReportsNoClasses } from '@/components/teacher/reports/ReportsNoClasses';
-import { ReportsReteachPanel } from './ReportsReteachPanel';
+import { ReportsReteachLoading, ReportsReteachPanel } from './ReportsReteachPanel';
+import { ClassroomWeekSection } from '@/components/teacher/digest/ClassroomWeekSection';
 import { ReportsProGate } from './ReportsGate';
 import { ReportsClassView } from './ReportsClassView';
 import { ReportsStudentView } from './ReportsStudentView';
@@ -35,6 +36,7 @@ import { HeadingMascot } from '@/components/teacher/HeadingMascot';
 /** Slide distance for the drill-down; the direction follows depth and locale. */
 const SLIDE_PX = 56;
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
+const noop = () => {};
 
 /**
  * TeacherReportsInner - Teacher Reports Page
@@ -188,7 +190,9 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   const weekFocus = selectedClassroomId
     ? classrooms?.find((c) => c.id === selectedClassroomId) ?? null
     : classrooms?.find((c) => c.id === shownClassId) ?? classrooms?.[0] ?? null;
-  const weekPanel = weekFocus && classrooms && classrooms.length > 0 ? (
+  const weekPanel = classroomsLoading ? (
+    <ClassroomWeekSection classroomName="" digest={null} status="loading" showNudge={false} hostHref="" onRetry={noop} t={t} />
+  ) : weekFocus && classrooms && classrooms.length > 0 ? (
     <ClassroomWeekPanel
       classroomIds={classrooms.map((c) => c.id)}
       focusId={weekFocus.id}
@@ -214,14 +218,16 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
 
         {weekPanel}
 
-        {classrooms && classrooms.length > 0 ? (
+        {classroomsLoading ? (
+          <ReportsReteachLoading />
+        ) : classrooms && classrooms.length > 0 ? (
           <ReportsReteachPanel classrooms={classrooms} onShown={setShownClassId} />
         ) : null}
 
         <h2 className="mb-3 text-base font-bold text-edu-ink">{t('teacher.reports.selectClassroom')}</h2>
 
         {classroomsLoading ? (
-          <div aria-busy="true" className="grid gap-3 sm:grid-cols-2">
+          <div data-testid="reports-picker-loading" aria-busy="true" className="grid gap-3 sm:grid-cols-2">
             <span className="sr-only" role="status">
               {t('teacher.reports.loadingClassrooms')}
             </span>

@@ -16881,11 +16881,7 @@ const es = {
       "homeCta": "Ver esta semana"
     },
     "proPowered": {"hint": "Incluido en tu plan Teacher Pro"},
-    "trialUsage": {"lead": "Durante tu prueba:", "games_one": "{count} partida de clase", "games_other": "{count} partidas de clase", "students_one": "{count} alumno con seguimiento", "students_other": "{count} alumnos con seguimiento", "practice_one": "{count} sesión de práctica", "practice_other": "{count} sesiones de práctica"},
-    "schoolBulkCta": {
-      "text": "¿Lo usas en todo el centro escolar?",
-      "link": "Consulta precios para centros"
-    }
+    "trialUsage": {"lead": "Durante tu prueba:", "games_one": "{count} partida de clase", "games_other": "{count} partidas de clase", "students_one": "{count} alumno con seguimiento", "students_other": "{count} alumnos con seguimiento", "practice_one": "{count} sesión de práctica", "practice_other": "{count} sesiones de práctica"}
   },
   "education": {
     "race": {

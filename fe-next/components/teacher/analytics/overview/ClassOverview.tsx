@@ -60,10 +60,15 @@ export function ClassOverview({ classroomId, classroomName, surface = 'class_rep
   const focusWords = (
     <ClassFocusWords classroomId={classroomId} classroomName={classroomName} fallback={metrics?.commonMistakes ?? []} surface={surface} />
   );
+  const focusPanelClass = `${REPORT_HERO_PANEL} grid gap-6 lg:grid-cols-2 [&>:only-child]:lg:col-span-2`;
+  // Same tree position as the ready layout below, so the words panel is not remounted (and refetched) when metrics land.
   const withFocus = (status: ReactNode) => (
     <div className="space-y-3">
       {status}
-      <div data-testid="overview-focus" className={REPORT_HERO_PANEL}>{focusWords}</div>
+      <div data-testid="overview-focus" className={focusPanelClass}>
+        {null}
+        {focusWords}
+      </div>
     </div>
   );
 
@@ -104,7 +109,7 @@ export function ClassOverview({ classroomId, classroomName, surface = 'class_rep
         <ProPoweredChip className="mt-1 shrink-0" />
       </div>
 
-      <div data-testid="overview-focus" className={`${REPORT_HERO_PANEL} grid gap-6 lg:grid-cols-2 [&>:only-child]:lg:col-span-2`}>
+      <div data-testid="overview-focus" className={focusPanelClass}>
         {attention.length > 0 ? (
           <section data-testid="overview-attention" aria-labelledby="ov-attn" className="min-w-0">
             <div className="flex items-center gap-2.5">

@@ -34,19 +34,7 @@ export function ReportsReteachPanel({ classrooms, onShown }: { classrooms: reado
     onShown?.(shownId);
   }, [onShown, shownId]);
 
-  if (state.status === 'loading') {
-    return (
-      <section data-testid="reports-reteach-panel" aria-busy="true" className={cn(REPORT_HERO_PANEL, 'mb-6 min-h-64')}>
-        <span className="sr-only" role="status">{t('teacher.reports.loadingClassrooms')}</span>
-        <div aria-hidden="true" className="h-8 w-56 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
-        <div aria-hidden="true" className="mt-4 grid gap-2 sm:grid-cols-2">
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-12 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
-          ))}
-        </div>
-      </section>
-    );
-  }
+  if (state.status === 'loading') return <ReportsReteachLoading />;
 
   if (state.status === 'error') return null;
 
@@ -97,6 +85,21 @@ export function ReportsReteachPanel({ classrooms, onShown }: { classrooms: reado
 
       <div className="mt-5">
         <PrimaryAction snapshot={snapshot} example={example} startClassId={startClassId} />
+      </div>
+    </section>
+  );
+}
+
+export function ReportsReteachLoading() {
+  const { t } = useLanguage();
+  return (
+    <section data-testid="reports-reteach-panel" aria-busy="true" className={cn(REPORT_HERO_PANEL, 'mb-6 min-h-[22rem]')}>
+      <span className="sr-only" role="status">{t('teacher.reports.loadingClassrooms')}</span>
+      <div aria-hidden="true" className="h-8 w-56 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
+      <div aria-hidden="true" className="mt-4 grid gap-2 sm:grid-cols-2">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="h-12 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
+        ))}
       </div>
     </section>
   );

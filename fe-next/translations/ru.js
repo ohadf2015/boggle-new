@@ -16627,11 +16627,7 @@ const ru = {
       "homeCta": "Смотреть эту неделю"
     },
     "proPowered": {"hint": "Входит в ваш тариф Teacher Pro"},
-    "trialUsage": {"lead": "За пробный период:", "games_one": "{count} игра с классом", "games_few": "{count} игры с классом", "games_many": "{count} игр с классом", "games_other": "{count} игры с классом", "students_one": "{count} ученик под наблюдением", "students_few": "{count} ученика под наблюдением", "students_many": "{count} учеников под наблюдением", "students_other": "{count} ученика под наблюдением", "practice_one": "{count} тренировка", "practice_few": "{count} тренировки", "practice_many": "{count} тренировок", "practice_other": "{count} тренировки"},
-    "schoolBulkCta": {
-      "text": "Используете это во всей школе?",
-      "link": "Узнать цены для школ"
-    }
+    "trialUsage": {"lead": "За пробный период:", "games_one": "{count} игра с классом", "games_few": "{count} игры с классом", "games_many": "{count} игр с классом", "games_other": "{count} игры с классом", "students_one": "{count} ученик под наблюдением", "students_few": "{count} ученика под наблюдением", "students_many": "{count} учеников под наблюдением", "students_other": "{count} ученика под наблюдением", "practice_one": "{count} тренировка", "practice_few": "{count} тренировки", "practice_many": "{count} тренировок", "practice_other": "{count} тренировки"}
   },
   "ugc": {
     "createBoard": "Создать доску",

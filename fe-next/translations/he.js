@@ -16818,11 +16818,7 @@ const he = {
       "homeCta": "לצפייה בשבוע הזה"
     },
     "proPowered": {"hint": "חלק מתוכנית פרו למורים שלך"},
-    "trialUsage": {"lead": "בתקופת הניסיון:", "games_one": "משחק כיתתי אחד", "games_other": "{count} משחקים כיתתיים", "students_one": "תלמיד אחד במעקב", "students_other": "{count} תלמידים במעקב", "practice_one": "תרגול אחד", "practice_other": "{count} תרגולים"},
-    "schoolBulkCta": {
-      "text": "מריצים את זה בכל בית הספר?",
-      "link": "קבלו מחיר לבתי ספר"
-    }
+    "trialUsage": {"lead": "בתקופת הניסיון:", "games_one": "משחק כיתתי אחד", "games_other": "{count} משחקים כיתתיים", "students_one": "תלמיד אחד במעקב", "students_other": "{count} תלמידים במעקב", "practice_one": "תרגול אחד", "practice_other": "{count} תרגולים"}
   },
   "education": {
     "race": {

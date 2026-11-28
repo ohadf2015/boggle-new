@@ -27,19 +27,22 @@ const SSR_VIEW = { width: 390, height: 844 };
 
 /**
  * The hub's layout rule, but hydration-safe: this frame IS server-rendered (the
- * pending state), so the first client render must match the server's, and the
- * real viewport is applied in a layout effect before the first paint.
+ * pending state), so the first client render must match the server's. The
+ * browser paints that server HTML before hydration, so it stays hidden until
+ * the layout effect has measured the real viewport.
  */
-function useFrameLayout(): { layout: HubLayout; scale: number } {
+function useFrameLayout(): { layout: HubLayout; scale: number; measured: boolean } {
   const [view, setView] = useState(SSR_VIEW);
+  const [measured, setMeasured] = useState(false);
   useLayoutEffect(() => {
     const update = () => setView((v) => (v.width === window.innerWidth && v.height === window.innerHeight ? v : { width: window.innerWidth, height: window.innerHeight }));
     update();
+    setMeasured(true);
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
   }, []);
   const layout = pickHubLayout(view);
-  return { layout, scale: frameScale(layout, view.width, view.height) };
+  return { layout, scale: frameScale(layout, view.width, view.height), measured };
 }
 
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
@@ -70,7 +73,7 @@ interface Props {
 
 export function AcademyPageFrame({ title, art, badge, toolbar, regionLabel, pending = false, busy = false, children }: Props) {
   const { language, dir } = useLanguage() as { language: string; dir?: string };
-  const { layout, scale } = useFrameLayout();
+  const { layout, scale, measured } = useFrameLayout();
   const rail = layout.chrome === 'rail';
   const wide = layout.chrome === 'wide';
 
@@ -92,7 +95,7 @@ export function AcademyPageFrame({ title, art, badge, toolbar, regionLabel, pend
             ? 'gap-1.5 ps-[max(0.5rem,env(safe-area-inset-left,0px))] pe-[max(0.5rem,env(safe-area-inset-right,0px))] pb-[calc(env(safe-area-inset-bottom,0px)+0.375rem)] pt-[calc(env(safe-area-inset-top,0px)+0.375rem)]'
             : 'gap-2.5 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pt-[calc(env(safe-area-inset-top,0px)+0.5rem)] sm:px-6 sm:pb-5 sm:pt-4',
         )}
-        style={{ width: '100%', height: '100%', ...(scale !== 1 ? { zoom: scale } : {}) }}
+        style={{ width: '100%', height: '100%', ...(scale !== 1 ? { zoom: scale } : {}), ...(measured ? {} : { visibility: 'hidden' as const }) }}
       >
         <div className={cn('mx-auto flex w-full shrink-0 items-center gap-2', wide ? 'max-w-6xl' : 'max-w-3xl', rail && 'max-w-none')}>
           <AcademyPlaque title={title} art={art} badge={badge} compact={rail} />

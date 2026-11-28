@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { PublicTeacherPayCta } from '../PublicTeacherPayCta';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { TEACHER_PRO_CHECKOUT_PATH } from '@/components/education/TeacherProCheckoutCta';
@@ -39,14 +40,19 @@ describe('PublicTeacherPayCta', () => {
     expect(screen.queryByTestId('teacher-pro-checkout-link')).not.toBeInTheDocument();
   });
 
-  it('shows a bulk-pricing link to /education/for-schools for a signed-in teacher', () => {
+  it('renders nothing for a signed-in teacher, so no strip sits under the app tab bar', () => {
     mockUseAuth.mockReturnValue({
       profile: { user_role: 'teacher' },
       loading: false,
     });
+    const { container } = render(<PublicTeacherPayCta locale="en" />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('stays out of the page flow, so the app shell beside it is never squeezed while auth loads', () => {
+    mockUseAuth.mockReturnValue({ profile: null, loading: true });
     render(<PublicTeacherPayCta locale="en" />);
-    const link = screen.getByTestId('school-bulk-pricing-link');
-    expect(link).toHaveAttribute('href', '/en/education/for-schools#lead');
+    expect(screen.getByTestId('public-teacher-pay-cta')).toHaveClass('absolute');
   });
 
   it('does not show the bulk-pricing link while unsigned', () => {

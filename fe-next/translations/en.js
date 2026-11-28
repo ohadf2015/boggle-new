@@ -15218,11 +15218,7 @@ const en = {
       "homeCta": "See this week"
     },
     "proPowered": {"hint": "Part of your Teacher Pro plan"},
-    "trialUsage": {"lead": "During your trial:", "games_one": "{count} class game", "games_other": "{count} class games", "students_one": "{count} student tracked", "students_other": "{count} students tracked", "practice_one": "{count} practice session", "practice_other": "{count} practice sessions"},
-    "schoolBulkCta": {
-      "text": "Running this for your whole school?",
-      "link": "Get bulk pricing"
-    }
+    "trialUsage": {"lead": "During your trial:", "games_one": "{count} class game", "games_other": "{count} class games", "students_one": "{count} student tracked", "students_other": "{count} students tracked", "practice_one": "{count} practice session", "practice_other": "{count} practice sessions"}
   },
   "education": {
     "race": {
