@@ -116,7 +116,8 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '', quiet
     if (practiceRes.error) return { data: null, error: practiceRes.error };
     if (assignmentRes.error) return { data: null, error: assignmentRes.error };
 
-    const students = studentRes.data ?? [];
+    // The teacher's own seat in their class is represented by the test-run row, never as a student.
+    const students = (studentRes.data ?? []).filter((s) => s.student_id !== teacherId);
     const assignments = assignmentRes.data ?? [];
     // Optional: a failed read of the teacher's own play just hides their test row.
     const testRun = teacherId && !ownRes.error
