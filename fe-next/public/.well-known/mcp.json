@@ -1,0 +1,10 @@
+{
+  "name": "LexiClash",
+  "description": "Daily word puzzle, shareable challenge links, word scoring and the daily leaderboard.",
+  "version": "1.0.0",
+  "endpoint": "https://www.lexiclash.live/api/mcp",
+  "transport": "streamable-http",
+  "authentication": "none",
+  "tools": ["get_daily_puzzle", "create_challenge", "score_words", "daily_leaderboard"],
+  "documentation": "https://www.lexiclash.live/llms.txt"
+}

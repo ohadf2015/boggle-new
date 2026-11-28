@@ -437,3 +437,9 @@ Curriculum Alignment:
 - 9-12 vocabulary: academic + college-prep (TOEFL/IELTS), 1500+ words
 - Adult ESL: teacher-set difficulty and per-student tiers, professional vocabulary
 - ESL/EFL: cognates, false friends, code-switching support
+
+## For AI agents (MCP)
+- MCP server (streamable HTTP, no auth): https://www.lexiclash.live/api/mcp
+- Manifest: https://www.lexiclash.live/.well-known/mcp.json
+- Tools: get_daily_puzzle, create_challenge, score_words, daily_leaderboard
+- Links returned by the tools carry ?src=mcp
