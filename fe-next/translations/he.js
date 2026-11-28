@@ -22485,7 +22485,7 @@ const he = {
       "finished": "זכרתם את כולן. כל הכבוד!",
       "wrongComeback": "המילה הזאת תחזור עוד מעט, ותהיה לכם עוד הזדמנות.",
       "peeked": "הצצתם ב-{count} מתוך {total}",
-      "multiplier": "×{count}",
+      "multiplier": "פי {count}",
       "scoreLabel": "{score} נקודות",
       "finishTitle_one": "אתם יודעים את המילה!",
       "finishTitle": "אתם יודעים את כל {count} המילים!",
