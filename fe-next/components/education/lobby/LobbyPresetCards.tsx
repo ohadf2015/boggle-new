@@ -102,9 +102,9 @@ export function LobbyPresetCards({ active, onApply }: LobbyPresetCardsProps) {
                 <span
                   data-testid="preset-check"
                   aria-hidden="true"
-                  className="absolute -end-2 -top-2 grid size-7 place-items-center rounded-full border-[3px] border-neo-black bg-neo-black shadow-hard-sm motion-safe:animate-[lc-preset-check_240ms_cubic-bezier(0.23,1,0.32,1)]"
+                  className="absolute -end-2 -top-2 grid size-7 place-items-center rounded-full border-[3px] border-neo-black bg-edu-surface shadow-hard-sm motion-safe:animate-[lc-preset-check_240ms_cubic-bezier(0.23,1,0.32,1)]"
                 >
-                  <Check className="size-4 text-neo-cream" strokeWidth={4} />
+                  <Check className="size-4 text-edu-ink" strokeWidth={4} />
                 </span>
               ) : null}
             </button>
