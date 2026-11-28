@@ -24019,6 +24019,7 @@ const ja = {
     "selfBeat": "自己ベスト更新！",
     "yourBest": "自己ベスト",
     "pingedYou": "挑戦状が届いた",
+    "challengeBack": "挑戦し返す",
     "wins": "{count}勝",
     "losses": "{count}敗",
     "draws": "{count}分"

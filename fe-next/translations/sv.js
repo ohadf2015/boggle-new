@@ -24019,6 +24019,7 @@ const sv = {
     "selfBeat": "Nytt personbästa!",
     "yourBest": "Ditt bästa",
     "pingedYou": "Pingade dig",
+    "challengeBack": "Utmana tillbaka",
     "wins": "{count} V",
     "losses": "{count} F",
     "draws": "{count} O"

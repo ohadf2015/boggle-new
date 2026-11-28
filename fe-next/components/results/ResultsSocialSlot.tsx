@@ -30,6 +30,8 @@ export interface ResultsSocialSlotProps {
   /** A rival the screen already knows (edu classroom standings): no lookup runs. */
   rival?: RivalSummary | null;
   onRematch?: () => void;
+  /** Quick Play: share a challenge from the rival card. */
+  onChallenge?: () => Promise<unknown> | void;
   /** Server XP for this game (null until it arrives, or for modes that award none). */
   xp?: ResultsXp | null;
   /** Hold the public-name prompt back on this screen (MP: a guest's first game). */
@@ -39,7 +41,7 @@ export interface ResultsSocialSlotProps {
 }
 
 /** The one social block every results screen mounts: name prompt, new record, rival, next unlock. */
-export function ResultsSocialSlot({ mode, score, rivalScore, opponentUserIds, previousBest, subMode, date, rival: given, onRematch, xp, holdNamePrompt = false, holdGuestSave = false }: ResultsSocialSlotProps) {
+export function ResultsSocialSlot({ mode, score, rivalScore, opponentUserIds, previousBest, subMode, date, rival: given, onRematch, onChallenge, xp, holdNamePrompt = false, holdGuestSave = false }: ResultsSocialSlotProps) {
   const { loading, isAuthenticated } = useAuth();
   const { language } = useLanguage();
   const [fetched, setFetched] = useState<RivalSummary | null>(null);
@@ -79,7 +81,7 @@ export function ResultsSocialSlot({ mode, score, rivalScore, opponentUserIds, pr
     <div data-testid="results-social-slot" className="flex flex-col gap-3 w-full">
       <NewRecordBanner mode={mode} score={score} />
       {mode !== 'edu' && <WorldRecordChip mode={mode} subMode={subMode} score={score} />}
-      {rival && <RivalCard rival={rival} mode={mode} onRematch={onRematch} />}
+      {rival && <RivalCard rival={rival} mode={mode} onRematch={onRematch} onChallenge={onChallenge} />}
       {!holdNamePrompt && <PublicNamePrompt mode={mode} />}
       <NextUnlockTeaser mode={mode} xp={xp} holdGuestSave={holdGuestSave} />
     </div>

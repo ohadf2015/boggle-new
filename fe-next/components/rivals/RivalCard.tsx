@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { m } from 'framer-motion';
-import { Swords, Bell } from 'lucide-react';
+import { Swords, Bell, Share2 } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { TitleBadge } from '@/components/progression/TitleBadge';
 import { RecordHolderCrown } from '@/components/records/RecordHolderCrown';
@@ -59,9 +59,11 @@ export interface RivalCardProps {
   rival: RivalSummary;
   mode: ResultsMode;
   onRematch?: () => void;
+  /** Share a challenge on this run (Quick Play). Shown only when the rival is beaten. */
+  onChallenge?: () => Promise<unknown> | void;
 }
 
-export function RivalCard({ rival, mode, onRematch }: RivalCardProps) {
+export function RivalCard({ rival, mode, onRematch, onChallenge }: RivalCardProps) {
   const { t, language } = useLanguage();
 
   useEffect(() => {
@@ -71,6 +73,7 @@ export function RivalCard({ rival, mode, onRematch }: RivalCardProps) {
   const avatarProps = typeof rival.avatar === 'string'
     ? { avatarImage: rival.avatar }
     : { customAvatar: (rival.avatar as CustomAvatarConfig | undefined) ?? undefined };
+  const beaten = rival.gap != null && rival.gap <= 0;
   const canPing = !!rival.userId && mode !== 'edu';
   const why = whyLabel(rival, t as T, language);
   const name = rival.kind === 'self' ? t('rivals.yourBest') : rival.name;
@@ -125,6 +128,20 @@ export function RivalCard({ rival, mode, onRematch }: RivalCardProps) {
           </div>
         ) : <span />}
         <div className="flex items-center gap-2 shrink-0">
+          {onChallenge && beaten && (
+            <button
+              type="button"
+              data-testid="rival-challenge"
+              onClick={() => {
+                posthog.capture('rival_card_challenge_clicked', { mode, kind: rival.kind });
+                void onChallenge();
+              }}
+              className="inline-flex min-h-11 items-center gap-1 px-3 rounded-neo border-2 border-neo-black bg-neo-yellow text-neo-black text-xs font-black uppercase shadow-hard-sm"
+            >
+              <Share2 aria-hidden className="w-3.5 h-3.5" />
+              {t('rivals.challengeBack')}
+            </button>
+          )}
           {onRematch && (
             <button
               type="button"

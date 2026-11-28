@@ -23040,6 +23040,7 @@ const en = {
     "selfBeat": "New personal best!",
     "yourBest": "Your best",
     "pingedYou": "Pinged you",
+    "challengeBack": "Challenge them back",
     "wins": "{count} W",
     "losses": "{count} L",
     "draws": "{count} D"

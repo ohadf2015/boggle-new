@@ -392,6 +392,7 @@ export function QuickPlayResults({
               previousBest={prevBestScore}
               rivalScore={result.scorePct}
               subMode={result.mode}
+              onChallenge={onChallenge}
               xp={user && outcome.newTotalXp == null ? null : { gained: outcome.xp, total: outcome.newTotalXp }}
             />
             <QuickPlayRankCard totalPoints={outcome.totalPoints} percentileToday={percentileToday} scorePct={result.scorePct} />

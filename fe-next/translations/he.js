@@ -23980,6 +23980,7 @@ const he = {
     "selfBeat": "שיא אישי חדש!",
     "yourBest": "השיא שלך",
     "pingedYou": "עקץ אותך",
+    "challengeBack": "אתגר אותו בחזרה",
     "wins": "{count} נצ׳",
     "losses": "{count} הפ׳",
     "draws": "{count} תיקו"

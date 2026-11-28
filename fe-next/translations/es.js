@@ -24031,6 +24031,7 @@ const es = {
     "selfBeat": "¡Nuevo récord personal!",
     "yourBest": "Tu récord",
     "pingedYou": "Te retó",
+    "challengeBack": "Rétalo de vuelta",
     "wins": "{count} G",
     "losses": "{count} P",
     "draws": "{count} E"

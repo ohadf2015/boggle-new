@@ -23750,6 +23750,7 @@ const ru = {
     "selfBeat": "Новый личный рекорд!",
     "yourBest": "Твой рекорд",
     "pingedYou": "Бросил тебе вызов",
+    "challengeBack": "Бросить вызов в ответ",
     "wins": "{count} В",
     "losses": "{count} П",
     "draws": "{count} Н"

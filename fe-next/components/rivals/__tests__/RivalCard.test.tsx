@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 const capture = vi.fn();
 const ping = vi.fn();
@@ -33,6 +33,19 @@ describe('RivalCard', () => {
     render(<RivalCard mode="multiplayer" rival={{ kind: 'h2h', userId: 'b', name: 'Bea', gap: -5, record: { wins: 3, losses: 2, draws: 1 } }} />);
     expect(screen.getByText('rivals.youBeat {"name":"Bea"}')).toBeTruthy();
     expect(screen.getByTestId('rival-record').textContent).toContain('3');
+  });
+
+  it('Given I beat my rival and a challenge handler, Then the challenge button tracks and shares', () => {
+    const onChallenge = vi.fn();
+    render(<RivalCard mode="quickPlay" onChallenge={onChallenge} rival={{ kind: 'h2h', userId: 'b', name: 'Bea', gap: -5 }} />);
+    fireEvent.click(screen.getByTestId('rival-challenge'));
+    expect(onChallenge).toHaveBeenCalledTimes(1);
+    expect(capture).toHaveBeenCalledWith('rival_card_challenge_clicked', { mode: 'quickPlay', kind: 'h2h' });
+  });
+
+  it('Given a rival still ahead, Then there is no challenge button', () => {
+    render(<RivalCard mode="quickPlay" onChallenge={vi.fn()} rival={{ kind: 'h2h', userId: 'b', name: 'Bea', gap: 5 }} />);
+    expect(screen.queryByTestId('rival-challenge')).toBeNull();
   });
 
   it('Given they pinged me, Then the chip shows', () => {
