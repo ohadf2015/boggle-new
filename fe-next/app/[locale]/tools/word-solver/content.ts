@@ -236,7 +236,7 @@ const content: Record<Locale, ToolContent> = {
   },
   sv: {
     title: 'Bilda Ord av Bokstäver — Anagramlösare Svenska',
-    subtitle: 'Vilka ord kan bildas av dessa bokstäver? Skriv in dem så ser du alla svenska ord direkt, med en gratis anagramlösare och anagramgenerator.',
+    subtitle: 'Vilka ord kan bildas av dessa bokstäver? Skriv in dem så ser du direkt vilka ord du kan bilda, med en gratis anagramlösare och anagramgenerator.',
     description:
       'Gratis anagramlösare på svenska. Ange dina bokstäver och hitta alla möjliga ord direkt. Perfekt för Scrabble, Wordfeud och LexiClash.',
     metaDescription:
