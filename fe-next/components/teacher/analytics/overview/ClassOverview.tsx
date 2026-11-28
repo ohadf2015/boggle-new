@@ -58,7 +58,7 @@ export function ClassOverview({ classroomId, classroomName, surface = 'class_rep
   }, [students]);
 
   const focusWords = (
-    <ClassFocusWords classroomId={classroomId} classroomName={classroomName} fallback={metrics?.commonMistakes ?? []} surface={surface} />
+    <ClassFocusWords classroomId={classroomId} classroomName={classroomName} fallback={metrics?.commonMistakes ?? []} fallbackPending={isLoading} surface={surface} />
   );
   const focusPanelClass = `${REPORT_HERO_PANEL} grid gap-6 lg:grid-cols-2 [&>:only-child]:lg:col-span-2`;
   // Same tree position as the ready layout below, so the words panel is not remounted (and refetched) when metrics land.
@@ -73,7 +73,7 @@ export function ClassOverview({ classroomId, classroomName, surface = 'class_rep
   );
 
   if (isLoading) {
-    return withFocus(<div aria-busy="true" className="h-16 rounded-neo-lg bg-edu-ink/10 motion-safe:animate-pulse" />);
+    return withFocus(<div aria-busy="true" className="h-12 rounded-neo-lg bg-edu-ink/10 motion-safe:animate-pulse" />);
   }
   if (error || !metrics) {
     return withFocus(
