@@ -350,8 +350,8 @@ const content: Record<Locale, ToolContent> = {
     },
   },
   es: {
-    title: 'Buscador de Palabras y Anagramas',
-    subtitle: 'Descifra letras y encuentra todas las palabras posibles',
+    title: 'Buscador de Palabras con Letras Desordenadas',
+    subtitle: 'Escribe las letras que tienes, aunque estén revueltas, y descubre todas las palabras y anagramas que se pueden formar con ellas',
     description:
       'Solucionador de anagramas y descifrador de palabras gratuito en línea. Ingresa tus letras y encuentra todas las palabras posibles al instante. Perfecto para Scrabble, Boggle y LexiClash.',
     metaDescription:
