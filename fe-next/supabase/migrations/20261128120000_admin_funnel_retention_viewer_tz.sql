@@ -27,6 +27,7 @@ GRANT EXECUTE ON FUNCTION public.admin_resolve_timezone(text) TO service_role;
 
 -- Today / last 7 local calendar days (including today) / last 30 local calendar days.
 DROP FUNCTION IF EXISTS public.admin_activity_stats();
+DROP FUNCTION IF EXISTS public.admin_activity_stats(text);
 CREATE FUNCTION public.admin_activity_stats(p_tz text DEFAULT 'UTC')
 RETURNS json
 LANGUAGE sql
@@ -70,6 +71,7 @@ REVOKE ALL ON FUNCTION public.admin_activity_stats(text) FROM PUBLIC, anon, auth
 GRANT EXECUTE ON FUNCTION public.admin_activity_stats(text) TO service_role;
 
 DROP FUNCTION IF EXISTS public.admin_real_games_stats();
+DROP FUNCTION IF EXISTS public.admin_real_games_stats(text);
 CREATE FUNCTION public.admin_real_games_stats(p_tz text DEFAULT 'UTC')
 RETURNS json
 LANGUAGE sql
@@ -117,6 +119,7 @@ REVOKE ALL ON FUNCTION public.admin_real_games_stats(text) FROM PUBLIC, anon, au
 GRANT EXECUTE ON FUNCTION public.admin_real_games_stats(text) TO service_role;
 
 DROP FUNCTION IF EXISTS public.admin_signup_growth(integer);
+DROP FUNCTION IF EXISTS public.admin_signup_growth(integer, text);
 CREATE FUNCTION public.admin_signup_growth(weeks integer DEFAULT 26, p_tz text DEFAULT 'UTC')
 RETURNS json
 LANGUAGE sql
@@ -154,6 +157,7 @@ REVOKE ALL ON FUNCTION public.admin_signup_growth(integer, text) FROM PUBLIC, an
 GRANT EXECUTE ON FUNCTION public.admin_signup_growth(integer, text) TO service_role;
 
 DROP FUNCTION IF EXISTS public.admin_cohort_retention(integer);
+DROP FUNCTION IF EXISTS public.admin_cohort_retention(integer, text);
 CREATE FUNCTION public.admin_cohort_retention(weeks integer DEFAULT 12, p_tz text DEFAULT 'UTC')
 RETURNS TABLE(cohort_week date, week_offset integer, retained bigint, cohort_size bigint, retention_pct numeric)
 LANGUAGE sql
