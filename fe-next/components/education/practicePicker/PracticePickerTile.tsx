@@ -95,36 +95,17 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
             'cursor-not-allowed border-edu-line bg-edu-surface text-edu-ink'
       )}
     >
-      {/* Art: a poster sits whole on its own field colour above the band, chip art floats on the tile. */}
-      {art.kind === 'poster' ? (
-        <span
-          data-poster-frame=""
-          className={cn('relative block min-h-0 flex-1 overflow-hidden', !tile.ready && 'grayscale')}
-          style={{ backgroundColor: art.field }}
-        >
-          <Image
-            data-testid={`practice-tile-art-${tile.id}`}
-            src={art.src}
-            alt=""
-            fill
-            sizes="(max-width: 640px) 45vw, 180px"
-            unoptimized
-            className="object-contain"
-          />
-        </span>
-      ) : (
-        <span className="absolute inset-0 flex items-start justify-center pt-3">
-          <Image
-            data-testid={`practice-tile-art-${tile.id}`}
-            src={art.src}
-            alt=""
-            width={96}
-            height={96}
-            unoptimized
-            className={cn('h-[48%] w-auto object-contain', !tile.ready && 'grayscale')}
-          />
-        </span>
-      )}
+      <span data-art-frame="" className={cn('relative block min-h-0 flex-1', !tile.ready && 'grayscale')}>
+        <Image
+          data-testid={`practice-tile-art-${tile.id}`}
+          src={art}
+          alt=""
+          fill
+          sizes="(max-width: 640px) 45vw, 180px"
+          unoptimized
+          className="object-contain p-1.5"
+        />
+      </span>
 
       {/* Name + one meta line, on a hard band so they read over any art. */}
       <span className="relative mt-auto w-full border-t-[3px] border-edu-line bg-edu-surface px-2 py-1.5">
