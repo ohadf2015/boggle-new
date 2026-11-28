@@ -25,12 +25,17 @@ vi.mock('@/lib/auth/getAuthedUser', () => ({
   getAuthedUser: (...args: unknown[]) => getAuthedUser(...args),
 }));
 
-const { getCheckoutStatus } = vi.hoisted(() => ({
-  getCheckoutStatus: vi.fn(async (): Promise<string | null> => null),
+const { getCheckout, grantProOnCheckoutReturn } = vi.hoisted(() => ({
+  getCheckout: vi.fn(async (): Promise<Record<string, unknown> | null> => null),
+  grantProOnCheckoutReturn: vi.fn(async (): Promise<'granted' | 'skipped' | 'failed'> => 'skipped'),
 }));
 vi.mock('@/lib/polar', () => ({
-  getPolarClient: () => ({ getCheckoutStatus }),
+  getPolarClient: () => ({ getCheckout }),
 }));
+vi.mock('@/lib/education/grantProOnCheckoutReturn', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/education/grantProOnCheckoutReturn')>();
+  return { ...actual, grantProOnCheckoutReturn };
+});
 
 const capture = vi.fn();
 vi.mock('@/lib/posthog', () => ({
@@ -48,8 +53,11 @@ describe('POST /api/subscription/checkout-return', () => {
     maybeSingle.mockReset();
     maybeSingle.mockResolvedValue({ data: { is_test_account: false }, error: null });
     capture.mockReset();
-    getCheckoutStatus.mockReset();
-    getCheckoutStatus.mockResolvedValue(null);
+    getCheckout.mockReset();
+    getCheckout.mockResolvedValue(null);
+    grantProOnCheckoutReturn.mockReset();
+    grantProOnCheckoutReturn.mockResolvedValue('skipped');
+    delete process.env.POLAR_PRO_PRODUCT_ID;
   });
 
   it('records checkout_return_landed unconditionally (without checking grant/subscription) as both a durable event and server telemetry', async () => {
@@ -96,7 +104,7 @@ describe('POST /api/subscription/checkout-return', () => {
 
   it('attributes the return to the exact Polar checkout: checkout_id + Polar status + $current_url on both events and the durable row', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@school.org' });
-    getCheckoutStatus.mockResolvedValue('succeeded');
+    getCheckout.mockResolvedValue({ status: 'succeeded', external_customer_id: 'u1', product_id: 'prod_pro' });
     const checkoutId = '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a';
     const url = `https://www.lexiclash.live/en/teacher?checkout=success&checkout_id=${checkoutId}`;
     const req = new Request('http://localhost/api/subscription/checkout-return', {
@@ -107,7 +115,7 @@ describe('POST /api/subscription/checkout-return', () => {
     const res = await POST(req as never);
     expect(res.status).toBe(204);
 
-    expect(getCheckoutStatus).toHaveBeenCalledWith(checkoutId);
+    expect(getCheckout).toHaveBeenCalledWith(checkoutId);
     expect(logSubscriptionEvent).toHaveBeenCalledWith({
       userId: 'u1',
       eventType: 'checkout_return_landed',
@@ -128,7 +136,7 @@ describe('POST /api/subscription/checkout-return', () => {
 
   it('an anonymous return with a checkout id is still attributed (expired cookie after the Polar redirect)', async () => {
     getAuthedUser.mockResolvedValue(null);
-    getCheckoutStatus.mockResolvedValue('expired');
+    getCheckout.mockResolvedValue({ status: 'expired' });
     const checkoutId = '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a';
     const req = new Request('http://localhost/api/subscription/checkout-return', {
       method: 'POST',
@@ -153,14 +161,14 @@ describe('POST /api/subscription/checkout-return', () => {
 
     const res = await POST(req as never);
     expect(res.status).toBe(204);
-    expect(getCheckoutStatus).not.toHaveBeenCalled();
+    expect(getCheckout).not.toHaveBeenCalled();
     expect(logSubscriptionEvent.mock.calls[0][0].payload).not.toHaveProperty('checkout_id');
     expect(logSubscriptionEvent.mock.calls[0][0].payload.status).toBe('no_checkout_id');
   });
 
   it('a Polar status lookup failure records status unknown and still answers 204', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@school.org' });
-    getCheckoutStatus.mockRejectedValue(new Error('polar down'));
+    getCheckout.mockRejectedValue(new Error('polar down'));
     const checkoutId = '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a';
     const req = new Request('http://localhost/api/subscription/checkout-return', {
       method: 'POST',
@@ -214,6 +222,104 @@ describe('POST /api/subscription/checkout-return', () => {
 
     const res = await POST(req as never);
     expect(res.status).toBe(204);
+    expect(capture).toHaveBeenCalledTimes(2);
+  });
+
+  it('unlocks Teacher Pro on return when Polar already says this teacher’s checkout succeeded', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@school.org' });
+    process.env.POLAR_PRO_PRODUCT_ID = 'prod_pro';
+    const checkoutId = '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a';
+    const checkout = {
+      id: checkoutId,
+      status: 'succeeded',
+      external_customer_id: 'u1',
+      product_id: 'prod_pro',
+      subscription_id: 'sub_1',
+    };
+    getCheckout.mockResolvedValue(checkout);
+    grantProOnCheckoutReturn.mockResolvedValue('granted');
+
+    const res = await POST(
+      new Request('http://localhost/api/subscription/checkout-return', {
+        method: 'POST',
+        body: JSON.stringify({ checkout_id: checkoutId }),
+      }) as never,
+    );
+    expect(res.status).toBe(204);
+    expect(grantProOnCheckoutReturn).toHaveBeenCalledWith({
+      checkout,
+      authedUserId: 'u1',
+      proProductId: 'prod_pro',
+    });
+    expect(logSubscriptionEvent.mock.calls[0][0].payload).toMatchObject({
+      checkout_id: checkoutId,
+      status: 'succeeded',
+      grant: 'granted',
+    });
+    expect(logSubscriptionEvent.mock.calls[0][0].payload).not.toHaveProperty('trial');
+    expect(capture.mock.calls[0][0].properties.grant).toBe('granted');
+  });
+
+  it('does not grant another teacher’s succeeded checkout to the signed-in user', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@school.org' });
+    process.env.POLAR_PRO_PRODUCT_ID = 'prod_pro';
+    const checkoutId = '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a';
+    getCheckout.mockResolvedValue({
+      status: 'succeeded',
+      external_customer_id: 'someone-else',
+      product_id: 'prod_pro',
+    });
+    grantProOnCheckoutReturn.mockResolvedValue('skipped');
+
+    const res = await POST(
+      new Request('http://localhost/api/subscription/checkout-return', {
+        method: 'POST',
+        body: JSON.stringify({ checkout_id: checkoutId }),
+      }) as never,
+    );
+    expect(res.status).toBe(204);
+    expect(grantProOnCheckoutReturn).toHaveBeenCalled();
+    expect(logSubscriptionEvent.mock.calls[0][0].payload.grant).toBe('skipped');
+  });
+
+  it('does not grant on an anonymous return, even when Polar says succeeded', async () => {
+    getAuthedUser.mockResolvedValue(null);
+    getCheckout.mockResolvedValue({
+      status: 'succeeded',
+      external_customer_id: 'u1',
+      product_id: 'prod_pro',
+    });
+    const checkoutId = '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a';
+    const res = await POST(
+      new Request('http://localhost/api/subscription/checkout-return', {
+        method: 'POST',
+        body: JSON.stringify({ checkout_id: checkoutId }),
+      }) as never,
+    );
+    expect(res.status).toBe(204);
+    expect(grantProOnCheckoutReturn).not.toHaveBeenCalled();
+    expect(logSubscriptionEvent).not.toHaveBeenCalled();
+  });
+
+  it('still answers 204 when the grant write fails', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@school.org' });
+    process.env.POLAR_PRO_PRODUCT_ID = 'prod_pro';
+    const checkoutId = '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a';
+    getCheckout.mockResolvedValue({
+      status: 'succeeded',
+      external_customer_id: 'u1',
+      product_id: 'prod_pro',
+    });
+    grantProOnCheckoutReturn.mockRejectedValue(new Error('db down'));
+
+    const res = await POST(
+      new Request('http://localhost/api/subscription/checkout-return', {
+        method: 'POST',
+        body: JSON.stringify({ checkout_id: checkoutId }),
+      }) as never,
+    );
+    expect(res.status).toBe(204);
+    expect(logSubscriptionEvent.mock.calls[0][0].payload.grant).toBe('failed');
     expect(capture).toHaveBeenCalledTimes(2);
   });
 });

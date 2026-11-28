@@ -5,6 +5,7 @@ import '@testing-library/jest-dom';
 const trackEduProCheckoutReturnLanded = vi.fn();
 vi.mock('@/lib/education/proFunnelTelemetry', () => ({
   trackEduProCheckoutReturnLanded: () => trackEduProCheckoutReturnLanded(),
+  checkoutReturnBeaconPromise: () => null,
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),

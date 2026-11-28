@@ -215,6 +215,13 @@ export function trackTeacherTrialUpgradeCtaClicked(args: {
 export const PRO_SUCCESS_SEEN_STORAGE_KEY = 'lexi_edu_pro_success_seen_at';
 /** Same window as the welcome event: a reload is not a second return. */
 export const RETURN_LANDED_STORAGE_KEY = 'lexi_edu_pro_return_landed_at';
+
+let checkoutReturnBeacon: Promise<void> | null = null;
+
+/** The in-flight return beacon, if any — so the UI can refresh Pro after the grant write. */
+export function checkoutReturnBeaconPromise(): Promise<void> | null {
+  return checkoutReturnBeacon;
+}
 /** A reload within this window is the same return from checkout, not a new one. */
 const SUCCESS_DEDUPE_MS = 24 * 3_600_000;
 
@@ -297,7 +304,7 @@ export function trackEduProCheckoutReturnLanded(
   try {
     if (typeof fetch === 'function') {
       const path = typeof window !== 'undefined' ? window.location?.pathname : undefined;
-      void fetch('/api/subscription/checkout-return', {
+      checkoutReturnBeacon = fetch('/api/subscription/checkout-return', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -309,7 +316,7 @@ export function trackEduProCheckoutReturnLanded(
         }),
         keepalive: true,
         credentials: 'same-origin',
-      }).catch(() => {});
+      }).then(() => undefined, () => undefined);
     }
   } catch {
     /* analytics must never block checkout return */

@@ -5,6 +5,7 @@ import { logSubscriptionEvent } from '@/lib/subscriptions';
 import { withTimeout } from '@/lib/server/routeTimeout';
 import { checkoutClientKind, testEmailReason } from '@/lib/education/checkoutTrafficTags';
 import { normalizeCheckoutId } from '@/lib/education/checkoutReturn';
+import { grantProOnCheckoutReturn, type PolarCheckoutSnapshot } from '@/lib/education/grantProOnCheckoutReturn';
 import { getPolarClient } from '@/lib/polar';
 import {
   buildCheckoutReturnLandedEvent,
@@ -14,6 +15,7 @@ import {
 import logger from '@/utils/logger';
 
 const RETURN_RECORD_TIMEOUT_MS = 1500;
+const GRANT_TIMEOUT_MS = 2000;
 const TEST_FLAG_LOOKUP_TIMEOUT_MS = 800;
 const LOCALE_RE = /^[a-z]{2}(-[A-Za-z]{2})?$/;
 
@@ -34,19 +36,25 @@ function currentUrlFromBody(raw: unknown): string | undefined {
 }
 
 /**
- * Polar's own status for the checkout the teacher just returned from — the
+ * Polar's own checkout for the session the teacher just returned from — the
  * reconciliation the bare beacon never had: 'succeeded' with no webhook grant
- * means the webhook is broken; 'expired'/'open' means a stale success-URL
- * revisit. Null when the id is missing/malformed or Polar can't be asked —
- * the beacon must record and move on either way.
+ * means the webhook is late or broken, and this object is enough to unlock
+ * Pro immediately; 'expired'/'open' means a stale success-URL revisit. Null
+ * checkout when the id is missing/malformed or Polar can't be asked — the
+ * beacon must record and move on either way.
  */
-async function polarCheckoutStatus(checkoutId: string | null): Promise<{ status: string; checkoutId: string | null }> {
-  if (!checkoutId) return { status: 'no_checkout_id', checkoutId: null };
+async function polarCheckoutLookup(checkoutId: string | null): Promise<{
+  status: string;
+  checkoutId: string | null;
+  checkout: PolarCheckoutSnapshot | null;
+}> {
+  if (!checkoutId) return { status: 'no_checkout_id', checkoutId: null, checkout: null };
   try {
-    const status = await getPolarClient().getCheckoutStatus(checkoutId);
-    return { status: status ?? 'unknown', checkoutId };
+    const checkout = await getPolarClient().getCheckout(checkoutId);
+    const status = typeof checkout?.status === 'string' && checkout.status ? checkout.status : 'unknown';
+    return { status, checkoutId, checkout };
   } catch {
-    return { status: 'unknown', checkoutId };
+    return { status: 'unknown', checkoutId, checkout: null };
   }
 }
 
@@ -73,6 +81,10 @@ async function profileIsTestAccount(userId: string): Promise<boolean> {
  * with `?checkout=success`. Not gated behind webhook grant (`hasPro`), and not
  * gated behind browser PostHog cookie consent (~97% of visitors never reach
  * client PostHog).
+ *
+ * When Polar already says this checkout succeeded and it belongs to the
+ * signed-in teacher, also unlock Teacher Pro here so a late webhook does
+ * not leave a paying teacher looking at "still activating".
  *
  * Records both:
  * 1. Durable `subscription_events` row (`event_type = 'checkout_return_landed'`)
@@ -103,7 +115,7 @@ export async function POST(request: NextRequest) {
     // itself says happened to it. Resolved before the auth branch so an
     // anonymous return (expired cookie after the redirect) is just as
     // attributable as a signed-in one.
-    const attribution = await polarCheckoutStatus(normalizeCheckoutId(body.checkout_id));
+    const attribution = await polarCheckoutLookup(normalizeCheckoutId(body.checkout_id));
     const currentUrl = currentUrlFromBody(body.url);
     const attributionTags: Record<string, unknown> = {
       status: attribution.status,
@@ -129,6 +141,25 @@ export async function POST(request: NextRequest) {
     const testReason = profileTest ? 'profile_flag' : emailReason;
     const isTestAccount = testReason !== null;
 
+    // Unlock Pro from Polar's own checkout when the webhook has not landed
+    // yet. Failure here must not drop the return record or the 204.
+    let grant: 'granted' | 'skipped' | 'failed' | undefined;
+    if (attribution.checkout) {
+      try {
+        grant = await withTimeout(
+          grantProOnCheckoutReturn({
+            checkout: attribution.checkout,
+            authedUserId: user.id,
+            proProductId: process.env.POLAR_PRO_PRODUCT_ID,
+          }),
+          GRANT_TIMEOUT_MS,
+        );
+      } catch (err) {
+        grant = 'failed';
+        logger.warn('Could not grant Teacher Pro on checkout return:', err);
+      }
+    }
+
     // Never include `trial: true` in subscription_events.payload — readers
     // treat any event with `{ trial: true }` as a consumed Polar trial.
     // `status`/`checkout_id`/`current_url` attribute the return without it.
@@ -140,6 +171,7 @@ export async function POST(request: NextRequest) {
       test_reason: testReason,
       status: attribution.status,
       ...(attribution.checkoutId ? { checkout_id: attribution.checkoutId } : {}),
+      ...(grant ? { grant } : {}),
       ...(currentUrl ? { current_url: currentUrl } : {}),
       ...(locale ? { locale } : {}),
       ...(path ? { path } : {}),
@@ -163,6 +195,7 @@ export async function POST(request: NextRequest) {
       is_test_account: isTestAccount,
       test_reason: testReason,
       ...attributionTags,
+      ...(grant ? { grant } : {}),
       ...(locale ? { locale } : {}),
       ...(path ? { path } : {}),
     };

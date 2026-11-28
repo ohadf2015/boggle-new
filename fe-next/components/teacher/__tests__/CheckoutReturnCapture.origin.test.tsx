@@ -5,6 +5,7 @@ import '@testing-library/jest-dom';
 const landed = vi.fn();
 vi.mock('@/lib/education/proFunnelTelemetry', () => ({
   trackEduProCheckoutReturnLanded: () => landed(),
+  checkoutReturnBeaconPromise: () => null,
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'he' }),
