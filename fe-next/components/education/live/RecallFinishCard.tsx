@@ -29,7 +29,7 @@ export function RecallFinishCard({ run, words, newBest, t }: RecallFinishCardPro
       data-stars={run.stars}
       data-score={run.score}
       role="status"
-      className="relative flex flex-col items-center gap-1.5 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-3 py-2 text-center text-neo-black shadow-hard motion-safe:animate-[recall-pop_280ms_cubic-bezier(0.23,1,0.32,1)_both]"
+      className="relative flex flex-col items-center gap-1 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-3 py-1.5 text-center text-neo-black shadow-hard motion-safe:animate-[recall-pop_280ms_cubic-bezier(0.23,1,0.32,1)_both]"
     >
       {newBest && (
         <span className="absolute -top-3 end-3 inline-flex rotate-3 items-center gap-1 rounded-full border-2 border-neo-black bg-neo-pink px-2 py-0.5 font-neo-display text-xs font-black uppercase text-neo-black shadow-hard-sm">

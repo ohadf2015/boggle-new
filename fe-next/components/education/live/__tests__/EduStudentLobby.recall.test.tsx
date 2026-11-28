@@ -144,11 +144,11 @@ describe('EduStudentLobby learn then recall', () => {
     expect(screen.getByTestId('ready-slot')).toBeInTheDocument();
   });
 
-  it('given only one word with a meaning, when the lobby opens, then the flip-through cards stay as before', () => {
+  it('given only one word with a meaning, when the lobby opens, then the words are built from letters instead of quizzed', () => {
     act(() => useStudyDeck.getState().setDeck('ROOM1', [{ word: 'xylem', definition: 'Carries water' }, { word: 'sun' }]));
     render(<EduStudentLobby {...base} />);
-    expect(screen.getByTestId('study-word')).toHaveTextContent('xylem');
-    expect(screen.queryByTestId('recall-meet')).not.toBeInTheDocument();
+    expect(screen.getByTestId('recall-start')).toHaveTextContent('eduStudent.recall.buildStart');
+    expect(screen.queryByTestId('study-word')).not.toBeInTheDocument();
     expect(screen.getByTestId('study-ready-locked')).toHaveTextContent('eduStudent.lobby.studyReadyLocked');
   });
 

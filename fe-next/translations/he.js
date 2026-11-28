@@ -22498,7 +22498,10 @@ const he = {
       "bestCombo": "קומבו שיא \u2066×{count}\u2069",
       "newBest": "שיא חדש!",
       "stars": "{count} מתוך 3 כוכבים",
-      "beatScore": "עוד סיבוב: נסו לעבור את {score}"
+      "beatScore": "עוד סיבוב: נסו לעבור את {score}",
+      "buildIntro": "הציצו במילים של היום, ואז תרכיבו כל אחת מאותיות מבולגנות.",
+      "buildStart": "יאללה לבנות",
+      "buildQuestion": "הרכיבו את המילה"
     },
     "exit": {
       "title": "לצאת מהמשחק?",

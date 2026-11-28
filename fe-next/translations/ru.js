@@ -22265,7 +22265,10 @@ const ru = {
       "bestCombo": "Лучшее комбо ×{count}",
       "newBest": "Новый рекорд!",
       "stars": "Звёзд: {count} из 3",
-      "beatScore": "Сыграй ещё и побей {score}"
+      "beatScore": "Сыграй ещё и побей {score}",
+      "buildIntro": "Посмотри на слова дня. Потом ты соберёшь каждое из перемешанных букв.",
+      "buildStart": "Собираем",
+      "buildQuestion": "Собери это слово"
     },
     "exit": {
       "title": "Выйти из игры?",

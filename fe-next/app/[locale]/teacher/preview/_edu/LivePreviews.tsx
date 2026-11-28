@@ -42,13 +42,14 @@ const STUDY_DECK = {
 };
 
 /** The student lobby while classmates walk in: one arrival every 1.5s, each popping onto the wall. `study` seeds a lesson deck. */
-export function LobbyArrivalsPreview({ study = false }: { study?: boolean }) {
+export function LobbyArrivalsPreview({ study = false, noDefinitions = false }: { study?: boolean; noDefinitions?: boolean }) {
   const { t, language } = useLanguage();
   useEffect(() => {
     if (!study) return undefined;
-    useStudyDeck.getState().setDeck('PREVIEW-STUDY', language === 'he' ? STUDY_DECK.he : STUDY_DECK.en);
+    const deck = language === 'he' ? STUDY_DECK.he : STUDY_DECK.en;
+    useStudyDeck.getState().setDeck('PREVIEW-STUDY', noDefinitions ? deck.map(({ word }) => ({ word })) : deck);
     return () => useStudyDeck.getState().clear();
-  }, [study, language]);
+  }, [study, noDefinitions, language]);
   const f = fixtureFor(language);
   const everyone = useMemo(() => [f.me, f.shortRival, ...f.classmates], [f]);
   const [count, setCount] = useState(2);

@@ -37,17 +37,17 @@ describe('EduStudentLobby learn-the-words-first', () => {
   });
 
   it('shows the words one at a time and holds READY until every card is seen', () => {
-    act(() => useStudyDeck.getState().setDeck('ROOM1', [{ word: 'xylem', definition: 'Carries water' }, { word: 'stomata' }]));
+    act(() => useStudyDeck.getState().setDeck('ROOM1', [{ word: 'ox', definition: 'Carries water' }, { word: 'go' }]));
     render(<EduStudentLobby {...base} />);
 
-    expect(screen.getByTestId('study-word')).toHaveTextContent('xylem');
+    expect(screen.getByTestId('study-word')).toHaveTextContent('ox');
     expect(screen.getByText('Carries water')).toBeInTheDocument();
     expect(screen.queryByTestId('ready-slot')).not.toBeInTheDocument();
     expect(screen.getByTestId('study-ready-locked')).toBeInTheDocument();
     expect(screen.getByTestId('study-back')).toBeDisabled();
 
     fireEvent.click(screen.getByTestId('study-next'));
-    expect(screen.getByTestId('study-word')).toHaveTextContent('stomata');
+    expect(screen.getByTestId('study-word')).toHaveTextContent('go');
     fireEvent.click(screen.getByTestId('study-done'));
 
     expect(screen.getByTestId('ready-slot')).toBeInTheDocument();

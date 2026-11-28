@@ -22537,7 +22537,10 @@ const sv = {
       "bestCombo": "Bästa kombo ×{count}",
       "newBest": "Nytt rekord!",
       "stars": "{count} av 3 stjärnor",
-      "beatScore": "Kör igen och slå {score}"
+      "beatScore": "Kör igen och slå {score}",
+      "buildIntro": "Kolla in dagens ord. Sen bygger du vart och ett av blandade bokstäver.",
+      "buildStart": "Nu bygger vi",
+      "buildQuestion": "Bygg det här ordet"
     },
     "exit": {
       "title": "Lämna spelet?",

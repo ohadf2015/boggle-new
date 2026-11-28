@@ -22549,7 +22549,10 @@ const es = {
       "bestCombo": "Mejor combo ×{count}",
       "newBest": "¡Nuevo récord!",
       "stars": "{count} de 3 estrellas",
-      "beatScore": "Juega otra vez y supera {score}"
+      "beatScore": "Juega otra vez y supera {score}",
+      "buildIntro": "Echa un vistazo a las palabras de hoy. Luego armarás cada una con letras revueltas.",
+      "buildStart": "¡A armar!",
+      "buildQuestion": "Arma esta palabra"
     },
     "exit": {
       "title": "¿Salir del juego?",

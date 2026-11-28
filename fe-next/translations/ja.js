@@ -22537,7 +22537,10 @@ const ja = {
       "bestCombo": "最高コンボ ×{count}",
       "newBest": "自己ベスト！",
       "stars": "星{count}つ（3つ中）",
-      "beatScore": "もう一回やって{score}をこえよう"
+      "beatScore": "もう一回やって{score}をこえよう",
+      "buildIntro": "今日の単語を見てみよう。このあと、バラバラの文字から1つずつ組み立てるよ。",
+      "buildStart": "組み立てスタート",
+      "buildQuestion": "この単語を組み立てよう"
     },
     "exit": {
       "title": "ゲームをぬける？",

@@ -21558,7 +21558,10 @@ const en = {
       "bestCombo": "Best combo ×{count}",
       "newBest": "New best!",
       "stars": "{count} of 3 stars",
-      "beatScore": "Play again and beat {score}"
+      "beatScore": "Play again and beat {score}",
+      "buildIntro": "Peek at today's words, then build each one from mixed-up letters.",
+      "buildStart": "Let's build",
+      "buildQuestion": "Build this word"
     },
     "exit": {
       "title": "Leave the game?",
