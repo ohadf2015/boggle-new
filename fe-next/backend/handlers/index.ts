@@ -33,6 +33,7 @@ import { registerWordPackHandler } from './wordPackHandler.js';
 import { registerWordCraftHandlers } from './wordcraftHandler.js';
 import { registerKickHandler } from './kickHandler.js';
 import { registerReactionHandlers } from './reactionHandler.js';
+import { registerArcadePartyHandlers } from './arcadePartyHandler.js';
 import { registerLobbyEmoteHandlers } from './lobbyEmoteHandler.js';
 import { registerLobbyAdGateHandlers } from './lobbyAdGateHandler.js';
 import { registerGiftHandlers } from './giftHandler.js';
@@ -81,6 +82,7 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerWordCraftHandlers(io, socket);
   registerKickHandler(io, socket);
   registerReactionHandlers(io, socket);
+  registerArcadePartyHandlers(io, socket);
   registerRivalSync(io, socket);
   registerLobbyEmoteHandlers(io, socket);
   registerLobbyAdGateHandlers(io, socket);

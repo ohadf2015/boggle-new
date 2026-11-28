@@ -18,6 +18,7 @@ const alias = {
   '@/utils/growthTracking': stub('noop.tsx'),
   '@/utils/onboardingStorage': stub('noop.tsx'),
   '@/components/auth/AuthModal': stub('noop.tsx'),
+  '@/utils/SocketContext': stub('SocketContext.tsx'),
 };
 
 await build({
@@ -48,5 +49,5 @@ writeFileSync(path.join(out, 'app.css'), result.css);
 cpSync(path.join(app, 'public/holidays'), path.join(out, 'holidays'), { recursive: true });
 cpSync(path.join(app, 'public/fonts'), path.join(out, 'fonts'), { recursive: true, force: true });
 writeFileSync(path.join(out, 'index.html'), `<!doctype html><html class="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="/app.css"><link rel="stylesheet" href="/entry.css"></head><body class="bg-neo-navy text-neo-white"><div id="root"></div><script type="module" src="/entry.js"></script></body></html>`);
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Rubik:wght@400;500;700;900&display=swap"><link rel="stylesheet" href="/app.css"><link rel="stylesheet" href="/entry.css"></head><body class="bg-neo-navy text-neo-white"><div id="root"></div><script type="module" src="/entry.js"></script></body></html>`);
 console.log('built', out);

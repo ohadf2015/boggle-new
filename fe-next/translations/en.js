@@ -216,7 +216,43 @@ const en = {
       "newBest": "New best!",
       "tieBest": "Tied your best!",
       "soClose": "So close! Just {gap} short of your best",
-      "bestScore": "Your best: {score}"
+      "bestScore": "Your best: {score}",
+      "party": {
+        "tie": "It's a tie!",
+        "scanToJoin": "Scan to join",
+        "needPlayer": "Waiting for the first player…",
+        "haveCode": "Joining a big-screen party? Enter its code",
+        "badge": "TV",
+        "bigScreen": "Big screen + phones",
+        "waiting": "Waiting for players…",
+        "start": "Start!",
+        "again": "Play again",
+        "players": "Players: {n}",
+        "winner": "{name} wins!",
+        "fullscreen": "Full screen",
+        "joinTitle": "Join the party",
+        "namePlaceholder": "Your name",
+        "join": "Join",
+        "youreIn": "You're in! Watch the big screen",
+        "missing": "That party has ended. Ask for the new code on the big screen",
+        "full": "This party is full (8 players)",
+        "reconnecting": "Reconnecting…",
+        "holdToFly": "HOLD TO FLY",
+        "slide": "Slide to move your plate",
+        "tapToThrow": "Tap where to throw",
+        "cough": "*cough* {name} caught a burnt latke!",
+        "frenzy": "{name} found the golden doughnut!",
+        "oops": "{name} hit the mascot!",
+        "turbo": "{name} grabbed the turbo!",
+        "codeLabel": "Code",
+        "grabPhones": "Grab your phones and join the party!",
+        "fort": "Fort {n}",
+        "howTo": {
+          "catch": "Slide your plate on your phone to catch doughnuts. Dodge the burnt latkes!",
+          "splat": "Tap a fort on your phone to throw at whoever pops out. Not the mascot!",
+          "dash": "Hold your phone screen to fly up, let go to glide. Grab the gifts!"
+        }
+      }
     },
     // @holiday-arcade:end
     "event": {

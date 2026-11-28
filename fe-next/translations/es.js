@@ -216,7 +216,43 @@ const es = {
       "newBest": "¡Nuevo récord!",
       "tieBest": "¡Igualaste tu récord!",
       "soClose": "¡Por poco! Te faltaron {gap} para tu récord",
-      "bestScore": "Tu récord: {score}"
+      "bestScore": "Tu récord: {score}",
+      "party": {
+        "tie": "¡Empate!",
+        "scanToJoin": "Escanea para unirte",
+        "needPlayer": "Esperando al primer jugador…",
+        "haveCode": "¿Te unes a una partida en pantalla grande? Escribe el código",
+        "badge": "TV",
+        "bigScreen": "Pantalla grande + móviles",
+        "waiting": "Esperando jugadores…",
+        "start": "¡Empezamos!",
+        "again": "Otra ronda",
+        "players": "Jugadores: {n}",
+        "winner": "¡Gana {name}!",
+        "fullscreen": "Pantalla completa",
+        "joinTitle": "Únete a la fiesta",
+        "namePlaceholder": "Tu nombre",
+        "join": "Entrar",
+        "youreIn": "¡Ya estás dentro! Mira la pantalla grande",
+        "missing": "Esa partida ya terminó. Pide el código nuevo en la pantalla grande",
+        "full": "La fiesta está llena (8 jugadores)",
+        "reconnecting": "Reconectando…",
+        "holdToFly": "MANTÉN PARA VOLAR",
+        "slide": "Desliza para mover tu plato",
+        "tapToThrow": "Toca donde quieras lanzar",
+        "cough": "*cof cof* ¡{name} ha pillado un latke quemado!",
+        "frenzy": "¡{name} ha encontrado el dónut dorado!",
+        "oops": "¡{name} le ha dado a la mascota!",
+        "turbo": "¡{name} ha cogido el turbo!",
+        "codeLabel": "Código",
+        "grabPhones": "¡Coged los móviles y uníos a la fiesta!",
+        "fort": "Fuerte {n}",
+        "howTo": {
+          "catch": "Mueve tu plato en el móvil para atrapar dónuts. ¡Esquiva los latkes quemados!",
+          "splat": "Toca un fuerte en el móvil para lanzar al que asome. ¡A la mascota no!",
+          "dash": "Mantén pulsada la pantalla para subir y suelta para planear. ¡Coge los regalos!"
+        }
+      }
     },
     // @holiday-arcade:end
     "event": {

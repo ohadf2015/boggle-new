@@ -216,7 +216,43 @@ const ja = {
       "newBest": "自己ベスト更新！",
       "tieBest": "自己ベストとタイ！",
       "soClose": "おしい！ベストまであと{gap}点",
-      "bestScore": "自己ベスト：{score}"
+      "bestScore": "自己ベスト：{score}",
+      "party": {
+        "tie": "引き分け！",
+        "scanToJoin": "スキャンして参加",
+        "needPlayer": "最初のプレイヤーを待っています…",
+        "haveCode": "大画面パーティーに参加？コードを入力",
+        "badge": "TV",
+        "bigScreen": "大画面＋スマホ",
+        "waiting": "プレイヤーを待っています…",
+        "start": "スタート！",
+        "again": "もう一回",
+        "players": "プレイヤー：{n}",
+        "winner": "{name}さんの勝ち！",
+        "fullscreen": "全画面",
+        "joinTitle": "パーティーに参加",
+        "namePlaceholder": "なまえ",
+        "join": "参加する",
+        "youreIn": "参加しました！大画面を見てね",
+        "missing": "このパーティーは終わりました。大画面の新しいコードを使ってね",
+        "full": "パーティーは満員です（8人）",
+        "reconnecting": "再接続中…",
+        "holdToFly": "長押しで飛ぶ",
+        "slide": "スライドしてお皿を動かそう",
+        "tapToThrow": "投げたい場所をタップ",
+        "cough": "*ゴホッ* {name}さんが焦げたラトケをキャッチ！",
+        "frenzy": "{name}さんが金のドーナツを見つけた！",
+        "oops": "{name}さんがマスコットに当てちゃった！",
+        "turbo": "{name}さんがターボをゲット！",
+        "codeLabel": "コード",
+        "grabPhones": "スマホを持ってパーティーに参加しよう！",
+        "fort": "砦 {n}",
+        "howTo": {
+          "catch": "スマホでお皿を動かしてドーナツをキャッチ。焦げたラトケはよけよう！",
+          "splat": "スマホで砦をタップして、顔を出した相手に雪玉を投げよう。マスコットはダメ！",
+          "dash": "画面を長押しで上昇、離すと滑空。プレゼントを集めよう！"
+        }
+      }
     },
     // @holiday-arcade:end
     "event": {
