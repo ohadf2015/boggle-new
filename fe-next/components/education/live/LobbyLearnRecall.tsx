@@ -41,6 +41,7 @@ export function LobbyLearnRecall({ cards, studied, onDone, quiet = false, userna
   const pool = useMemo(() => cards.map((c) => c.word), [cards]);
   const [phase, setPhase] = useState<Phase>(studied ? 'learned' : 'meet');
   const [round, setRound] = useState(0);
+  const [open, setOpen] = useState<string | null>(null);
   const startedAt = useRef(0);
 
   if (items.length < 2) return <LobbyWordStudy cards={cards} studied={studied} onDone={onDone} quiet={quiet} t={t} />;
@@ -70,13 +71,27 @@ export function LobbyLearnRecall({ cards, studied, onDone, quiet = false, userna
       {phase === 'meet' && (
         <>
           <p className="font-neo-body text-base text-neo-cream/80 edu-sky:text-edu-ink/80">{t('eduStudent.recall.intro')}</p>
-          <ul data-testid="recall-meet" className="flex max-h-[40cqh] min-h-24 flex-col divide-y-2 divide-neo-black/15 overflow-y-auto rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-4 py-1 text-neo-black shadow-hard">
-            {cards.map((card) => (
-              <li key={card.word} className="flex flex-col py-2">
-                <span dir="auto" className="break-words font-neo-display text-xl font-black leading-tight">{card.word}</span>
-                {card.definition && <span dir="auto" className="font-neo-body text-base leading-snug">{card.definition}</span>}
-              </li>
-            ))}
+          <ul data-testid="recall-meet" className="flex max-h-[40cqh] min-h-24 flex-wrap content-start gap-2 overflow-y-auto">
+            {cards.map((card) => {
+              const isOpen = open === card.word;
+              return (
+                <li key={card.word} className={isOpen ? 'w-full' : undefined}>
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    onClick={() => setOpen(isOpen ? null : card.word)}
+                    className={cn(
+                      'flex w-full flex-col items-start gap-1 rounded-neo-lg border-[3px] border-neo-black px-4 py-2 text-start text-neo-black shadow-hard-sm',
+                      PRESS,
+                      isOpen ? 'bg-neo-yellow' : 'bg-neo-cream',
+                    )}
+                  >
+                    <span dir="auto" className="break-words font-neo-display text-xl font-black leading-tight">{card.word}</span>
+                    {isOpen && card.definition && <span dir="auto" className="font-neo-body text-base leading-snug">{card.definition}</span>}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
           <button type="button" data-testid="recall-start" onClick={() => {
               startedAt.current = Date.now();

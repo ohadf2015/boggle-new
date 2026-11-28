@@ -57,3 +57,6 @@ export const LESSON_RACE_MIN_HUMANS = 2;
 
 /** Board modes whose accepted words reach the shared word handler (the only place a claim is decided). */
 export const LESSON_RACE_MODES: ReadonlySet<string> = new Set(['classic', 'blast', 'word-hunt']);
+
+/** Once the class has found every lesson word on the board, the round holds this long for the cheer, then ends. */
+export const LIST_CLEARED_END_MS = 5000;

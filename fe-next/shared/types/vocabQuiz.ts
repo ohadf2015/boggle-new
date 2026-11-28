@@ -68,11 +68,11 @@ export interface VocabQuizBoss {
 // Round shape
 // ---------------------------------------------------------------------------
 
-export const VOCAB_QUIZ_DEFAULT_QUESTION_COUNT = 10;
+export const VOCAB_QUIZ_DEFAULT_QUESTION_COUNT = 8;
 export const VOCAB_QUIZ_MIN_QUESTION_COUNT = 4;
 export const VOCAB_QUIZ_MAX_QUESTION_COUNT = 30;
 
-export const VOCAB_QUIZ_DEFAULT_SECONDS = 20;
+export const VOCAB_QUIZ_DEFAULT_SECONDS = 15;
 export const VOCAB_QUIZ_MIN_SECONDS = 5;
 export const VOCAB_QUIZ_MAX_SECONDS = 90;
 

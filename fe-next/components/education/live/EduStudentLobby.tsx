@@ -47,9 +47,7 @@ export function EduStudentLobby({
     return () => window.clearTimeout(timer);
   }, [locked]);
 
-  const waitingKey = locked
-    ? "eduLiveRoom.student.waitPractice"
-    : readySlot && !isReady
+  const waitingKey = readySlot && !isReady
       ? "eduLiveRoom.student.waitReady"
       : "academy.waiting.forTeacher";
 
@@ -166,13 +164,15 @@ export function EduStudentLobby({
         className="shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-1"
       >
         <div className="mx-auto flex w-full max-w-lg flex-col gap-2">
-          <p
-            data-testid="edu-student-waiting"
-            role="status"
-            className="text-center font-neo-display text-base font-bold leading-snug text-edu-ink lg:text-lg"
-          >
-            {t(waitingKey)}
-          </p>
+          {!locked && (
+            <p
+              data-testid="edu-student-waiting"
+              role="status"
+              className="text-center font-neo-display text-base font-bold leading-snug text-edu-ink lg:text-lg"
+            >
+              {t(waitingKey)}
+            </p>
+          )}
           {locked ? (
             <>
               <p

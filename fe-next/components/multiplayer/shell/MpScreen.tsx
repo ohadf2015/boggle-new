@@ -44,7 +44,7 @@ export function MpScreen({ header, body, footer, testId, bodyScroll = 'none', ba
       data-testid={testId}
       data-mp-screen=""
       className={cn(
-        'mp-screen relative isolate flex-1 h-full min-h-0 w-full grid grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-neo-navy text-neo-white',
+        'mp-screen relative isolate flex-1 h-full min-h-0 w-full grid grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-neo-navy edu-sky:bg-edu-page text-neo-white edu-sky:text-edu-ink',
         'ps-[env(safe-area-inset-left)] pe-[env(safe-area-inset-right)]',
         className,
       )}

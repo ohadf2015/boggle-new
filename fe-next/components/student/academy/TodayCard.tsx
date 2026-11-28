@@ -14,9 +14,8 @@ export function TodayCard({ items, warmup }: { items: TodayItem[]; warmup: Stude
   const label = (item: TodayItem): string => {
     if (item.id === 'warmup') return item.done ? t('student.today.warmupDone', 'All homework done') : t('student.today.warmup', 'Warm up');
     if (item.id === 'chest') return item.done ? t('student.today.chestDone', 'Chest opened') : t('student.today.chest', 'Open your chest');
-    return item.done
-      ? t('student.today.streakDone', 'Flame lit today')
-      : t('student.today.streak', 'Keep your {count}-day flame', { count: item.count ?? 0 });
+    if (item.done) return t('student.today.streakDone', 'Flame lit today');
+    return item.count ? t('student.today.streak', 'Keep your {count}-day flame', { count: item.count }) : t('student.today.streakStart', 'Light your flame');
   };
 
   return (

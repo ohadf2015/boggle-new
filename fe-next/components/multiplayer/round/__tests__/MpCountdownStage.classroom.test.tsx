@@ -9,13 +9,39 @@ vi.mock('@/lib/native/webViewLayerFlash', () => ({ prefersStaticFullscreenOverla
 vi.mock('@/components/Avatar', () => ({ default: () => <i /> }));
 
 import { MpCountdownStage, __resetCountdownDupGuard } from '../MpCountdownStage';
+import { ingestLessonClaimsRound } from '@/components/education/live/useLessonClaims';
+import { useClassroomContextStore } from '@/hooks/gameState/classroomContextStore';
 
-const t = (k: string) => k;
+const t = (k: string, p?: Record<string, string | number>) => (p ? `${k}:${JSON.stringify(p)}` : k);
 
 describe('MpCountdownStage in a classroom room', () => {
   beforeEach(() => {
     __resetCountdownDupGuard();
     mode.value = 'classic';
+    ingestLessonClaimsRound({});
+    useClassroomContextStore.setState({ level: 'core', wordBank: [] });
+  });
+
+  it('Given a classroom board round with lesson words in the race, Then the countdown names the goal and skips the generic how-to', () => {
+    ingestLessonClaimsRound({ lessonClaims: { roundId: 1, total: 6, claimedCount: 0, slots: [] } });
+    render(<MpCountdownStage t={t} classroom={{ mode: 'classic' }} />);
+    expect(screen.getByTestId('mp-countdown-goal')).toHaveTextContent('eduStudent.countdown.goal:{"count":6}');
+    expect(screen.getByTestId('mp-countdown-goal')).toHaveTextContent('eduStudent.countdown.goalBonus:{"bonus":5}');
+    expect(screen.queryByTestId('mp-countdown-howto')).toBeNull();
+    expect(screen.queryByTestId('mp-countdown-rule')).toBeNull();
+  });
+
+  it('Given a solo practice round with no race, Then the goal counts the lesson words the student was sent', () => {
+    useClassroomContextStore.setState({ level: 'core', wordBank: ['storm', 'cell', 'leaf'] });
+    render(<MpCountdownStage t={t} classroom={{ mode: 'classic' }} />);
+    expect(screen.getByTestId('mp-countdown-goal')).toHaveTextContent('eduStudent.countdown.goal:{"count":3}');
+  });
+
+  it('Given a Vocab Quiz with lesson words, Then it keeps the quiz rule, since every question is a lesson word', () => {
+    useClassroomContextStore.setState({ level: 'core', wordBank: ['storm', 'cell'] });
+    render(<MpCountdownStage t={t} classroom={{ mode: 'vocab-quiz' }} />);
+    expect(screen.queryByTestId('mp-countdown-goal')).toBeNull();
+    expect(screen.getByTestId('mp-countdown-rule')).toBeInTheDocument();
   });
 
   it('Given a Vocab Quiz, Then the countdown announces the quiz, not Classic', () => {

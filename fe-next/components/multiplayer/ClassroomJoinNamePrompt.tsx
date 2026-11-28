@@ -71,19 +71,19 @@ export const ClassroomJoinNamePrompt: React.FC<ClassroomJoinNamePromptProps> = (
       <form
         data-testid="classroom-name-prompt"
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-neo-lg border-neo-thick border-neo-cream/40 bg-neo-navy-light/90 shadow-hard-lg p-5 sm:p-6"
+        className="w-full max-w-sm rounded-neo-lg border-neo-thick edu-sky:border-neo-thick border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy-light/90 edu-sky:bg-edu-surface/90 shadow-hard-lg p-5 sm:p-6"
       >
-        <div className="flex items-center gap-2 text-neo-cyan font-bold mb-1">
+        <div className="flex items-center gap-2 text-neo-cyan edu-sky:text-edu-cyan-ink font-bold mb-1">
           <GraduationCap className="w-5 h-5" />
           <span className="font-neo-body text-sm uppercase tracking-wide">
             {t('education.classroomGame.namePrompt.eyebrow')}
           </span>
         </div>
 
-        <h2 className="text-2xl font-black text-neo-white mb-1 text-start">
+        <h2 className="text-2xl font-black text-neo-white edu-sky:text-edu-ink mb-1 text-start">
           {t('education.classroomGame.namePrompt.title')}
         </h2>
-        <p className="text-sm text-neo-white/80 font-neo-body mb-4 text-start">
+        <p className="text-sm text-neo-white/80 edu-sky:text-edu-ink/80 font-neo-body mb-4 text-start">
           {t('education.classroomGame.namePrompt.subtitle')}
         </p>
 
@@ -143,7 +143,7 @@ export const ClassroomJoinNamePrompt: React.FC<ClassroomJoinNamePromptProps> = (
           )}
         </button>
 
-        <p className="mt-3 text-center text-xs font-neo-body text-neo-white/70">
+        <p className="mt-3 text-center text-xs font-neo-body text-neo-white/70 edu-sky:text-edu-ink/70">
           {t('education.classroomGame.namePrompt.roomLabel', { code: roomCode })}
         </p>
       </form>

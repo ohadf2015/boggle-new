@@ -4,7 +4,7 @@ import { TeacherHomePreview } from '@/components/teacher/home/TeacherHomePreview
 import { DockPreview, JoinRefusalPreview, LobbyHudPreview } from './StudentPreviews';
 import { ProjectorPreview } from './ProjectorBatchPreviews';
 import { HostResultsBatchPreview, StudentResultsPreview } from './ResultsBatchPreviews';
-import { LiveRoundPreview, LobbyArrivalsPreview } from './LivePreviews';
+import { CountdownPreview, LiveRoundPreview, LobbyArrivalsPreview } from './LivePreviews';
 import { LiveControlsPreview, LobbyHostPreview } from './LobbyPreviews';
 import { SetupBatchPreview } from './SetupBatchPreview';
 import { SettingsPreview, SetupPreview } from './TeacherPreviews';
@@ -29,6 +29,7 @@ export function EduPreview({ state, v }: { state: string; v?: string }) {
     case 'edu-explainer': return <UpgradePreview v="explainer" />;
     case 'edu-reports': return <ReportsPreview v={v} />;
     case 'edu-upgrade': return <UpgradePreview v={v} />;
+    case 'edu-countdown': return <CountdownPreview v={v} />;
     case 'edu-combo': case 'edu-rival': case 'edu-claim': return <LiveRoundPreview state={state} v={v} />;
     case 'edu-arrivals': return <LobbyArrivalsPreview study={v === 'study'} />;
     case 'edu-lobby': return <LobbyHostPreview v={v} />;

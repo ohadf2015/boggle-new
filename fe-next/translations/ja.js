@@ -15334,11 +15334,20 @@ const ja = {
       "chestDone": "宝箱オープン済み",
       "streak": "{count}日の炎をキープ",
       "streakDone": "今日の炎はついた",
+      "streakStart": "炎をともそう",
       "warmupCta": "ゲーム前にウォームアップ",
       "play": "プレイ"
     }
   },
   "teacher": {
+    "studentView": {
+      "open": "生徒の画面を見る",
+      "banner": "生徒ビュー：{name}に見えている画面",
+      "back": "クラスに戻る",
+      "error": "このクラスのレッスンを読み込めませんでした。",
+      "retry": "もう一度",
+      "studentName": "あなた"
+    },
     "classPage": {
       "noLists": "このクラスにはまだ単語リストがありません。",
       "coverage": "リストの単語を{pct}%発見"
@@ -15973,15 +15982,15 @@ const ja = {
         "title": "クイック設定",
         "fridayBattle": {
           "name": "金曜単語バトル",
-          "desc": "チーム戦 · 前回のリスト · 速くてにぎやか"
+          "desc": "2チームで授業の単語を探して競争"
         },
         "sped": {
           "name": "サポート (SPED)",
-          "desc": "少ない単語 · 長めの時間 · 大きな文字"
+          "desc": "少ない単語・長めの時間・大きな文字"
         },
         "standard": {
           "name": "標準",
-          "desc": "全員が個人戦・3分"
+          "desc": "全員が個人戦"
         }
       },
       "playStyle": {
@@ -16881,6 +16890,7 @@ const ja = {
       "claimedCount": "{claimed}/{total} ゲット済み",
       "takenBy": "{word}は{name}が先にゲット",
       "youClaimed": "{word}ゲット！+{bonus}",
+      "listCleared": "クラスで授業の単語を{count}個ぜんぶ見つけた！🎉",
       "claimedBy": "{name}が{word}をゲット！",
       "projectorTitle": "ワードレース"
     },
@@ -22414,6 +22424,10 @@ const ja = {
     }
   },
   "eduStudent": {
+    "countdown": {
+      "goal": "授業の単語を{count}個さがそう！",
+      "goalBonus": "1語につき+{bonus}点"
+    },
     "mode": {
       "vocabQuiz": {
         "rule": "ヒントを読んで、合う単語をタップ。速く正確に答えるほど高得点。"
@@ -22441,7 +22455,7 @@ const ja = {
       "studyLearned_other": "{count}語おぼえた"
     },
     "recall": {
-      "intro": "まず目を通して、そのあと短いクイズで覚えたかチェックしよう。",
+      "intro": "単語をタップすると意味が見られるよ。",
       "start": "クイズをはじめる",
       "question": "この意味の単語はどれ？",
       "spellQuestion": "この意味の単語を組み立てよう",

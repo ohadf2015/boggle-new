@@ -67,13 +67,13 @@ describe('StudentWordBank — core students see the lesson words to hunt', () =>
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('support keeps its full word bank and challenge keeps its badge', () => {
+  it('support keeps its full word bank; challenge hunts the same hidden lesson words as core', () => {
     const { unmount } = render(<StudentWordBank level="support" words={['storm']} />);
     expect(screen.getByTestId('student-word-bank')).toBeInTheDocument();
     expect(screen.queryByTestId('lesson-target-strip')).not.toBeInTheDocument();
     unmount();
     render(<StudentWordBank level="challenge" words={['storm']} />);
-    expect(screen.getByText('education.wordBank.challengeBadge:{"min":5}')).toBeInTheDocument();
-    expect(screen.queryByTestId('lesson-target-strip')).not.toBeInTheDocument();
+    expect(screen.getByTestId('lesson-target-strip')).toHaveTextContent('education.wordBank.huntTitle:{"found":0,"total":1}');
+    expect(screen.queryByText('storm')).not.toBeInTheDocument();
   });
 });

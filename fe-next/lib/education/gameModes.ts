@@ -78,11 +78,11 @@ interface ModeShape {
 }
 
 const MODE_SHAPE: Record<string, ModeShape> = {
-  classic: { poster: '/mascot/teacher/modes/classic.webp', accent: 'cyan', minutes: 3, needsDefinitions: false },
-  'word-hunt': { poster: '/mascot/teacher/modes/word-hunt.webp', accent: 'lime', minutes: 4, needsDefinitions: false },
-  blast: { poster: '/mascot/teacher/modes/blast.webp', accent: 'pink', minutes: 3, needsDefinitions: false },
+  classic: { poster: '/mascot/teacher/modes/classic.webp', accent: 'cyan', minutes: 2, needsDefinitions: false },
+  'word-hunt': { poster: '/mascot/teacher/modes/word-hunt.webp', accent: 'lime', minutes: 3, needsDefinitions: false },
+  blast: { poster: '/mascot/teacher/modes/blast.webp', accent: 'pink', minutes: 2, needsDefinitions: false },
   'wheel-rush': { poster: '/mascot/teacher/modes/wheel-rush.webp', accent: 'purple', minutes: Math.ceil(fixedRoundSeconds('wheel-rush')! / 60), needsDefinitions: false },
-  [VOCAB_QUIZ_MODE]: { poster: '/mascot/teacher/modes/vocab-quiz.webp', accent: 'cyan', minutes: 5, needsDefinitions: true },
+  [VOCAB_QUIZ_MODE]: { poster: '/mascot/teacher/modes/vocab-quiz.webp', accent: 'cyan', minutes: 3, needsDefinitions: true },
   wordcraft: { poster: '/mascot/teacher/modes/wordcraft.webp', accent: 'lime', minutes: 5, needsDefinitions: false },
   crossword: { poster: '/mascot/teacher/modes/crossword.webp', accent: 'cyan', minutes: Math.ceil(fixedRoundSeconds('crossword')! / 60), needsDefinitions: true },
 };

@@ -16,4 +16,10 @@ describe('Today chips on a 390px phone', () => {
     }
     expect(screen.getByText('All homework done')).toBeInTheDocument();
   });
+
+  it('Given a student with no streak yet, Then the flame chip invites them to light it instead of saying 0-day', () => {
+    render(<TodayCard items={[{ id: 'streak', done: false, count: 0 }]} warmup={null} />);
+    expect(screen.getByTestId('academy-today-streak')).toHaveTextContent('Light your flame');
+    expect(screen.queryByText(/0-day/)).toBeNull();
+  });
 });

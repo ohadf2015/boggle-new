@@ -47,7 +47,7 @@ describe('classroomHostPreset', () => {
 
   it('falls back to sane values when a stored setting is malformed', () => {
     expect(classroomHostPreset({ timerSeconds: 0, difficulty: 'weird' as never })).toEqual({
-      timerMinutes: 3,
+      timerMinutes: 2,
       difficulty: 'MEDIUM',
       minWordLength: 3,
     });

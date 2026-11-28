@@ -78,10 +78,10 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
     // Show loading indicator when server is preparing the game
     if (isGameLoading) {
       return withClock(
-        <div className="h-full bg-neo-navy flex items-center justify-center overflow-hidden">
+        <div className="h-full bg-neo-navy edu-sky:bg-edu-surface flex items-center justify-center overflow-hidden">
           <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-10 w-10 text-neo-lime animate-spin" />
-            <div className="text-lg font-bold text-white/70">
+            <Loader2 className="h-10 w-10 text-neo-lime edu-sky:text-edu-lime-ink animate-spin" />
+            <div className="text-lg font-bold text-white/70 edu-sky:text-edu-ink/70">
               {t('common.preparingGame')}
             </div>
           </div>
@@ -123,7 +123,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
     const validWords = foundWords.filter(w => w.validated !== false);
 
     return withClock(
-      <div className="flex-1 w-full bg-neo-navy flex items-center justify-center">
+      <div className="flex-1 w-full bg-neo-navy edu-sky:bg-edu-page flex items-center justify-center">
         <AdaptiveMotion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -138,10 +138,10 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
               {t('common.score')}
             </div>
           </div>
-          <div className="text-white/60 font-bold text-sm">
+          <div className="text-white/60 edu-sky:text-edu-ink/60 font-bold text-sm">
             {validWords.length} {t('common.words')}
           </div>
-          <div className="flex items-center gap-2 text-white/60 text-sm">
+          <div className="flex items-center gap-2 text-white/60 edu-sky:text-edu-ink/60 text-sm">
             <Loader2 className="h-4 w-4 animate-spin" />
             <span>{t('game.calculatingResults')}</span>
           </div>
