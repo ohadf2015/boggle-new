@@ -243,7 +243,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
     <button
       type="button"
       onClick={() => setSheet('howto')}
-      className="inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-navy px-3 py-1 text-xs font-bold text-neo-cyan shadow-hard-sm active:translate-y-0.5"
+      className="inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-navy edu-sky:bg-edu-surface px-3 py-1 text-xs font-bold text-neo-cyan edu-sky:text-edu-cyan-ink shadow-hard-sm active:translate-y-0.5"
     >
       <HelpCircle aria-hidden="true" className="w-3.5 h-3.5" />
       {t('mpUi.lobby.howToPlay')}
@@ -270,7 +270,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
         </div>
       </div>
       {/* The shared status line truncates to one line; here it has room to wrap. */}
-      <div className="min-w-0 max-w-md flex flex-col items-center gap-2 [&_p]:whitespace-normal [&_p]:line-clamp-3 [&_p]:text-neo-white/85 [&_p]:font-bold [&_p]:text-[length:calc(15px*var(--mp-u,1))]">
+      <div className="min-w-0 max-w-md flex flex-col items-center gap-2 [&_p]:whitespace-normal [&_p]:line-clamp-3 [&_p]:text-neo-white/85 edu-sky:[&_p]:text-edu-ink/85 [&_p]:font-bold [&_p]:text-[length:calc(15px*var(--mp-u,1))]">
         <ReadyMeter seats={seats} meId={username} />
         {status}
       </div>
@@ -281,16 +281,16 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
 
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 w-full text-neo-white relative lg:max-w-[calc(1280px*var(--mp-u,1))] lg:mx-auto">
+    <div className="flex-1 flex flex-col min-h-0 w-full text-neo-white edu-sky:text-edu-ink relative lg:max-w-[calc(1280px*var(--mp-u,1))] lg:mx-auto">
       <header className="shrink-0 border-b-2 border-neo-black/70">
         <MpHudBar
           className="grid-cols-[auto_1fr_auto]"
           start={<LobbyExitButton onPress={onExitRoom} t={t} />}
           center={
             gameLanguage ? (
-              <span className="inline-flex items-center gap-1.5 h-10 px-3 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-sm min-w-0">
+              <span className="inline-flex items-center gap-1.5 h-10 px-3 rounded-neo border-2 border-neo-black bg-neo-navy-light edu-sky:bg-edu-surface shadow-hard-sm min-w-0">
                 <span aria-hidden="true" className="text-base leading-none">{languageFlag(gameLanguage)}</span>
-                <span data-testid="lobby-language-name" className="truncate text-xs font-bold uppercase tracking-wider text-neo-lime max-[419px]:sr-only">{t(languageLabelKey(gameLanguage))}</span>
+                <span data-testid="lobby-language-name" className="truncate text-xs font-bold uppercase tracking-wider text-neo-lime edu-sky:text-edu-lime-ink max-[419px]:sr-only">{t(languageLabelKey(gameLanguage))}</span>
               </span>
             ) : null
           }
@@ -317,8 +317,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
               rightContent={
                 <div data-testid="desktop-chat-area" className="flex-1 min-h-0 flex flex-col gap-4">
                   <InviteCard gameCode={gameCode} t={props.t} />
-                  <section className="flex-1 min-h-28 flex flex-col overflow-hidden rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard">
-                    <h2 className="shrink-0 px-4 py-2 border-b-2 border-neo-black font-neo-display text-sm font-bold uppercase tracking-wider text-neo-white/80">
+                  <section className="flex-1 min-h-28 flex flex-col overflow-hidden rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 edu-sky:bg-edu-surface/70 shadow-hard">
+                    <h2 className="shrink-0 px-4 py-2 border-b-2 border-neo-black font-neo-display text-sm font-bold uppercase tracking-wider text-neo-white/80 edu-sky:text-edu-ink/80">
                       {t('mpUi.lobby.chat')}
                     </h2>
                     <div className="flex-1 min-h-0 flex flex-col overflow-y-auto overscroll-contain">
@@ -388,29 +388,29 @@ function ClassroomNameEditor({ username, canEdit, onSave, t }: { username: strin
             if (e.key === 'Enter') save();
             if (e.key === 'Escape') setEditing(false);
           }}
-          className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1.5 text-lg font-black focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[200px]"
+          className="bg-white/10 edu-sky:bg-edu-ink/10 text-neo-cream edu-sky:text-edu-ink border-2 border-neo-black rounded-neo px-3 py-1.5 text-lg font-black focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[200px]"
         />
         <button type="button" data-testid="name-save-button" onClick={save} aria-label={t('common.save')} className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm shrink-0">
           <Check className="w-4 h-4 text-neo-black" />
         </button>
-        <button type="button" onClick={() => { setEditing(false); setValue(username); }} aria-label={t('common.cancel')} className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo shrink-0">
-          <X className="w-4 h-4 text-neo-cream" />
+        <button type="button" onClick={() => { setEditing(false); setValue(username); }} aria-label={t('common.cancel')} className="w-8 h-8 flex items-center justify-center bg-white/10 edu-sky:bg-edu-ink/10 border-2 border-neo-black rounded-neo shrink-0">
+          <X className="w-4 h-4 text-neo-cream edu-sky:text-edu-ink" />
         </button>
       </div>
     );
   }
   return (
     <div className="flex items-center gap-2">
-      <h2 className="text-xl font-black text-neo-cream truncate">{username}</h2>
+      <h2 className="text-xl font-black text-neo-cream edu-sky:text-edu-ink truncate">{username}</h2>
       {canEdit && (
         <button
           type="button"
           data-testid="edit-name-button"
           onClick={() => { setValue(username); setEditing(true); }}
-          className="shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 border-[2px] border-neo-cream text-neo-cream flex items-center justify-center transition-colors"
+          className="shrink-0 w-7 h-7 rounded-full bg-white/10 edu-sky:bg-edu-ink/10 hover:bg-white/20 edu-sky:hover:bg-edu-ink/20 border-[2px] border-neo-cream edu-sky:border-edu-line text-neo-cream edu-sky:text-edu-ink flex items-center justify-center transition-colors"
           aria-label={t('playerView.editName')}
         >
-          <Pencil className="w-3.5 h-3.5 text-neo-cream" />
+          <Pencil className="w-3.5 h-3.5 text-neo-cream edu-sky:text-edu-ink" />
         </button>
       )}
     </div>

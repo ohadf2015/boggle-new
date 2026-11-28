@@ -46,6 +46,7 @@ export const EDU_SKY_ROOTS = [
   'components/GoRipplesAnimation.tsx',
   'player/PlayerView.tsx',
   'player/components/PlayerInGameView.tsx',
+  'player/components/PlayerWaitingView.tsx',
 ];
 
 /** Route roots that render <EduSkyScope> and export the sky viewport. */
