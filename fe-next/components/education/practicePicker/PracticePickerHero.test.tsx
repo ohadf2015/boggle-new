@@ -40,20 +40,12 @@ describe('PracticePickerHero', () => {
 
   it('GIVEN an accent fill WHEN the mascot renders THEN the art is transparent, never a poster plate', () => {
     render(<PracticePickerHero tile={tile()} onSelect={vi.fn()} />);
-    // A poster painted on neo-navy, dropped on a pink fill, reads as a bug.
-    // Only `-nobg` art is eligible on an accent.
-    expect(screen.getByTestId('practice-hero-art-blitz')).toHaveAttribute(
-      'src',
-      expect.stringMatching(/-nobg\.webp$/)
-    );
+    expect(screen.getByTestId('practice-hero-art-blitz')).toHaveAttribute('src', '/mascot/teacher/practice/blitz.webp');
   });
 
   it('GIVEN any mode WHEN rendered THEN there is exactly one primary action', () => {
     render(<PracticePickerHero tile={tile({ id: 'matching', mode: 'matching' })} onSelect={vi.fn()} />);
-    expect(screen.getByTestId('practice-hero-art-matching')).toHaveAttribute(
-      'src',
-      expect.stringMatching(/-nobg\.webp$/)
-    );
+    expect(screen.getByTestId('practice-hero-art-matching')).toHaveAttribute('src', '/mascot/teacher/practice/matching.webp');
     expect(screen.getAllByTestId('practice-picker-hero-play')).toHaveLength(1);
   });
 

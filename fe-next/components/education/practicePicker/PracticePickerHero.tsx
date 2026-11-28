@@ -28,7 +28,7 @@ import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Play, Zap } from 'lucide-react';
-import { practiceHeroArt, practiceTileAccent } from '@/lib/education/practiceTileArt';
+import { practiceTileArt, practiceTileAccent } from '@/lib/education/practiceTileArt';
 import { practiceXpRate } from '@/lib/education/practiceJuice';
 import type { PracticeTile } from '@/lib/education/practicePicker';
 import { pluralKeyOf } from '@/lib/i18n/pluralKey';
@@ -40,7 +40,7 @@ export interface PracticePickerHeroProps {
 
 export default function PracticePickerHero({ tile, onSelect }: PracticePickerHeroProps) {
   const { t, language } = useLanguage();
-  const art = practiceHeroArt(tile.id);
+  const art = practiceTileArt(tile.id);
   const accent = practiceTileAccent(tile.id);
   const xp = practiceXpRate(tile.id);
 

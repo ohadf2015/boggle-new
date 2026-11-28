@@ -63,19 +63,12 @@ describe('PracticePickerTile contrast', () => {
     expect(rail?.className).toContain('bg-neo-lime');
   });
 
-  it('lets a bespoke poster fill the card', () => {
-    render(<PracticePickerTile tile={tile({ id: 'blitz', mode: 'blitz' })} onSelect={vi.fn()} />);
-    expect(
-      screen.getByTestId('practice-tile-art-blitz').closest('[data-poster-frame]')
-    ).not.toBeNull();
-  });
-
-  it('shows the whole poster above the name band, on its own field colour', () => {
+  it('shows the whole sticker above the name band, sized by the card, not a fixed chip', () => {
     render(<PracticePickerTile tile={tile({ id: 'blitz', mode: 'blitz' })} onSelect={vi.fn()} />);
     const art = screen.getByTestId('practice-tile-art-blitz');
-    const frame = art.closest('[data-poster-frame]')!;
+    expect(art).toHaveAttribute('src', '/mascot/teacher/practice/blitz.webp');
     expect(art.className).toContain('object-contain');
-    expect(frame).toHaveStyle({ backgroundColor: '#ff1493' });
+    const frame = art.closest('[data-art-frame]')!;
     expect(frame.className).toContain('flex-1');
     expect(frame.className).not.toContain('absolute');
   });

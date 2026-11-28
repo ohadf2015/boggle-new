@@ -147,29 +147,13 @@ describe('PracticePicker poster grid', () => {
     expect(screen.queryByTestId('practice-tile-xp-word_list')).not.toBeInTheDocument();
   });
 
-  it('gives every tile mascot art, poster or fallback', () => {
+  it('gives every tile and the hero its own practice sticker', () => {
     renderIt();
     expandAll();
     for (const id of ['flashcard', 'spelling', 'matching', 'solo_board']) {
-      const art = screen.getByTestId(`practice-tile-art-${id}`);
-      expect(art).toHaveAttribute('src', expect.stringMatching(/\.webp$/));
+      expect(screen.getByTestId(`practice-tile-art-${id}`)).toHaveAttribute('src', `/mascot/teacher/practice/${id}.webp`);
     }
-    expect(screen.getByTestId('practice-hero-art-blitz')).toHaveAttribute(
-      'src',
-      expect.stringMatching(/-nobg\.webp$/)
-    );
-  });
-
-  it('uses the full-bleed poster where one has been drawn', () => {
-    renderIt();
-    expandAll();
-    // The bespoke posters live on the tiles; the hero floats a transparent
-    // mascot on its accent instead (a poster plate on another fill reads as a
-    // failed image load).
-    expect(screen.getByTestId('practice-tile-art-spelling')).toHaveAttribute(
-      'src',
-      '/mascot/teacher/practice-spelling-sky.webp'
-    );
+    expect(screen.getByTestId('practice-hero-art-blitz')).toHaveAttribute('src', '/mascot/teacher/practice/blitz.webp');
   });
 
   it('keeps every tile to a single line of copy so the grid fits a phone', () => {
