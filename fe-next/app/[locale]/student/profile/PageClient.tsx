@@ -11,6 +11,9 @@ import { ArrowRight, Play } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
+import { useTeacherStudentModeLessons } from '@/hooks/useTeacherStudentModeLessons';
+import { withOwnProgress } from '@/lib/education/teacherStudentView';
+import { StudentModeError } from '@/components/teacher/classroom/StudentModeError';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { EducationBadgeGrid, type StudentAchievement } from '@/components/education';
 import { AcademyPageFrame, FrameSkeleton } from '@/components/student/pages/AcademyPageFrame';
@@ -42,7 +45,10 @@ export default function StudentProfilePageClient() {
   const userId = user?.id ?? null;
   const [achievements, setAchievements] = useState<StudentAchievement[]>([]);
   const [isLoadingAchievements, setIsLoadingAchievements] = useState(true);
-  const { lessons, isLoading: isLoadingProgress } = useStudentProgress();
+  const { lessons: ownLessons, progress, isLoading: progressLoading } = useStudentProgress();
+  const mode = useTeacherStudentModeLessons();
+  const lessons = mode.active ? withOwnProgress(mode.lessons ?? [], progress) : ownLessons;
+  const isLoadingProgress = progressLoading || mode.pending;
   const awards = useAwardsRecord(userId);
 
   const rows = lessons.flatMap((l) => (l.progress ? [l.progress] : []));
@@ -118,6 +124,8 @@ export default function StudentProfilePageClient() {
     >
       {!ready ? (
         <FrameSkeleton rows={3} />
+      ) : mode.error ? (
+        <StudentModeError onRetry={mode.retry} />
       ) : (
         <div data-testid="student-profile-content" className="flex flex-col gap-3">
           <div className={cn(CARD, 'flex flex-col gap-4')} style={toneStyle('plum', { shadow: 3, trim: 2 })}>

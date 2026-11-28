@@ -8,9 +8,11 @@
  * Here `lessons` stays null until a real authed response arrives.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import type { PracticeLesson } from '@/hooks/usePracticeLessons';
+import { useTeacherStudentModeLessons } from '@/hooks/useTeacherStudentModeLessons';
+import { studentLessonsToPracticeLessons } from '@/lib/education/teacherStudentView';
 
 export function useAuthedLessons(): {
   lessons: PracticeLesson[] | null;
@@ -23,9 +25,11 @@ export function useAuthedLessons(): {
   const [lessons, setLessons] = useState<PracticeLesson[] | null>(null);
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const mode = useTeacherStudentModeLessons();
+  const modeLessons = useMemo(() => (mode.lessons ? studentLessonsToPracticeLessons(mode.lessons) : null), [mode.lessons]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || mode.pending || mode.active) return;
     let cancelled = false;
     fetch('/api/education/practice/lessons')
       .then(async (res) => {
@@ -42,12 +46,15 @@ export function useAuthedLessons(): {
     return () => {
       cancelled = true;
     };
-  }, [ready, attempt]);
+  }, [ready, attempt, mode.pending, mode.active]);
 
   const retry = useCallback(() => {
     setError(false);
     setAttempt((n) => n + 1);
   }, []);
 
-  return { lessons, error, signedOut: !loading && !user, retry };
+  const signedOut = !loading && !user;
+  if (mode.pending) return { lessons: null, error: false, signedOut, retry };
+  if (mode.active) return { lessons: modeLessons, error: mode.error, signedOut, retry: mode.retry };
+  return { lessons, error, signedOut, retry };
 }

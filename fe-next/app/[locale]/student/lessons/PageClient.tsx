@@ -18,6 +18,9 @@ import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { usePracticeLessons } from '@/hooks/usePracticeLessons';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { mergeStudentLessons } from '@/lib/education/mergeLessons';
+import { withOwnProgress } from '@/lib/education/teacherStudentView';
+import { useTeacherStudentModeLessons } from '@/hooks/useTeacherStudentModeLessons';
+import { StudentModeError } from '@/components/teacher/classroom/StudentModeError';
 import { AcademyPageFrame, FrameSkeleton } from '@/components/student/pages/AcademyPageFrame';
 import { LessonCard, LessonsEmpty, LessonsFootnote, orderLessons } from '@/components/student/pages/LessonsList';
 import { useStudentSubpageGuard } from '@/components/student/pages/useStudentSubpageGuard';
@@ -30,18 +33,23 @@ export default function StudentLessonsPageClient() {
   const { t: rawT, language } = useLanguage();
   const t = rawT as unknown as T;
   const { status } = useStudentSubpageGuard(language);
-  const { lessons: assigned, isLoading } = useStudentProgress();
+  const { lessons: assigned, progress, isLoading } = useStudentProgress();
+  const mode = useTeacherStudentModeLessons();
   const { lessons: practisable, isLoading: practisableLoading } = usePracticeLessons();
   const { level } = useStudentClassroom();
   // The redirect decides on the session; whether an EMPTY list is real waits
   // for lists fetched after the profile landed (the hooks gate on it).
   const { profile } = useAuth();
   const listsSettled = useSettledAfterProfile(!!profile, [assigned, practisable]);
-  const lessons = useMemo(() => orderLessons(mergeStudentLessons(assigned, practisable)), [assigned, practisable]);
+  const lessons = useMemo(
+    () => orderLessons(mode.active ? withOwnProgress(mode.lessons ?? [], progress) : mergeStudentLessons(assigned, practisable)),
+    [mode.active, mode.lessons, progress, assigned, practisable],
+  );
   const done = lessons.filter((l) => l.status === 'completed').length;
 
   const ready = status === 'ready';
-  const listLoading = ready && (isLoading || practisableLoading || !listsSettled) && lessons.length === 0;
+  const listLoading =
+    ready && (mode.pending || (mode.active ? isLoading : (isLoading || practisableLoading || !listsSettled) && lessons.length === 0));
 
   const badge =
     ready && lessons.length > 0 ? (
@@ -65,6 +73,8 @@ export default function StudentLessonsPageClient() {
     >
       {!ready || listLoading ? (
         <FrameSkeleton rows={4} />
+      ) : mode.error ? (
+        <StudentModeError onRetry={mode.retry} />
       ) : (
         <div data-testid="student-lessons-content" className="h-full">
           {lessons.length === 0 ? (

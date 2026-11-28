@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { assignmentsToStudentLessons } from '../teacherStudentView';
-import type { TeacherAssignment } from '@/lib/supabase/education/types';
+import { assignmentsToStudentLessons, studentLessonsToPracticeLessons, withOwnProgress } from '../teacherStudentView';
+import type { StudentLessonProgress, TeacherAssignment } from '@/lib/supabase/education/types';
 
 const assignment = (over: Partial<TeacherAssignment> = {}): TeacherAssignment => ({
   id: 'a1',
@@ -42,5 +42,41 @@ describe('assignmentsToStudentLessons', () => {
       'c1',
     );
     expect(lessons.map((l) => l.assignment?.id)).toEqual(['new']);
+  });
+});
+
+const row = (over: Partial<StudentLessonProgress> = {}) =>
+  ({ lesson_id: 'l1', words_mastered: ['orbit'], completed_at: null, total_practice_sessions: 1, total_xp: 20, ...over }) as StudentLessonProgress;
+
+describe('withOwnProgress', () => {
+  const lessons = assignmentsToStudentLessons(
+    [assignment(), assignment({ id: 'a2', lesson_id: 'l2', created_at: '2026-11-19T00:00:00Z', vocabulary_lessons: { id: 'l2', name: 'Sea', language: 'en', words: [] } as never })],
+    'c1',
+  );
+
+  it('Given the teacher finished a round of a class lesson, Then that lesson counts as done with their mastered words, like a student whose homework was stamped', () => {
+    const [played, untouched] = withOwnProgress(lessons, [row()]);
+    expect(played).toMatchObject({ lessonId: 'l1', status: 'completed', progress: { words_mastered: ['orbit'], total_xp: 20 } });
+    expect(untouched).toMatchObject({ lessonId: 'l2', status: 'assigned', progress: { words_mastered: [] } });
+  });
+
+  it('Given a progress row with no finished round yet, Then the lesson is started, not done', () => {
+    expect(withOwnProgress(lessons, [row({ total_practice_sessions: 0 })])[0].status).toBe('started');
+  });
+
+  it('Given a row stamped complete, Then it is done even with no session count', () => {
+    expect(withOwnProgress(lessons, [row({ total_practice_sessions: 0, completed_at: '2026-11-28T00:00:00Z' })])[0].status).toBe('completed');
+  });
+
+  it('Given the teacher played lessons outside this class, Then the class list and its order stay as they are', () => {
+    const out = withOwnProgress(lessons, [row({ lesson_id: 'elsewhere' })]);
+    expect(out.map((l) => [l.lessonId, l.status])).toEqual([['l1', 'assigned'], ['l2', 'assigned']]);
+  });
+});
+
+describe('studentLessonsToPracticeLessons', () => {
+  it('Given the class lessons, Then the practice screens get the same lessons in their shape, assignment focus kept', () => {
+    const [p] = studentLessonsToPracticeLessons(assignmentsToStudentLessons([assignment({ practice_focus: 'spelling' } as never)], 'c1'));
+    expect(p).toMatchObject({ id: 'l1', name: 'Space words', language: 'en', words: [{ word: 'orbit' }], classroom_id: 'c1', assignment: { lesson_id: 'l1', practice_focus: 'spelling' } });
   });
 });

@@ -25,7 +25,11 @@ const knobs = vi.hoisted(() => ({
   push: vi.fn(),
   auth: vi.fn(),
   lessons: [] as unknown[],
+  progress: [] as unknown[],
+  progressLoading: false,
+  mode: { active: false, pending: false, lessons: null as unknown[] | null, error: false, retry: vi.fn() },
 }));
+vi.mock('@/hooks/useTeacherStudentModeLessons', () => ({ useTeacherStudentModeLessons: () => knobs.mode }));
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: knobs.push, replace: knobs.push }),
@@ -48,7 +52,7 @@ vi.mock('next/link', () => ({
   ),
 }));
 vi.mock('@/hooks/useStudentProgress', () => ({
-  useStudentProgress: () => ({ lessons: knobs.lessons, isLoading: false }),
+  useStudentProgress: () => ({ lessons: knobs.lessons, progress: knobs.progress, isLoading: knobs.progressLoading }),
 }));
 vi.mock('@/hooks/usePracticeLessons', () => ({
   usePracticeLessons: () => ({ lessons: [], isLoading: false, error: null }),
@@ -68,6 +72,7 @@ const PAGES = [
 describe.each(PAGES)('/student/%s renders once auth resolves', (_name, Page, contentId) => {
   beforeEach(() => {
     knobs.push.mockReset();
+    knobs.mode = { active: false, pending: false, lessons: null, error: false, retry: vi.fn() };
     knobs.lessons = [];
   });
 
@@ -150,5 +155,47 @@ describe('/student/lessons lists the student lessons', () => {
     const empty = cards[0].querySelectorAll('svg.lucide-star');
     expect(empty.length).toBe(3);
     for (const star of empty) expect(star.getAttribute('class')).not.toMatch(/fill-white\//);
+  });
+});
+
+describe('/student/lessons for a teacher in student mode', () => {
+  const classLesson = { lessonId: 'l1', status: 'assigned', classroomId: 'c1', lesson: { id: 'l1', name: 'Class words', words: [{ word: 'orbit' }] }, progress: { words_mastered: [] } };
+  beforeEach(() => {
+    knobs.push.mockReset();
+    knobs.auth.mockReturnValue({ user: { id: 'T' }, profile: { id: 'T', user_role: 'teacher' }, loading: false });
+    knobs.lessons = [{ lessonId: 'elsewhere', status: 'started', progress: { lesson_id: 'elsewhere' } }];
+    knobs.progress = [{ lesson_id: 'l1', words_mastered: ['orbit'], completed_at: null, total_practice_sessions: 1 }];
+    knobs.mode = { active: true, pending: false, lessons: [classLesson], error: false, retry: vi.fn() };
+    knobs.progressLoading = false;
+  });
+
+  it('waits for the teacher’s own progress so cards do not paint unstarted and then jump to done', () => {
+    knobs.progressLoading = true;
+    render(<StudentLessonsPageClient />);
+    expect(screen.queryByTestId('student-lesson-card')).toBeNull();
+  });
+
+  it('lists the class lessons with the teacher’s own progress, not their stray rows from other lessons', async () => {
+    render(<StudentLessonsPageClient />);
+    const cards = await screen.findAllByTestId('student-lesson-card');
+    expect(cards).toHaveLength(1);
+    expect(screen.getByText('Class words')).toBeInTheDocument();
+    expect(cards[0].querySelectorAll('svg.lucide-star.fill-neo-yellow').length).toBeGreaterThan(0);
+  });
+
+  it('waits on the class read instead of painting the empty state', () => {
+    knobs.mode = { ...knobs.mode, pending: true, lessons: null };
+    render(<StudentLessonsPageClient />);
+    expect(screen.queryByText('academy.pages.noLessonsTitle')).toBeNull();
+    expect(screen.queryByTestId('student-lesson-card')).toBeNull();
+  });
+
+  it('says the class read failed, with a retry, instead of "no lessons"', () => {
+    const retry = vi.fn();
+    knobs.mode = { ...knobs.mode, error: true, lessons: null, retry };
+    render(<StudentLessonsPageClient />);
+    expect(screen.queryByText('academy.pages.noLessonsTitle')).toBeNull();
+    screen.getByTestId('student-view-retry').click();
+    expect(retry).toHaveBeenCalled();
   });
 });

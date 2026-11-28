@@ -3,7 +3,13 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-const state = vi.hoisted(() => ({ lessons: [] as unknown[], earnedRows: [] as unknown[] }));
+const state = vi.hoisted(() => ({
+  lessons: [] as unknown[],
+  progress: [] as unknown[],
+  earnedRows: [] as unknown[],
+  mode: { active: false, pending: false, lessons: null as unknown[] | null, error: false, retry: () => undefined },
+}));
+vi.mock('@/hooks/useTeacherStudentModeLessons', () => ({ useTeacherStudentModeLessons: () => state.mode }));
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
 vi.mock('@/contexts/AuthContext', () => ({
@@ -13,7 +19,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string, f?: unknown) => (typeof f === 'string' ? f : k), language: 'en', dir: 'ltr' }),
 }));
 vi.mock('@/hooks/useStudentProgress', () => ({
-  useStudentProgress: () => ({ lessons: state.lessons, isLoading: false, error: null }),
+  useStudentProgress: () => ({ lessons: state.lessons, progress: state.progress, isLoading: false, error: null }),
 }));
 vi.mock('@/components/student/pages/AcademyPageFrame', () => ({
   AcademyPageFrame: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -45,7 +51,27 @@ import StudentProfilePageClient from './PageClient';
 const lesson = (p: Record<string, unknown>) => ({ lessonId: 'l1', status: 'started', progress: { total_xp: 0, current_streak: 0, words_mastered: [], total_practice_sessions: 0, ...p } });
 
 describe('StudentProfilePageClient', () => {
-  beforeEach(() => { state.lessons = []; state.earnedRows = []; });
+  beforeEach(() => {
+    state.lessons = [];
+    state.progress = [];
+    state.earnedRows = [];
+    state.mode = { active: false, pending: false, lessons: null, error: false, retry: () => undefined };
+  });
+
+  test('given a teacher in student mode, then the stats are their own progress on that class’s lessons only', async () => {
+    state.lessons = [lesson({ total_xp: 500, total_practice_sessions: 9 })];
+    state.progress = [{ lesson_id: 'c-l1', total_xp: 20, current_streak: 1, words_mastered: ['a'], total_practice_sessions: 1, completed_at: null }];
+    state.mode = { ...state.mode, active: true, lessons: [{ lessonId: 'c-l1', status: 'assigned', lesson: { id: 'c-l1', name: 'Class', words: [] } }, { lessonId: 'c-l2', status: 'assigned', lesson: { id: 'c-l2', name: 'Two', words: [] } }] };
+    render(<StudentProfilePageClient />);
+    await waitFor(() => expect(screen.getByText('20 education.xp.totalXp')).toBeInTheDocument());
+  });
+
+  test('given the student-mode class read failed, then a retry shows instead of a brand-new-student profile', () => {
+    state.mode = { ...state.mode, active: true, error: true };
+    render(<StudentProfilePageClient />);
+    expect(screen.getByTestId('student-view-retry')).toBeInTheDocument();
+    expect(screen.queryByTestId('profile-first-step')).toBeNull();
+  });
 
   test('given a new student, then one first step replaces the dead zero stats', async () => {
     state.lessons = [lesson({})];
