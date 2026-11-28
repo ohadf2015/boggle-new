@@ -67,6 +67,10 @@ const faqs = [
     a: 'LexiClash is a free, browser-based competitive word game with a worldwide leaderboard, real-time multiplayer battles for 2-20+ players, and ranked daily challenges where everyone solves the same puzzle. NYT Spelling Bee and Wordle have informal score-sharing, but LexiClash is built around live competition and persistent rankings — no download, no pay-to-win.',
   },
   {
+    q: 'Which online puzzle games have an active leaderboard or competitive element?',
+    a: "LexiClash does, and it runs free in the browser with no download. There is a global leaderboard with a monthly season and an all-time ranking, a leaderboard for each daily puzzle where everyone gets the same board, and live standings inside every multiplayer room, where you race other players on the same letter grid in real time.",
+  },
+  {
     q: 'Is there a free competitive word game I can play in the browser?',
     a: 'Yes. LexiClash runs entirely in the browser on phone, tablet, or desktop. Create or join a room, race opponents on the same letter grid in real time, and climb the global and daily leaderboards — all free, no signup required to start.',
   },
