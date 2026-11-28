@@ -25,3 +25,4 @@ of real text, never the carrier of meaning.
 | `words-mastered.webp` | `app/[locale]/student/achievements/PageClient.tsx` — page header |
 | `share-code.webp` | `components/teacher/PlayTabFirstRunCard.tsx` — the share-the-code moment |
 | `pro-hero-poster.webp`, `pro-unlocks.webp` | pre-existing Pro upgrade art |
+| `teacher-pro-upsell-hero.webp` | `components/teacher/ClassLimitUpsellModal.tsx` — light classroom hero on the Teacher Pro upgrade modal |

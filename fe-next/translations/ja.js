@@ -15800,6 +15800,7 @@ const ja = {
       "giftedNoCard": "カード登録も自動更新もありません。期限が来たら無料プランに戻るだけです。",
       "giftedUntil": "無償 Pro の期限",
       "giftedBadge": "ギフト",
+      "upsellHeroAlt": "レキシクラッシュのマスコットと一緒にワードゲームをしている明るい教室のイラスト",
       "classLimitTitle": "クラスの上限に達しました",
       "classLimitReached": "クラス数の上限に達しました。無制限にするには Teacher Pro にアップグレードしてください。",
       "classLimitMessage": "無料クラスを{{limit}}個中{{current}}個作成しました。Proにアップグレードすると、クラスを無制限に作れます。",
