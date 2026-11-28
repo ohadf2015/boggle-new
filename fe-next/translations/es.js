@@ -15331,6 +15331,7 @@ const es = {
     "studentView": {
       "open": "Ver la app del alumno",
       "banner": "Estás viendo lo que ven los alumnos",
+      "bannerShort": "Vista de alumno",
       "exit": "Salir",
       "liveRound": "Partida en vivo con bots",
       "error": "No pudimos cargar las lecciones de esta clase.",

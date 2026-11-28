@@ -25,6 +25,7 @@ describe('TeacherStudentModeLayer', () => {
     startTeacherStudentMode('c1');
     render(<TeacherStudentModeLayer>{page}</TeacherStudentModeLayer>);
     expect(screen.getByTestId('teacher-student-mode-bar')).toHaveTextContent('teacher.studentView.banner');
+    expect(screen.getByTestId('teacher-student-mode-bar')).toHaveTextContent('teacher.studentView.bannerShort');
     expect(screen.getByTestId('page').parentElement).toHaveAttribute('data-teacher-student-mode', 'on');
   });
 

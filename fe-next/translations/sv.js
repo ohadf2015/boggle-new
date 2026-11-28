@@ -15695,6 +15695,7 @@ const sv = {
     "studentView": {
       "open": "Se elevappen",
       "banner": "Du ser det eleverna ser",
+      "bannerShort": "Elevvy",
       "exit": "Avsluta",
       "liveRound": "Livespel med bottar",
       "error": "Vi kunde inte ladda klassens lektioner.",

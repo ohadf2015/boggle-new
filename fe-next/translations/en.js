@@ -13669,6 +13669,7 @@ const en = {
     "studentView": {
       "open": "See the student app",
       "banner": "You're seeing what students see",
+      "bannerShort": "Student view",
       "exit": "Exit",
       "liveRound": "Live game with bots",
       "error": "We couldn't load this class's lessons.",
