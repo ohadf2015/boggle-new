@@ -51,7 +51,7 @@ export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry, o
               className="flex min-h-12 w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-6 py-3 font-neo-display font-black text-neo-black shadow-edu-lip-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-black"
             >
               <RotateCcw className="h-5 w-5" aria-hidden="true" />
-              {t('common.restart') || 'Restart Game'}
+              {t('education.student.gameEnded.restart')}
             </button>
           )}
           <DeadEndPracticeLink state="room_gone" className="bg-neo-lime text-neo-black focus-visible:outline-neo-black" />

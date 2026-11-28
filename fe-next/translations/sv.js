@@ -19225,6 +19225,7 @@ const sv = {
         "joinClassLine": "Lärarens spel tog precis slut. Gå med i klassen nu så är du med i nästa.",
         "nextGameToast": "Det spelet tog precis slut. Nu är du med i klassen, så du kommer med i nästa.",
         "title": "Det här spelet är slut",
+        "restart": "Starta om spelet",
         "retry": "Försök igen",
         "toClass": "Till min klass",
         "newCode": "Skriv en ny kod",

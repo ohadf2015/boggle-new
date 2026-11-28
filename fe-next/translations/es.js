@@ -18860,6 +18860,7 @@ const es = {
         "joinClassLine": "El juego de tu profe acaba de terminar. Únete a tu clase ahora y entrarás en el próximo.",
         "nextGameToast": "Ese juego acaba de terminar. Ya estás en la clase, así que entrarás en el próximo.",
         "title": "Este juego terminó",
+        "restart": "Reiniciar el juego",
         "retry": "Reintentar",
         "toClass": "Ir a mi clase",
         "newCode": "Poner otro código",

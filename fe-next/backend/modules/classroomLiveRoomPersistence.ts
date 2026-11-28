@@ -10,6 +10,7 @@
  */
 
 import type { Socket } from 'socket.io';
+import type { Avatar, GameMode, Language } from '@/shared/types/game';
 import { getSupabase } from './supabase/client.js';
 import {
   createGame,
@@ -26,18 +27,57 @@ import {
 import { getGameRoom, joinRoom } from '../utils/socketHelpers.js';
 import logger from '../utils/logger.js';
 
+const LANGUAGES: readonly Language[] = ['he', 'en', 'sv', 'ja', 'es', 'ru', 'fr', 'de'];
+const BOARD_MODES: readonly GameMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush', 'word-tower', 'crossword', 'wordcraft'];
+const CLASSROOM_MODES = ['classic', 'blast', 'word-hunt', 'wheel-rush', 'vocab-quiz', 'wordcraft', 'crossword'] as const;
+
+function asLanguage(value: unknown): Language {
+  return typeof value === 'string' && (LANGUAGES as readonly string[]).includes(value) ? (value as Language) : 'en';
+}
+
+function asAvatar(value: unknown): Avatar | null {
+  if (!value || typeof value !== 'object') return null;
+  const raw = value as Record<string, unknown>;
+  const avatar: Avatar = {};
+  if (typeof raw.avatarImage === 'string') avatar.avatarImage = raw.avatarImage;
+  if (typeof raw.emoji === 'string') avatar.emoji = raw.emoji;
+  if (typeof raw.color === 'string') avatar.color = raw.color;
+  if (raw.customAvatar && typeof raw.customAvatar === 'object') {
+    avatar.customAvatar = raw.customAvatar as Avatar['customAvatar'];
+  }
+  return avatar;
+}
+
+function asClassroomMode(value: unknown): NonNullable<ClassroomGameSettings['gameMode']> {
+  return typeof value === 'string' && (CLASSROOM_MODES as readonly string[]).includes(value)
+    ? (value as NonNullable<ClassroomGameSettings['gameMode']>)
+    : 'classic';
+}
+
+/** Board engines use GameMode. vocab-quiz is stored beside it so a restored quiz room stays a quiz. */
+function restoredBoardMode(value: string | undefined): GameMode | undefined {
+  if (!value) return undefined;
+  if ((BOARD_MODES as readonly string[]).includes(value)) return value as GameMode;
+  if (value === 'vocab-quiz') return 'vocab-quiz' as GameMode;
+  return undefined;
+}
+
+function restoredBoardPhase(phase: ClassroomLiveRoomRecord['currentPhase']): GameState['gameState'] {
+  return phase === 'playing' ? 'in-progress' : 'waiting';
+}
+
 export interface HostIdentity {
   userId: string;
   username: string;
   socketId?: string;
-  avatar?: unknown;
+  avatar?: Avatar | null;
 }
 
 export interface LiveRoomRosterEntry {
   userId: string;
   username: string;
   socketId?: string;
-  avatar?: unknown;
+  avatar?: Avatar | null;
   score?: number;
 }
 
@@ -48,9 +88,9 @@ export interface ClassroomLiveRoomRecord {
   hostIdentity: HostIdentity;
   roster: LiveRoomRosterEntry[];
   gameConfig: {
-    language?: string;
-    gameMode?: string;
-    settings?: Record<string, unknown>;
+    language?: Language;
+    gameMode?: ClassroomGameSettings['gameMode'];
+    settings?: ClassroomGameSettings;
   };
   lessonWords: string[];
   currentPhase: 'waiting' | 'playing' | 'ended';
@@ -177,10 +217,9 @@ export async function restoreLiveRoomFromDb(
         hostUsername,
         hostPlayerId: record.hostIdentity?.userId || record.teacherId,
         roomName: roomCode,
-        language: (record.gameConfig?.language as never) || 'en',
+        language: asLanguage(record.gameConfig?.language),
         isClassroom: true,
         isPrivate: true,
-        gameMode: (record.gameConfig?.gameMode as never) || 'classic',
         allowLateJoin: true,
       });
 
@@ -189,7 +228,7 @@ export async function restoreLiveRoomFromDb(
         isHost: true,
         authUserId: record.teacherId,
         playerId: record.hostIdentity?.userId || record.teacherId,
-        avatar: record.hostIdentity?.avatar,
+        avatar: asAvatar(record.hostIdentity?.avatar),
       });
 
       // Restore roster students
@@ -200,7 +239,7 @@ export async function restoreLiveRoomFromDb(
             isHost: false,
             authUserId: player.userId,
             playerId: player.userId,
-            avatar: player.avatar,
+            avatar: asAvatar(player.avatar),
           });
         }
       }
@@ -210,11 +249,10 @@ export async function restoreLiveRoomFromDb(
         game.selectedVocabulary = new Set(record.lessonWords);
       }
 
-      if (record.gameConfig?.gameMode) {
-        game.gameMode = record.gameConfig.gameMode as never;
-      }
+      const restoredMode = restoredBoardMode(record.gameConfig?.gameMode);
+      if (restoredMode) game.gameMode = restoredMode;
 
-      game.gameState = record.currentPhase;
+      game.gameState = restoredBoardPhase(record.currentPhase);
       logger.info('CLASSROOM_GAME', `Restored room ${roomCode} from DB (phase: ${record.currentPhase}, roster: ${record.roster?.length ?? 0})`);
     } else if (isTeacherConnecting && connectingSocket) {
       // Reclaim host socket on reconnect
@@ -241,14 +279,14 @@ export async function restoreLiveRoomFromDb(
           lessonIds: [],
           lessonNames: [],
           vocabularyWords: record.lessonWords,
-          language: record.gameConfig?.language || 'en',
-          settings: (record.gameConfig?.settings as ClassroomGameSettings) || {
-            gameMode: (record.gameConfig?.gameMode as never) || 'classic',
+          language: asLanguage(record.gameConfig?.language),
+          settings: record.gameConfig?.settings || {
+            gameMode: asClassroomMode(record.gameConfig?.gameMode),
           },
         });
       }
-      if (record.currentPhase !== 'waiting') {
-        await updateClassroomGameStatus(roomCode, record.currentPhase as never);
+      if (record.currentPhase === 'playing') {
+        await updateClassroomGameStatus(roomCode, 'playing');
       }
     } catch (redisErr) {
       logger.warn('CLASSROOM_GAME', `Redis sync for restored room ${roomCode} failed: ${(redisErr as Error)?.message ?? redisErr}`);
