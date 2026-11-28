@@ -172,3 +172,19 @@ describe('DailyFlowChrome chain handoff', () => {
     expect(consumeDailyHandoff('word-tower')).toBe(true);
   });
 });
+
+describe('DailyFlowChrome end slot', () => {
+  it('Given host controls, Then the inline nav shows them at the row end, after back', () => {
+    render(<DailyFlowChrome modeId="connections" intro={false} inline end={<button type="button">help</button>} />);
+    const nav = screen.getByTestId('daily-flow-nav');
+    const end = screen.getByTestId('daily-flow-nav-end');
+    expect(nav.lastElementChild).toBe(end);
+    expect(end.className).toContain('ms-auto');
+    expect(end.textContent).toBe('help');
+  });
+
+  it('Given the floating nav, Then no end slot is drawn', () => {
+    render(<DailyFlowChrome modeId="connections" intro={false} end={<button type="button">help</button>} />);
+    expect(screen.queryByTestId('daily-flow-nav-end')).toBeNull();
+  });
+});

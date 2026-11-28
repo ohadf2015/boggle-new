@@ -12,6 +12,7 @@ import { useDailyDate } from '@/hooks/useUtcDay';
 import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
 import { loadDailyResult } from '@/lib/connections/dailyResultStore';
 import { DailyFlowChrome } from '@/components/daily/flow/DailyFlowChrome';
+import { DailyFlowMute } from '@/components/daily/flow/DailyFlowMute';
 import BridgeTutorial from '@/components/connections/tutorial/BridgeTutorial';
 import { shouldAutoShowTutorial, markTutorialSeen } from '@/components/connections/tutorial/tutorialGate';
 import { useModeBed } from '@/hooks/useModeBed';
@@ -76,27 +77,34 @@ export default function DailyPageClient({ locale }: Props): React.JSX.Element {
 
   return (
     <div data-testid="connections-daily-root" className="flex-1 flex flex-col min-h-0">
-      <div className="relative">
-        <DailyFlowChrome
-          modeId="connections"
-          inline
-          skip={!finished && !tutorialOpen}
-          introDeferred={tutorial === 'undecided'}
-          intro={tutorial !== 'auto'}
-        />
-        {tutorial === 'off' && !finished && (
-          <button
-            type="button"
-            data-testid="connections-how-to-play"
-            onClick={() => setTutorial('manual')}
-            className="absolute end-3 top-2 z-10 flex h-9 items-center gap-1 rounded-full border-2 border-neo-black bg-neo-navy/90 px-3 text-xs font-black text-neo-white shadow-hard-sm"
-          >
-            <CircleHelp className="h-4 w-4" strokeWidth={2.75} aria-hidden="true" />
-            {/* Icon-only under 360px: the labelled pill collides with Back + Skip on 320px phones. */}
-            <span className="max-[359px]:sr-only">{t('daily.howToPlay')}</span>
-          </button>
-        )}
-      </div>
+      {/* One nav row: back + skip at the start, how to play + mute at the end. The mute
+          used to float over the quest title, and the how-to-play pill over the row. */}
+      <DailyFlowChrome
+        modeId="connections"
+        inline
+        skip={!finished && !tutorialOpen}
+        introDeferred={tutorial === 'undecided'}
+        intro={tutorial !== 'auto'}
+        end={
+          finished ? null : (
+            <>
+              {tutorial === 'off' && (
+                <button
+                  type="button"
+                  data-testid="connections-how-to-play"
+                  onClick={() => setTutorial('manual')}
+                  className="flex h-9 min-w-9 items-center justify-center gap-1 rounded-full border-2 border-neo-black bg-neo-navy/90 px-3 text-xs font-black text-neo-white shadow-hard-sm max-[479px]:px-0"
+                >
+                  <CircleHelp className="h-4 w-4" strokeWidth={2.75} aria-hidden="true" />
+                  {/* Icon-only on phones: three labelled pills crowd a 360-414px row. */}
+                  <span className="max-[479px]:sr-only">{t('daily.howToPlay')}</span>
+                </button>
+              )}
+              <DailyFlowMute />
+            </>
+          )
+        }
+      />
       {tutorialOpen && <BridgeTutorial onDone={closeTutorial} />}
       {gameMounted && (
         <div className={tutorialOpen ? 'hidden' : 'flex-1 flex flex-col min-h-0'}>

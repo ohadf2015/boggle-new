@@ -64,7 +64,8 @@ export default function RankBadge({ standing, rankUpId = null, onRankUpShown, co
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(standing.ratio * 100)}
-          className={`${compact ? 'mt-0.5 h-1.5' : 'mt-1 h-2'} overflow-hidden rounded-full border border-neo-cream/40 bg-neo-navy`}
+          // A dark, black-edged track: the old cream-tinted hairline read as a grey stretch beside the fill.
+          className={`${compact ? 'mt-1 h-2.5' : 'mt-1 h-3'} overflow-hidden rounded-full border-2 border-neo-black bg-neo-black/40`}
         >
           <m.div
             initial={false}

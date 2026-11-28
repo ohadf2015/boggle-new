@@ -80,10 +80,19 @@ describe('PuzzleCard — hint and wrong-answer layout', () => {
     expect(cls).not.toMatch(/\b(ml|mr|pl|pr)-/);
   });
 
-  it('reserves the hint row before the hint is shown so nothing jumps', () => {
+  it('reserves the hint row before the hint is shown on tall screens only', () => {
     renderCard({ hintRevealed: false });
-    expect(screen.getByTestId('puzzle-hint-row').className).toMatch(/min-h-/);
+    const cls = screen.getByTestId('puzzle-hint-row').className;
+    expect(cls).toContain('[@media(min-height:860px)]:min-h-[3rem]');
     expect(screen.queryByText(puzzle.hint as string)).toBeNull();
+  });
+
+  it('Given a phone (2026-11-28 report), Then the empty hint row takes no room, so the bridge keeps its second word', () => {
+    renderCard({ hintRevealed: false });
+    const cls = screen.getByTestId('puzzle-hint-row').className;
+    // No unconditional reservation: the reserved 3rem once pushed the bottom plate out of view.
+    expect(cls.split(/\s+/)).not.toContain('min-h-[3rem]');
+    expect(cls).toContain('[@media(max-height:859px)]:empty:mb-0');
   });
 
   it('Given a short phone, Then the stage area shrinks and clips before the keyboard dock is pushed off screen', () => {

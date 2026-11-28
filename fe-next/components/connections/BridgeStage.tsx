@@ -24,7 +24,10 @@ interface BridgeStageProps {
  * wide card (desktop, tablet) lays them out in a row.
  *
  * Layout is plain flex flow, no absolute positioning or negative margins, so
- * nothing can paint over the hint row above or the feedback line below. Every
+ * nothing can paint over the hint row above or the feedback line below. The
+ * plates and the deck never shrink; the ropes and the river are scenery and give
+ * up their height first when the stage is shorter than the whole bridge, so a
+ * short phone still shows both words instead of clipping the bottom plate. Every
  * vertical size is also capped by the stage height (`cqh` of the nearest
  * `container-type: size` ancestor, PuzzleCard's stage), so on a short screen with
  * the keyboard up the plates, tiles and river shrink instead of overflowing.
@@ -62,21 +65,21 @@ export default function BridgeStage({ word1, word2, isCorrect, isGaveUp, isRTL =
   return (
     <div
       data-testid="bridge-stage"
-      className="relative mx-auto flex w-full flex-col items-center @min-[36rem]:flex-row @min-[36rem]:items-center"
+      className="relative mx-auto flex min-h-0 w-full flex-col items-center @min-[36rem]:flex-row @min-[36rem]:items-center"
       style={{ containerType: 'inline-size' }}
     >
-      <m.div {...plate(1, 0)} className="relative z-[1] w-full @min-[36rem]:flex @min-[36rem]:w-[30%] @min-[36rem]:shrink-0">
+      <m.div {...plate(1, 0)} className="relative z-[1] w-full shrink-0 @min-[36rem]:flex @min-[36rem]:w-[30%] @min-[36rem]:shrink-0">
         <Plate word={word1} bob={!resolved && !reducedMotion} phase={0} />
       </m.div>
 
       <div
         data-testid="bridge-span"
-        className="flex w-full max-w-[24rem] flex-col items-stretch @min-[36rem]:min-w-0 @min-[36rem]:max-w-none @min-[36rem]:flex-1 @min-[36rem]:px-3"
+        className="flex min-h-0 w-full max-w-[24rem] flex-col items-stretch @min-[36rem]:min-w-0 @min-[36rem]:max-w-none @min-[36rem]:flex-1 @min-[36rem]:px-3"
       >
         {/* Two ropes tie the deck to the top plate; they pull lime on a solve. */}
         <div
           aria-hidden="true"
-          className="flex h-[clamp(0.5rem,min(7cqi,7cqh),2rem)] justify-between px-[7%] @max-[36rem]:[@media(min-height:780px)]:h-[clamp(0.5rem,min(9cqi,8cqh),2.5rem)] @min-[36rem]:hidden"
+          className="flex h-[clamp(0.5rem,min(7cqi,7cqh),2rem)] min-h-0 justify-between overflow-hidden px-[7%] @max-[36rem]:[@media(min-height:780px)]:h-[clamp(0.5rem,min(9cqi,8cqh),2.5rem)] @min-[36rem]:hidden"
         >
           {[0, 1].map((i) => (
             <span key={i} data-testid="bridge-rope" className={`relative h-full ${ROPE}`}>
@@ -100,7 +103,7 @@ export default function BridgeStage({ word1, word2, isCorrect, isGaveUp, isRTL =
           animate={isCorrect && !reducedMotion ? { scale: [1, 1.04, 1] } : { scale: 1 }}
           transition={isCorrect ? { duration: 0.35, delay: 0.3 } : { ...SLIDE, delay: 0.12 }}
           className={[
-            'relative z-[1] rounded-[6px] border-neo-thick px-1.5 py-[clamp(0.125rem,1.2cqh,0.375rem)] shadow-hard transition-colors duration-300',
+            'relative z-[1] shrink-0 rounded-[6px] border-neo-thick px-1.5 py-[clamp(0.125rem,1.2cqh,0.375rem)] shadow-hard transition-colors duration-300',
             'bg-[repeating-linear-gradient(90deg,var(--neo-cozy-muted)_0_22px,var(--neo-cozy-dark)_22px_24px)]',
             isCorrect ? 'border-neo-lime' : isGaveUp ? 'border-neo-red' : 'border-neo-black',
           ].join(' ')}
@@ -120,7 +123,7 @@ export default function BridgeStage({ word1, word2, isCorrect, isGaveUp, isRTL =
         <div
           aria-hidden="true"
           data-testid="bridge-river"
-          className="relative flex h-[clamp(1.75rem,min(18cqi,17cqh),4.5rem)] justify-between overflow-hidden px-[7%] @max-[36rem]:[@media(min-height:780px)]:h-[clamp(1.75rem,min(20cqi,18cqh),5rem)]"
+          className="relative flex h-[clamp(1.75rem,min(18cqi,17cqh),4.5rem)] min-h-0 justify-between overflow-hidden px-[7%] @max-[36rem]:[@media(min-height:780px)]:h-[clamp(1.75rem,min(20cqi,18cqh),5rem)]"
         >
           <BridgeArch />
           <span className={`relative h-full ${PIER}`} />
@@ -129,7 +132,7 @@ export default function BridgeStage({ word1, word2, isCorrect, isGaveUp, isRTL =
         </div>
       </div>
 
-      <m.div {...plate(-1, 0.06)} className="relative z-[1] w-full @min-[36rem]:flex @min-[36rem]:w-[30%] @min-[36rem]:shrink-0">
+      <m.div {...plate(-1, 0.06)} className="relative z-[1] w-full shrink-0 @min-[36rem]:flex @min-[36rem]:w-[30%] @min-[36rem]:shrink-0">
         <Plate word={word2} bob={!resolved && !reducedMotion} phase={1.3} />
       </m.div>
     </div>

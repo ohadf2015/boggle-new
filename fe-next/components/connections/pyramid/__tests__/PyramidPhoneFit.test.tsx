@@ -38,6 +38,16 @@ function renderProgress() {
 }
 
 describe('PyramidProgress on short phones', () => {
+  it('shrinks the capstone spot, the bricks and the rise on mid-height phones too', () => {
+    renderProgress();
+    expect(screen.getByTestId('pyramid-apex').className).toContain('[@container(max-height:48rem)]:h-11');
+    for (const i of [0, 1, 2]) {
+      expect(screen.getByTestId(`pyramid-tier-${i}`).className).toContain('[@container(max-height:48rem)]:h-9');
+    }
+    const row = screen.getByTestId('pyramid-tier-0').parentElement!;
+    expect(row.className).toContain('[@container(42rem<height<=48rem)]:mt-3');
+  });
+
   it('shrinks the capstone spot and the bricks on short screens', () => {
     renderProgress();
     expect(screen.getByTestId('pyramid-apex').className).toContain('[@container(max-height:42rem)]:h-11');
@@ -75,7 +85,25 @@ describe('PyramidHeader on short phones', () => {
 
   it('drops the daily heading on the shortest phones so the keyboard dock stays on screen', () => {
     render(<PyramidHeader daily state={initPyramidState(pyramid as never)} metaAnswer="STONE" />);
-    expect(screen.getByTestId('daily-quest-heading').className).toContain('[@container(height<=36rem)]:hidden');
+    const row = screen.getByTestId('pyramid-title-row');
+    expect(row.contains(screen.getByTestId('daily-quest-heading'))).toBe(true);
+    expect(row.className).toContain('[@container(height<=36rem)]:hidden');
+  });
+
+  it('Given the daily host (2026-11-28 report), Then the rank sits at the end of the title row, not on a row of its own', () => {
+    render(<PyramidHeader daily state={initPyramidState(pyramid as never)} metaAnswer="STONE" rankSlot={<span>rank</span>} />);
+    const row = screen.getByTestId('pyramid-title-row');
+    const rank = screen.getByTestId('pyramid-rank-slot');
+    expect(row.contains(rank)).toBe(true);
+    expect(row.lastElementChild).toBe(rank);
+    // No room reserved for the floating mute button: the daily nav row hosts mute now.
+    expect(screen.getByTestId('daily-quest-heading').className).not.toMatch(/(^|\s)pe-10(\s|$)/);
+  });
+
+  it('keeps the standalone pyramid rank on its own row under the title', () => {
+    render(<PyramidHeader state={initPyramidState(pyramid as never)} metaAnswer="STONE" rankSlot={<span>rank</span>} />);
+    expect(screen.queryByTestId('pyramid-title-row')).toBeNull();
+    expect(screen.getByTestId('pyramid-rank-slot').textContent).toBe('rank');
   });
 
   it('renders no empty rank wrapper when there is no rank', () => {
