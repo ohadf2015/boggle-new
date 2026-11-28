@@ -26,7 +26,8 @@ describe('/en/lexiclash-join', () => {
 
   it('holds no second code form (recurring pitfall class 3)', () => {
     const src = readFileSync(join(__dirname, '..', 'page.tsx'), 'utf8');
-    expect(src).not.toMatch(/<input|<form|JoinFlow|JoinCodeStep/);
+    // Tags and imports only: the page's own comment names JoinFlow to explain where it links.
+    expect(src).not.toMatch(/<input|<form|<JoinFlow|<JoinCodeStep|from '@\/components\/education\/join\//);
   });
 
   it('states the same code length the form accepts', () => {
