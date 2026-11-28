@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import ClassLimitUpsellModal from '@/components/teacher/ClassLimitUpsellModal';
 import Link from 'next/link';
 import { CalendarDays, Play, Plus, QrCode, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -57,6 +58,8 @@ function startOfDay(ms: number): number {
 }
 
 export function HomeNewClass({ href, count, limit, t }: { href: string; count: number; limit: number | null; t: T }) {
+  const atLimit = limit !== null && count >= limit;
+  const [open, setOpen] = useState(false);
   return (
     <div className="flex shrink-0 items-center gap-3">
       {limit !== null ? (
@@ -64,10 +67,25 @@ export function HomeNewClass({ href, count, limit, t }: { href: string; count: n
           {t('eduShell.setup.capMeter', { count, limit })}
         </span>
       ) : null}
-      <Link href={href} data-testid="home-new-class" className={cn(QUIET_LINK, 'whitespace-nowrap')}>
-        <Plus className="size-4" aria-hidden="true" />
-        {t('eduShell.home.newClass')}
-      </Link>
+      {atLimit ? (
+        <button
+          type="button"
+          data-testid="home-new-class"
+          className={cn(QUIET_LINK, 'whitespace-nowrap')}
+          onClick={() => setOpen(true)}
+        >
+          <Plus className="size-4" aria-hidden="true" />
+          {t('eduShell.home.newClass')}
+        </button>
+      ) : (
+        <Link href={href} data-testid="home-new-class" className={cn(QUIET_LINK, 'whitespace-nowrap')}>
+          <Plus className="size-4" aria-hidden="true" />
+          {t('eduShell.home.newClass')}
+        </Link>
+      )}
+      {atLimit ? (
+        <ClassLimitUpsellModal isOpen={open} onClose={() => setOpen(false)} currentCount={count} limit={limit} reason="class_limit" />
+      ) : null}
     </div>
   );
 }

@@ -15,6 +15,7 @@ import { PressSurface } from '@/components/motion/PressSurface';
 import { neoChunkyPress } from '@/components/ui/neoStyles';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { HomeShareSheet } from './HomeShareSheet';
+import ClassLimitUpsellModal from '@/components/teacher/ClassLimitUpsellModal';
 import { HomeGreeting } from './HomeGreeting';
 import { EduMascot } from '@/components/education/EduMascot';
 import { NB_PRIMARY_FACE, NB_STICKER, NB_BLOCK } from '../nb/nbStyles';
@@ -66,6 +67,8 @@ export interface HomeHeroProps {
   joinGoal?: ReactNode;
   /** Free-plan class count ("2 of 3 free classes used"), shown inside the class menu; omit for Pro. */
   capLabel?: string;
+  /** Free-plan class cap; null for Pro. When the teacher is at this cap, New class opens the upgrade prompt. */
+  classLimit?: number | null;
   /** A class that already played: Play again (last mode, this week's list) takes the primary slot. */
   replay?: HomeReplay;
   startHref?: string;
@@ -77,11 +80,13 @@ export interface HomeHeroProps {
 /** The class desk: class name, its facts and code, one huge Start, then the second actions. A white card on Home, open on the class page. */
 export function HomeHero({
   classrooms, selectedId, onSelect, onStart, language, t, rehearse, meta, eyebrow, titleLevel = 2, tone = 'pink',
-  newClassHref, classesHref, classPageLink = true, joinGoal, capLabel, replay, startHref, onShare, testIds,
+  newClassHref, classesHref, classPageLink = true, joinGoal, capLabel, classLimit = null, replay, startHref, onShare, testIds,
 }: HomeHeroProps) {
   const selected = classrooms.find((c) => c.id === selectedId) ?? classrooms[0];
   const [pending, setPending] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [newClassOpen, setNewClassOpen] = useState(false);
+  const atClassLimit = classLimit !== null && classrooms.length >= classLimit;
   const code = selected?.join_code?.trim() ?? '';
   const pickHref = teacherHostHref(language, { classroomId: selected?.id });
   const begin = () => {
@@ -93,7 +98,7 @@ export function HomeHero({
   const heading = createElement(
     `h${titleLevel}`,
     { id: 'home-hero-title', className: cn('min-w-0 max-w-full font-neo-display text-3xl font-black leading-tight text-edu-ink sm:text-5xl', desk && BAND[tone]) },
-    <ClassMenu classrooms={classrooms} selected={selected} onSelect={onSelect} capLabel={capLabel} newClassHref={newClassHref} classesHref={classesHref} classPageHref={classPageLink && selected ? `/${language}/teacher/classroom/${selected.id}` : undefined} t={t} />,
+    <ClassMenu classrooms={classrooms} selected={selected} onSelect={onSelect} capLabel={capLabel} newClassHref={atClassLimit ? undefined : newClassHref} onNewClass={atClassLimit && newClassHref ? () => setNewClassOpen(true) : undefined} classesHref={classesHref} classPageHref={classPageLink && selected ? `/${language}/teacher/classroom/${selected.id}` : undefined} t={t} />,
   );
   const playIcon = pending
     ? <Loader2 className="size-7 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" />
@@ -181,6 +186,16 @@ export function HomeHero({
         </div>
       </section>
 
+      {atClassLimit ? (
+        <ClassLimitUpsellModal
+          isOpen={newClassOpen}
+          onClose={() => setNewClassOpen(false)}
+          currentCount={classrooms.length}
+          limit={classLimit}
+          reason="class_limit"
+        />
+      ) : null}
+
       {selected && code && !onShare ? (
         <HomeShareSheet
           classroom={{ id: selected.id, name: selected.name, join_code: code, member_count: selected.member_count, language: selected.language }}
@@ -227,19 +242,20 @@ function CodeChip({ code, big, onShare, t, testIds }: { code: string; big: boole
   );
 }
 
-function ClassMenu({ classrooms, selected, onSelect, capLabel, newClassHref, classesHref, classPageHref, t }: {
+function ClassMenu({ classrooms, selected, onSelect, capLabel, newClassHref, onNewClass, classesHref, classPageHref, t }: {
   classrooms: readonly HomeHeroClass[];
   selected: HomeHeroClass | undefined;
   onSelect: (id: string) => void;
   capLabel?: string;
   newClassHref?: string;
+  onNewClass?: () => void;
   classesHref?: string;
   classPageHref?: string;
   t: T;
 }) {
   const label = <span dir="auto" className="min-w-0 break-words">{selected?.name}</span>;
   const several = classrooms.length > 1;
-  if (!several && !newClassHref && !classPageHref && !classesHref) {
+  if (!several && !newClassHref && !onNewClass && !classPageHref && !classesHref) {
     return <span data-testid="home-class-switcher" className="inline-flex min-w-0 max-w-full">{label}</span>;
   }
   return (
@@ -259,7 +275,7 @@ function ClassMenu({ classrooms, selected, onSelect, capLabel, newClassHref, cla
             <span dir="auto" className="truncate">{c.name}</span>
           </DropdownMenuItem>
         )) : null}
-        {several && (classPageHref || newClassHref || classesHref) ? <DropdownMenuSeparator className="bg-edu-ink/10" /> : null}
+        {several && (classPageHref || newClassHref || onNewClass || classesHref) ? <DropdownMenuSeparator className="bg-edu-ink/10" /> : null}
         {classPageHref ? (
           <DropdownMenuItem asChild className={MENU_ROW}>
             <Link href={classPageHref} data-testid="home-class-page">
@@ -268,7 +284,12 @@ function ClassMenu({ classrooms, selected, onSelect, capLabel, newClassHref, cla
             </Link>
           </DropdownMenuItem>
         ) : null}
-        {newClassHref ? (
+        {onNewClass ? (
+          <DropdownMenuItem data-testid="home-new-class" className={MENU_ROW} onSelect={onNewClass}>
+            <Plus className="size-4 shrink-0" aria-hidden="true" />
+            {t('eduShell.home.newClass')}
+          </DropdownMenuItem>
+        ) : newClassHref ? (
           <DropdownMenuItem asChild className={MENU_ROW}>
             <Link href={newClassHref} data-testid="home-new-class">
               <Plus className="size-4 shrink-0" aria-hidden="true" />
