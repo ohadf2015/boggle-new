@@ -308,6 +308,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
       pinned={null}
       aside={
         <>
+          {sessionPack ? null : <LobbyWarmupStatus warmup={warmup} className="mb-2 justify-center" />}
           <ClassroomModeCatalogue
             selected={pickedId}
             minutes={roundMinutes}
@@ -316,7 +317,6 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             blockedKey={blockedKey}
             onGoLive={goLive}
           />
-          {sessionPack ? null : <LobbyWarmupStatus warmup={warmup} className="mt-2 justify-center" />}
         </>
       }
     >
