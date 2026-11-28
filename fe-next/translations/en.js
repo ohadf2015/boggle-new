@@ -2,6 +2,11 @@
 const en = {
   // @holiday:start
   "holiday": {
+    "home": {
+      "line": "Holiday games, daily gifts and party games for the whole family, only this season.",
+      "cta": "Open the holiday hub",
+      "opens": "Opens {date}"
+    },
     // @holiday-arcade:start
     "arcade": {
       "lobby": {

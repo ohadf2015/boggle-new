@@ -2,6 +2,11 @@
 const es = {
   // @holiday:start
   "holiday": {
+    "home": {
+      "line": "Juegos festivos, regalos diarios y juegos de fiesta para toda la familia, solo esta temporada.",
+      "cta": "Abrir el rincón festivo",
+      "opens": "Abre el {date}"
+    },
     // @holiday-arcade:start
     "arcade": {
       "lobby": {

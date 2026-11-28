@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import { HomePreview } from '../HomePreview';
 
 const moreGamesProps = vi.fn();
-vi.mock('@/components/holidays/HolidayEventCard', () => ({ default: () => <div data-testid="slot-holiday" /> }));
+vi.mock('@/components/holidays/HolidayHomeCard', () => ({ default: () => <div data-testid="slot-holiday" /> }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
@@ -32,7 +32,7 @@ vi.mock('../MoreGames', () => ({
 }));
 
 describe('HomePreview — holiday event card', () => {
-  it('Given the home for any visitor, then the holiday track is the first full-width card above the daily block', () => {
+  it('Given the home for any visitor, then the one holiday card is the first full-width card above the daily block', () => {
     render(<HomePreview />);
     const order = Array.from(document.querySelectorAll('[data-testid^="slot-"]')).map((el) => el.getAttribute('data-testid'));
     expect(order.indexOf('slot-holiday')).toBe(order.indexOf('slot-daily') - 1);

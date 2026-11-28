@@ -2,6 +2,11 @@
 const sv = {
   // @holiday:start
   "holiday": {
+    "home": {
+      "line": "Högtidsspel, dagliga presenter och partyspel för hela familjen, bara den här säsongen.",
+      "cta": "Öppna högtidshubben",
+      "opens": "Öppnar {date}"
+    },
     // @holiday-arcade:start
     "arcade": {
       "lobby": {

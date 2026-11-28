@@ -10,7 +10,6 @@ type T = (key: string, params?: Record<string, string | number>) => string;
 const LINKS = [
   { id: 'daily', path: '/daily', bg: 'bg-neo-lime', tilt: '-rotate-1', art: { hanukkah: '/holidays/props-dreidel.webp', christmas: '/holidays/props-ornament.webp' } },
   { id: 'friends', path: '/multiplayer', bg: 'bg-neo-pink', tilt: 'rotate-1', art: { hanukkah: '/holidays/table-hanukkah.webp', christmas: '/holidays/table-christmas.webp' } },
-  { id: 'track', path: '#holiday-event', bg: 'bg-neo-cyan', tilt: '-rotate-1', art: { hanukkah: '/holidays/together-hanukkah.webp', christmas: '/holidays/together-christmas.webp' } },
 ] as const;
 
 export default function ArcadeMoreFun({ holiday, lang, t }: { holiday: HolidayKey; lang: string; t: T }) {
@@ -20,7 +19,7 @@ export default function ArcadeMoreFun({ holiday, lang, t }: { holiday: HolidayKe
         <h2 id="arcade-more-title" className="font-neo-display text-2xl font-black text-neo-cream">{t('holiday.arcade.lobby.moreTitle')}</h2>
         <p className="mt-0.5 text-sm text-neo-white/65">{t('holiday.arcade.lobby.moreLine')}</p>
       </div>
-      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {LINKS.map((l) => (
           <li key={l.id} className={l.tilt}>
             <PressSurface asChild lip={4}>

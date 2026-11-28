@@ -2,6 +2,11 @@
 const ru = {
   // @holiday:start
   "holiday": {
+    "home": {
+      "line": "Праздничные игры, ежедневные подарки и игры для всей семьи — только в этом сезоне.",
+      "cta": "Открыть праздничный раздел",
+      "opens": "Откроется {date}"
+    },
     // @holiday-arcade:start
     "arcade": {
       "lobby": {
