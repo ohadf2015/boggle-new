@@ -17067,6 +17067,11 @@ const sv = {
         "averageScoreEmpty": "—",
         "upgrade": "Mer detaljer per elev med Teacher Pro {{price}}",
         "never": "Aldrig",
+        "testRun": {
+          "name": "Du",
+          "badge": "Testkörning",
+          "note": "Den markerade raden är du som spelar som elev. Bara du ser den, och den räknas inte i klassens siffror."
+        },
         "parentShare": {
           "title": "Dela med föräldrar",
           "generated": "Framsteg per {{date}}",

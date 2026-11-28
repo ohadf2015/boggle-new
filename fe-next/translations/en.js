@@ -14772,6 +14772,11 @@ const en = {
         "averageScoreEmpty": "—",
         "upgrade": "More per-student detail with Teacher Pro {{price}}",
         "never": "Never",
+        "testRun": {
+          "name": "You",
+          "badge": "Test run",
+          "note": "The highlighted row is you playing as a student. Only you see it, and it isn’t counted in class numbers."
+        },
         "parentShare": {
           "title": "Share with parents",
           "generated": "Progress as of {{date}}",
