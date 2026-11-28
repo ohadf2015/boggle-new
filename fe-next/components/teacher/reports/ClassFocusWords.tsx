@@ -37,7 +37,7 @@ export function ClassFocusWords({
 
   const words = state.status === 'ready' ? snapshotWords(state.report.hardestWords) : [];
   if (state.status === 'loading' || (words.length === 0 && fallbackPending)) {
-    return <div data-testid="class-focus-loading" aria-busy="true" className="h-72 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />;
+    return <div data-testid="class-focus-loading" aria-busy="true" className="h-80 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />;
   }
 
   const title = (
