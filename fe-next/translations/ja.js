@@ -2,6 +2,11 @@
 const ja = {
   // @holiday:start
   "holiday": {
+    "home": {
+      "line": "ホリデーゲーム、毎日のプレゼント、家族で遊べるパーティーゲーム。この季節だけ！",
+      "cta": "ホリデー広場へ",
+      "opens": "{date}オープン"
+    },
     // @holiday-arcade:start
     "arcade": {
       "lobby": {

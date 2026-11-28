@@ -12,12 +12,13 @@ import ArcadeGameHost from './ArcadeGameHost';
 import ArcadeCard from './ArcadeCard';
 import { prefetchGame } from './gameLoaders';
 import ArcadeMoreFun from './ArcadeMoreFun';
+import HolidayEventCard from '@/components/holidays/HolidayEventCard';
 import { localDateIn, trackIndex, windowFor } from '@/lib/holidays/calendar';
 import styles from './arcade.module.css';
 
 const LOOK = {
-  hanukkah: { hero: '/holidays/hero-hanukkah.webp', stripe: 'bg-neo-holiday-blue', bulbs: ['bg-neo-holiday-gold', 'bg-neo-holiday-blue', 'bg-neo-holiday-snow'] },
-  christmas: { hero: '/holidays/hero-christmas.webp', stripe: 'bg-neo-holiday-red', bulbs: ['bg-neo-holiday-red', 'bg-neo-holiday-pine', 'bg-neo-holiday-gold'] },
+  hanukkah: { hero: '/holidays/hero-hanukkah.webp', stripe: 'bg-neo-holiday-blue', bulbs: ['bg-neo-holiday-blue', 'bg-neo-holiday-snow', 'bg-neo-cyan'], chip: 'bg-neo-holiday-blue text-neo-white' },
+  christmas: { hero: '/holidays/hero-christmas.webp', stripe: 'bg-neo-holiday-red', bulbs: ['bg-neo-holiday-red', 'bg-neo-holiday-pine', 'bg-neo-holiday-snow'], chip: 'bg-neo-holiday-red text-neo-white' },
 } as const;
 
 export default function ArcadeHub() {
@@ -68,7 +69,7 @@ export default function ArcadeHub() {
           {t('holiday.arcade.lobby.home')}
         </Link>
         {night !== null && win && (
-          <span data-testid="arcade-night" className="rounded-full border-[3px] border-black bg-neo-holiday-gold px-3 py-1 font-neo-display text-sm font-black text-neo-navy shadow-hard-sm tabular-nums">
+          <span data-testid="arcade-night" className={cn('rounded-full border-[3px] border-black px-3 py-1 font-neo-display text-sm font-black shadow-hard-sm tabular-nums', look.chip)}>
             {t(`holiday.arcade.lobby.${holiday === 'hanukkah' ? 'night' : 'day'}`, { n: night + 1, total: win.trackDays.length })}
           </span>
         )}
@@ -89,8 +90,12 @@ export default function ArcadeHub() {
         </div>
       </header>
 
+      <div id="holiday-event" className="scroll-mt-20 empty:hidden">
+        <HolidayEventCard inHub />
+      </div>
+
       <div className="flex flex-col gap-3">
-        <h2 className="flex items-center gap-2 font-neo-display text-2xl font-black text-neo-holiday-gold">
+        <h2 className="flex items-center gap-2 font-neo-display text-2xl font-black text-neo-cream">
           <Users className="size-6" aria-hidden="true" />
           {t('holiday.arcade.family.section')}
         </h2>

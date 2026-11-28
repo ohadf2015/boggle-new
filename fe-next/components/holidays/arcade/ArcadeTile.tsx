@@ -28,7 +28,7 @@ export default function ArcadeTile({ holiday, opensOn }: { holiday: HolidayKey; 
       {opensOn ? (
         <Lock className="size-6 shrink-0 text-neo-white/60" aria-hidden="true" />
       ) : (
-        <Gamepad2 className="size-6 shrink-0 text-neo-holiday-gold" aria-hidden="true" />
+        <Gamepad2 className="size-6 shrink-0 text-neo-cream" aria-hidden="true" />
       )}
     </>
   );

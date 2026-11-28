@@ -21,7 +21,7 @@ import { WeeklyThemeCard } from '@/components/daily/WeeklyThemeCard';
 import { ClassroomStrip } from './ClassroomStrip';
 import { HomeEducationCardConnected } from '@/components/education/HomeEducationCardConnected';
 import { FreshAdSlot } from '@/components/landing/fresh/FreshAdSlot';
-import HolidayEventCard from '@/components/holidays/HolidayEventCard';
+import HolidayHomeCard from '@/components/holidays/HolidayHomeCard';
 import { pickHeroAvatar, type HeroAvatar } from './heroAvatar';
 import { heroBubble, type HeroBubbleLine } from './heroBubble';
 import { quickRoundsPlayed } from '@/lib/quickPlay/guestProgress';
@@ -93,8 +93,8 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
         data-testid="hp-cards"
         className="mx-auto mt-16 grid w-full max-w-[480px] grid-cols-1 gap-8 lg:mt-10 lg:max-w-4xl lg:grid-cols-2 lg:gap-6 lg:px-6"
       >
-        <div id="holiday-event" className="min-w-0 scroll-mt-20 px-4 empty:hidden lg:col-span-2 lg:px-0">
-          <HolidayEventCard />
+        <div className="min-w-0 px-4 empty:hidden lg:col-span-2 lg:px-0">
+          <HolidayHomeCard />
         </div>
         <div className="flex min-w-0 flex-col gap-4 px-4 lg:px-0">
           <DailyBlock

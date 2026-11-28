@@ -12,6 +12,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string, p?: Record<string, unknown>) => (p ? `${k}:${JSON.stringify(p)}` : k), language: 'he' }),
 }));
 vi.mock('../ArcadeGameHost', () => ({ default: () => null }));
+vi.mock('@/components/holidays/HolidayEventCard', () => ({ default: ({ inHub }: { inHub?: boolean }) => <div data-testid="event-card" data-in-hub={String(!!inHub)} /> }));
 
 import ArcadeHub from '../ArcadeHub';
 
@@ -19,14 +20,16 @@ beforeEach(() => vi.useFakeTimers({ toFake: ['Date'] }));
 afterEach(() => vi.useRealTimers());
 
 describe('ArcadeHub connections', () => {
-  it('Given Hanukkah, then the hub links back home, to the holiday daily, to friends and to the event track', () => {
+  it('Given Hanukkah, then the hub holds the event track and links home, to the holiday daily and to friends', () => {
     vi.setSystemTime(new Date('2026-12-06T12:00:00'));
     holiday.mockReturnValue({ holiday: 'hanukkah', resolved: true });
     render(<ArcadeHub />);
     expect(screen.getByTestId('arcade-home')).toHaveAttribute('href', '/he');
     expect(screen.getByTestId('arcade-more-daily')).toHaveAttribute('href', '/he/daily');
     expect(screen.getByTestId('arcade-more-friends')).toHaveAttribute('href', '/he/multiplayer');
-    expect(screen.getByTestId('arcade-more-track')).toHaveAttribute('href', '/he#holiday-event');
+    expect(screen.queryByTestId('arcade-more-track')).toBeNull();
+    expect(screen.getByTestId('event-card')).toHaveAttribute('data-in-hub', 'true');
+    expect(document.getElementById('holiday-event')).not.toBeNull();
     expect(screen.getByTestId('hp-keycaps')).toBeInTheDocument();
   });
 

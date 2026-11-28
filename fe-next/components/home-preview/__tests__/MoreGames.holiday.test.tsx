@@ -1,24 +1,15 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-const holiday = vi.fn();
-vi.mock('@/hooks/useHoliday', () => ({ useHoliday: () => holiday() }));
+vi.mock('@/hooks/useHoliday', () => ({ useHoliday: () => ({ holiday: 'christmas', theme: 'christmas', resolved: true }) }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k, language: 'en' }) }));
 
 import { MoreGames } from '../MoreGames';
 
-describe('MoreGames holiday cartridge', () => {
-  it('Given a holiday is on, then the shelf opens with the Holiday Arcade', () => {
-    holiday.mockReturnValue({ holiday: 'christmas', resolved: true });
-    render(<MoreGames lang="en" t={(k) => k} />);
-    const first = screen.getAllByRole('link')[0];
-    expect(first).toHaveAttribute('href', '/en/holiday-arcade');
-    expect(first).toHaveAttribute('data-testid', 'hp-games-holiday');
-  });
-
-  it('Given no holiday, then the shelf has no arcade cartridge', () => {
-    holiday.mockReturnValue({ holiday: null, resolved: true });
+describe('MoreGames during a holiday', () => {
+  it('Given a holiday is live, then the shelf keeps the regular games only (the holiday has its own home card)', () => {
     render(<MoreGames lang="en" t={(k) => k} />);
     expect(screen.queryByTestId('hp-games-holiday')).toBeNull();
+    expect(screen.getAllByRole('link').some((a) => a.getAttribute('href')?.includes('holiday-arcade'))).toBe(false);
   });
 });

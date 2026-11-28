@@ -29,7 +29,7 @@ export default function ArcadeCard({ game, wide, onPick, onWarm }: { game: Arcad
           loading="lazy"
           className={cn('absolute start-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 drop-shadow-[4px_4px_0_rgb(var(--neo-black))] transition-transform duration-300 group-hover:rotate-6 rtl:translate-x-1/2 motion-reduce:transition-none', wide ? 'h-4/5 w-auto sm:h-auto sm:w-3/5' : 'w-3/5', styles.floatProp)}
         />
-        <span className="absolute start-2 top-2 inline-flex items-center gap-1 rounded-full border-2 border-black bg-neo-holiday-gold px-2 py-0.5 font-neo-display text-[11px] font-black uppercase text-neo-navy shadow-hard-sm">
+        <span className={cn('absolute start-2 top-2 inline-flex items-center gap-1 rounded-full border-2 border-black px-2 py-0.5 font-neo-display text-[11px] font-black uppercase text-neo-white shadow-hard-sm', meta.holiday === 'hanukkah' ? 'bg-neo-holiday-blue' : 'bg-neo-holiday-red')}>
           <Users className="size-3" aria-hidden="true" />
           {t('holiday.arcade.family.badge')}
         </span>

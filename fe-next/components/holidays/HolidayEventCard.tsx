@@ -75,7 +75,7 @@ function Day({ day, today, locked, theme, t }: { day: HolidayDayView; today: boo
       title={rewardLabel(t, day.reward)}
       className={cn(
         'relative flex aspect-[3/4] min-w-0 items-end justify-center rounded-lg border-2 border-black bg-neo-navy p-0.5',
-        today && 'ring-2 ring-neo-holiday-gold ring-offset-2 ring-offset-neo-navy-light',
+        today && 'ring-2 ring-neo-cream ring-offset-2 ring-offset-neo-navy-light',
         day.source === 'daily' && 'shadow-[0_0_0_2px_var(--neo-holiday-gold),0_0_12px_var(--neo-holiday-gold)]',
       )}
     >
@@ -99,7 +99,7 @@ function Day({ day, today, locked, theme, t }: { day: HolidayDayView; today: boo
   );
 }
 
-export default function HolidayEventCard() {
+export default function HolidayEventCard({ inHub = false }: { inHub?: boolean }) {
   const { t, language } = useLanguage();
   const { holiday: live, theme: holiday, phase, resolved } = useHoliday();
   const { user, loading: authLoading } = useAuth();
@@ -148,13 +148,13 @@ export default function HolidayEventCard() {
         <h2 id="holiday-event-title" className="font-neo-display text-lg font-bold leading-tight">
           {t(`holiday.event.${holiday}.title`)}
         </h2>
-        <span className="shrink-0 font-neo-display text-xs font-bold text-neo-holiday-gold tabular-nums">
+        <span className="shrink-0 font-neo-display text-xs font-bold text-neo-cream tabular-nums">
           {t('holiday.event.progress', { lit: litCount, total: view.days.length })}
         </span>
       </header>
       <p className="mt-0.5 text-xs text-neo-white/70">{t(`holiday.event.${holiday}.subtitle`)}</p>
       {untilTrack !== null && (
-        <p data-testid="holiday-countdown" className="mt-2 inline-block rounded-full border-2 border-black bg-neo-holiday-gold px-2 py-0.5 font-neo-display text-xs font-bold text-neo-navy tabular-nums">
+        <p data-testid="holiday-countdown" className="mt-2 inline-block rounded-full border-2 border-black bg-neo-cream px-2 py-0.5 font-neo-display text-xs font-bold text-neo-navy tabular-nums">
           {untilTrack === 1 ? t(`holiday.event.${holiday}.startsTomorrow`) : t(pluralKeyOf(`holiday.event.${holiday}.startsIn`, untilTrack, language), { count: untilTrack })}
         </p>
       )}
@@ -178,14 +178,14 @@ export default function HolidayEventCard() {
       {tracked && <HolidayRescueCard holiday={holiday} />}
       {tracked && <HolidayTablePanel holiday={holiday} />}
       {tracked && load.state === 'ready' && <HolidayCardExtras holiday={holiday} win={win} today={today} view={view} locale={language} />}
-      <ArcadeTile holiday={holiday} opensOn={phase === 'preview' ? win.start : undefined} />
-      <HolidaySeasonLink className="mt-3 block text-center text-sm font-bold text-neo-holiday-gold underline-offset-4 hover:underline" />
+      {!inHub && <ArcadeTile holiday={holiday} opensOn={phase === 'preview' ? win.start : undefined} />}
+      <HolidaySeasonLink className="mt-3 block text-center text-sm font-bold text-neo-cream underline-offset-4 hover:underline" />
 
       {pop && (
         <div
           data-testid="holiday-reward-pop"
           role="status"
-          className="mt-3 flex items-center gap-2 rounded-xl border-2 border-black bg-neo-holiday-gold px-3 py-2 font-neo-display text-sm font-bold text-neo-navy shadow-hard-sm motion-safe:animate-in motion-safe:zoom-in-95"
+          className="mt-3 flex items-center gap-2 rounded-xl border-2 border-black bg-neo-cyan px-3 py-2 font-neo-display text-sm font-bold text-neo-navy shadow-hard-sm motion-safe:animate-in motion-safe:zoom-in-95"
         >
           <span>{t('holiday.event.earned', { day: pop.index + 1 })}</span>
           <span className="truncate">{rewardLabel(t, pop.reward)}</span>
