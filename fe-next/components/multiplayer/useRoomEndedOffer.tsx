@@ -17,8 +17,11 @@ import { trackGrowthEvent } from '@/utils/growthTracking';
 import { markRoomEndedRecoveryAccepted } from '@/lib/multiplayer/roomEndedRecovery';
 import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
 
-/** Long enough to read a sentence and reach the button on a phone. */
-export const ROOM_ENDED_OFFER_DURATION_MS = 10_000;
+/**
+ * The offer stays until the player taps "Play now" or the close button: a 10s
+ * toast converted only ~9% of dead-room visitors, most of whom never reached it.
+ */
+export const ROOM_ENDED_OFFER_DURATION_MS = Infinity;
 
 interface UseRoomEndedOfferInput {
   /** A fresh object per dead room; null when there is nothing to offer. */
@@ -64,6 +67,14 @@ export function useRoomEndedOffer({ offer, onShown, onPlayNow, t, typedCodeRef }
             className="shrink-0 rounded-neo border-2 border-neo-black bg-neo-lime px-3 py-1.5 font-neo-display font-bold uppercase tracking-tight text-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-hard-pressed"
           >
             {tr('multiplayerFlow.roomEnded.playNow')}
+          </button>
+          <button
+            type="button"
+            aria-label={tr('common.close')}
+            onClick={() => toast.dismiss(tt.id)}
+            className="shrink-0 px-1 font-bold text-neo-black/70"
+          >
+            ✕
           </button>
         </span>
       ),

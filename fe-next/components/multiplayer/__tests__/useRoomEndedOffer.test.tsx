@@ -58,6 +58,16 @@ describe('useRoomEndedOffer', () => {
     expect(consumeRoomEndedRecoveryAccepted()).toBe(true);
   });
 
+  it('GIVEN an offer THEN the toast never auto-dismisses and a close button dismisses it without accepting', () => {
+    renderHook(() => useRoomEndedOffer({ offer: { seq: 1 }, onShown: vi.fn(), onPlayNow: vi.fn(), t }));
+    expect(toast.mock.calls[0][1]).toMatchObject({ duration: Infinity });
+    const renderToast = toast.mock.calls[0][0] as (tt: { id: string }) => React.ReactElement;
+    render(renderToast({ id: 'toast-1' }));
+    fireEvent.click(screen.getByRole('button', { name: 'common.close' }));
+    expect(toast.dismiss).toHaveBeenCalledWith('toast-1');
+    expect(trackGrowthEvent).not.toHaveBeenCalled();
+  });
+
   it('GIVEN the player typed the code THEN says no room has that code (a typo reads the same as an ended room) and resets the flag', () => {
     const typedCodeRef = { current: true };
     renderHook(() => useRoomEndedOffer({ offer: { seq: 1 }, onShown: vi.fn(), onPlayNow: vi.fn(), t, typedCodeRef }));
