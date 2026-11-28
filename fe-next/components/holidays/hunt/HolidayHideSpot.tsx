@@ -71,7 +71,7 @@ export default function HolidayHideSpot({ slot }: { slot: HuntSlot }) {
             void collect();
           }}
           aria-label={t('holiday.hunt.itemLabel', { item: t(`holiday.hunt.item.${state.item}`) })}
-          className="pointer-events-auto size-14 translate-x-[30%] rounded-full focus-visible:translate-x-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-holiday-gold rtl:-translate-x-[30%]"
+          className="pointer-events-auto size-14 translate-x-[30%] rounded-full focus-visible:translate-x-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-navy dark:focus-visible:ring-neo-cream rtl:-translate-x-[30%]"
         >
           <span
             onAnimationEnd={(e) => {

@@ -19,7 +19,7 @@ export default function LandingMascot({ src, label, sparkSrc }: Props) {
         aria-label={label}
         onClick={() => setHop(true)}
         onAnimationEnd={(e) => e.animationName.includes('hop') && setHop(false)}
-        className={`${hop ? styles.mascotHop : styles.mascot} relative block h-full w-full rounded-neo focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-holiday-gold`}
+        className={`${hop ? styles.mascotHop : styles.mascot} relative block h-full w-full rounded-neo focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream`}
       >
         <Image src={src} alt="" fill sizes="(min-width: 640px) 176px, 128px" priority className="object-contain drop-shadow-[4px_4px_0_rgb(var(--neo-black))]" />
       </button>

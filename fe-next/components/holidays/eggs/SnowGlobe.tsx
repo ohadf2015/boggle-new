@@ -100,7 +100,7 @@ export default function SnowGlobe({ needsPermission, askPermission }: { needsPer
         </p>
         <div className="mt-2 flex justify-center gap-2">
           {needsPermission && (
-            <button type="button" onClick={askPermission} className="rounded-lg border-2 border-black bg-neo-holiday-gold px-3 py-1 text-xs font-bold text-neo-navy">
+            <button type="button" onClick={askPermission} className="rounded-lg border-2 border-black bg-neo-holiday-red px-3 py-1 text-xs font-bold text-neo-white">
               {t('holiday.eggs.globeShake')}
             </button>
           )}

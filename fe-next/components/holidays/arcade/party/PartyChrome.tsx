@@ -2,6 +2,7 @@
 
 import { QRCodeSVG } from 'qrcode.react';
 import { ArrowLeft, Maximize2 } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
 import styles from '../arcade.module.css';
 
@@ -37,7 +38,7 @@ export function PartyHeader({ title, code, codeLabel, backLabel, fullLabel, stri
       </div>
       <div className="flex items-center gap-[1.2cqw] px-[1.2cqw] pb-[1.2cqh] pt-[2.4cqh] text-[3.4cqh]">
         <button type="button" onClick={onExit} aria-label={backLabel} className={cn(TV_BTN, 'size-[1.9em] bg-neo-cream text-neo-navy')}>
-          <ArrowLeft className="size-[0.9em] rtl:rotate-180" aria-hidden="true" />
+          <DirectionalIcon icon={ArrowLeft} className="size-[0.9em]" />
         </button>
         <h1 className="min-w-0 flex-1 truncate font-neo-display text-[4.6cqh] font-black leading-none text-neo-white">{title}</h1>
         {code && (

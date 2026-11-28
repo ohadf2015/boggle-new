@@ -2,7 +2,7 @@ import styles from './holidayDaily.module.css';
 
 export type BurstKind = 'coin' | 'ribbon' | 'confetti';
 
-const COLORS = ['var(--neo-holiday-gold)', 'var(--neo-holiday-red)', 'var(--neo-holiday-blue)', 'var(--neo-holiday-pine)', 'var(--neo-holiday-snow)'];
+const COLORS = ['var(--neo-holiday-red)', 'var(--neo-holiday-blue)', 'var(--neo-holiday-pine)', 'var(--neo-holiday-snow)'];
 
 export function reducedMotion(): boolean {
   return typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;

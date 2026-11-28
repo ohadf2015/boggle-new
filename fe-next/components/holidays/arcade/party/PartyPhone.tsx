@@ -116,8 +116,8 @@ function Pad({ game, color, send }: { game: PartyGameId; color: string; send: (d
   return (
     <div data-testid="party-field" className={cn(PANEL, 'gap-3 bg-cover bg-center p-3')} style={{ backgroundImage: `url(${partyBg('splat')})` }}>
       <p className={cn('self-center rounded-2xl border-[3px] border-black px-4 py-1 font-neo-display text-2xl font-black text-neo-navy shadow-hard', seatBg(color))}>{t('holiday.arcade.party.tapToThrow')}</p>
-      <div className="flex min-h-0 flex-[2] items-end gap-1.5">{back.map(({ i }) => fort(i, false))}</div>
-      <div className="flex min-h-0 flex-[3] items-end gap-3">{front.map(({ i }) => fort(i, true))}</div>
+      <div dir="ltr" className="flex min-h-0 flex-[2] items-end gap-1.5">{back.map(({ i }) => fort(i, false))}</div>
+      <div dir="ltr" className="flex min-h-0 flex-[3] items-end gap-3">{front.map(({ i }) => fort(i, true))}</div>
     </div>
   );
 }

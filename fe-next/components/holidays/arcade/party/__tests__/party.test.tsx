@@ -59,6 +59,16 @@ describe('big screen party', () => {
     expect(sock.emitted.filter((e) => e.event === 'party:input').map((e) => e.data)).toEqual([{ hold: true }, { hold: false }]);
   });
 
+  it('Given a Hebrew phone in a snowball round, then the forts stay in big-screen order left to right so a tap hits the fort it points at', () => {
+    sessionStorage.setItem('party-seat:ABCD', JSON.stringify({ playerId: 'p1', token: 't1', name: 'Ana', color: 'neo-lime', game: 'splat' }));
+    sock.acks['party:join'] = { ok: true, code: 'ABCD', game: 'splat', phase: 'lobby', player: { id: 'p1', name: 'Ana', color: 'neo-lime' }, token: 't1' };
+    render(<PartyPhone code="ABCD" />);
+    fire('party:go', { players: [] });
+    const rows = [...screen.getByTestId('party-field').querySelectorAll('button')].map((b) => b.parentElement!);
+    expect(new Set(rows).size).toBe(2);
+    for (const row of new Set(rows)) expect(row).toHaveAttribute('dir', 'ltr');
+  });
+
   it('Given the round ends, then the phone shows its place and can start the next round', () => {
     sessionStorage.setItem('party-seat:ABCD', JSON.stringify({ playerId: 'p1', token: 't1', name: 'Ana', color: 'neo-lime', game: 'catch' }));
     render(<PartyPhone code="ABCD" />);

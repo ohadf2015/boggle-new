@@ -17,7 +17,7 @@ export function FeatureSection({ copy }: { copy: LandingCopy }) {
           <article key={f.title} className={`${styles.feature} flex gap-4 rounded-neo-lg border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard`}>
             <Image src={f.art} alt="" width={96} height={96} className="h-20 w-20 shrink-0 object-contain" />
             <div>
-              <h3 className="mb-1 text-lg font-black text-neo-holiday-gold">{f.title}</h3>
+              <h3 className="mb-1 text-lg font-black text-neo-cream">{f.title}</h3>
               <p className="text-sm leading-relaxed text-neo-gray-200">{f.body}</p>
             </div>
           </article>
@@ -61,7 +61,7 @@ export function ArcadeSection({ copy, holiday, locale, live }: ArcadeProps) {
       <div className="grid gap-4 sm:grid-cols-3">
         {gamesFor(holiday).filter((id) => copy.arcade[id]).map((id) =>
           live ? (
-            <Link key={id} href={`/${locale}/holiday-arcade?g=${id}&holiday=${holiday}`} className={`${card} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-holiday-gold`}>
+            <Link key={id} href={`/${locale}/holiday-arcade?g=${id}&holiday=${holiday}`} className={`${card} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream`}>
               <CoverCard id={id} copy={copy} />
             </Link>
           ) : (
@@ -77,8 +77,8 @@ export function ArcadeSection({ copy, holiday, locale, live }: ArcadeProps) {
 
 export function EggSection({ copy }: { copy: LandingCopy }) {
   return (
-    <section className="mt-12 rounded-neo-lg border-3 border-dashed border-neo-holiday-gold p-5">
-      <h2 className="mb-2 font-neo-display text-xl font-black text-neo-holiday-gold">{copy.eggTitle}</h2>
+    <section className="mt-12 rounded-neo-lg border-3 border-dashed border-neo-cream/60 p-5">
+      <h2 className="mb-2 font-neo-display text-xl font-black text-neo-cream">{copy.eggTitle}</h2>
       <p className="text-neo-gray-200">{copy.eggBody}</p>
     </section>
   );
@@ -93,7 +93,7 @@ export function FaqSection({ title, faqs }: { title: string; faqs: LandingFaq[] 
           <details key={f.q} className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard-sm">
             <summary className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-bold">
               <span>{f.q}</span>
-              <span aria-hidden className="text-neo-holiday-gold transition-transform group-open:rotate-180 motion-reduce:transition-none">▼</span>
+              <span aria-hidden className="text-neo-cream transition-transform group-open:rotate-180 motion-reduce:transition-none">▼</span>
             </summary>
             <p className="border-t-2 border-neo-black px-5 py-4 text-neo-gray-200">{f.a}</p>
           </details>

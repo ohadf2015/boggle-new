@@ -44,7 +44,7 @@ export function createPartySplatScene(ctx: KitCtx, feed: PartyFeed<SplatSnapshot
         fadeAway(ctx, mark, 600, -20);
         const seat = feed.seat(e.player as string);
         const name = seat?.name ?? '';
-        ctx.float(x, y - 100, e.type === 'hit' ? `${name} +${e.points}` : feed.say('party.oops', { name }), e.type === 'hit' ? 'gold' : 'bad');
+        ctx.float(x, y - 100, e.type === 'hit' ? `${name} \u2066+${e.points}\u2069` : feed.say('party.oops', { name }), e.type === 'hit' ? 'gold' : 'bad');
       } else if (e.type === 'party') ctx.banner(feed.say('splat.party'));
       else if (e.type === 'level') ctx.banner(feed.say(`splat.level${Math.min(4, e.level as number)}`));
     }

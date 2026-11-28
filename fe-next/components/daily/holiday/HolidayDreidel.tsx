@@ -84,7 +84,7 @@ export default function HolidayDreidel({ puzzleDate, initial }: { puzzleDate: st
           <img src="/holidays/props-dreidel.webp" alt="" width={182} height={256} className="h-full w-auto" />
           <span
             className={cn(
-              'absolute bottom-6 rounded-lg border-2 border-black bg-neo-holiday-gold px-1.5 font-neo-display text-2xl font-black leading-tight text-neo-navy',
+              'absolute bottom-6 rounded-lg border-2 border-black bg-neo-holiday-blue px-1.5 font-neo-display text-2xl font-black leading-tight text-neo-white',
               outcome && styles.pop,
             )}
             aria-hidden="true"

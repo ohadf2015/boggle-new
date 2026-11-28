@@ -76,7 +76,7 @@ function Day({ day, today, locked, theme, t }: { day: HolidayDayView; today: boo
       className={cn(
         'relative flex aspect-[3/4] min-w-0 items-end justify-center rounded-lg border-2 border-black bg-neo-navy p-0.5',
         today && 'ring-2 ring-neo-cream ring-offset-2 ring-offset-neo-navy-light',
-        day.source === 'daily' && 'shadow-[0_0_0_2px_var(--neo-holiday-gold),0_0_12px_var(--neo-holiday-gold)]',
+        day.source === 'daily' && 'shadow-[0_0_0_2px_var(--neo-cream),0_0_12px_var(--neo-cream)]',
       )}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}

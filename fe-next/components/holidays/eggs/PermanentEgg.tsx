@@ -33,12 +33,12 @@ export function PermanentEggView({ kind, text, label, className }: { kind: EggKi
           setSaid(true);
           celebrateHolidayEgg(kind);
         }}
-        className={cn(egg.size, 'rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-holiday-gold')}
+        className={cn(egg.size, 'rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-navy dark:focus-visible:ring-neo-cream')}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img key={wiggle} src={egg.art} alt="" width={80} height={80} className={cn('size-full object-contain', wiggle > 0 ? 'holiday-bell-ring' : 'holiday-peek')} />
       </button>
-      {egg.line && <span className="text-sm font-bold text-neo-holiday-gold">{text}</span>}
+      {egg.line && <span className="text-sm font-bold text-neo-navy dark:text-neo-cream">{text}</span>}
       {!egg.line && said && (
         <span role="status" className="holiday-pop-in absolute bottom-full mb-1 whitespace-nowrap rounded-lg border-2 border-black bg-neo-cream px-2 py-1 text-[11px] font-bold text-neo-navy shadow-hard-sm">
           {text}

@@ -6,6 +6,7 @@ import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { HolidayKey } from '@/lib/holidays/calendar';
+import { holidayAccentBg } from '@/components/holidays/holidayAccent';
 import { holidayGet, type HolidayQuery } from '@/lib/holidays/holidayClient';
 import type { HolidayWrappedStats } from '@/lib/holidays/wrapped.server';
 import { downloadShareImage, shareImageWithNativeShare } from '@/utils/shareImageGenerator';
@@ -78,6 +79,7 @@ export default function HolidayWrapped({ holiday, query, onClose }: Props) {
     setSharing(true);
     const s = load.stats;
     const image = await buildWrappedImage({
+      holiday,
       title: t(`holiday.wrapped.${holiday}.title`),
       art: `/holidays/gift-tier-${holiday === 'hanukkah' ? 8 : 9}.webp`,
       rows: slides
@@ -128,12 +130,12 @@ export default function HolidayWrapped({ holiday, query, onClose }: Props) {
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={sl.art} alt="" width={160} height={160} className={cn('size-36 object-contain', i === index && 'holiday-pop-in')} />
-                  {sl.value && <p className={cn('font-neo-display text-5xl font-bold text-neo-holiday-gold break-all', i === index && 'holiday-card-flip')}>{sl.value}</p>}
+                  {sl.value && <p className={cn('font-neo-display text-5xl font-bold text-neo-cream break-all', i === index && 'holiday-card-flip')}>{sl.value}</p>}
                   <p className="font-neo-display text-lg font-bold leading-snug">{t(sl.labelKey, sl.params)}</p>
                   {sl.id === 'finale' && load.stats.titles.length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1.5">
                       {load.stats.titles.map((id) => (
-                        <span key={id} className="rounded-full border-2 border-black bg-neo-holiday-gold px-2 py-0.5 font-neo-display text-xs font-bold text-neo-navy">
+                        <span key={id} className={cn('rounded-full border-2 border-black px-2 py-0.5 font-neo-display text-xs font-bold text-neo-white', holidayAccentBg(holiday))}>
                           {t(`holiday.title.${id}`)}
                         </span>
                       ))}
@@ -148,7 +150,7 @@ export default function HolidayWrapped({ holiday, query, onClose }: Props) {
               </button>
               <div className="flex gap-1" aria-hidden="true">
                 {slides.map((sl, i) => (
-                  <span key={sl.id} className={cn('size-2 rounded-full border border-black', i === index ? 'bg-neo-holiday-gold' : 'bg-neo-white/30')} />
+                  <span key={sl.id} className={cn('size-2 rounded-full border border-black', i === index ? 'bg-neo-cream' : 'bg-neo-white/30')} />
                 ))}
               </div>
               {index < slides.length - 1 ? (
@@ -156,7 +158,7 @@ export default function HolidayWrapped({ holiday, query, onClose }: Props) {
                   {t('holiday.wrapped.next')}
                 </button>
               ) : (
-                <button type="button" onClick={share} disabled={sharing} className="rounded-lg border-2 border-black bg-neo-holiday-gold px-3 py-1 text-sm font-bold text-neo-navy shadow-hard-sm">
+                <button type="button" onClick={share} disabled={sharing} className={cn('rounded-lg border-2 border-black px-3 py-1 text-sm font-bold text-neo-white shadow-hard-sm', holidayAccentBg(holiday))}>
                   {t('holiday.wrapped.share')}
                 </button>
               )}
