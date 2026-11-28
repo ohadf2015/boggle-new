@@ -802,7 +802,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
   },
 
   ja: {
-    metaTitle: '無料の教室向け語彙ゲーム — ライブマルチプレイヤー、6言語 | LexiClash',
+    metaTitle: 'クラスルームで使える無料の語彙ゲーム — ライブ対戦・6言語 | LexiClash',
     metaDescription:
       '無料で使える教室向けの語彙ゲーム。ライブマルチプレイヤー、1v1デュエル、自分の単語リスト。英語、スペイン語、ヘブライ語、スウェーデン語、日本語、ロシア語の6言語に対応。どのブラウザでも動作。無料で始められます。',
     ogTitle: '無料の教室向け語彙ゲーム',
@@ -818,7 +818,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line3: '生徒の登録は不要。',
     },
     heroSubtitle:
-      `先生が実際に使う語彙ゲーム。ライブマルチプレイヤー、あなたのリスト、${P.languages}言語 — 生徒はコードで参加、登録不要。`,
+      `先生が実際に使う語彙ゲーム。ライブマルチプレイヤー、あなたのリスト、${P.languages}言語。クラスルーム（Google Classroom）やメールで参加コードを送れば、生徒は登録なしで参加できます。`,
     ctaSubLabel: '無料 · 生徒の登録不要',
     duelCta: { label: '⚔ 1対1のデュエルを開始', note: '生徒どうしを対戦させる' },
     related: {
