@@ -32,7 +32,7 @@ describe('POST /api/cron/admin-daily-summary', () => {
     expect(h.rpc).not.toHaveBeenCalled();
   });
 
-  it('summarises yesterday (UTC) and sends it to every admin', async () => {
+  it('summarises yesterday in Asia/Jerusalem and sends it to every admin', async () => {
     const res = await POST(req());
     expect(res.status).toBe(200);
     expect(h.rpc).toHaveBeenCalledWith('admin_daily_summary', { p_day: '2026-11-13' });
@@ -40,6 +40,15 @@ describe('POST /api/cron/admin-daily-summary', () => {
       title: 'Yesterday: 262 games, up from 23',
       dedupeKey: 'daily-summary:2026-11-13',
     }));
+    expect(await res.json()).toEqual({ success: true, sent: true, day: '2026-11-13', ...stats });
+  });
+
+  it('uses the Jerusalem calendar day when that differs from UTC yesterday', async () => {
+    vi.useFakeTimers({ now: new Date('2026-11-13T23:30:00Z'), toFake: ['Date'] });
+    const res = await POST(req());
+    expect(res.status).toBe(200);
+    // 23:30 UTC is already 01:30 on Nov 14 in Israel, so yesterday is Nov 13, not Nov 12.
+    expect(h.rpc).toHaveBeenCalledWith('admin_daily_summary', { p_day: '2026-11-13' });
     expect(await res.json()).toEqual({ success: true, sent: true, day: '2026-11-13', ...stats });
   });
 

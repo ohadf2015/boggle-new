@@ -113,8 +113,13 @@ export async function fetchRevenueSummary(supabase: SupabaseClient): Promise<Rec
 
 const DRILL_KINDS = ['signups', 'payers', 'checkouts'] as const;
 
-export async function fetchDrilldown(supabase: SupabaseClient, kind: string, week: string | null): Promise<unknown[]> {
-  const { data, error } = await supabase.rpc('admin_drilldown', { kind, week });
+export async function fetchDrilldown(
+  supabase: SupabaseClient,
+  kind: string,
+  week: string | null,
+  timeZone = 'UTC',
+): Promise<unknown[]> {
+  const { data, error } = await supabase.rpc('admin_drilldown', { kind, week, p_tz: timeZone });
   if (error || !data) return [];
   return data as unknown[];
 }
@@ -132,7 +137,7 @@ router.get('/analytics/revenue', async (_req: AdminRequest, res: Response): Prom
   }
 });
 
-/** GET /api/admin/analytics/drilldown?kind=signups|payers|checkouts[&week=YYYY-MM-DD] */
+/** GET /api/admin/analytics/drilldown?kind=signups|payers|checkouts[&week=YYYY-MM-DD][&tz=IANA] */
 router.get('/analytics/drilldown', async (req: AdminRequest, res: Response): Promise<void> => {
   const kind = String(req.query.kind ?? '');
   const week = req.query.week ? String(req.query.week) : null;
@@ -141,7 +146,8 @@ router.get('/analytics/drilldown', async (req: AdminRequest, res: Response): Pro
     return;
   }
   try {
-    const rows = await fetchDrilldown(getSupabase(), kind, week);
+    const tz = resolveAdminTimeZone(req.query.tz);
+    const rows = await fetchDrilldown(getSupabase(), kind, week, tz);
     res.json(successResponse({ rows }));
   } catch (err) {
     logger.error('ADMIN_ANALYTICS', `Drilldown error: ${(err as Error).message}`);

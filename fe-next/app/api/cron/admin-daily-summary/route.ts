@@ -3,22 +3,25 @@ import { isAuthorizedCronRequest } from '@/lib/cronAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { notifyAdmins } from '@/lib/admin/adminNotifications';
 import { dailySummaryNotice, type DayCounts } from '@/lib/admin/adminEvents';
+import { addLocalDays, localDateOf } from '@/lib/admin/viewerTimeZone';
 import { captureApiError } from '@/utils/sentry';
 import logger from '@/utils/logger';
 
+const ADMIN_SUMMARY_TZ = 'Asia/Jerusalem';
+
 /**
- * POST /api/cron/admin-daily-summary  (pg_cron, daily 05:00 UTC)
+ * POST /api/cron/admin-daily-summary  (pg_cron, daily 05:00 UTC = 07:00/08:00 Israel)
  *
- * Yesterday's games, signups and teacher signups against the day before, sent to every
- * admin through the bell and phone push. The per-day dedupe key makes a double fire a no-op.
- * `?dry=1` returns the notice and sends nothing.
+ * Yesterday's games, signups and teacher signups in Asia/Jerusalem, against the day
+ * before, sent to every admin through the bell and phone push. The per-day dedupe
+ * key makes a double fire a no-op. `?dry=1` returns the notice and sends nothing.
  */
 export async function POST(request: NextRequest) {
   if (!isAuthorizedCronRequest(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   const dry = request.nextUrl.searchParams.get('dry') === '1';
-  const day = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+  const day = addLocalDays(localDateOf(Date.now(), ADMIN_SUMMARY_TZ), -1);
 
   try {
     const supabase = getSupabaseAdmin();

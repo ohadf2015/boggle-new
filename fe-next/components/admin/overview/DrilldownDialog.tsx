@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { withViewerTz } from '@/lib/admin/viewerTimeZone';
 
 export type DrillKind = 'signups' | 'payers' | 'checkouts';
 
@@ -65,7 +66,7 @@ export function DrilldownDialog({ target, authToken, onClose }: Props) {
     setRows(null);
     setFailed(false);
     const qs = new URLSearchParams({ kind: target.kind, ...(target.week ? { week: target.week } : {}) });
-    fetch(`/api/admin/analytics/drilldown?${qs}`, { headers: { Authorization: `Bearer ${authToken}` } })
+    fetch(withViewerTz(`/api/admin/analytics/drilldown?${qs}`), { headers: { Authorization: `Bearer ${authToken}` } })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
