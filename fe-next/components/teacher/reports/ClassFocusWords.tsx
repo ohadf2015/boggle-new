@@ -22,21 +22,24 @@ export function ClassFocusWords({
   classroomId,
   classroomName,
   fallback,
+  fallbackPending = false,
   surface,
 }: {
   classroomId: string;
   classroomName: string;
   fallback: readonly FallbackWord[];
+  /** The fallback list is still loading: an empty result is not "no games yet". */
+  fallbackPending?: boolean;
   surface: ResultsSurface;
 }) {
   const { t, language } = useLanguage();
   const state = useWordMasteryReport(classroomId);
 
-  if (state.status === 'loading') {
-    return <div data-testid="class-focus-loading" aria-busy="true" className="h-48 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />;
+  const words = state.status === 'ready' ? snapshotWords(state.report.hardestWords) : [];
+  if (state.status === 'loading' || (words.length === 0 && fallbackPending)) {
+    return <div data-testid="class-focus-loading" aria-busy="true" className="h-72 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />;
   }
 
-  const words = state.status === 'ready' ? snapshotWords(state.report.hardestWords) : [];
   const title = (
     <div className="flex items-center gap-2.5">
       <IconBadge icon={Target} tone="pink" />
