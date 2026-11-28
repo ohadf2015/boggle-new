@@ -5,30 +5,22 @@ import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { HolidayKey } from '@/lib/holidays/calendar';
 import type { ArcadeGameId } from '@/lib/holidays/arcade/games';
+import { readBest, recordBest, type BestResult } from '@/lib/holidays/arcade/best';
 import ArcadeResults from './ArcadeResults';
 import ArcadeShell from './ArcadeShell';
 import { useArcadeRound, type RoundEnd } from './useArcadeRound';
-
-export interface GameProps {
-  content: never;
-  lang: string;
-  onScore: (score: number) => void;
-  onEnd: (end: RoundEnd) => void;
-}
+import type { FamilyGameProps } from './family/FamilyGame';
+import { GAME_LOADERS } from './gameLoaders';
 
 const loading = () => <div className="h-96 animate-pulse rounded-2xl bg-neo-navy-light/60" />;
 
-const GAMES: Record<ArcadeGameId, ComponentType<GameProps>> = {
-  oil: dynamic(() => import('./oil/OilGame'), { ssr: false, loading }) as ComponentType<GameProps>,
-  sleigh: dynamic(() => import('./sleigh/SleighGame'), { ssr: false, loading }) as ComponentType<GameProps>,
-  snowball: dynamic(() => import('./snowball/SnowballGame'), { ssr: false, loading }) as ComponentType<GameProps>,
-  dreidel: dynamic(() => import('./dreidel/DreidelGame'), { ssr: false, loading }) as ComponentType<GameProps>,
-  wrap: dynamic(() => import('./wrap/WrapGame'), { ssr: false, loading }) as ComponentType<GameProps>,
-  sufganiyah: dynamic(() => import('./stack/StackGame'), { ssr: false, loading }) as ComponentType<GameProps>,
-  latke: dynamic(() => import('./family/LatkeFlip'), { ssr: false, loading }) as ComponentType<GameProps>,
-  spin: dynamic(() => import('./family/SpinOff'), { ssr: false, loading }) as ComponentType<GameProps>,
-  presents: dynamic(() => import('./family/PresentStack'), { ssr: false, loading }) as ComponentType<GameProps>,
-  splat: dynamic(() => import('./family/SnowballSplat'), { ssr: false, loading }) as ComponentType<GameProps>,
+const GAMES: Record<ArcadeGameId, ComponentType<FamilyGameProps>> = {
+  latke: dynamic(GAME_LOADERS.latke, { ssr: false, loading }),
+  spin: dynamic(GAME_LOADERS.spin, { ssr: false, loading }),
+  catch: dynamic(GAME_LOADERS.catch, { ssr: false, loading }),
+  presents: dynamic(GAME_LOADERS.presents, { ssr: false, loading }),
+  splat: dynamic(GAME_LOADERS.splat, { ssr: false, loading }),
+  dash: dynamic(GAME_LOADERS.dash, { ssr: false, loading }),
 };
 
 interface Props {
@@ -41,28 +33,26 @@ export default function ArcadeGameHost({ holiday, game, onExit }: Props) {
   const { t } = useLanguage();
   const { state, start, finish } = useArcadeRound(game);
   const [score, setScore] = useState(0);
+  const [roster, setRoster] = useState<string[] | null>(null);
+  const [best, setBest] = useState<BestResult | null>(null);
+
+  const end = useCallback(
+    (e: RoundEnd) => {
+      if ((e.players ?? 1) > 1) {
+        const prior = readBest(game);
+        setBest({ best: prior, previous: prior, verdict: null });
+      } else setBest(recordBest(game, e.score));
+      finish(e);
+    },
+    [game, finish],
+  );
 
   const again = useCallback(() => {
     setScore(0);
-    void start();
+    start();
   }, [start]);
 
   const Game = GAMES[game];
-
-  if (state.phase === 'loading') {
-    return <div className="mx-auto mt-6 h-[28rem] w-full max-w-lg animate-pulse rounded-2xl border-[3px] border-black bg-neo-navy-light/60" role="status" aria-label={t('holiday.arcade.loading')} />;
-  }
-  if (state.phase === 'error') {
-    return (
-      <div className="mx-auto mt-6 flex max-w-sm flex-col items-center gap-3 rounded-2xl border-[3px] border-black bg-neo-navy-light p-4 text-center text-neo-white shadow-hard">
-        <p>{t('holiday.arcade.loadError')}</p>
-        <button type="button" onClick={again} className="rounded-xl border-[3px] border-black bg-neo-cream px-4 py-2 font-neo-display font-black text-neo-navy shadow-hard">
-          {t('holiday.arcade.retry')}
-        </button>
-      </div>
-    );
-  }
-
   const over = state.phase === 'over';
   return (
     <ArcadeShell
@@ -71,19 +61,20 @@ export default function ArcadeGameHost({ holiday, game, onExit }: Props) {
       score={over ? state.end.score : score}
       onExit={onExit}
       overlay={
-        over ? (
+        over && best ? (
           <ArcadeResults
             game={game}
             end={state.end}
             settle={state.settle}
-            headline={t(state.end.won ? `holiday.arcade.${game}.win` : `holiday.arcade.${game}.over`)}
+            best={best}
+            headline={t(`holiday.arcade.${game}.${state.end.won ? 'win' : 'over'}`)}
             onAgain={again}
             onHub={onExit}
           />
         ) : undefined
       }
     >
-      <Game key={state.key} content={state.round.content as never} lang={state.round.lang} onScore={setScore} onEnd={finish} />
+      <Game key={state.key} content={{ seed: state.seed }} roster={roster} onRoster={setRoster} onScore={setScore} onEnd={end} />
     </ArcadeShell>
   );
 }

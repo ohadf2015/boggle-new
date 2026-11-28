@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { HOLES, newSplatGame, stepSplat, throwBall, SPLAT_POINTS, ballAt, FLIGHT_S, THROW_FROM } from '../splat';
+import { FAMILY_RULES } from '../family';
+import { PARTY_S, HOLES, newSplatGame, stepSplat, throwBall, SPLAT_POINTS, ballAt, FLIGHT_S, THROW_FROM } from '../splat';
 
 describe('Snowball Splat', () => {
   it('Given time passes, then pop-ups appear in free holes', () => {
@@ -53,5 +54,57 @@ describe('Snowball Splat', () => {
     const g = newSplatGame(3, 5);
     for (let i = 0; i < 60; i++) stepSplat(g, 0.1);
     expect(g.over).toBe(true);
+  });
+
+  it('Given any seed, then the gremlin party fires once between 15 and 35 seconds and fills every fort with gremlins', () => {
+    for (let seed = 1; seed <= 10; seed++) {
+      const g = newSplatGame(seed, 50);
+      let at = -1;
+      for (let t = 0; t < 40 && at < 0; t += 1 / 60) {
+        stepSplat(g, 1 / 60);
+        if (g.events.some((e) => e.type === 'party')) at = g.time;
+        g.events.length = 0;
+      }
+      expect(at).toBeGreaterThanOrEqual(15);
+      expect(at).toBeLessThanOrEqual(35);
+      for (let t = 0; t < 1; t += 1 / 60) stepSplat(g, 1 / 60);
+      expect(g.party).toBeGreaterThan(PARTY_S - 1.5);
+      expect(g.pops.filter((p) => p.kind === 'gremlin').length).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it('Given later levels, then pop-ups come faster and leave sooner', () => {
+    const g = newSplatGame(3, 50);
+    let early = 0;
+    let late = 0;
+    for (let t = 0; t < 50; t += 1 / 60) {
+      stepSplat(g, 1 / 60);
+      for (const e of g.events) if (e.type === 'spawn') (g.time < 12 ? (early += 1) : g.time > 38 ? (late += 1) : 0);
+      g.events.length = 0;
+    }
+    expect(late).toBeGreaterThan(early * 1.2);
+  });
+
+  it('Given a sharpshooter all game, then the score stays inside the server bound', () => {
+    const g = newSplatGame(5, 50);
+    for (let t = 0; t < 51; t += 1 / 60) {
+      const up = g.pops.find((p) => p.phase === 'up' && p.kind !== 'mascot');
+      if (up) throwBall(g, HOLES[up.hole].x, HOLES[up.hole].y - 60);
+      stepSplat(g, 1 / 60);
+    }
+    expect(g.score).toBeLessThanOrEqual(FAMILY_RULES.splat.cap);
+    expect(g.score).toBeLessThanOrEqual(FAMILY_RULES.splat.perSecond * 50);
+    expect(g.hits).toBeGreaterThan(20);
+  });
+
+  it('Given the first seconds, then a sneaky gremlin shows up early so something exciting happens right away', () => {
+    const g = newSplatGame(8, 50);
+    let at = -1;
+    for (let t = 0; t < 8 && at < 0; t += 1 / 60) {
+      stepSplat(g, 1 / 60);
+      if (g.pops.some((p) => p.kind === 'gremlin')) at = g.time;
+    }
+    expect(at).toBeGreaterThan(0);
+    expect(at).toBeLessThan(6.5);
   });
 });

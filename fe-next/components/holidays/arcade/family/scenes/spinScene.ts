@@ -1,9 +1,9 @@
 import type { Container, Graphics, Sprite } from 'pixi.js';
 import { classifyGesture, type PointerSample } from '@/lib/holidays/arcade/kit/gesture';
-import { ARENA, launch, letterGelt, newSpinGame, SPIN_ROUNDS, stepSpin, type DreidelSide, type Top } from '@/lib/holidays/arcade/spin';
+import { ARENA, launch, letterGelt, newSpinGame, nudge, SPIN_ROUNDS, stepSpin, type DreidelSide, type Top } from '@/lib/holidays/arcade/spin';
 import type { KitCtx, Scene } from '../../kit/types';
 import { neoColor } from '../../kit/neoColor';
-import { ambience, backdrop, burstPreset, fadeAway, glow, popIn, reporter, sprite, type TurnOpts } from './common';
+import { ambience, backdrop, burstPreset, fadeAway, finale, glow, levelUp, popIn, reporter, sprite, type TurnOpts } from './common';
 
 export const SPIN_ART = ['bg-dreidel', 'spr-dreidel-blue', 'spr-dreidel-red', 'spr-dreidel-green', 'spr-dreidel-purple', 'spr-gelt-coins', 'spr-spark-impact', 'spr-trophy'];
 
@@ -46,6 +46,8 @@ export function createSpinScene(ctx: KitCtx, opts: TurnOpts): Scene {
   let press: PointerSample | null = null;
   let drag: PointerSample | null = null;
   let clock = 0;
+  let aimIdle = 0;
+  let nagged = false;
 
   const build = () => {
     views.forEach((v) => v.root.destroy({ children: true }));
@@ -53,7 +55,9 @@ export function createSpinScene(ctx: KitCtx, opts: TurnOpts): Scene {
       const root = new pixi.Container();
       const shadow = new pixi.Graphics().ellipse(0, 6, 44, 14).fill({ color: navy, alpha: 0.45 });
       const blur = new pixi.Graphics();
-      const art = sprite(ctx, `spr-dreidel-${top.color}`, 0, 0, SPRITE_H, root);
+      const art = sprite(ctx, `spr-dreidel-${top.color}`, 0, 0, top.mega ? SPRITE_H * 1.45 : SPRITE_H, root);
+      if (top.mega) glow(ctx, 'neo-pink', 90, root).position.set(0, -50);
+      if (top.you) glow(ctx, 'neo-cyan', 70, root).position.set(0, -40);
       art.anchor.set(0.5, 0.9);
       root.addChildAt(shadow, 0);
       root.addChildAt(blur, 1);
@@ -61,7 +65,25 @@ export function createSpinScene(ctx: KitCtx, opts: TurnOpts): Scene {
       popIn(ctx, art, art.scale.x);
       return { top, root, shadow, blur, art, base: art.scale.y, fallen: false };
     });
-    if (g.round > 0) ctx.float(ARENA.x, ARENA.y - 40, opts.say('spin.round', { n: g.round + 1, total: SPIN_ROUNDS }), 'gold');
+  };
+
+  const coinViews = new Map<number, Sprite>();
+  const syncCoins = () => {
+    const live = new Set(g.coins.map((c) => c.id));
+    for (const [id, c] of coinViews) if (!live.has(id)) {
+      c.destroy();
+      coinViews.delete(id);
+    }
+    for (const c of g.coins) {
+      let v = coinViews.get(c.id);
+      if (!v) {
+        v = sprite(ctx, 'spr-gelt-coins', c.x, c.y, 62);
+        v.zIndex = c.y - 5;
+        popIn(ctx, v, v.scale.x, 300);
+        coinViews.set(c.id, v);
+      }
+      if (!ctx.reduced) v.y = c.y + Math.sin(clock * 6 + c.id) * 5;
+    }
   };
 
   const land = (v: View, letter: DreidelSide, you: boolean) => {
@@ -119,6 +141,25 @@ export function createSpinScene(ctx: KitCtx, opts: TurnOpts): Scene {
           fadeAway(ctx, cup, 1600, 40);
         }
       } else if (e.type === 'roundScore') ctx.float(ARENA.x, ARENA.y + 40, `+${e.points}`, 'gold');
+      else if (e.type === 'round') levelUp(ctx, opts, 'spin', e.round === SPIN_ROUNDS - 1 ? 4 : Math.min(3, e.round));
+      else if (e.type === 'rain') {
+        ctx.sfx.play('coin');
+        ctx.banner(opts.say('spin.rain'));
+        ctx.burst(coins, ARENA.x, ARENA.y - 200);
+      } else if (e.type === 'gelt') {
+        ctx.sfx.play('coin');
+        ctx.burst(coins, e.x, e.y, 10);
+        ctx.float(e.x, e.y - 50, `+${e.points}`, 'gold');
+      } else if (e.type === 'ko') {
+        ctx.sfx.play('perfect');
+        ctx.shake(10, 0.25);
+        ctx.float(e.x, e.y - 160, opts.say('spin.ko'), 'good');
+        ctx.float(e.x, e.y - 110, `+${e.points}`, 'gold');
+        if (g.kos >= 2) opts.cheer(opts.say('spin.koCheer'));
+      } else if (e.type === 'nudge') {
+        ctx.sfx.play('whoosh');
+        ctx.burst(sparks, e.x, e.y - 30, 8);
+      }
     }
     g.events.length = 0;
   };
@@ -162,16 +203,32 @@ export function createSpinScene(ctx: KitCtx, opts: TurnOpts): Scene {
   return {
     update(dt) {
       clock += dt;
+      if (g.phase === 'aim' && !press) {
+        aimIdle += dt;
+        if (aimIdle > 3 && !nagged) {
+          nagged = true;
+          ctx.float(ARENA.x, ARENA.y + 260, opts.say('spin.swipe'), 'good');
+        }
+        if (aimIdle > 6) launch(g, (Math.random() - 0.5) * 200, -300);
+      } else {
+        aimIdle = 0;
+        nagged = false;
+      }
       stepSpin(g, dt);
       handle();
       sync();
       drawAim();
+      syncCoins();
       embers(dt);
       flames.forEach((f, i) => { f.alpha = 0.7 + 0.3 * Math.sin(clock * 9 + i * 2.1); });
-      report.hud({ score: g.score, left: 0, combo: g.wins, round: Math.min(SPIN_ROUNDS, g.round + 1) });
-      if (g.phase === 'over') report.end({ score: g.score, won: g.wins >= 2 });
+      report.hud({ score: g.score, left: 0, combo: g.kos, round: Math.min(SPIN_ROUNDS, g.round + 1), rounds: SPIN_ROUNDS, pushes: g.phase === 'spinning' ? g.pushes : undefined });
+      if (g.phase === 'over') finale(ctx, opts, report, { score: g.score, won: g.wins >= 2 }, opts.say(g.wins >= 2 ? 'spin.finaleWin' : 'spin.finale', { n: g.wins }));
     },
     pointerDown(p) {
+      if (g.phase === 'spinning') {
+        nudge(g, p.x, p.y);
+        return;
+      }
       if (g.phase !== 'aim') return;
       press = p;
       drag = p;
@@ -184,11 +241,14 @@ export function createSpinScene(ctx: KitCtx, opts: TurnOpts): Scene {
       const gesture = classifyGesture(press, p);
       press = null;
       drag = null;
-      if (gesture.kind === 'tap') launch(g, 0, -620);
+      if (gesture.kind === 'tap') launch(g, 0, -300);
       else launch(g, gesture.kind === 'flick' ? gesture.vx : gesture.dx * 4, gesture.kind === 'flick' ? gesture.vy : gesture.dy * 4);
     },
     action() {
-      launch(g, 0, -620);
+      if (g.phase === 'spinning') {
+        const foe = g.tops.find((t) => !t.you && !t.letter);
+        if (foe) nudge(g, foe.body.position.x, foe.body.position.y);
+      } else launch(g, 0, -300);
     },
   };
 }

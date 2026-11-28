@@ -4,7 +4,6 @@ const en = {
   "holiday": {
     // @holiday-arcade:start
     "arcade": {
-      "wordSection": "Word games",
       "lobby": {
         "home": "Home",
         "night": "Night {n} of {total}",
@@ -40,12 +39,17 @@ const en = {
         "combo": "{count}x combo",
         "timeLeft_one": "{count} second left",
         "timeLeft_other": "{count} seconds left",
-        "yourScore": "Coins come from Player 1's score"
+        "yourScore": "Coins come from Player 1's score",
+        "yourTurn": "{name}, your turn!",
+        "toBeat": "Score to beat: {score}",
+        "scoreboard": "Scores",
+        "mult": "x{n}!",
+        "onFire": "You're on fire!"
       },
       "latke": {
         "title": "Latke Flip",
         "blurb": "Flip the latkes when they turn golden. Don't let them burn!",
-        "how": "Tap a latke when its ring reaches the gold band. Flip both sides to serve it.",
+        "how": "Tap a latke when its ring hits the gold band",
         "win": "Golden! What a fry-up",
         "over": "The pan has gone cold",
         "turnWin": "Latke legend!",
@@ -54,17 +58,24 @@ const en = {
         "cheer": "Look at that golden crunch!",
         "early": "Not yet!",
         "cough": "*cough cough* A bit too crispy!",
-        "burnt": "Burnt!"
+        "burnt": "Burnt!",
+        "star": "Star latke! A perfect flip pays triple",
+        "level1": "A fourth latke joins the pan!",
+        "level2": "The oil's getting hotter!",
+        "level3": "Five latkes at once!",
+        "level4": "Rush hour at the stove!",
+        "finale": "Pan's off! Latkes served: {n}",
+        "finaleWin": "What a fry-up! Latkes served: {n}"
       },
       "spin": {
         "title": "Dreidel Spin-Off",
         "blurb": "Flick your dreidel into the ring. The last one spinning wins.",
-        "how": "Swipe to launch your blue dreidel. Knock the others over and keep spinning!",
+        "how": "Swipe hard to launch, then tap a rival to ram it",
+        "swipe": "Swipe up to launch!",
         "win": "Spin champion!",
         "over": "The dreidels have spoken",
         "turnWin": "Spin champion!",
         "turnOver": "All spun out!",
-        "round": "Round {n} of {total}",
         "roundOf": "Round {n} of {total}",
         "youWin": "Yours is still spinning!",
         "knocked": "Knocked flat! Get the next round",
@@ -74,28 +85,64 @@ const en = {
           "hei": "Hey! +{gelt} gelt",
           "shin": "Shin: +{gelt} gelt",
           "pe": "Pe: +{gelt} gelt"
-        }
+        },
+        "pushes": "Pushes: {count}",
+        "rain": "Gelt rain! Spin over the coins",
+        "ko": "Knockout!",
+        "koCheer": "Bumper dreidel champion!",
+        "level1": "Round 2: a fourth dreidel joins!",
+        "level2": "Round 3: watch out for the mega dreidel!",
+        "level3": "No more Mr. Nice Dreidel!",
+        "level4": "Final round!",
+        "finale": "The dreidels have spoken! Rounds won: {n}",
+        "finaleWin": "Spin champion! Rounds won: {n}"
+      },
+      "catch": {
+        "title": "Sufganiyah Catch",
+        "blurb": "Catch the falling doughnuts and dodge the burnt latkes.",
+        "how": "Slide the plate to catch the doughnuts",
+        "win": "Doughnut master!",
+        "over": "The bakery is closed",
+        "turnWin": "Plate piled high!",
+        "turnOver": "Time's up!",
+        "frenzy": "DOUGHNUT STORM!",
+        "frenzyCheer": "It's raining sufganiyot!",
+        "burnt": "Burnt!",
+        "cough": "*cough* Who threw a burnt latke in?",
+        "splat": "Splat!",
+        "oops": "Noooo, the jelly!",
+        "goldenComing": "Golden doughnut incoming!",
+        "level1": "Look out, burnt latkes!",
+        "level2": "Wobbly doughnuts!",
+        "level3": "Double drops!",
+        "level4": "Faster and faster!",
+        "finale": "The bakery's closing!",
+        "finaleWin": "What a catch!"
       },
       "presents": {
-        "miss": "Whoops! Mind the sleigh",
-        "lives_one": "{count} gift left",
-        "lives_other": "{count} gifts left",
         "title": "Present Stack",
         "blurb": "Drop swinging gifts onto Santa's sleigh. How high can you go?",
-        "how": "Tap to drop the gift. Land it right on top for a perfect stack.",
+        "how": "Tap to drop the gift onto the stack",
         "win": "Sleigh fully loaded!",
-        "over": "Timber! The presents went flying",
+        "over": "The sleigh is packed for tonight",
         "turnWin": "What a tower!",
-        "turnOver": "Timber!",
+        "turnOver": "Time's up!",
         "perfect": "Perfect stack!",
         "cheer": "Santa's going to need a bigger sleigh!",
         "topple": "TIMBER!",
-        "facepalm": "Oh no… the reindeer can't watch"
+        "facepalm": "Oh no… the reindeer can't watch",
+        "golden": "Golden gift! +300",
+        "level1": "The crane speeds up!",
+        "level2": "The wind is picking up!",
+        "level3": "Faster swings!",
+        "level4": "Blizzard!",
+        "finale": "Tallest tower: {n}",
+        "finaleWin": "Sky-high! Tallest tower: {n}"
       },
       "splat": {
         "title": "Snowball Splat",
         "blurb": "Splat the elves and the sneaky gremlin. Don't hit the mascot!",
-        "how": "Tap or flick to throw a snowball. Gremlins are worth the most. Leave the mascot alone!",
+        "how": "Tap or flick to throw. Don't hit the mascot!",
         "win": "Snowball champion!",
         "over": "The snow fort held out",
         "turnWin": "Splat-tastic!",
@@ -103,28 +150,47 @@ const en = {
         "gotcha": "Gotcha, gremlin!",
         "cheer": "What an arm!",
         "oops": "Oops!",
-        "mascotLine": "Hey! Not me!"
+        "mascotLine": "Hey! Not me!",
+        "party": "GREMLIN PARTY!",
+        "partyCheer": "Gremlins everywhere! Splat them all!",
+        "level1": "More gremlins sneaking out!",
+        "level2": "They're getting faster!",
+        "level3": "Careful, the mascot keeps peeking!",
+        "level4": "Snowstorm finale!",
+        "finale": "Snowballs landed: {n}",
+        "finaleWin": "Snowball legend! Snowballs landed: {n}"
+      },
+      "dash": {
+        "title": "Sleigh Dash",
+        "blurb": "Fly over the rooftops, grab the gifts and dodge the owls.",
+        "how": "Hold to fly up, let go to glide down",
+        "win": "What a haul of gifts!",
+        "over": "The sleigh is parked for the night",
+        "turnWin": "Ace pilot!",
+        "turnOver": "Time's up!",
+        "near": "Close one! +{n}",
+        "owlHit": "Hoo! Sorry, owl!",
+        "smokeHit": "*cough* Chimney smoke!",
+        "starComing": "Grab the star!",
+        "turbo": "REINDEER TURBO!",
+        "turboCheer": "Whoosh! Nothing can stop us now!",
+        "level1": "The owls are out!",
+        "level2": "Speeding up!",
+        "level3": "Owl squadron!",
+        "level4": "Full speed to midnight!",
+        "finale": "Time to land!",
+        "finaleWin": "Santa's top pilot!"
       },
       "back": "Back to the arcade",
       "scoreLabel": "Score",
       "pause": "Pause",
       "resume": "Keep playing",
-      "rackHint": "Tap letters to build a word",
-      "erase": "Erase",
-      "submit": "Go",
-      "shuffle": "Shuffle",
-      "great": "Nice one!",
       "loading": "Loading the arcade…",
-      "loadError": "We couldn't start this game.",
-      "retry": "Try again",
-      "play": "Play",
       "coinNote": "Every game counts for today's holiday track. Coins are capped per day.",
       "tileTitle": "Holiday Arcade",
-      "tileSubtitle": "Family party games and word games, only this season",
+      "tileSubtitle": "Party games for the whole family, only this season",
       "tileLocked": "Opens {date}",
       "shareText": "I scored {score} in {game} on LexiClash! Can you beat it?",
-      "wordsFound_one": "{count} word",
-      "wordsFound_other": "{count} words",
       "saving": "Saving your score…",
       "saveError": "We couldn't save this round. Your score still counts for today.",
       "coins_one": "+{count} coin",
@@ -134,14 +200,6 @@ const en = {
       "share": "Share",
       "hub": "All games",
       "signIn": "Sign in to earn coins",
-      "reject": {
-        "short": "Too short",
-        "letters": "Those letters aren't all here",
-        "dup": "You already used that one",
-        "unknown": "Not in our dictionary",
-        "offline": "Connection hiccup, try that again",
-        "all": "Use every letter in the box"
-      },
       "hanukkah": {
         "title": "Hanukkah Arcade",
         "subtitle": "Quick games for the Festival of Lights"
@@ -150,109 +208,10 @@ const en = {
         "title": "Christmas Arcade",
         "subtitle": "Quick games while the snow falls"
       },
-      "oil": {
-        "title": "Oil for 8 Nights",
-        "blurb": "Words keep the menorah burning. Make it to the eighth night.",
-        "win": "All eight candles are lit!",
-        "over": "The oil ran out",
-        "nightLit": "Night {night} is lit",
-        "miracle": "Miracle! The last drop holds",
-        "nightOf": "Night {night} of {total}",
-        "candlesLit_one": "{count} candle lit",
-        "candlesLit_other": "{count} candles lit",
-        "oilLevel": "Oil left",
-        "hint": "Longer words pour in more oil"
-      },
-      "sleigh": {
-        "title": "Sleigh Spell",
-        "blurb": "Spell a word at every chimney to drop a gift down it.",
-        "win": "Every gift delivered!",
-        "over": "Santa's run is over",
-        "bells_one": "{count} bell left",
-        "bells_other": "{count} bells left",
-        "hint": "Spell a word before the chimney slips past",
-        "missed": "Missed that chimney!"
-      },
-      "snowball": {
-        "title": "Snowball Fight",
-        "blurb": "Catch the real words, throw back the fakes.",
-        "win": "What a snowball fight!",
-        "over": "Snowball fight over",
-        "catch": "Catch",
-        "toss": "Throw",
-        "combo": "{count} in a row!",
-        "hint": "Swipe up to catch a real word, swipe sideways to throw a fake",
-        "oops": "Brr, that one was a fake!"
-      },
-      "wrap": {
-        "title": "Wrap It Up",
-        "blurb": "Unscramble each gift before it rolls off the belt.",
-        "win": "Every gift wrapped!",
-        "over": "The belt won the day",
-        "hint": "Use every letter to wrap the gift",
-        "missed": "That gift slipped away!",
-        "misses_one": "{count} miss left",
-        "misses_other": "{count} misses left",
-        "mystery": "Mystery gift unwrapped!",
-        "mysteryHint": "Mystery gift! A holiday word is hiding in here"
-      },
-      "dreidel": {
-        "title": "Dreidel Duel",
-        "blurb": "Spin, find words, win the gelt. First to 10 takes it.",
-        "win": "You won the gelt!",
-        "over": "The dreidel picked the other side",
-        "you": "You",
-        "bot": "Dreidel bot",
-        "yourSpin": "Your spin…",
-        "botSpin": "The bot spins…",
-        "botThinking": "The bot is thinking…",
-        "botFound": "The bot found {word}",
-        "giveUp": "Skip this turn",
-        "goal": "First to {count} gelt wins",
-        "needLetter": "Your word needs the letter {letter}",
-        "needLong": "Gimel needs a word with {count}+ letters",
-        "pot": "Pot: {count}",
-        "rule": {
-          "nun": "Nun: nothing happens this turn",
-          "gimel": "Gimel! A word with {count}+ letters takes the whole pot",
-          "hei": "Hey! Any word takes half the pot",
-          "shin": "Shin: find a word with {letter} or put one gelt in"
-        },
-        "result": {
-          "nun": {
-            "win": "Nun, nothing happens",
-            "miss": "Nun, nothing happens"
-          },
-          "gimel": {
-            "win": "Gimel! The whole pot is yours",
-            "miss": "No long word, the pot stays put"
-          },
-          "hei": {
-            "win": "Hey! Half the pot is yours",
-            "miss": "No word, no gelt this time"
-          },
-          "shin": {
-            "win": "Saved! No gelt paid",
-            "miss": "One gelt goes into the pot"
-          }
-        },
-        "side": {
-          "nun": "Nun",
-          "gimel": "Gimel",
-          "hei": "Hey",
-          "shin": "Shin"
-        }
-      },
-      "sufganiyah": {
-        "title": "Sufganiyah Stack",
-        "blurb": "Link touching doughnuts into words before the tray fills up.",
-        "win": "The tray survived!",
-        "over": "The tray overflowed",
-        "hint": "Drag across touching doughnuts to spell a word",
-        "pick": "Pick touching doughnuts",
-        "splash": "Jelly splash!",
-        "tray": "Doughnut tray"
-      }
+      "newBest": "New best!",
+      "tieBest": "Tied your best!",
+      "soClose": "So close! Just {gap} short of your best",
+      "bestScore": "Your best: {score}"
     },
     // @holiday-arcade:end
     "event": {

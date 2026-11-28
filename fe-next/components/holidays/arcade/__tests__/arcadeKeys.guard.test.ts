@@ -14,26 +14,25 @@ function sources(dir: string): string[] {
   });
 }
 
-const SIDES = ['nun', 'gimel', 'hei', 'shin'];
-const PLURALS = ['wordsFound', 'coins', 'family.timeLeft', 'oil.candlesLit', 'sleigh.bells', 'wrap.misses', 'presents.lives'];
+const PLURALS = ['coins', 'family.timeLeft'];
 const dynamic = [
-  ...Object.keys(ARCADE_GAMES).flatMap((g) => ['title', 'blurb', 'win', 'over'].map((k) => `${g}.${k}`)),
+  ...Object.keys(ARCADE_GAMES).flatMap((g) =>
+    ['title', 'blurb', 'win', 'over', 'how', 'turnWin', 'turnOver', 'finale', 'finaleWin', 'level1', 'level2', 'level3', 'level4'].map((k) => `${g}.${k}`),
+  ),
   ...['hanukkah', 'christmas'].flatMap((h) => [`${h}.title`, `${h}.subtitle`]),
-  ...['short', 'letters', 'dup', 'unknown', 'offline', 'all'].map((r) => `reject.${r}`),
-  ...SIDES.flatMap((s) => [`dreidel.rule.${s}`, `dreidel.side.${s}`, `dreidel.result.${s}.win`, `dreidel.result.${s}.miss`]),
-  'dreidel.you',
-  'dreidel.bot',
-  ...Object.values(ARCADE_GAMES).filter((g) => g.family).flatMap((g) => ['how', 'turnWin', 'turnOver'].map((k) => `${g.id}.${k}`)),
-  ...['perfect', 'cheer', 'early', 'cough', 'burnt'].map((k) => `latke.${k}`),
-  ...['round', 'roundOf', 'youWin', 'knocked', ...['nun', 'gimel', 'hei', 'shin', 'pe'].map((s) => `side.${s}`)].map((k) => `spin.${k}`),
-  ...['perfect', 'cheer', 'topple', 'facepalm', 'miss'].map((k) => `presents.${k}`),
-  ...['gotcha', 'cheer', 'oops', 'mascotLine'].map((k) => `splat.${k}`),
+  ...['nun', 'gimel', 'hei', 'shin', 'pe'].map((s) => `spin.side.${s}`),
+  'newBest',
+  'tieBest',
 ];
 
 const get = (tree: unknown, key: string) => key.split('.').reduce<unknown>((o, k) => (o as Record<string, unknown> | undefined)?.[k], tree);
 
 describe('holiday arcade translations', () => {
-  const literal = [...sources(DIR).join('\n').matchAll(/holiday\.arcade\.([a-zA-Z.]+[a-zA-Z])['"`]/g)].map((m) => m[1]);
+  const src = sources(DIR).join('\n');
+  const literal = [
+    ...[...src.matchAll(/holiday\.arcade\.([a-zA-Z.]+[a-zA-Z])['"`]/g)].map((m) => m[1]),
+    ...[...src.matchAll(/\bsay\('([a-zA-Z.]+[a-zA-Z])'/g)].map((m) => m[1]),
+  ];
   const keys = [...new Set([...literal, ...dynamic])];
 
   it.each(LANGS)('Given %s, then every arcade key the UI uses has its own text', async (lang) => {

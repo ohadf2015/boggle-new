@@ -4,7 +4,6 @@ const es = {
   "holiday": {
     // @holiday-arcade:start
     "arcade": {
-      "wordSection": "Juegos de palabras",
       "lobby": {
         "home": "Inicio",
         "night": "Noche {n} de {total}",
@@ -40,12 +39,17 @@ const es = {
         "combo": "Combo x{count}",
         "timeLeft_one": "Queda {count} segundo",
         "timeLeft_other": "Quedan {count} segundos",
-        "yourScore": "Las monedas salen de la puntuación del jugador 1"
+        "yourScore": "Las monedas salen de la puntuación del jugador 1",
+        "yourTurn": "¡{name}, te toca!",
+        "toBeat": "Puntos a superar: {score}",
+        "scoreboard": "Marcador",
+        "mult": "¡x{n}!",
+        "onFire": "¡Estás que te sales!"
       },
       "latke": {
         "title": "Latkes al vuelo",
         "blurb": "Dales la vuelta a los latkes cuando estén dorados. ¡Que no se quemen!",
-        "how": "Toca un latke cuando el anillo llegue a la franja dorada. Dale la vuelta por los dos lados para servirlo.",
+        "how": "Toca un latke cuando su anillo llegue a la franja dorada",
         "win": "¡Doraditos! Menuda fritura",
         "over": "La sartén se ha enfriado",
         "turnWin": "¡Leyenda de los latkes!",
@@ -54,17 +58,24 @@ const es = {
         "cheer": "¡Mira qué crujientes y dorados!",
         "early": "¡Todavía no!",
         "cough": "*cof, cof* Un pelín quemado…",
-        "burnt": "¡Quemado!"
+        "burnt": "¡Quemado!",
+        "star": "¡Latke estrella! Un giro perfecto vale el triple",
+        "level1": "¡Un cuarto latke a la sartén!",
+        "level2": "¡El aceite está cada vez más caliente!",
+        "level3": "¡Cinco latkes a la vez!",
+        "level4": "¡Hora punta en los fogones!",
+        "finale": "¡Se acabó la fritura! Latkes servidos: {n}",
+        "finaleWin": "¡Qué fritura! Latkes servidos: {n}"
       },
       "spin": {
         "title": "Batalla de perinolas",
         "blurb": "Lanza tu perinola al ruedo. Gana la última que siga girando.",
-        "how": "Desliza para lanzar tu perinola azul. ¡Derriba a las demás y no dejes de girar!",
+        "how": "Desliza con fuerza para lanzar y toca a un rival para embestirlo",
+        "swipe": "¡Desliza hacia arriba para lanzar!",
         "win": "¡Campeón de la perinola!",
         "over": "Las perinolas han hablado",
         "turnWin": "¡Campeón de la perinola!",
         "turnOver": "¡Todas al suelo!",
-        "round": "Ronda {n} de {total}",
         "roundOf": "Ronda {n} de {total}",
         "youWin": "¡La tuya sigue girando!",
         "knocked": "¡Al suelo! A por la siguiente ronda",
@@ -74,28 +85,64 @@ const es = {
           "hei": "¡Hei! +{gelt} monedas de chocolate",
           "shin": "Shin: +{gelt} monedas de chocolate",
           "pe": "Pe: +{gelt} monedas de chocolate"
-        }
+        },
+        "pushes": "Empujones: {count}",
+        "rain": "¡Lluvia de monedas! Pasa por encima",
+        "ko": "¡KO!",
+        "koCheer": "¡Campeón de los choques!",
+        "level1": "Ronda 2: ¡entra una cuarta perinola!",
+        "level2": "Ronda 3: ¡cuidado con la megaperinola!",
+        "level3": "¡Se acabaron las buenas maneras!",
+        "level4": "¡Última ronda!",
+        "finale": "¡Las perinolas han hablado! Rondas ganadas: {n}",
+        "finaleWin": "¡Campeón del giro! Rondas ganadas: {n}"
+      },
+      "catch": {
+        "title": "Atrapa sufganiyot",
+        "blurb": "Atrapa los dónuts que caen y esquiva los latkes quemados.",
+        "how": "Mueve el plato para atrapar los dónuts",
+        "win": "¡Maestro del dónut!",
+        "over": "La pastelería ha cerrado",
+        "turnWin": "¡Plato hasta arriba!",
+        "turnOver": "¡Se acabó el tiempo!",
+        "frenzy": "¡TORMENTA DE DÓNUTS!",
+        "frenzyCheer": "¡Llueven sufganiyot!",
+        "burnt": "¡Quemado!",
+        "cough": "*cof cof* ¿Quién ha tirado un latke quemado?",
+        "splat": "¡Chof!",
+        "oops": "¡Nooo, la mermelada!",
+        "goldenComing": "¡Ahí viene un dónut dorado!",
+        "level1": "¡Ojo, latkes quemados!",
+        "level2": "¡Dónuts que zigzaguean!",
+        "level3": "¡Caen de dos en dos!",
+        "level4": "¡Cada vez más rápido!",
+        "finale": "¡La pastelería cierra!",
+        "finaleWin": "¡Menudas manos!"
       },
       "presents": {
-        "miss": "¡Uy! Apunta al trineo",
-        "lives_one": "Queda {count} regalo",
-        "lives_other": "Quedan {count} regalos",
         "title": "Torre de regalos",
         "blurb": "Suelta los regalos que se balancean sobre el trineo de Papá Noel. ¿Hasta dónde llegarás?",
-        "how": "Toca para soltar el regalo. Si cae justo encima, la torre queda perfecta.",
+        "how": "Toca para soltar el regalo sobre la torre",
         "win": "¡Trineo hasta arriba!",
-        "over": "¡Cataplum! Los regalos salieron volando",
+        "over": "El trineo ya está cargado por hoy",
         "turnWin": "¡Menuda torre!",
-        "turnOver": "¡Cataplum!",
+        "turnOver": "¡Se acabó el tiempo!",
         "perfect": "¡Encaje perfecto!",
         "cheer": "¡Papá Noel va a necesitar un trineo más grande!",
         "topple": "¡CATAPLUM!",
-        "facepalm": "Ay, no… los renos no pueden ni mirar"
+        "facepalm": "Ay, no… los renos no pueden ni mirar",
+        "golden": "¡Regalo dorado! +300",
+        "level1": "¡La grúa acelera!",
+        "level2": "¡Se levanta viento!",
+        "level3": "¡Balanceos más rápidos!",
+        "level4": "¡Ventisca!",
+        "finale": "Torre más alta: {n}",
+        "finaleWin": "¡Hasta el cielo! Torre más alta: {n}"
       },
       "splat": {
         "title": "Bolazos de nieve",
         "blurb": "Acierta a los elfos y al gremlin travieso. ¡A la mascota no!",
-        "how": "Toca o desliza para lanzar una bola de nieve. El gremlin da más puntos. ¡Deja en paz a la mascota!",
+        "how": "Toca o desliza para lanzar. ¡A la mascota no!",
         "win": "¡Campeón de las bolas de nieve!",
         "over": "El fuerte de nieve aguantó",
         "turnWin": "¡Bolazo total!",
@@ -103,28 +150,47 @@ const es = {
         "gotcha": "¡Te pillé, gremlin!",
         "cheer": "¡Qué brazo!",
         "oops": "¡Uy!",
-        "mascotLine": "¡Eh! ¡A mí no!"
+        "mascotLine": "¡Eh! ¡A mí no!",
+        "party": "¡FIESTA DE DUENDES!",
+        "partyCheer": "¡Duendes por todas partes! ¡A por ellos!",
+        "level1": "¡Salen más duendes!",
+        "level2": "¡Cada vez son más rápidos!",
+        "level3": "¡Cuidado, la mascota no para de asomarse!",
+        "level4": "¡Gran final con nevada!",
+        "finale": "Bolas que dieron en el blanco: {n}",
+        "finaleWin": "¡Leyenda de la nieve! Bolas en el blanco: {n}"
+      },
+      "dash": {
+        "title": "Trineo a toda pastilla",
+        "blurb": "Vuela sobre los tejados, coge los regalos y esquiva a los búhos.",
+        "how": "Mantén pulsado para subir y suelta para bajar",
+        "win": "¡Menudo botín de regalos!",
+        "over": "El trineo se queda aparcado esta noche",
+        "turnWin": "¡Piloto de primera!",
+        "turnOver": "¡Se acabó el tiempo!",
+        "near": "¡Por los pelos! +{n}",
+        "owlHit": "¡Uuh! ¡Perdón, búho!",
+        "smokeHit": "*cof cof* ¡Humo de chimenea!",
+        "starComing": "¡Coge la estrella!",
+        "turbo": "¡TURBO DE RENOS!",
+        "turboCheer": "¡Fiuuu! ¡Nadie nos para!",
+        "level1": "¡Salen los búhos!",
+        "level2": "¡Más velocidad!",
+        "level3": "¡Escuadrón de búhos!",
+        "level4": "¡A toda máquina hasta medianoche!",
+        "finale": "¡Hora de aterrizar!",
+        "finaleWin": "¡El mejor piloto de Papá Noel!"
       },
       "back": "Volver al arcade",
       "scoreLabel": "Puntos",
       "pause": "Pausa",
       "resume": "Seguir jugando",
-      "rackHint": "Toca letras para formar una palabra",
-      "erase": "Borrar",
-      "submit": "Listo",
-      "shuffle": "Mezclar",
-      "great": "¡Muy bien!",
       "loading": "Cargando el arcade…",
-      "loadError": "No pudimos empezar este juego.",
-      "retry": "Reintentar",
-      "play": "Jugar",
       "coinNote": "Cada partida cuenta para el reto festivo de hoy. Las monedas tienen un límite diario.",
       "tileTitle": "Arcade festivo",
-      "tileSubtitle": "Juegos de fiesta en familia y juegos de palabras, solo esta temporada",
+      "tileSubtitle": "Juegos de fiesta para toda la familia, solo esta temporada",
       "tileLocked": "Abre el {date}",
       "shareText": "¡Hice {score} puntos en {game} en LexiClash! ¿Me superas?",
-      "wordsFound_one": "{count} palabra",
-      "wordsFound_other": "{count} palabras",
       "saving": "Guardando tu puntuación…",
       "saveError": "No pudimos guardar esta ronda. Igual cuenta para hoy.",
       "coins_one": "+{count} moneda",
@@ -134,14 +200,6 @@ const es = {
       "share": "Compartir",
       "hub": "Todos los juegos",
       "signIn": "Inicia sesión para ganar monedas",
-      "reject": {
-        "short": "Muy corta",
-        "letters": "No están todas esas letras",
-        "dup": "Esa ya la usaste",
-        "unknown": "No está en nuestro diccionario",
-        "offline": "Fallo de conexión, prueba otra vez",
-        "all": "Usa todas las letras de la caja"
-      },
       "hanukkah": {
         "title": "Arcade de Janucá",
         "subtitle": "Juegos rápidos para la Fiesta de las Luces"
@@ -150,109 +208,10 @@ const es = {
         "title": "Arcade de Navidad",
         "subtitle": "Juegos rápidos mientras cae la nieve"
       },
-      "oil": {
-        "title": "Aceite para 8 noches",
-        "blurb": "Cada palabra mantiene encendida la menorá. Llega a la octava noche.",
-        "win": "¡Las ocho velas encendidas!",
-        "over": "Se acabó el aceite",
-        "nightLit": "La noche {night} ya brilla",
-        "miracle": "¡Milagro! La última gota aguanta",
-        "nightOf": "Noche {night} de {total}",
-        "candlesLit_one": "{count} vela encendida",
-        "candlesLit_other": "{count} velas encendidas",
-        "oilLevel": "Aceite restante",
-        "hint": "Las palabras largas echan más aceite"
-      },
-      "sleigh": {
-        "title": "Trineo de letras",
-        "blurb": "Forma una palabra en cada chimenea para dejar caer un regalo.",
-        "win": "¡Todos los regalos entregados!",
-        "over": "Se acabó el reparto",
-        "bells_one": "Queda {count} cascabel",
-        "bells_other": "Quedan {count} cascabeles",
-        "hint": "Forma una palabra antes de que pase la chimenea",
-        "missed": "¡Se escapó esa chimenea!"
-      },
-      "snowball": {
-        "title": "Guerra de bolas de nieve",
-        "blurb": "Atrapa las palabras reales y devuelve las falsas.",
-        "win": "¡Menuda guerra de nieve!",
-        "over": "Fin de la guerra de nieve",
-        "catch": "Atrapar",
-        "toss": "Lanzar",
-        "combo": "¡{count} seguidas!",
-        "hint": "Desliza hacia arriba para atrapar una palabra real y de lado para lanzar una falsa",
-        "oops": "¡Brrr, esa era falsa!"
-      },
-      "wrap": {
-        "title": "Envuélvelo",
-        "blurb": "Ordena las letras de cada regalo antes de que se caiga de la cinta.",
-        "win": "¡Todos los regalos envueltos!",
-        "over": "La cinta ganó esta vez",
-        "hint": "Usa todas las letras para envolver el regalo",
-        "missed": "¡Ese regalo se escapó!",
-        "misses_one": "Te queda {count} fallo",
-        "misses_other": "Te quedan {count} fallos",
-        "mystery": "¡Regalo sorpresa abierto!",
-        "mysteryHint": "¡Regalo sorpresa! Aquí se esconde una palabra navideña"
-      },
-      "dreidel": {
-        "title": "Duelo de perinola",
-        "blurb": "Gira, encuentra palabras y gana las monedas. Gana quien llegue a 10.",
-        "win": "¡Te llevaste todas las monedas!",
-        "over": "La perinola eligió al otro lado",
-        "you": "Tú",
-        "bot": "Bot",
-        "yourSpin": "Te toca girar…",
-        "botSpin": "Gira el bot…",
-        "botThinking": "El bot está pensando…",
-        "botFound": "El bot encontró {word}",
-        "giveUp": "Pasar el turno",
-        "goal": "Gana quien llegue a {count} monedas",
-        "needLetter": "Tu palabra necesita la letra {letter}",
-        "needLong": "Con Guímel necesitas una palabra de {count} letras o más",
-        "pot": "Bote: {count}",
-        "rule": {
-          "nun": "Nun: no pasa nada en este turno",
-          "gimel": "¡Guímel! Una palabra de {count}+ letras se lleva todo el bote",
-          "hei": "¡He! Cualquier palabra se lleva la mitad",
-          "shin": "Shin: busca una palabra con {letter} o pon una moneda"
-        },
-        "result": {
-          "nun": {
-            "win": "Nun, no pasa nada",
-            "miss": "Nun, no pasa nada"
-          },
-          "gimel": {
-            "win": "¡Guímel! Todo el bote es tuyo",
-            "miss": "Sin palabra larga, el bote se queda"
-          },
-          "hei": {
-            "win": "¡He! La mitad del bote es tuya",
-            "miss": "Sin palabra, sin monedas esta vez"
-          },
-          "shin": {
-            "win": "¡Te salvaste! No pagas",
-            "miss": "Una moneda va al bote"
-          }
-        },
-        "side": {
-          "nun": "Nun",
-          "gimel": "Guímel",
-          "hei": "He",
-          "shin": "Shin"
-        }
-      },
-      "sufganiyah": {
-        "title": "Torre de sufganiyot",
-        "blurb": "Une buñuelos que se tocan para formar palabras antes de que se llene la bandeja.",
-        "win": "¡La bandeja aguantó!",
-        "over": "La bandeja se desbordó",
-        "hint": "Arrastra por buñuelos que se tocan para formar una palabra",
-        "pick": "Elige buñuelos que se toquen",
-        "splash": "¡Explosión de mermelada!",
-        "tray": "Bandeja de buñuelos"
-      }
+      "newBest": "¡Nuevo récord!",
+      "tieBest": "¡Igualaste tu récord!",
+      "soClose": "¡Por poco! Te faltaron {gap} para tu récord",
+      "bestScore": "Tu récord: {score}"
     },
     // @holiday-arcade:end
     "event": {

@@ -21,15 +21,36 @@ interface Props {
   label: string;
   focus?: { x: number; y: number };
   className?: string;
+  onInput?: () => void;
 }
 
 const TONE: Record<FloatTone, string> = {
-  gold: 'text-neo-holiday-gold',
+  gold: 'text-neo-cream',
   good: 'text-neo-lime',
   bad: 'text-neo-pink',
 };
 
 const HIT_STOP_RATE = 0.12;
+
+// A tween whose sprite was destroyed throws on every frame and freezes the game loop; drop it instead.
+function guardTweens(tweens: TweenManager): TweenManager {
+  const add = tweens.add.bind(tweens);
+  tweens.add = (opts) => {
+    let dead = false;
+    const safe = (fn: () => void) => {
+      if (dead) return;
+      try {
+        fn();
+      } catch (err) {
+        dead = true;
+        console.warn('[arcade] tween dropped', err);
+      }
+    };
+    return add({ ...opts, onUpdate: (v) => safe(() => opts.onUpdate(v)), onComplete: opts.onComplete && (() => safe(() => opts.onComplete!())) });
+  };
+  return tweens;
+}
+const SLOW_MO_RATE = 0.3;
 
 export default function PixiStage({ className, label, ...props }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -79,6 +100,7 @@ export default function PixiStage({ className, label, ...props }: Props) {
       const tweens = new TweenManager();
       const view = { scale: 1, x: 0, y: 0 };
       let stopMs = 0;
+      let slowMs = 0;
 
       const layout = () => {
         const { width: w, height: h } = created.screen;
@@ -103,6 +125,16 @@ export default function PixiStage({ className, label, ...props }: Props) {
         window.setTimeout(() => span.remove(), 1400);
       };
 
+      const banner = (text: string) => {
+        floats.querySelector(`.${styles.banner}`)?.remove();
+        const span = document.createElement('span');
+        span.className = cn(styles.banner, 'rounded-2xl border-[3px] border-black bg-[var(--arcade-accent)] text-neo-white px-4 py-1.5 font-neo-display text-2xl font-black shadow-hard-lg sm:text-3xl');
+        span.textContent = text;
+        span.addEventListener('animationend', () => span.remove(), { once: true });
+        floats.appendChild(span);
+        window.setTimeout(() => span.remove(), 2200);
+      };
+
       const ctx: KitCtx = {
         pixi,
         app: created,
@@ -110,17 +142,21 @@ export default function PixiStage({ className, label, ...props }: Props) {
         fx,
         reduced,
         tex: (name) => pixi.Assets.get(artUrl(name)) ?? pixi.Texture.WHITE,
-        tweens,
+        tweens: guardTweens(tweens),
         shake: (intensity, seconds = 0.3) => {
           if (!reduced) shaker.shake({ intensity, duration: seconds, decay: 'exponential' });
         },
         hitStop: (ms) => {
           if (!reduced) stopMs = Math.max(stopMs, ms);
         },
+        slowMo: (ms) => {
+          if (!reduced) slowMs = Math.max(slowMs, ms);
+        },
         burst: (preset, x, y, count) => {
           if (!reduced) particles.burst(preset, x, y, count);
         },
         float,
+        banner,
         sfx: propsRef.current.sfx,
       };
       const scene = propsRef.current.create(ctx);
@@ -137,8 +173,9 @@ export default function PixiStage({ className, label, ...props }: Props) {
         shaker.update(frame / 1000);
         world.position.set(view.x + shaker.offset.x, view.y + shaker.offset.y);
         if (propsRef.current.paused || document.hidden) return;
-        const scale = stopMs > 0 ? HIT_STOP_RATE : 1;
+        const scale = stopMs > 0 ? HIT_STOP_RATE : slowMs > 0 ? SLOW_MO_RATE : 1;
         stopMs = Math.max(0, stopMs - frame);
+        slowMs = Math.max(0, slowMs - frame);
         loop.advance(frame, scale);
       });
 
@@ -149,6 +186,7 @@ export default function PixiStage({ className, label, ...props }: Props) {
       const on = (type: 'pointerdown' | 'pointermove' | 'pointerup' | 'pointercancel', fn: (p: PointerSample) => void) => {
         const h = (e: PointerEvent) => {
           if (propsRef.current.paused) return;
+          if (type === 'pointerdown' || type === 'pointermove') propsRef.current.onInput?.();
           if (type === 'pointerdown') host.setPointerCapture?.(e.pointerId);
           fn(toWorld(e));
         };
@@ -173,13 +211,21 @@ export default function PixiStage({ className, label, ...props }: Props) {
   }, []);
 
   const onKey = (e: KeyboardEvent) => {
-    if (e.key !== ' ' && e.key !== 'Enter') return;
+    const steer = e.key === 'ArrowLeft' ? -1 : e.key === 'ArrowRight' ? 1 : 0;
+    if (e.key !== ' ' && e.key !== 'Enter' && !steer) return;
     e.preventDefault();
-    if (!propsRef.current.paused) sceneRef.current?.action?.();
+    if (propsRef.current.paused) return;
+    propsRef.current.onInput?.();
+    if (steer) sceneRef.current?.steer?.(steer);
+    else if (!e.repeat) sceneRef.current?.action?.();
+  };
+
+  const onKeyUp = (e: KeyboardEvent) => {
+    if (e.key === ' ' || e.key === 'Enter') sceneRef.current?.release?.();
   };
 
   return (
-    <div ref={hostRef} tabIndex={0} role="application" aria-label={label} onKeyDown={onKey} className={cn(styles.stage, className)}>
+    <div ref={hostRef} tabIndex={0} role="application" aria-label={label} onKeyDown={onKey} onKeyUp={onKeyUp} className={cn(styles.stage, className)}>
       <div ref={floatsRef} className={styles.floats} aria-hidden="true" />
     </div>
   );

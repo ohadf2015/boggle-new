@@ -8,8 +8,10 @@ export interface TurnHud {
   score: number;
   left: number;
   combo: number;
+  mult?: number;
   round?: number;
-  lives?: number;
+  rounds?: number;
+  pushes?: number;
 }
 
 export interface TurnResult {
@@ -114,7 +116,7 @@ export function popIn(ctx: KitCtx, s: Sprite, to: number, ms = 260) {
     s.scale.set(to);
     return;
   }
-  ctx.tweens.add({ from: 0, to, duration: ms / 1000, easing: (t) => 1 + 2.70158 * (t - 1) ** 3 + 1.70158 * (t - 1) ** 2, onUpdate: (v) => s.scale.set(v) });
+  ctx.tweens.add({ from: 0, to, duration: ms / 1000, easing: (t) => 1 + 2.70158 * (t - 1) ** 3 + 1.70158 * (t - 1) ** 2, onUpdate: (v) => !s.destroyed && s.scale.set(v) });
 }
 
 export function fadeAway(ctx: KitCtx, s: Sprite | Container, ms: number, rise = 0) {
@@ -122,10 +124,11 @@ export function fadeAway(ctx: KitCtx, s: Sprite | Container, ms: number, rise = 
   ctx.tweens.add({
     from: 0, to: 1, duration: ms / 1000,
     onUpdate: (v) => {
+      if (s.destroyed) return;
       s.alpha = 1 - v;
       s.y = y0 - rise * v;
     },
-    onComplete: () => s.destroy({ children: true }),
+    onComplete: () => !s.destroyed && s.destroy({ children: true }),
   });
 }
 
@@ -134,10 +137,11 @@ export function squash(ctx: KitCtx, s: Container, base: number, amount = 0.18, m
   ctx.tweens.add({
     from: 1, to: 0, duration: ms / 1000,
     onUpdate: (v) => {
+      if (s.destroyed) return;
       const k = Math.sin(v * Math.PI) * amount;
       s.scale.set(base * (1 + k), base * (1 - k));
     },
-    onComplete: () => s.scale.set(base),
+    onComplete: () => !s.destroyed && s.scale.set(base),
   });
 }
 
@@ -146,10 +150,13 @@ export function reporter(opts: TurnOpts) {
   let ended = false;
   return {
     hud(h: TurnHud) {
-      const key = `${h.score}|${h.left}|${h.combo}|${h.round}|${h.lives}`;
+      const key = `${h.score}|${h.left}|${h.combo}|${h.mult}|${h.round}|${h.pushes}`;
       if (key === last) return;
       last = key;
       opts.hud(h);
+    },
+    get ended() {
+      return ended;
     },
     end(r: TurnResult) {
       if (ended) return;
@@ -157,4 +164,26 @@ export function reporter(opts: TurnOpts) {
       opts.end(r);
     },
   };
+}
+
+export function multPop(ctx: KitCtx, opts: TurnOpts, mult: number, x: number, y: number) {
+  ctx.sfx.play('perfect');
+  ctx.float(x, y, opts.say('family.mult', { n: mult }), 'good');
+  if (mult >= 3) opts.cheer(opts.say('family.onFire'));
+}
+
+export function levelUp(ctx: KitCtx, opts: TurnOpts, game: string, level: number) {
+  ctx.sfx.play('whoosh');
+  ctx.banner(opts.say(`${game}.level${Math.min(level, 4)}`));
+}
+
+export function finale(ctx: KitCtx, opts: TurnOpts, report: ReturnType<typeof reporter>, result: TurnResult, line: string) {
+  if (report.ended) return;
+  ctx.slowMo(1300);
+  ctx.shake(8, 0.4);
+  const tokens = result.won ? ['neo-holiday-gold', 'neo-lime', 'neo-cyan', 'neo-pink', 'neo-cream'] : ['neo-holiday-snow', 'neo-cream', 'neo-holiday-blue'];
+  ctx.burst(burstPreset(tokens, { shape: 'rect', particlesPerWave: 48, lifetime: { min: 1, max: 1.8 }, speed: { min: 260, max: 820 } }), ART_W / 2, ART_H * 0.45);
+  ctx.sfx.play(result.won ? 'win' : 'gasp');
+  opts.cheer(line);
+  report.end(result);
 }

@@ -16,10 +16,11 @@ interface Props {
   cue: number;
   line?: string;
   className?: string;
+  bubbleClassName?: string;
   style?: CSSProperties;
 }
 
-export default function HolidayMascotPop({ holiday, cue, line, className, style }: Props) {
+export default function HolidayMascotPop({ holiday, cue, line, className, bubbleClassName, style }: Props) {
   const { t } = useLanguage();
   const [motion, setMotion] = useState<'bounce' | 'wiggle' | null>(null);
   const [taps, setTaps] = useState(0);
@@ -44,7 +45,7 @@ export default function HolidayMascotPop({ holiday, cue, line, className, style 
       className={cn('pointer-events-auto relative flex flex-col items-center', motion === 'bounce' && styles.bounce, motion === 'wiggle' && styles.wiggle, className)}
     >
       {(line || taps > 0) && (
-        <span className="mb-1 max-w-[9rem] rounded-xl border-2 border-black bg-neo-cream px-2 py-1 text-center font-neo-display text-[11px] font-bold leading-tight text-neo-navy shadow-hard-sm">
+        <span className={cn('mb-1 max-w-[9rem] rounded-xl border-2 border-black bg-neo-cream px-2 py-1 text-center font-neo-display text-[11px] font-bold leading-tight text-neo-navy shadow-hard-sm', bubbleClassName)}>
           {taps > 0 && !line ? t(`holiday.daily.mascotHi.${holiday}`, holiday === 'hanukkah' ? 'Happy Hanukkah!' : 'Merry Christmas!') : line}
         </span>
       )}

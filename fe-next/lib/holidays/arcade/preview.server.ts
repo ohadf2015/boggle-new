@@ -2,7 +2,6 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { HOLIDAY_KEYS } from '../calendar';
 import { HOLIDAY_LOCALES, parseHolidayInput } from '../holidayRequest.server';
-import { buildContent } from './content.server';
 import { ARCADE_GAMES, isArcadeGame } from './games';
 
 export async function previewRound(request: NextRequest): Promise<NextResponse | null> {
@@ -17,5 +16,5 @@ export async function previewRound(request: NextRequest): Promise<NextResponse |
   const l = typeof locale === 'string' ? locale.slice(0, 2) : 'en';
   const lang = (HOLIDAY_LOCALES as readonly string[]).includes(l) ? l : 'en';
   const seed = 1 + Math.floor(Math.random() * (2 ** 31 - 2));
-  return NextResponse.json({ roundId: null, game, lang, seconds: ARCADE_GAMES[game].seconds, content: await buildContent(game, lang, seed) });
+  return NextResponse.json({ roundId: null, game, lang, seconds: ARCADE_GAMES[game].seconds, content: { seed } });
 }

@@ -2,14 +2,16 @@ import type { Sprite } from 'pixi.js';
 import { dropGift, GIFT_SIZE, hangingAt, newPresentsGame, PIVOT, stepPresents, type Gift, type GiftKind } from '@/lib/holidays/arcade/presents';
 import { ART_W, type KitCtx, type Scene } from '../../kit/types';
 import { neoColor } from '../../kit/neoColor';
-import { ambience, burstPreset, fadeAway, popIn, reporter, sprite, squash, type TurnOpts } from './common';
+import { comboMult } from '@/lib/holidays/arcade/kit/pace';
+import { ambience, burstPreset, fadeAway, finale, levelUp, multPop, popIn, reporter, sprite, squash, type TurnOpts } from './common';
 
 export const PRESENTS_ART = ['bg-stack', 'spr-gift-red', 'spr-gift-green', 'spr-gift-blue', 'spr-spark-star', 'spr-spark-impact'];
 
 const SKY_CUT = 700;
 
 function giftSprite(ctx: KitCtx, kind: GiftKind): Sprite {
-  const s = new ctx.pixi.Sprite(ctx.tex(`spr-gift-${kind}`));
+  const s = new ctx.pixi.Sprite(ctx.tex(`spr-gift-${kind === 'gold' ? 'red' : kind}`));
+  if (kind === 'gold') s.tint = neoColor('neo-holiday-gold');
   const { w, h } = GIFT_SIZE[kind];
   const k = (w * 1.1) / (s.texture.width || w);
   s.scale.set(k);
@@ -92,18 +94,40 @@ export function createPresentsScene(ctx: KitCtx, opts: TurnOpts): Scene {
         ctx.sfx.play('gasp');
         ctx.shake(18, 0.6);
         ctx.hitStop(140);
+        ctx.slowMo(700);
         ctx.burst(confetti, 384, g.topY + 200);
-        ctx.float(384, 520, opts.say('presents.topple'), 'bad');
+        ctx.banner(opts.say('presents.topple'));
         opts.cheer(opts.say('presents.facepalm'));
         const boom = sprite(ctx, 'spr-spark-impact', 384, 600, 240);
         boom.zIndex = 1500;
         popIn(ctx, boom, boom.scale.x, 180);
         fadeAway(ctx, boom, 700);
-      } else if (e.type === 'miss') {
-        ctx.sfx.play('crash');
-        ctx.shake(10, 0.35);
-        ctx.float(384, 560, opts.say('presents.miss'), 'bad');
-      } else if (e.type === 'hang') hang(e.kind);
+        for (const [, s] of sprites) {
+          const x0 = s.x;
+          const y0 = s.y;
+          const dir = x0 < 384 ? -1 : 1;
+          const spin = (Math.random() - 0.5) * 12;
+          if (ctx.reduced) s.destroy();
+          else
+            ctx.tweens.add({
+              from: 0, to: 1, duration: 0.9,
+              onUpdate: (k) => {
+                s.position.set(x0 + dir * (200 + Math.abs(spin) * 30) * k, y0 - Math.sin(k * Math.PI) * 220 + 500 * k * k);
+                s.rotation = spin * k;
+              },
+              onComplete: () => s.destroy(),
+            });
+        }
+        sprites.clear();
+      } else if (e.type === 'golden') {
+        ctx.sfx.play('win');
+        ctx.burst(stars, e.x, e.y);
+        ctx.burst(confetti, e.x, e.y);
+        ctx.float(e.x, e.y - 120, `+${e.points}`, 'good');
+        ctx.banner(opts.say('presents.golden'));
+      } else if (e.type === 'mult') multPop(ctx, opts, e.mult, 384, 420);
+      else if (e.type === 'level') levelUp(ctx, opts, 'presents', e.level);
+      else if (e.type === 'hang') hang(e.kind);
     }
     g.events.length = 0;
   };
@@ -127,7 +151,7 @@ export function createPresentsScene(ctx: KitCtx, opts: TurnOpts): Scene {
       const { h } = GIFT_SIZE[g.hanging];
       hanging.position.set(at.x, at.y + h / 2);
       hanging.rotation = at.angle * 0.3;
-      rope.moveTo(PIVOT.x, PIVOT.y + g.cam).lineTo(at.x, at.y - 10).stroke({ width: 5, color: ropeColor });
+      rope.moveTo(PIVOT.x + g.wind, PIVOT.y + g.cam).lineTo(at.x, at.y - 10).stroke({ width: 5, color: ropeColor });
     }
   };
 
@@ -145,8 +169,8 @@ export function createPresentsScene(ctx: KitCtx, opts: TurnOpts): Scene {
         ctx.sfx.play('wobble');
         wobbleCd = 1.2;
       }
-      report.hud({ score: g.score, left: Math.ceil(g.seconds - g.time), combo: g.combo, lives: g.lives });
-      if (g.over) report.end({ score: g.score, won: !g.toppled && g.stacked >= 6 });
+      report.hud({ score: g.score, left: Math.ceil(g.seconds - g.time), combo: g.combo, mult: comboMult(g.combo) });
+      if (g.over) finale(ctx, opts, report, { score: g.score, won: g.bestHeight >= 8 }, opts.say(g.bestHeight >= 8 ? 'presents.finaleWin' : 'presents.finale', { n: g.bestHeight }));
     },
     pointerDown() {
       dropGift(g);
