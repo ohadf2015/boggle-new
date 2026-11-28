@@ -53,7 +53,15 @@ describe('robots.txt', () => {
   });
 
   it('still points at the sitemap', () => {
-    expect(robots().sitemap).toBe('https://www.lexiclash.live/sitemap.xml');
+    expect(robots().sitemap).toContain('https://www.lexiclash.live/sitemap.xml');
+  });
+
+  it('lists the Google News sitemap and each locale blog feed', () => {
+    const sitemaps = list(robots().sitemap);
+    expect(sitemaps).toContain('https://www.lexiclash.live/news-sitemap.xml');
+    for (const l of ['en', 'he', 'sv', 'ja', 'es', 'ru']) {
+      expect(sitemaps).toContain(`https://www.lexiclash.live/${l}/blog/feed.xml`);
+    }
   });
 });
 

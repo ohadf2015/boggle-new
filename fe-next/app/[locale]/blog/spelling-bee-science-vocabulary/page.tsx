@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
+import { getBlogPostDates } from '@/lib/blog/posts';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import SpellingBeeSciencePageClient from './PageClient';
 import { contentByLocale } from './content';
@@ -11,8 +12,7 @@ interface PageProps {
 }
 
 const SLUG = 'spelling-bee-science-vocabulary';
-const DATE_PUBLISHED = '2026-06-27';
-const DATE_MODIFIED = '2026-06-27';
+const { datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED } = getBlogPostDates(SLUG);
 
 const metaTitles: Record<string, string> = {
   en: 'Why Spelling Bees Work: The Memory Science Behind Elite Vocabulary',

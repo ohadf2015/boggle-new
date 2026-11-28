@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
+import { getBlogPostDates } from '@/lib/blog/posts';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import NetflixWordGameRisePageClient from './PageClient';
@@ -12,8 +13,7 @@ interface PageProps {
 }
 
 const SLUG = 'netflix-word-game-2026-rise';
-const DATE_PUBLISHED = '2026-04-29';
-const DATE_MODIFIED = '2026-05-19';
+const { datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED } = getBlogPostDates(SLUG);
 
 const metaTitles: Record<string, string> = {
   en: 'Netflix Just Dropped a Word Game — 2026 Is the Year Word Games Took Over',

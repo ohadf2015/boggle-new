@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
+import { getBlogPostDates } from '@/lib/blog/posts';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { extractFaqFromSections } from '@/utils/seo/parseFaqProse';
 import JuegosPalabrasGratisPageClient from './PageClient';
@@ -13,8 +14,7 @@ interface PageProps {
 }
 
 const SLUG = 'juegos-palabras-gratis';
-const DATE_PUBLISHED = '2026-05-11';
-const DATE_MODIFIED = '2026-05-11';
+const { datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED } = getBlogPostDates(SLUG);
 
 const metaTitles: Record<string, string> = {
   es: 'Juegos de Palabras Gratis 2026: Cómo Detectar las Trampas en 30 Segundos',

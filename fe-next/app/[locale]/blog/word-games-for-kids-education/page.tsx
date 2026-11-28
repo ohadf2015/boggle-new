@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
+import { getBlogPostDates } from '@/lib/blog/posts';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
 import WordGamesEducationPageClient from './PageClient';
@@ -12,8 +13,7 @@ interface PageProps {
 }
 
 const SLUG = 'word-games-for-kids-education';
-const DATE_PUBLISHED = '2026-01-27';
-const DATE_MODIFIED = '2026-05-19';
+const { datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED } = getBlogPostDates(SLUG);
 
 const metaTitles: Record<string, string> = {
   en: 'Free Word Games for Kids & Education - Spelling & Vocabulary Building',

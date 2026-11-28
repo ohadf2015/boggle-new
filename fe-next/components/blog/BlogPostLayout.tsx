@@ -2,12 +2,14 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { InlineBannerAd } from '@/components/ads';
 import { BlogProse } from '@/components/blog/BlogProse';
 import { LandingButton, LandingPage, Prose, type LandingTone } from '@/components/landing/kit';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { BLOG_AUTHOR, getBlogPost } from '@/lib/blog/manifest';
 import { cn } from '@/lib/utils';
 import { safeToLocaleDateString } from '@/utils/bcp47Locale';
 
@@ -56,7 +58,14 @@ export function BlogPostLayout({
   after,
   children,
 }: BlogPostLayoutProps) {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
+  // A /blog/<slug> page takes its dates and byline from the manifest that also feeds the
+  // JSON-LD, sitemaps and RSS, so what readers see matches what Google is told.
+  const post = getBlogPost(usePathname()?.match(/\/blog\/([^/]+)\/?$/)?.[1] ?? '');
+  const published = post?.date ?? date;
+  const updated = post && post.dateModified !== post.date ? post.dateModified : undefined;
+  const formatDate = (d: string) =>
+    safeToLocaleDateString(new Date(d), language, { month: 'long', day: 'numeric', year: 'numeric' });
 
   return (
     <div className="flex min-h-screen flex-col bg-neo-navy">
@@ -82,11 +91,24 @@ export function BlogPostLayout({
             <h1 className="font-neo-display text-[2rem] font-bold leading-[1.1] text-balance sm:text-5xl">{title}</h1>
             {subtitle && <p className="text-lg leading-relaxed text-neo-white/85">{subtitle}</p>}
             <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-neo-white/70">
-              {byline && <span className="font-bold">{byline}</span>}
-              {date && (
+              {byline ? (
+                <span className="font-bold">{byline}</span>
+              ) : (
+                post && (
+                  <Link rel="author" href={`/${locale}/about/ohad-fisher`} className="font-bold hover:underline">
+                    {BLOG_AUTHOR.name}
+                  </Link>
+                )
+              )}
+              {published && (
                 <span className="flex items-center gap-1.5">
                   <Calendar aria-hidden className="h-4 w-4" />
-                  {safeToLocaleDateString(new Date(date), language, { month: 'long', day: 'numeric', year: 'numeric' })}
+                  <time dateTime={published}>{formatDate(published)}</time>
+                </span>
+              )}
+              {updated && (
+                <span>
+                  {t('legal.lastUpdated')}: <time dateTime={updated}>{formatDate(updated)}</time>
                 </span>
               )}
               <span className="flex items-center gap-1.5">

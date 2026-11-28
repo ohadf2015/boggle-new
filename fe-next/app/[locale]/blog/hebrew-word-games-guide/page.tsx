@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
+import { getBlogPostDates } from '@/lib/blog/posts';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import HebrewGuidePageClient from './PageClient';
 import { contentByLocale } from './content';
@@ -11,8 +12,7 @@ interface PageProps {
 }
 
 const SLUG = 'hebrew-word-games-guide';
-const DATE_PUBLISHED = '2025-10-24';
-const DATE_MODIFIED = '2026-09-29';
+const { datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED } = getBlogPostDates(SLUG);
 
 const metaTitles: Record<string, string> = {
   en: 'Hebrew Word Games Guide - Free Online משחק מילים בעברית',

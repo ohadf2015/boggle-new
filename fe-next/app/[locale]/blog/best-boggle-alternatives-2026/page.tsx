@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
+import { getBlogPostDates } from '@/lib/blog/posts';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import BoggleAlternativesPageClient from './PageClient';
 import { contentByLocale } from './content';
@@ -12,8 +13,7 @@ interface PageProps {
 }
 
 const SLUG = 'best-boggle-alternatives-2026';
-const DATE_PUBLISHED = '2025-12-01';
-const DATE_MODIFIED = '2026-11-04';
+const { datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED } = getBlogPostDates(SLUG);
 
 const metaTitles: Record<string, string> = {
   en: '6 Free Games Like Boggle — No Signup, Live | LexiClash',

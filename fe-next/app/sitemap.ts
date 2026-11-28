@@ -5,6 +5,7 @@ import { EDUCATION_PAGES } from '@/lib/seo/educationPageLinks';
 import { WORD_LISTS_GENERATED_AT } from '@/lib/seo/wordLists/catalog';
 import { wordListSitemapRoutes } from '@/lib/seo/wordLists/sitemapRoutes';
 import { isAppScreenUrl } from '@/lib/seo/appScreens';
+import { blogPostLocales, getAllBlogEntries } from '@/lib/blog/posts';
 import buildInfo from '@/lib/seo/buildInfo.generated.json';
 import { HOLIDAY_LANDINGS, landingAlternates, landingUrl } from '@/lib/holidays/landing';
 
@@ -22,7 +23,6 @@ const LAST_DEPLOYED =
   (buildInfo as { builtAt?: string }).builtAt ||
   process.env.NEXT_PUBLIC_BUILD_TIME ||
   '2026-03-26T00:00:00.000Z';
-const BLOG_UPDATED = '2026-05-15T00:00:00.000Z';
 const LEGAL_UPDATED = '2026-02-01T00:00:00.000Z';
 const GUIDES_UPDATED = '2026-03-01T00:00:00.000Z';
 
@@ -380,104 +380,29 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/glossary', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.8 });
 
   // ─── Blog ───
-  addForAllLocales(routes, '/blog', { lastModified: BLOG_UPDATED, changeFrequency: 'weekly', priority: 0.9 });
-  const blogArticles = [
-    '10-surprising-benefits-word-games',
-    'science-behind-word-games',
-    'daily-challenge-strategies',
-    'multilingual-word-learning',
-    'top-player-secrets',
-    'improve-word-game-skills',
-    'why-word-games-are-addictive',
-    'best-boggle-alternatives-2026',
-    'word-games-for-brain-training',
-    'hebrew-word-games-guide',
-    'multiplayer-word-games-social',
-    'vocabulary-building-strategies',
-    'word-game-history',
-    'word-games-and-mental-health',
-    'word-games-for-kids-education',
-    'boggle-vs-wordle',
-    'boggle-vs-scrabble',
-    'boggle-vs-words-with-friends',
-    'netflix-word-game-2026-rise',
-    'most-popular-word-games-2026',
-    'free-word-games-online',
-    'milat-hayom-habit',
-    'mishachke-milim-chinuch',
-    'alternativas-a-scrabble',
-    'juegos-palabras-gratis',
-    'ordspel-familjer',
-    'ai-vs-word-games-language-learning',
-    'spelling-bee-science-vocabulary',
-    'multiplayer-strategy-guide',
-    'leaderboard-elo-explained',
-    'death-of-turn-based-word-games',
-  ];
-  // English-only articles (metaTitles has 'en' only → hasTranslation=false →
-  // every non-en locale is noindexed). Advertising noindexed locale URLs in
-  // the sitemap is the same negative signal as the ru case above, so these
-  // ship in the sitemap for /en only.
-  const EN_ONLY_BLOG = new Set([
-    'multiplayer-strategy-guide',
-    'leaderboard-elo-explained',
-  ]);
-  // Articles with a native ru translation (contentByLocale.ru + ru metaTitles →
-  // hasTranslation indexes them). Every other article serves the English body
-  // on /ru noindexed — advertising those in the sitemap is a pure negative
-  // signal (AdSense "low value content" rejection, 2026-07-02). Add a slug here
-  // when its ru translation ships.
-  const RU_TRANSLATED_BLOG = new Set([
-    'word-games-for-brain-training',
-    'free-word-games-online',
-    'vocabulary-building-strategies',
-    'improve-word-game-skills',
-    '10-surprising-benefits-word-games',
-    'science-behind-word-games',
-    'why-word-games-are-addictive',
-    'word-games-and-mental-health',
-    'multilingual-word-learning',
-    'word-game-history',
-    'word-games-for-kids-education',
-    'daily-challenge-strategies',
-    'multiplayer-word-games-social',
-    'top-player-secrets',
-  ]);
-  const blogLocalesNoRu = LOCALES.filter((l) => l !== 'ru');
-  blogArticles.forEach((slug) => {
-    if (EN_ONLY_BLOG.has(slug)) {
-      routes.push({
-        url: `${BASE_URL}/en/blog/${slug}`,
-        lastModified: BLOG_UPDATED,
-        changeFrequency: 'monthly',
-        priority: 0.85,
-        alternates: {
-          languages: {
-            'x-default': `${BASE_URL}/en/blog/${slug}`,
-            en: `${BASE_URL}/en/blog/${slug}`,
-          },
-        },
-      });
-      return;
-    }
-    const hasRu = RU_TRANSLATED_BLOG.has(slug);
-    const alts = langAlternates(`/blog/${slug}`);
-    if (!hasRu) {
-      // hreflang must not point at the noindexed ru sibling.
-      delete alts.ru;
-      delete alts['ru-RU'];
-    }
-    const blogLocales = hasRu ? LOCALES : blogLocalesNoRu;
-    blogLocales.forEach((locale) => {
-      routes.push({
-        url: `${BASE_URL}/${locale}/blog/${slug}`,
-        lastModified: BLOG_UPDATED,
-        changeFrequency: 'monthly',
-        priority: 0.85,
-        alternates: { languages: alts },
-      });
+  // Posts, dates, hero images and locales come from lib/blog/posts — the same list the article
+  // JSON-LD, /news-sitemap.xml and the RSS feeds read. Locales follow BODY_LOCALES, so an
+  // English-only or not-yet-translated (e.g. ru) article never advertises a noindexed sibling.
+  const blogEntries = getAllBlogEntries();
+  const newestBlogEdit = blogEntries.map((e) => e.dateModified).sort().pop() ?? LAST_DEPLOYED;
+  addForAllLocales(routes, '/blog', { lastModified: newestBlogEdit, changeFrequency: 'weekly', priority: 0.9 });
+  for (const entry of blogEntries) {
+    const path = `/blog/${entry.slug}`;
+    const locales = blogPostLocales(entry.slug);
+    const urls = new Set(locales.map((l) => `${BASE_URL}/${l}${path}`));
+    const languages = Object.fromEntries(
+      Object.entries(langAlternates(path)).filter(([code, url]) => code !== 'x-default' && urls.has(url)),
+    );
+    languages['x-default'] = `${BASE_URL}/${locales.includes('en') ? 'en' : locales[0]}${path}`;
+    routes.push({
+      url: entry.url,
+      lastModified: entry.dateModified,
+      changeFrequency: 'monthly',
+      priority: 0.85,
+      alternates: { languages },
+      images: entry.images,
     });
-  });
+  }
 
   // ─── Info pages ───
   addForAllLocales(routes, '/faq', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.8 });

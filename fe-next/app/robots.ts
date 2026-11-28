@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { locales } from '@/i18n/config';
 import { EDU_SECTIONS, type EduSection } from '@/lib/navigation/eduSections';
+import { blogFeedLocales, blogFeedUrl } from '@/lib/blog/posts';
 
 // Signed-in classroom app pages: a minor's name, a class roster or a join code, never search content.
 const PRIVATE_EDU_SECTIONS: readonly EduSection[] = EDU_SECTIONS.filter((s) => s !== 'education' && s !== 'pricing');
@@ -109,6 +110,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: disallowPaths,
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    // Google reads RSS feeds as sitemaps too; the news sitemap lists only the last two days of posts.
+    sitemap: [`${baseUrl}/sitemap.xml`, `${baseUrl}/news-sitemap.xml`, ...blogFeedLocales().map(blogFeedUrl)],
   };
 }

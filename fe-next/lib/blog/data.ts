@@ -2,11 +2,9 @@
 // Single source of truth for both the blog index (/[locale]/blog) and the
 // homepage's "Latest from the Blog" section. Consumers sort/slice as needed.
 
-export interface BlogPost {
-  slug: string;
-  image: string;
-  date: string;
-}
+import { blogPosts, type BlogPost } from './manifest';
+
+export { blogPosts, type BlogPost };
 
 export interface LocalizedPostContent {
   title: string;
@@ -22,154 +20,6 @@ export interface PageContent {
   posts: Record<string, LocalizedPostContent>;
 }
 
-export const blogPosts: BlogPost[] = [
-  {
-    slug: '10-surprising-benefits-word-games',
-    image: '/images/blog/10-benefits.jpg',
-    date: '2025-06-15',
-  },
-  {
-    slug: 'science-behind-word-games',
-    image: '/images/blog/science-brain.jpg',
-    date: '2025-07-03',
-  },
-  {
-    slug: 'daily-challenge-strategies',
-    image: '/images/blog/daily-strategies.jpg',
-    date: '2025-07-22',
-  },
-  {
-    slug: 'multilingual-word-learning',
-    image: '/images/blog/multilingual.jpg',
-    date: '2025-08-10',
-  },
-  {
-    slug: 'top-player-secrets',
-    image: '/images/blog/top-secrets.jpg',
-    date: '2025-08-28',
-  },
-  {
-    slug: 'improve-word-game-skills',
-    image: '/images/blog/improve-skills.jpg',
-    date: '2025-09-15',
-  },
-  {
-    slug: 'word-games-and-mental-health',
-    image: '/images/blog/mental-health.jpg',
-    date: '2025-10-05',
-  },
-  {
-    slug: 'hebrew-word-games-guide',
-    image: '/images/blog/hebrew-word-games.jpg',
-    date: '2025-10-24',
-  },
-  {
-    slug: 'why-word-games-are-addictive',
-    image: '/images/blog/why-addictive.jpg',
-    date: '2025-11-12',
-  },
-  {
-    slug: 'best-boggle-alternatives-2026',
-    image: '/images/blog/boggle-alternatives.jpg',
-    date: '2025-12-01',
-  },
-  {
-    slug: 'word-games-for-brain-training',
-    image: '/images/blog/brain-training-words.jpg',
-    date: '2025-12-20',
-  },
-  {
-    slug: 'word-game-history',
-    image: '/images/blog/word-game-history.jpg',
-    date: '2026-01-08',
-  },
-  {
-    slug: 'word-games-for-kids-education',
-    image: '/images/blog/kids-education.jpg',
-    date: '2026-01-27',
-  },
-  {
-    slug: 'multiplayer-word-games-social',
-    image: '/images/blog/multiplayer-social.jpg',
-    date: '2026-02-15',
-  },
-  {
-    slug: 'vocabulary-building-strategies',
-    image: '/images/blog/vocabulary-building.jpg',
-    date: '2026-03-05',
-  },
-  {
-    slug: 'boggle-vs-wordle',
-    image: '/images/blog/boggle-vs-wordle.jpg',
-    date: '2026-03-28',
-  },
-  {
-    slug: 'boggle-vs-scrabble',
-    image: '/images/blog/boggle-vs-scrabble.jpg',
-    date: '2026-03-28',
-  },
-  {
-    slug: 'boggle-vs-words-with-friends',
-    image: '/images/blog/boggle-vs-wwf.jpg',
-    date: '2026-03-28',
-  },
-  {
-    slug: 'netflix-word-game-2026-rise',
-    image: '/images/blog/netflix-word-games.jpg',
-    date: '2026-04-29',
-  },
-  {
-    slug: 'most-popular-word-games-2026',
-    image: '/images/blog/most-popular-word-games-2026.jpg',
-    date: '2026-05-15',
-  },
-  {
-    slug: 'free-word-games-online',
-    image: '/images/blog/free-word-games-online.jpg',
-    date: '2026-05-11',
-  },
-  {
-    slug: 'milat-hayom-habit',
-    image: '/images/blog/milat-hayom-habit.jpg',
-    date: '2026-05-11',
-  },
-  {
-    slug: 'mishachke-milim-chinuch',
-    image: '/images/blog/mishachke-milim-chinuch.jpg',
-    date: '2026-05-11',
-  },
-  {
-    slug: 'alternativas-a-scrabble',
-    image: '/images/blog/alternativas-a-scrabble.jpg',
-    date: '2026-05-11',
-  },
-  {
-    slug: 'juegos-palabras-gratis',
-    image: '/images/blog/juegos-palabras-gratis.jpg',
-    date: '2026-05-11',
-  },
-  {
-    slug: 'ordspel-familjer',
-    image: '/images/blog/ordspel-familjer.jpg',
-    date: '2026-05-11',
-  },
-  {
-    slug: 'multiplayer-strategy-guide',
-    image: '/images/blog/strategy-tactics.jpg',
-    date: '2026-08-03',
-  },
-  {
-    slug: 'leaderboard-elo-explained',
-    image: '/images/blog/top-player-secrets.jpg',
-    date: '2026-08-03',
-  },
-  {
-    slug: 'death-of-turn-based-word-games',
-    // TODO-image: dedicated /images/blog/death-of-turn-based-word-games.jpg hero
-    image: '/images/blog/multiplayer-social.jpg',
-    date: '2026-09-12',
-  },
-];
 
 export const blogPostsContent: Record<string, PageContent> = {
   en: {
@@ -177,6 +27,18 @@ export const blogPostsContent: Record<string, PageContent> = {
     pageSubtitle: 'Tips, strategies, and insights for word game enthusiasts',
     footerText: 'Join thousands of word game enthusiasts improving their skills with LexiClash. Play solo, compete with friends, or challenge daily puzzles in Hebrew, English, Swedish, and Japanese.',
     posts: {
+      'ai-vs-word-games-language-learning': {
+        title: 'AI Language Apps vs. Word Games: What Science (and Reddit) Actually Say',
+        excerpt: 'Duolingo has 500 million users. Word games have been around for 5,000 years. Turns out the ancient technology might be winning.',
+        readTime: '9 min read',
+        category: 'Language Learning',
+      },
+      'spelling-bee-science-vocabulary': {
+        title: 'Why Spelling Bees Work: The Memory Science Behind Elite Vocabulary',
+        excerpt: 'A 14-year-old just won $50,000 by memorizing words most adults can\'t even define. Here\'s what their training reveals about how memory actually works — and how you can use it.',
+        readTime: '7 min read',
+        category: 'Education',
+      },
       'death-of-turn-based-word-games': {
         title: "I Waited 11 Days for Someone to Play 'QI.' Then I Deleted the App.",
         excerpt: 'Turn-based word games taught a whole generation that playing with friends means waiting for friends. Real-time word games are correcting that mistake.',
@@ -328,6 +190,18 @@ export const blogPostsContent: Record<string, PageContent> = {
     pageSubtitle: 'טיפים, אסטרטגיות ותובנות לחובבי משחקי מילים',
     footerText: 'הצטרפו לאלפי חובבי משחקי מילים שמשפרים את הכישורים שלהם עם LexiClash. שחקו לבד, התחרו עם חברים, או התמודדו עם אתגרים יומיים בעברית, אנגלית, שוודית ויפנית.',
     posts: {
+      'ai-vs-word-games-language-learning': {
+        title: 'אפליקציות שפה מול משחקי מילים: מה אומר המחקר (ורדיט) באמת',
+        excerpt: 'לדואולינגו יש 500 מיליון משתמשים. משחקי מילים קיימים כבר 5,000 שנה. מסתבר שהטכנולוגיה הישנה מנצחת.',
+        readTime: '9 דקות קריאה',
+        category: 'לימוד שפות',
+      },
+      'spelling-bee-science-vocabulary': {
+        title: 'למה חידוני איות עובדים: מדע הזיכרון מאחורי אוצר מילים ברמה עילית',
+        excerpt: 'ילד בן 14 זכה ב-50,000 דולר על ידי שינון מילים שרוב המבוגרים לא מכירים. מה זה מלמד אותנו על אופן פעולת הזיכרון?',
+        readTime: '7 דקות קריאה',
+        category: 'חינוך',
+      },
       'death-of-turn-based-word-games': {
         title: 'חיכיתי 11 יום שמישהי תשחק את המילה "את". ואז מחקתי את האפליקציה.',
         excerpt: 'חיכיתי אחד עשר יום שמישהי תשחק מילה בת שתי אותיות. משחקי מילים מבוססי תורות לימדו דור שלם שלשחק עם חברים זה לחכות לחברים — זמן אמת מתקן את הטעות.',
@@ -473,6 +347,18 @@ export const blogPostsContent: Record<string, PageContent> = {
     pageSubtitle: 'Tips, strategier och insikter för ordspelsentusiaster',
     footerText: 'Gå med tusentals ordspelsentusiaster som förbättrar sina färdigheter med LexiClash. Spela solo, tävla med vänner eller utmana dagliga pussel på hebreiska, engelska, svenska och japanska.',
     posts: {
+      'ai-vs-word-games-language-learning': {
+        title: 'AI-språkappar vs. Ordspel: Vad Forskningen (och Reddit) Faktiskt Säger',
+        excerpt: 'Duolingo har 500 miljoner användare. Ordspel har funnits i 5 000 år. Det visar sig att den gamla tekniken kanske vinner.',
+        readTime: '9 min läsning',
+        category: 'Språkinlärning',
+      },
+      'spelling-bee-science-vocabulary': {
+        title: 'Varför stavningstävlingar fungerar: Minnesforskning om ordförråd på elitnivå',
+        excerpt: 'En 14-åring vann nyligen 50 000 dollar på att stava ord som de flesta vuxna aldrig hört. Vad avslöjar det om hur minnet faktiskt fungerar?',
+        readTime: '7 min läsning',
+        category: 'Utbildning',
+      },
       'death-of-turn-based-word-games': {
         title: 'Jag väntade 11 dagar på att någon skulle lägga "ZOO". Sen raderade jag appen.',
         excerpt: 'Jag väntade elva dagar på att Karin skulle lägga ZOO. Sen raderade jag appen – och upptäckte vad ordspel i realtid faktiskt kan göra med en spelkväll.',
@@ -612,6 +498,18 @@ export const blogPostsContent: Record<string, PageContent> = {
     pageSubtitle: 'ワードゲーム愛好家のためのヒント、戦略、洞察',
     footerText: 'LexiClashでスキルを向上させている何千人ものワードゲーム愛好家に参加しましょう。ソロプレイ、友達との対戦、ヘブライ語、英語、スウェーデン語、日本語でのデイリーチャレンジに挑戦しましょう。',
     posts: {
+      'ai-vs-word-games-language-learning': {
+        title: 'AI語学アプリ vs 単語ゲーム：科学とRedditが本当に語ること',
+        excerpt: 'Duolingoのユーザーは5億人。単語ゲームの歴史は5,000年。どうやら古い技術が勝っているらしい。',
+        readTime: '9分で読める',
+        category: '語学学習',
+      },
+      'spelling-bee-science-vocabulary': {
+        title: 'スペリングビーはなぜ効果的か：エリート語彙力の背後にある記憶科学',
+        excerpt: '14歳の少年が、ほとんどの大人が知らない単語を暗記して5万ドルを獲得しました。彼のトレーニングから、記憶の仕組みについて何が分かるでしょうか？',
+        readTime: '7分で読める',
+        category: '教育',
+      },
       'death-of-turn-based-word-games': {
         title: '11日待って届いた一手は「QI」。私はアプリを消した',
         excerpt: '通知が届いたのは11日後だった。「佳代子さんが『QI』をプレイしました」——その瞬間、私はアプリを消すことを決めた。ターンベース言葉ゲームの静かな終わりと、リアルタイム対戦が教えてくれたこと。',
@@ -745,6 +643,18 @@ export const blogPostsContent: Record<string, PageContent> = {
     pageSubtitle: 'Consejos, estrategias e ideas para entusiastas de juegos de palabras',
     footerText: 'Únete a miles de entusiastas de juegos de palabras que mejoran sus habilidades con LexiClash. Juega solo, compite con amigos o desafía puzzles diarios en hebreo, inglés, sueco, japonés y español.',
     posts: {
+      'ai-vs-word-games-language-learning': {
+        title: 'Apps de Idiomas con IA vs Juegos de Palabras: Lo que la Ciencia (y Reddit) Realmente Dicen',
+        excerpt: 'Duolingo tiene 500 millones de usuarios. Los juegos de palabras llevan 5.000 años. Resulta que la tecnología antigua quizás está ganando.',
+        readTime: '9 min de lectura',
+        category: 'Aprendizaje de idiomas',
+      },
+      'spelling-bee-science-vocabulary': {
+        title: 'Por Qué Funcionan los Concursos de Ortografía: La Ciencia del Vocabulario de Élite',
+        excerpt: 'Un joven de 14 años ganó 50.000 dólares memorizando palabras que la mayoría de adultos no conocen. ¿Qué revela su entrenamiento sobre cómo funciona realmente la memoria?',
+        readTime: '7 min de lectura',
+        category: 'Educación',
+      },
       'death-of-turn-based-word-games': {
         title: 'Esperé 11 días a que alguien jugara "FE". Después desinstalé la aplicación.',
         excerpt: 'Esperé once días a que mi amiga jugara una palabra de dos letras. Ese día entendí por qué las partidas por turnos mueren en silencio, y por qué el tiempo real las está reemplazando.',
