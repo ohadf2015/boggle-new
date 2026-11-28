@@ -1,7 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
-const { mockReplace, mockPush, classes, prepareRehearsal } = vi.hoisted(() => ({
+const { mockReplace, mockPush, classes, prepareRehearsal, own } = vi.hoisted(() => ({
+  own: {
+    progress: [] as Array<Record<string, unknown>>,
+    progressLoading: false,
+    streak: { currentStreak: 0, isStreakAtRisk: false, lastWinDate: null as string | null },
+    dueCount: null as number | null,
+    assignments: [] as unknown[],
+  },
   mockReplace: vi.fn(),
   mockPush: vi.fn(),
   classes: { list: [] as Array<{ id: string; name: string }>, loading: false, error: null as string | null },
@@ -9,18 +16,35 @@ const { mockReplace, mockPush, classes, prepareRehearsal } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/components/student/academy/AcademyHubView', () => ({
-  AcademyHubView: (p: { classroomName: string | null; data: { lessons: unknown[] }; liveGame: { rehearsal?: boolean; teacherName: string } | null; join: () => void }) => (
-    <button type="button" data-testid="academy-hub" data-live={p.liveGame?.rehearsal ? p.liveGame.teacherName : ''} onClick={p.join}>
+  AcademyHubView: (p: { classroomName: string | null; profileXp: number; data: Record<string, unknown> & { lessons: unknown[] }; liveGame: { rehearsal?: boolean; teacherName: string } | null; join: () => void }) => (
+    <button
+      type="button"
+      data-testid="academy-hub"
+      data-live={p.liveGame?.rehearsal ? p.liveGame.teacherName : ''}
+      data-stats={JSON.stringify({ xp: p.profileXp, stars: p.data.stars, streak: p.data.streak, review: p.data.reviewCount, pending: !!p.data.reviewPending, loading: p.data.lessonsLoading, reviewLesson: p.data.reviewLessonId })}
+      onClick={p.join}
+    >
       {`${p.classroomName}:${p.data.lessons.length}`}
     </button>
   ),
 }));
 vi.mock('next/navigation', () => ({ useRouter: () => ({ replace: mockReplace, push: mockPush }) }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k, language: 'en' }) }));
-vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'T' }, profile: { display_name: 'Ms Cohen' } }) }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'T' }, profile: { display_name: 'Ms Cohen', total_xp: 140 } }) }));
+vi.mock('@/hooks/useStudentProgress', () => ({ useStudentProgress: () => ({ progress: own.progress, lessons: [], isLoading: own.progressLoading }) }));
+vi.mock('@/hooks/useWinStreak', () => ({ useWinStreak: () => own.streak }));
+vi.mock('@/components/student/academy/ReviewCountBridge', async () => {
+  const { useEffect } = await import('react');
+  return {
+    ReviewCountBridge: ({ lessonId, onCount }: { lessonId: string; onCount: (n: number) => void }) => {
+      useEffect(() => { if (own.dueCount !== null) onCount(own.dueCount); }, [onCount]);
+      return <i data-testid="review-bridge" data-lesson={lessonId} />;
+    },
+  };
+});
 vi.mock('@/components/education/TeacherGate', () => ({ TeacherGate: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
 vi.mock('@/hooks/useClassroom', () => ({ useClassrooms: () => ({ classrooms: classes.list, isLoading: classes.loading, error: classes.error, refresh: vi.fn() }) }));
-vi.mock('@/hooks/useAssignments', () => ({ useAssignments: () => ({ assignments: [], isLoading: false, error: null, refresh: vi.fn() }) }));
+vi.mock('@/hooks/useAssignments', () => ({ useAssignments: () => ({ assignments: own.assignments, isLoading: false, error: null, refresh: vi.fn() }) }));
 vi.mock('@/components/teacher/home/RehearseWithBotsButton', () => ({ prepareRehearsal }));
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div data-testid="loader" /> }));
 
@@ -36,7 +60,18 @@ beforeEach(() => {
   classes.list = [{ id: 'c1', name: '7B English' }];
   classes.loading = false;
   classes.error = null;
+  own.progress = [];
+  own.progressLoading = false;
+  own.streak = { currentStreak: 0, isStreakAtRisk: false, lastWinDate: null };
+  own.dueCount = null;
+  own.assignments = [];
 });
+
+const stats = () => JSON.parse(screen.getByTestId('academy-hub').getAttribute('data-stats') ?? '{}');
+const classAssignment = {
+  id: 'a1', classroom_id: 'c1', lesson_id: 'l1', created_at: '2026-11-20T00:00:00Z', due_date: null,
+  vocabulary_lessons: { id: 'l1', name: 'Space', language: 'en', words: [{ word: 'orbit', level: 'core' }, { word: 'moon', level: 'core' }] },
+};
 
 describe('StudentViewFrame', () => {
   it('Given a class with lessons, Then the teacher sees the real student academy for that class, led by the next lesson like a student, not a made-up live game', () => {
@@ -80,4 +115,21 @@ describe('StudentView (the student hub in student mode)', () => {
     expect(onMissing).not.toHaveBeenCalled();
   });
 
+
+  it('Given the teacher finished a round of a class lesson, Then the map shows their own XP, streak, stars and due review count like a student', async () => {
+    own.assignments = [classAssignment];
+    own.progress = [{ lesson_id: 'l1', words_mastered: ['orbit', 'moon'], completed_at: null, total_practice_sessions: 1, total_xp: 20 }];
+    own.streak = { currentStreak: 1, isStreakAtRisk: false, lastWinDate: new Date().toISOString() };
+    own.dueCount = 2;
+    render(<StudentView classroomId="c1" onMissing={vi.fn()} />);
+    expect(screen.getByTestId('review-bridge')).toHaveAttribute('data-lesson', 'l1');
+    await waitFor(() => expect(stats()).toMatchObject({ xp: 140, stars: 3, streak: 1, review: 2, pending: false, loading: false }));
+  });
+
+  it('Given the teacher’s own progress is still loading, Then the map waits instead of painting zeros that jump', () => {
+    own.assignments = [classAssignment];
+    own.progressLoading = true;
+    render(<StudentView classroomId="c1" onMissing={vi.fn()} />);
+    expect(stats()).toMatchObject({ loading: true, pending: true });
+  });
 });
