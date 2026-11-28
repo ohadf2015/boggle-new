@@ -2,6 +2,13 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ClassLimitUpsellModal from '../ClassLimitUpsellModal';
 
+vi.mock('next/image', () => ({
+  default: ({ alt, src, ...props }: { alt?: string; src: string; [k: string]: unknown }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img alt={alt ?? ''} src={typeof src === 'string' ? src : ''} />
+  ),
+}));
+
 const mockTrackGrowthEvent = vi.fn();
 vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...args: unknown[]) => mockTrackGrowthEvent(...args),
@@ -37,6 +44,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
     t: (key: string, vars?: Record<string, unknown>) =>
       ({
         'teacher.subscription.classLimitTitle': 'Class limit reached',
+        'teacher.subscription.upsellHeroAlt': 'A colorful cartoon classroom playing a word game',
+        'teacher.subscription.featureOutcome1': 'Run every class you teach, no cap',
+        'teacher.subscription.featureOutcome3': 'See who is stuck, word by word, live',
         'teacher.subscription.classLimitMessage': `You have ${vars?.current}/${vars?.limit} classes`,
         'teacher.subscription.studentLimitTitle': 'Student limit reached',
         'teacher.subscription.studentLimitMessage': `You have ${vars?.current}/${vars?.limit} students`,
@@ -185,7 +195,17 @@ describe('ClassLimitUpsellModal', () => {
 
   it('shows a concrete sample of what Pro adds to every class, not just a bullet list', () => {
     render(<ClassLimitUpsellModal isOpen onClose={() => {}} currentCount={3} limit={3} />);
-    expect(screen.getByTestId('pro-preview-analytics')).toBeInTheDocument();
-    expect(screen.getAllByTestId('pro-preview-student-row').length).toBeGreaterThan(1);
+    const hero = screen.getByRole('img', { name: 'A colorful cartoon classroom playing a word game' });
+    expect(hero).toHaveAttribute('src', '/images/education/teacher-pro-upsell-hero.webp');
+    expect(screen.getByText('Run every class you teach, no cap')).toBeInTheDocument();
+    expect(screen.getByText('See who is stuck, word by word, live')).toBeInTheDocument();
+  });
+
+  it('renders the light Education sky theme, not the dark game chrome', () => {
+    render(<ClassLimitUpsellModal isOpen onClose={() => {}} currentCount={3} limit={3} />);
+    const dialog = screen.getByTestId('teacher-pro-upsell');
+    expect(dialog).toHaveAttribute('data-edu-theme', 'sky');
+    expect(dialog.className).toContain('bg-edu-surface');
+    expect(dialog.className).toContain('text-edu-ink');
   });
 });

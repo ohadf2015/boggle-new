@@ -20,12 +20,19 @@ import {
   beaconTeacherProUpgradeClicked,
 } from '@/lib/education/teacherProUpgradeBeacon';
 import { teacherProUpgradeCtaLabel } from '@/components/education/TeacherProCheckoutCta';
+import Image from 'next/image';
 import { Dialog } from '@/components/ui/dialog';
-import { Zap } from 'lucide-react';
+import { BarChart3, School, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NbDialogBody, NbDialogContent, NbDialogFooter, NbDialogHeader } from '@/components/teacher/nb/NbDialog';
 import { NB_BLOCK, NB_LINK, NB_PANEL, NB_PRIMARY, NB_SECONDARY, NB_STICKER } from '@/components/teacher/nb/nbStyles';
-import { ProFeaturePreview } from '@/components/teacher/pro/ProFeaturePreview';
+
+/** Light Education classroom hero, generated with Higgsfield. No baked-in text. */
+export const TEACHER_PRO_UPSELL_HERO = {
+  src: '/images/education/teacher-pro-upsell-hero.webp',
+  width: 960,
+  height: 537,
+} as const;
 
 export type PlanGateLimitType = 'classrooms' | 'students';
 
@@ -143,48 +150,67 @@ export default function ClassLimitUpsellModal({
         });
 
   const upgradeClass = cn(NB_PRIMARY, 'cursor-pointer');
+  const benefits = [
+    { icon: School, label: t('teacher.subscription.featureOutcome1') },
+    { icon: BarChart3, label: t('teacher.subscription.featureOutcome3') },
+  ] as const;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <NbDialogContent size="sm" noDescription>
+      <NbDialogContent
+        size="sm"
+        noDescription
+        data-edu-theme="sky"
+        data-testid="teacher-pro-upsell"
+        className="bg-edu-surface text-edu-ink"
+      >
         <NbDialogHeader
           color="cyan"
           icon={<Zap className="size-6" strokeWidth={3} aria-hidden="true" />}
           title={t(titleKey)}
           closeLabel={t('common.close')}
         />
-        <NbDialogBody className="space-y-4">
-          <div className={cn(NB_PANEL, 'p-4')}>
-            <p className="font-neo-display text-lg font-black leading-snug">{message}</p>
-            <p className="mt-1 font-neo-body text-sm font-semibold leading-relaxed text-edu-ink/80">
+        <NbDialogBody className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain sm:space-y-4">
+          <div className="overflow-hidden rounded-neo border-[3px] border-edu-line shadow-edu-lip-sm">
+            <Image
+              src={TEACHER_PRO_UPSELL_HERO.src}
+              alt={t('teacher.subscription.upsellHeroAlt')}
+              width={TEACHER_PRO_UPSELL_HERO.width}
+              height={TEACHER_PRO_UPSELL_HERO.height}
+              className="h-auto w-full max-h-[5.5rem] object-cover object-center [@media(min-height:44rem)]:max-h-36 sm:[@media(min-height:44rem)]:max-h-44"
+              sizes="(max-width: 28rem) 100vw, 28rem"
+              priority
+            />
+          </div>
+
+          <div className={cn(NB_PANEL, 'bg-edu-tile p-3 sm:p-4')}>
+            <p className="font-neo-display text-base font-black leading-snug sm:text-lg">{message}</p>
+            <p className="mt-1 hidden font-neo-body text-sm font-semibold leading-relaxed text-edu-ink/80 [@media(min-height:44rem)]:block">
               {t('teacher.subscription.upgradeProDescription')}
             </p>
           </div>
 
-          <div className="space-y-2">
-            <h3 className="font-neo-display text-lg font-black text-edu-ink">
-              {t('teacher.subscription.proFeatures')}
-            </h3>
-            <div aria-hidden="true" className="pointer-events-none select-none">
-              <ProFeaturePreview feature="analytics" />
-            </div>
-            <ul className="flex flex-wrap gap-2">
-              {['teacher.subscription.unlimitedClasses'].map((key) => (
-                <li key={key} className={cn(NB_STICKER, NB_BLOCK.lime, 'text-sm')}>
-                  {t(key)}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ul className="grid grid-cols-2 gap-2 [@media(max-height:41.24rem)]:hidden">
+            {benefits.map(({ icon: Icon, label }) => (
+              <li
+                key={label}
+                className={cn(NB_STICKER, NB_BLOCK.lime, 'h-auto min-h-0 w-full flex-col items-center justify-center gap-1 whitespace-normal px-1.5 py-2 text-center text-[11px] leading-tight')}
+              >
+                <Icon className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
+                <span>{label}</span>
+              </li>
+            ))}
+          </ul>
 
-          <p className="flex flex-wrap items-baseline gap-x-2 font-neo-body text-sm font-bold text-edu-ink/80">
+        </NbDialogBody>
+        <NbDialogFooter className="flex flex-col items-stretch gap-2 bg-edu-surface sm:flex-col sm:gap-3">
+          <p className="flex flex-wrap items-baseline justify-center gap-x-2 font-neo-body text-sm font-bold text-edu-ink/80">
             <span>{t('teacher.subscription.priceUSD')}</span>
-            <span className="font-neo-display text-3xl font-black text-edu-cyan-ink">${TEACHER_PRO_PRICE_USD}</span>
+            <span className="font-neo-display text-2xl font-black text-edu-cyan-ink sm:text-3xl">${TEACHER_PRO_PRICE_USD}</span>
             <span>{t('teacher.subscription.perMonth')}</span>
-            <span className="basis-full text-xs text-edu-ink/65">{t('teacher.subscription.autoRenew')}</span>
+            <span className="basis-full text-center text-xs text-edu-ink/65">{t('teacher.subscription.autoRenew')}</span>
           </p>
-
-          <p className="border-t-2 border-edu-line/20 pt-3 text-center font-neo-body text-xs font-bold text-edu-ink/70">
+          <p className="text-center font-neo-body text-xs font-bold leading-snug text-edu-ink/70">
             {t('education.landing.districtCta.title')} {t('education.landing.districtCta.body')}{' '}
             <Link
               href={`/${language}/education/for-schools`}
@@ -194,47 +220,47 @@ export default function ClassLimitUpsellModal({
                   source: isStudentLimit ? 'student_limit_modal' : 'class_limit_modal',
                 })
               }
-              className={cn(NB_LINK, 'cursor-pointer text-xs')}
+              className={cn(NB_LINK, 'inline min-h-0 cursor-pointer px-0 text-xs')}
             >
               {t('education.landing.districtCta.button')}
             </Link>
           </p>
-        </NbDialogBody>
-        <NbDialogFooter>
-          <button
-            type="button"
-            onClick={isTrialExpired && onContinueFree ? onContinueFree : onClose}
-            className={cn(NB_SECONDARY, 'cursor-pointer')}
-          >
-            {isTrialExpired && onContinueFree ? t('teacher.subscription.continueFree') : t('common.cancel')}
-          </button>
-          {isTrialExpired ? (
-            <Link
-              href={`/${language}/teacher/upgrade`}
-              onClick={() =>
-                trackGrowthEvent('landing_cta_clicked', {
-                  cta: 'teacher_pro',
-                  source: 'trial_expired_modal',
-                })
-              }
-              className={upgradeClass}
-            >
-              {t('teacher.subscription.upgradeNow')}
-            </Link>
-          ) : (
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end sm:gap-3">
             <button
               type="button"
-              data-testid="plan-gate-upgrade"
-              disabled={pending}
-              aria-busy={pending || undefined}
-              onClick={() => {
-                void startPolarCheckout();
-              }}
-              className={upgradeClass}
+              onClick={isTrialExpired && onContinueFree ? onContinueFree : onClose}
+              className={cn(NB_SECONDARY, 'cursor-pointer')}
             >
-              {pending ? t('common.loading') : teacherProUpgradeCtaLabel(language)}
+              {isTrialExpired && onContinueFree ? t('teacher.subscription.continueFree') : t('common.cancel')}
             </button>
-          )}
+            {isTrialExpired ? (
+              <Link
+                href={`/${language}/teacher/upgrade`}
+                onClick={() =>
+                  trackGrowthEvent('landing_cta_clicked', {
+                    cta: 'teacher_pro',
+                    source: 'trial_expired_modal',
+                  })
+                }
+                className={upgradeClass}
+              >
+                {t('teacher.subscription.upgradeNow')}
+              </Link>
+            ) : (
+              <button
+                type="button"
+                data-testid="plan-gate-upgrade"
+                disabled={pending}
+                aria-busy={pending || undefined}
+                onClick={() => {
+                  void startPolarCheckout();
+                }}
+                className={upgradeClass}
+              >
+                {pending ? t('common.loading') : teacherProUpgradeCtaLabel(language)}
+              </button>
+            )}
+          </div>
         </NbDialogFooter>
       </NbDialogContent>
     </Dialog>

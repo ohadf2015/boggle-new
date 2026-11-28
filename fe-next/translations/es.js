@@ -15748,6 +15748,7 @@ const es = {
       "giftedNoCard": "Sin tarjeta ni renovación: simplemente termina y vuelves al plan gratuito.",
       "giftedUntil": "Pro de cortesía hasta",
       "giftedBadge": "Regalo",
+      "upsellHeroAlt": "Un aula de dibujos de colores jugando a un juego de palabras con la mascota de LexiClash",
       "classLimitTitle": "Has alcanzado el límite de clases",
       "classLimitReached": "Límite de clases alcanzado. Pásate a Teacher Pro para tener clases ilimitadas.",
       "classLimitMessage": "Has creado {{current}} de {{limit}} clases gratuitas. Con Pro puedes tener clases ilimitadas.",

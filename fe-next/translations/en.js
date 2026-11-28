@@ -15040,6 +15040,7 @@ const en = {
       "giftedNoCard": "No card on file, no renewal. It just ends, and you go back to Free.",
       "giftedUntil": "Complimentary Pro until",
       "giftedBadge": "Gift",
+      "upsellHeroAlt": "A colorful cartoon classroom playing a word game with the LexiClash mascot",
       "classLimitTitle": "You've reached your class limit",
       "classLimitMessage": "You've created {{current}} of {{limit}} free classes. Upgrade to Pro for unlimited classes.",
       "studentLimitTitle": "You've reached your student limit",

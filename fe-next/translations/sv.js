@@ -16111,6 +16111,7 @@ const sv = {
       "giftedNoCard": "Inget kort registrerat, ingen förnyelse – det tar bara slut och du går tillbaka till gratis.",
       "giftedUntil": "Kostnadsfritt Pro till",
       "giftedBadge": "Gåva",
+      "upsellHeroAlt": "Ett färgglatt ritat klassrum som spelar ett ordspel med LexiClash-maskoten",
       "classLimitTitle": "Du har nått din klassgräns",
       "classLimitReached": "Gränsen för klassrum är nådd. Uppgradera till Teacher Pro för obegränsat antal klassrum.",
       "classLimitMessage": "Du har skapat {{current}} av {{limit}} gratisklasser. Uppgradera till Pro för obegränsat antal klasser.",
