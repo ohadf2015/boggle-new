@@ -85,6 +85,7 @@ export const KNOWN_APP_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
   'leaderboard',
   'legal',
   'lexiclash-contra-wordle',
+  'lexiclash-join',
   'lexiclash-neged-wordle',
   'lexiclash-vs-apalabrados',
   'lexiclash-vs-blooket',

@@ -301,6 +301,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForLocaleOnly(routes, '/lexiclash-vs-wordwall', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForLocaleOnly(routes, '/lexiclash-vs-kahoot-gimkit-vocabulary', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForLocaleOnly(routes, '/lexiclash-vs-blooket', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForLocaleOnly(routes, '/lexiclash-join', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.8 });
   addForLocaleOnly(routes, '/lexiclash-vs-mentimeter', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForLocaleOnly(routes, '/lexiclash-vs-wayground', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForLocaleOnly(routes, '/lexiclash-vs-wooclap', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
