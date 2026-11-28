@@ -56,4 +56,13 @@ describe('ClassOverview focus words', () => {
     render(<ClassOverview classroomId="c1" classroomName="7B" />);
     expect(screen.getByTestId('overview-roster-fold-pending')).toBeInTheDocument();
   });
+
+  it('replaces the status placeholder with a new element, so the browser does not score it as moving', () => {
+    hook.loading = true;
+    const { rerender } = render(<ClassOverview classroomId="c1" classroomName="7B" />);
+    const placeholder = screen.getByTestId('overview-status-pending');
+    hook.loading = false;
+    rerender(<ClassOverview classroomId="c1" classroomName="7B" />);
+    expect(placeholder.isConnected).toBe(false);
+  });
 });
