@@ -15383,8 +15383,9 @@ const ja = {
   "teacher": {
     "studentView": {
       "open": "生徒の画面を見る",
-      "banner": "生徒ビュー：{name}に見えている画面",
-      "back": "クラスに戻る",
+      "banner": "生徒に見える画面を表示中",
+      "exit": "終了",
+      "liveRound": "ボットとライブ対戦",
       "error": "このクラスのレッスンを読み込めませんでした。",
       "retry": "もう一度",
       "studentName": "あなた"

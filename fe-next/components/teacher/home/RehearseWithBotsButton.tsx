@@ -37,6 +37,21 @@ export interface RehearseWithBotsButtonProps {
   buttonClassName?: string;
 }
 
+/** Queues the practice run for `classroomId` and returns the launch lobby to open. */
+export async function prepareRehearsal({ userId, classroomId, source, language, t, withSeat = false }: {
+  userId: string | undefined; classroomId: string | undefined; source: 'hq' | 'class'; language: string; t: T; withSeat?: boolean;
+}): Promise<string> {
+  type Lessons = Awaited<ReturnType<typeof getLessons>>['data'];
+  let lessons: Lessons = [];
+  if (userId) {
+    const capped = new Promise<Lessons>((resolve) => setTimeout(() => resolve([]), LESSON_LOOKUP_CAP_MS));
+    lessons = await Promise.race([getLessons(userId).then((r) => r.data ?? []), capped]).catch(() => []);
+  }
+  writeQuickLaunchIntent(buildRehearsalLaunch({ lessons, uiLanguage: language, classroomId, packName: (key) => t(key) }));
+  const entry = writeRehearseIntent({ source, classExists: !!classroomId, ...(withSeat ? { withSeat: true } : {}) });
+  return `/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}&${REHEARSE_ENTRY_PARAM}=${entry}`;
+}
+
 export function RehearseWithBotsButton({ classroomId, source, language, t, showNote = false, compact = false, className, onStart, withSeat = false, label, buttonClassName }: RehearseWithBotsButtonProps) {
   const router = useRouter();
   const { user } = useAuth();
@@ -47,15 +62,7 @@ export function RehearseWithBotsButton({ classroomId, source, language, t, showN
     if (pending) return;
     onStart?.();
     setPending(true);
-    type Lessons = Awaited<ReturnType<typeof getLessons>>['data'];
-    let lessons: Lessons = [];
-    if (user) {
-      const capped = new Promise<Lessons>((resolve) => setTimeout(() => resolve([]), LESSON_LOOKUP_CAP_MS));
-      lessons = await Promise.race([getLessons(user.id).then((r) => r.data ?? []), capped]).catch(() => []);
-    }
-    writeQuickLaunchIntent(buildRehearsalLaunch({ lessons, uiLanguage: language, classroomId, packName: (key) => t(key) }));
-    const entry = writeRehearseIntent({ source, classExists: !!classroomId, ...(withSeat ? { withSeat: true } : {}) });
-    router.push(`/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}&${REHEARSE_ENTRY_PARAM}=${entry}`);
+    router.push(await prepareRehearsal({ userId: user?.id, classroomId, source, language, t, withSeat }));
   };
 
   return (

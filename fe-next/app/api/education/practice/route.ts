@@ -378,6 +378,7 @@ export async function PATCH(request: NextRequest) {
           .eq('student_id', existing.student_id).eq('lesson_id', existing.lesson_id).single(),
         findSatisfiedAssignment(supabase, {
           lessonId: existing.lesson_id,
+          studentId: existing.student_id,
           sessionMode: existing.mode,
           extraWords: Array.isArray(merged.words_found) ? merged.words_found : [],
           wordsAttempted: (merged.words_attempted as Record<string, { attempts?: number }> | null) ?? null,
