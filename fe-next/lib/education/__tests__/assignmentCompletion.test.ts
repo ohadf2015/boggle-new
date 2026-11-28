@@ -16,7 +16,7 @@ import { captureAssignmentStartedServer } from '@/lib/education/assignmentEvents
 
 beforeEach(() => vi.clearAllMocks());
 
-function fakeClient(assignments: Array<{ id: string; practice_focus: string | null; word_count_target?: number | null; classroom_id?: string | null }>, upsertError: unknown = null) {
+function fakeClient(assignments: Array<{ id: string; practice_focus: string | null; word_count_target?: number | null; classroom_id?: string | null; classrooms?: { teacher_id: string } | null }>, upsertError: unknown = null) {
   const upsert = vi.fn().mockResolvedValue({ error: upsertError });
   const order = vi.fn().mockResolvedValue({ data: assignments, error: null });
   const eq = vi.fn(() => ({ order }));
@@ -123,7 +123,7 @@ describe('stampAssignmentCompletion', () => {
 });
 
 function fakeStartClient({
-  assignments = [] as Array<{ id: string; classroom_id?: string | null }>,
+  assignments = [] as Array<{ id: string; classroom_id?: string | null; classrooms?: { teacher_id: string } | null }>,
   progressRow = null as { assignment_id: string | null; completed_at: string | null } | null,
   insertError = null as unknown,
   updateError = null as unknown,
@@ -226,5 +226,26 @@ describe('stampAssignmentStartForLesson', () => {
     const { client, insert } = fakeStartClient();
     expect(await stampAssignmentStartForLesson(client, { studentId: 'S', lessonId: 'L' })).toBe(false);
     expect(insert).not.toHaveBeenCalled();
+  });
+});
+
+describe('the class teacher playing their own lesson', () => {
+  it('Given the caller teaches the class, When their session finishes, Then no assignment is satisfied (the class report never counts them)', async () => {
+    const { client } = fakeClient([{ id: 'A1', practice_focus: 'any', classroom_id: 'C1', classrooms: { teacher_id: 'T' } }]);
+    expect(await findSatisfiedAssignment(client, { lessonId: 'L', sessionMode: null, studentId: 'T' })).toBeNull();
+    expect(await findSatisfiedAssignment(client, { lessonId: 'L', sessionMode: null, studentId: 'S' })).toEqual({ id: 'A1', classroomId: 'C1' });
+  });
+
+  it('Given the caller teaches the class, When they start the lesson, Then no start is stamped and no assignment_started fires', async () => {
+    const { client, insert } = fakeStartClient({ assignments: [{ id: 'A9', classroom_id: 'C9', classrooms: { teacher_id: 'T' } }] });
+    expect(await stampAssignmentStartForLesson(client, { studentId: 'T', lessonId: 'L' })).toBe(false);
+    expect(insert).not.toHaveBeenCalled();
+    expect(captureAssignmentStartedServer).not.toHaveBeenCalled();
+  });
+
+  it('Given the class row is hidden from a student (embed null), Then the student is still stamped', async () => {
+    const { client, insert } = fakeStartClient({ assignments: [{ id: 'A9', classroom_id: 'C9', classrooms: null }] });
+    expect(await stampAssignmentStartForLesson(client, { studentId: 'S', lessonId: 'L' })).toBe(true);
+    expect(insert).toHaveBeenCalled();
   });
 });

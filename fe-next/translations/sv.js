@@ -15694,8 +15694,8 @@ const sv = {
   "teacher": {
     "studentView": {
       "open": "Se elevappen",
-      "banner": "Elevvy: det här ser {name}",
-      "back": "Tillbaka till klassen",
+      "banner": "Du ser det eleverna ser",
+      "exit": "Avsluta",
       "error": "Vi kunde inte ladda klassens lektioner.",
       "retry": "Försök igen",
       "studentName": "Du"

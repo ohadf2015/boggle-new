@@ -69,6 +69,8 @@ const ALLOW: Record<PatternName, Record<string, number>> = {
     // Full-screen practice run (fixed), same reason as the claim toast.
     'components/education/live/PracticeRunPanel.tsx': 1,
     'components/teacher/hq/HqProjectorSheet.tsx': 1,
+    // Viewport-pinned teacher student-mode bar and the frame under it (both fixed).
+    'components/teacher/classroom/TeacherStudentModeLayer.tsx': 3,
     'components/teacher/nb/nbDialogStyles.ts': 1,
     'components/student/academy/AcademyHubView.tsx': 2,
     'components/student/pages/AcademyPageFrame.tsx': 2,

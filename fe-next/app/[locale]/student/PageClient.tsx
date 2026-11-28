@@ -23,6 +23,9 @@ import { EducationShell } from '@/components/education/shell/EducationShell';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { AcademyHub } from '@/components/student/academy/AcademyHub';
 import { resolveStudentDisplayName } from '@/lib/education/studentDisplayName';
+import { isTeacherProfile } from '@/lib/education/teacherRole';
+import { endTeacherStudentMode, readTeacherStudentMode } from '@/lib/education/teacherStudentMode';
+import { StudentView as TeacherStudentHub } from '@/components/teacher/classroom/TeacherStudentView';
 import { signOut } from '@/lib/supabase';
 
 /**
@@ -38,6 +41,8 @@ export default function StudentPageClient() {
   const router = useRouter();
   const [isChecking, setIsChecking] = useState(true);
   const [profileStalled, setProfileStalled] = useState(false);
+  // A teacher walking through the student app for one of their classes (set by the class page).
+  const [teacherClassId, setTeacherClassId] = useState<string | null>(null);
   const { classroomId, classroom, classrooms, selectClassroom, level, isLoading: classroomLoading } = useStudentClassroom();
 
   useEffect(() => {
@@ -55,11 +60,11 @@ export default function StudentPageClient() {
       return;
     }
     if (!profile) return;
-    const isTeacherOrAdmin =
-      profile?.user_role === 'teacher' ||
-      profile?.user_role === 'admin' ||
-      profile?.is_admin === true;
-    if (isTeacherOrAdmin) { router.push(`/${language}/teacher`); return; }
+    if (isTeacherProfile(profile)) {
+      const mode = readTeacherStudentMode();
+      if (!mode) { router.push(`/${language}/teacher`); return; }
+      setTeacherClassId(mode.classroomId);
+    }
     setProfileStalled(false);
     setIsChecking(false);
   }, [user, profile, loading, router, language]);
@@ -125,6 +130,18 @@ export default function StudentPageClient() {
   }
 
   if (!user) return null;
+
+  if (teacherClassId) {
+    return (
+      <TeacherStudentHub
+        classroomId={teacherClassId}
+        onMissing={() => {
+          endTeacherStudentMode();
+          router.push(`/${language}/teacher`);
+        }}
+      />
+    );
+  }
 
   const studentName = resolveStudentDisplayName(profile, user, t('student.dashboard.defaultName'));
   const profileFields = (profile ?? {}) as { total_xp?: number | null; avatar_config?: unknown };

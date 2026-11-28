@@ -13668,8 +13668,8 @@ const en = {
   "teacher": {
     "studentView": {
       "open": "See the student app",
-      "banner": "Student view: what {name} sees",
-      "back": "Back to class",
+      "banner": "You're seeing what students see",
+      "exit": "Exit",
       "error": "We couldn't load this class's lessons.",
       "retry": "Try again",
       "studentName": "You"

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
@@ -127,7 +128,15 @@ function ClassPageLoaded({ classroom, t, language }: LoadedProps) {
         listsLoading={assignmentsLoading || lessonsLoading}
         lastGame={loop.last}
         replay={loop.replay}
-        rehearse={<RehearseWithBotsButton classroomId={classroom.id} source="class" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} className={HERO_SECONDARY_WRAP} buttonClassName={HERO_SECONDARY} />}
+        rehearse={(
+          <>
+            <RehearseWithBotsButton classroomId={classroom.id} source="class" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} className={HERO_SECONDARY_WRAP} buttonClassName={HERO_SECONDARY} />
+            <Link href={`/${language}/teacher/classroom/${classroom.id}/student-view`} data-testid="class-page-student-view" className={cn(HERO_SECONDARY, 'inline-flex items-center justify-center gap-2')}>
+              <Eye className="size-5" strokeWidth={2.75} aria-hidden="true" />
+              {t('teacher.studentView.open')}
+            </Link>
+          </>
+        )}
         joinGoal={belowStudentGoal(classroom.member_count ?? undefined) ? <HomeJoinGoal classroom={classroom} track={false} /> : undefined}
         onShare={() => setShareOpen(true)}
         onRequestDelete={() => setConfirmOpen(true)}

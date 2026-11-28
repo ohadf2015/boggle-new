@@ -15330,8 +15330,8 @@ const es = {
   "teacher": {
     "studentView": {
       "open": "Ver la app del alumno",
-      "banner": "Vista de alumno: lo que ve {name}",
-      "back": "Volver a la clase",
+      "banner": "Estás viendo lo que ven los alumnos",
+      "exit": "Salir",
       "error": "No pudimos cargar las lecciones de esta clase.",
       "retry": "Reintentar",
       "studentName": "Tú"

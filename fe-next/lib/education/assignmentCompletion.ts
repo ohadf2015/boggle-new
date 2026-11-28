@@ -25,12 +25,19 @@ export interface SatisfiedAssignmentLookup {
   vocabularyWordsFound?: readonly string[];
   /** Pasted word-list homework. When set, completion is coverage of this list — not any-session. */
   goalWords?: readonly string[];
+  /** The player. Their own class's assignments never count for them (a teacher trying the student app). */
+  studentId?: string;
 }
 
 export interface SatisfiedAssignment {
   id: string;
   classroomId: string | null;
 }
+
+type AssignmentClass = { classrooms?: { teacher_id?: string | null } | null };
+
+const taughtBy = (studentId: string | undefined) => (a: AssignmentClass) =>
+  !!studentId && a.classrooms?.teacher_id === studentId;
 
 /**
  * The assignment (newest first) that a finished session of this lesson
@@ -43,7 +50,7 @@ export async function findSatisfiedAssignment(
 ): Promise<SatisfiedAssignment | null> {
   const { data: assignments, error } = await client
     .from('lesson_assignments')
-    .select('id, practice_focus, word_count_target, classroom_id')
+    .select('id, practice_focus, word_count_target, classroom_id, classrooms(teacher_id)')
     .eq('lesson_id', args.lessonId)
     .order('created_at', { ascending: false });
   if (error) {
@@ -55,12 +62,16 @@ export async function findSatisfiedAssignment(
     ...(args.vocabularyWordsFound ?? []),
   ];
   const found = uniqueWordCount(args.wordsAttempted, extra);
-  const match = (assignments ?? []).find((a: {
+  const ownClass = taughtBy(args.studentId);
+  // Many-to-one embed: one class object per row at runtime (the untyped client guesses an array).
+  const rows = (assignments ?? []) as unknown as Array<AssignmentClass & {
     id: string;
     practice_focus: string | null;
     word_count_target?: number | null;
     classroom_id?: string | null;
-  }) => {
+  }>;
+  const match = rows.find((a) => {
+    if (ownClass(a)) return false;
     const target = a.word_count_target;
     if (typeof target === 'number' && target > 0) {
       return found >= target;
@@ -129,10 +140,11 @@ export async function stampAssignmentCompletion(
 export async function findAssignmentForLesson(
   client: SupabaseClient,
   lessonId: string,
+  studentId?: string,
 ): Promise<SatisfiedAssignment | null> {
   const { data, error } = await client
     .from('lesson_assignments')
-    .select('id, classroom_id')
+    .select('id, classroom_id, classrooms(teacher_id)')
     .eq('lesson_id', lessonId)
     .order('created_at', { ascending: false })
     .limit(1);
@@ -140,8 +152,8 @@ export async function findAssignmentForLesson(
     logger.error('findAssignmentForLesson: assignment lookup failed', error);
     return null;
   }
-  const row = (data ?? [])[0] as { id: string; classroom_id?: string | null } | undefined;
-  return row ? { id: row.id, classroomId: row.classroom_id ?? null } : null;
+  const row = (data ?? [])[0] as unknown as (AssignmentClass & { id: string; classroom_id?: string | null }) | undefined;
+  return row && !taughtBy(studentId)(row) ? { id: row.id, classroomId: row.classroom_id ?? null } : null;
 }
 
 /**
@@ -220,7 +232,7 @@ export async function stampAssignmentStartForLesson(
   args: { studentId: string; lessonId: string; now?: string },
 ): Promise<boolean> {
   try {
-    const assignment = await findAssignmentForLesson(client, args.lessonId);
+    const assignment = await findAssignmentForLesson(client, args.lessonId, args.studentId);
     if (!assignment) return false;
     return await stampAssignmentStarted(client, {
       studentId: args.studentId,

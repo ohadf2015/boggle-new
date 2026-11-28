@@ -2,6 +2,8 @@
 
 import type { StudentLesson } from '@/hooks/useStudentProgress';
 import { AcademyHubView } from '@/components/student/academy/AcademyHubView';
+import { StudentViewFrame } from '@/components/teacher/classroom/TeacherStudentView';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { AcademyData } from '@/components/student/academy/useAcademyData';
 
 const noop = () => undefined;
@@ -76,4 +78,11 @@ export function StudentHomePreview({ v }: { v?: string }) {
       clearReward={noop}
     />
   );
+}
+
+/** `?state=edu-student-view`: the teacher's "See the student app" page on fabricated class lessons. */
+export function TeacherStudentViewPreview() {
+  const { t } = useLanguage();
+  const fresh = [SPACE, WEATHER, ANIMALS].map((l) => ({ ...l, status: 'assigned' as const, progress: { words_mastered: [] } as unknown as StudentLesson['progress'] }));
+  return <StudentViewFrame userId="preview-teacher" classroomId={CLASS_ID} classroomName="7B English" teacherName="Ms Cohen" lessons={fresh} error={false} onRetry={noop} onJoin={noop} isJoining={false} t={t} />;
 }
