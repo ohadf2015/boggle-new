@@ -236,7 +236,7 @@ const content: Record<Locale, ToolContent> = {
   },
   sv: {
     title: 'Bilda Ord av Bokstäver — Anagramlösare Svenska',
-    subtitle: 'Lös anagram och hitta alla möjliga ord av dina bokstäver',
+    subtitle: 'Vilka ord kan bildas av dessa bokstäver? Skriv in dem så ser du alla svenska ord direkt, med en gratis anagramlösare och anagramgenerator.',
     description:
       'Gratis anagramlösare på svenska. Ange dina bokstäver och hitta alla möjliga ord direkt. Perfekt för Scrabble, Wordfeud och LexiClash.',
     metaDescription:
@@ -256,7 +256,7 @@ const content: Record<Locale, ToolContent> = {
     ctaButton: 'Spela LexiClash gratis',
     ctaDescription: 'Utmana vänner i ordstrider i realtid. Träna din hjärna!',
     fullDictionaryNote: 'Visar upp till 500 ord, de längsta först. Orden kontrolleras mot samma svenska ordlista som i LexiClash, med drygt 400 000 ord.',
-    howToTitle: 'Hur man använder ordlösaren',
+    howToTitle: 'Så skapar du ord av dina bokstäver',
     howToSteps: [
       'Skriv eller klistra in dina tillgängliga bokstäver i fältet ovan.',
       'Klicka på "Hitta ord" eller tryck Enter för att söka.',
