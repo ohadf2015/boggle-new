@@ -16523,6 +16523,11 @@ const es = {
         "averageScoreEmpty": "—",
         "upgrade": "Más detalles por alumno con Teacher Pro {{price}}",
         "never": "Nunca",
+        "testRun": {
+          "name": "Tú",
+          "badge": "Prueba",
+          "note": "La fila resaltada eres tú jugando como alumno. Solo tú la ves y no cuenta en los datos de la clase."
+        },
         "parentShare": {
           "title": "Compartir con las familias",
           "generated": "Progreso a fecha de {{date}}",

@@ -16756,6 +16756,11 @@ const ja = {
         "averageScoreEmpty": "—",
         "upgrade": "Teacher Pro {{price}} で各生徒の詳細を見る",
         "never": "なし",
+        "testRun": {
+          "name": "あなた",
+          "badge": "テストプレイ",
+          "note": "ハイライトされた行は、生徒として遊んだあなたの記録です。表示されるのはあなただけで、クラスの集計には含まれません。"
+        },
         "parentShare": {
           "title": "保護者と共有",
           "generated": "{{date}} 時点の進捗",

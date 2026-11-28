@@ -16,11 +16,14 @@ import Link from 'next/link';
 import { Check, Printer, Share2 } from 'lucide-react';
 import { useFitPageSize } from '@/components/teacher/lesson-creation/library/useFitPageSize';
 import AvatarLite from '@/components/AvatarLite';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { getClassroomAssignments, getAssignmentCompletions } from '@/lib/supabase/education/assignments';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
 import { getStudentsProgressSummary } from '@/lib/supabase/analytics';
+import { getStudentProgress } from '@/lib/supabase/education/progress';
+import { buildTeacherTestRunRow } from '@/lib/education/teacherTestRunRow';
 import { teacherFacingName } from '@/lib/education/rosterName';
 import {
   buildAssignmentProgressRows,
@@ -95,24 +98,35 @@ const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-edu-line px-3 text-sm
 export function ClassroomRosterProgress({ classroomId, classroomName = '' }: ClassroomRosterProgressProps) {
   const { t, language } = useLanguage();
   const { hasPro, loading: proLoading } = useTeacherPro();
+  const teacherId = useAuth().user?.id ?? null;
   const [copied, setCopied] = useState(false);
   const [bodyRef, pageSize] = useFitPageSize(ROW_H, PAGER_RESERVE, 10);
   const [page, setPage] = useState(0);
 
   const load = useCallback(async () => {
-    const [studentRes, practiceRes, assignmentRes] = await Promise.all([
+    const [studentRes, practiceRes, assignmentRes, ownRes] = await Promise.all([
       getClassroomStudents(classroomId),
       getStudentsProgressSummary(classroomId),
       getClassroomAssignments(classroomId),
+      teacherId ? getStudentProgress(teacherId) : Promise.resolve({ data: [], error: null }),
     ]);
     if (studentRes.error) return { data: null, error: studentRes.error };
     if (practiceRes.error) return { data: null, error: practiceRes.error };
     if (assignmentRes.error) return { data: null, error: assignmentRes.error };
 
     const students = studentRes.data ?? [];
-    if (students.length === 0) return { data: { rows: [] }, error: null };
-
     const assignments = assignmentRes.data ?? [];
+    // Optional: a failed read of the teacher's own play just hides their test row.
+    const testRun = teacherId && !ownRes.error
+      ? buildTeacherTestRunRow({
+          teacherId,
+          name: t('teacher.reports.rosterProgress.testRun.name'),
+          assignments: assignments.map((a) => ({ id: a.id, lessonId: a.lesson_id })),
+          progress: ownRes.data ?? [],
+        })
+      : null;
+    if (students.length === 0) return { data: { rows: [], testRun }, error: null };
+
     const batches = await Promise.all(assignments.map((a) => getAssignmentCompletions(a.id)));
     const firstErr = batches.find((b) => b.error)?.error;
     if (firstErr) return { data: null, error: firstErr };
@@ -155,8 +169,8 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
       })),
     });
 
-    return { data: { rows }, error: null };
-  }, [classroomId, t]);
+    return { data: { rows, testRun }, error: null };
+  }, [classroomId, t, teacherId]);
 
   const { data, loading, failed, retry } = useReportData(load);
 
@@ -237,7 +251,8 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
 
   if (loading) return <ReportSkeleton />;
   if (failed) return <ReportError onRetry={retry} />;
-  if (!data || data.rows.length === 0) return null;
+  if (!data || (data.rows.length === 0 && !data.testRun)) return null;
+  const testRun = data.testRun;
   const pageCount = Math.max(1, Math.ceil(data.rows.length / Math.max(1, pageSize)));
   const shownPage = Math.min(page, pageCount - 1);
   const pageRows = data.rows.slice(shownPage * pageSize, (shownPage + 1) * pageSize);
@@ -249,9 +264,14 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
     >
       <style>{PRINT_CSS}</style>
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <h3 className="font-neo-display text-lg font-bold text-edu-ink">
-          {t('teacher.reports.rosterProgress.title')}
-        </h3>
+        <div>
+          <h3 className="font-neo-display text-lg font-bold text-edu-ink">
+            {t('teacher.reports.rosterProgress.title')}
+          </h3>
+          {testRun ? (
+            <p className="text-sm text-edu-ink/75">{t('teacher.reports.rosterProgress.testRun.note')}</p>
+          ) : null}
+        </div>
         {proLoading ? null : hasPro ? (
           <div className="flex flex-wrap gap-2" data-testid="classroom-roster-parent-share">
             <button type="button" onClick={() => { void handleCopy(); }} className={SHARE_BTN}>
@@ -297,6 +317,30 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
               </th>
             </tr>
           </thead>
+          {testRun ? (
+            <tbody>
+              <tr
+                data-testid="classroom-roster-test-run"
+                className="border-b-2 border-dashed border-edu-line bg-neo-yellow/15"
+              >
+                <td className="px-3 py-2 font-bold text-edu-ink">
+                  <span className="flex flex-wrap items-center gap-2.5">
+                    <AvatarLite userId={testRun.studentId} pixelSize={28} />
+                    <span dir="auto">{testRun.name}</span>
+                    <span className="rounded-full border-2 border-neo-black bg-neo-yellow px-2 py-0.5 text-[10px] font-black uppercase text-neo-black">
+                      {t('teacher.reports.rosterProgress.testRun.badge')}
+                    </span>
+                  </span>
+                </td>
+                <td className="hidden px-3 py-2 text-end text-edu-ink tabular-nums sm:table-cell">
+                  {formatCompletion(testRun.completedAssignments, testRun.totalAssignments)}
+                </td>
+                <td className="px-3 py-2 text-end text-edu-ink tabular-nums">{formatScore(testRun.averageScore)}</td>
+                <td className="px-3 py-2 text-end text-edu-ink tabular-nums">{formatLastActive(testRun.lastActiveAt)}</td>
+                <td className="hidden px-3 py-2 sm:table-cell" />
+              </tr>
+            </tbody>
+          ) : null}
           <tbody ref={bodyRef}>
             {pageRows.map((row: RosterProgressRow) => (
               <tr

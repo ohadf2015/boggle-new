@@ -50,6 +50,9 @@ const translations: Record<string, string> = {
   'teacher.reports.rosterProgress.parentShare.copied': 'Copied',
   'teacher.reports.rosterProgress.parentShare.upgrade': 'Print a parent summary with Teacher Pro {{price}}',
   'teacher.reports.rosterProgress.parentShare.footer': 'LexiClash classroom progress.',
+  'teacher.reports.rosterProgress.testRun.name': 'You',
+  'teacher.reports.rosterProgress.testRun.badge': 'Test run',
+  'teacher.reports.rosterProgress.testRun.note': 'Only you see this row.',
   'teacher.reports.title': 'Reports',
   'teacher.reports.assignmentProgress.untitled': 'Untitled lesson',
   'teacher.reports.assignmentProgress.anonymousStudent': 'Student {{id}}',
@@ -100,6 +103,16 @@ vi.mock('@/lib/supabase/education/assignments', () => ({
   ),
 }));
 
+const ownProgressState: { data: unknown[]; error: { message: string } | null } = { data: [], error: null };
+
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ user: { id: 'teacher-1' } }),
+}));
+
+vi.mock('@/lib/supabase/education/progress', () => ({
+  getStudentProgress: vi.fn(() => Promise.resolve(ownProgressState)),
+}));
+
 vi.mock('@/lib/education/telemetry', () => ({
   trackTeacherRosterProgressUpgradeClicked: vi.fn(),
   trackTeacherRosterParentSharePrinted: vi.fn(),
@@ -134,7 +147,37 @@ describe('ClassroomRosterProgress', () => {
     assignmentsState.data = [];
     assignmentsState.error = null;
     completionBatches = {};
+    ownProgressState.data = [];
+    ownProgressState.error = null;
     vi.clearAllMocks();
+  });
+
+  it('shows the teacher\'s own student-mode play as a labelled test row, even with no students, and keeps it off the parent handout', async () => {
+    assignmentsState.data = [
+      { id: 'a1', lesson_id: 'L1', title: 'Animals', due_date: null },
+      { id: 'a2', lesson_id: 'L2', title: 'Food', due_date: null },
+    ];
+    ownProgressState.data = [
+      { lesson_id: 'L1', completed_at: null, total_practice_sessions: 1, last_practice_date: todayIso(), words_attempted: { cat: { attempts: 2, correct: 1 } } },
+    ];
+    render(<ClassroomRosterProgress classroomId="c1" />);
+
+    const row = await screen.findByTestId('classroom-roster-test-run');
+    expect(within(row).getByText('You')).toBeInTheDocument();
+    expect(within(row).getByText('Test run')).toBeInTheDocument();
+    expect(within(row).getByText('1/2')).toBeInTheDocument();
+    expect(within(row).getByText('50%')).toBeInTheDocument();
+    expect(screen.getByText('Only you see this row.')).toBeInTheDocument();
+    expect(within(screen.getByTestId('classroom-roster-parent-print')).queryByText('You')).toBeNull();
+  });
+
+  it('shows no test row when the teacher has not played this class\'s lessons', async () => {
+    studentsState.data = [rosterStudent('s1', { display_name: 'Ada' }, '2026-11-01T00:00:00Z')];
+    assignmentsState.data = [{ id: 'a1', lesson_id: 'L1', title: 'Animals', due_date: null }];
+    ownProgressState.data = [{ lesson_id: 'OTHER', completed_at: '2026-11-01T00:00:00Z' }];
+    render(<ClassroomRosterProgress classroomId="c1" />);
+    await screen.findAllByTestId('classroom-roster-row');
+    expect(screen.queryByTestId('classroom-roster-test-run')).toBeNull();
   });
 
   it('renders one row per student, sorted joined_idle → guest → signed_in', async () => {
