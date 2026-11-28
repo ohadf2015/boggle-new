@@ -69,13 +69,14 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
         <HomeEducationCardConnected slot="top" />
       </div>
       <div className="relative isolate">
-        <AmbientBackdrop theme="home" hill={false} className="max-lg:bottom-[68%]" />
+        <AmbientBackdrop theme="home" density="lively" hill={false} className="max-lg:bottom-[68%]" />
         <PlayHero
           lang={language}
           t={tt}
           animate={animate}
           avatar={avatar}
           bubble={line ? tt(line.key, line.params) : null}
+          bubbleFlame={line && line.key !== 'homePlay.bubbleBack' && line.key !== 'homePlay.bubbleFirst' && line.key !== 'homePlay.bubbleBackName' ? streak : null}
           streak={streak}
           streakLoading={streakLoading}
           atRisk={streakView.atRisk}
@@ -108,6 +109,7 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
             next={streakView.milestone?.next ?? null}
             isGuest={streakView.isGuest}
             onStreakChanged={() => streakView.refresh(true)}
+            animate={animate}
           />
           <StreakSavedToast saved={streakView.loading ? null : streakView.freezeSaved} />
           <StreakMilestoneCheer view={streakView} />

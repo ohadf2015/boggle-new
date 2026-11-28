@@ -6,6 +6,7 @@ import { ModeGlyph } from '@/components/quick-play/ModeGlyph';
 import { NODE_COLORS } from '@/components/quick-play/modeColors';
 import type { QuickMode } from '@/components/quick-play/types';
 import { quickPlayHref } from '@/lib/quickPlay/startMode';
+import styles from './homeMotion.module.css';
 
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 const TILT = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'];
@@ -13,16 +14,19 @@ const TILT = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'];
 interface ModeRailProps {
   lang: string;
   t: (key: string, params?: Record<string, string | number>) => string;
+  /** Motion on: each tile bobs gently on its own beat. */
+  animate?: boolean;
 }
 
 /** Tier 4 of the hero: the solo modes as filled colour-coded keys, one row. */
-export function ModeRail({ lang, t }: ModeRailProps) {
+export function ModeRail({ lang, t, animate = false }: ModeRailProps) {
   return (
     <div>
       <p className="mb-2 text-center text-xs font-bold text-neo-white/60 lg:text-sm">{t('homePlay.pickMode')}</p>
       <ul className="grid grid-cols-4 gap-2.5 lg:gap-3" data-testid="hp-keycaps">
         {MODES.map((mode, i) => (
-          <li key={mode} className={`min-w-0 ${TILT[i]}`}>
+          <li key={mode} data-motion={animate ? 'float' : undefined} className={`min-w-0 ${TILT[i]}`}>
+            <div className={animate ? styles.bob : undefined} style={animate ? { animationDelay: `${-i * 0.8}s` } : undefined}>
             <PressSurface asChild lip={4}>
               <Link
                 href={quickPlayHref(lang, mode)}
@@ -32,6 +36,7 @@ export function ModeRail({ lang, t }: ModeRailProps) {
                 <span className="max-w-full truncate px-0.5 font-neo-display text-[13px] font-bold leading-none lg:text-sm">{t(`quickPlay.solo.mode.${mode}`)}</span>
               </Link>
             </PressSurface>
+            </div>
           </li>
         ))}
       </ul>

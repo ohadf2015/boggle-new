@@ -59,12 +59,12 @@ describe('PlayHero motion', () => {
     expect(b.el.getAttribute('data-testid')).not.toBe('hp-play-now');
   });
 
-  it('given a touch phone, then PLAY breathes a few times and stops (no endless loop on an idle home)', () => {
+  it('given a touch phone, then PLAY keeps breathing too (the phone home must not go still), transform only', () => {
     stubPointer(true);
     renderHero();
     const [b] = breaths();
-    expect(Number.isFinite(b.opts.iterations)).toBe(true);
-    expect(b.opts.iterations).toBeLessThanOrEqual(4);
+    expect(b.opts.iterations).toBe(Infinity);
+    expect(transformOnly(b)).toBe(true);
   });
 
   it('given reduced motion (animate off), then nothing animates', () => {
