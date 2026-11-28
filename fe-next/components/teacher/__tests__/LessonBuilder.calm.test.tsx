@@ -72,11 +72,11 @@ describe('LessonBuilder: calm My lists', () => {
 });
 
 describe('LessonBuilder on the sky page', () => {
-  it('Then New word list is the full-size chunky primary and the hint reads at body size', () => {
+  it('Then New word list is the full-size chunky primary and no explainer sits under the title', () => {
     render(<LessonBuilder />);
     const create = screen.getByTestId('lessons-create');
     expect(create.className).toContain('min-h-[56px]');
     expect(create.className).toContain('text-xl');
-    expect(screen.getByTestId('lessons-hint').className).toContain('text-base');
+    expect(screen.queryByTestId('lessons-hint')).toBeNull();
   });
 });

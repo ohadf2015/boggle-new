@@ -58,11 +58,11 @@ afterEach(() => {
 });
 
 describe('Teacher Home — rehearse with bots', () => {
-  it('Given a teacher with a class, Then the hero offers the rehearsal as the one big secondary under Start', () => {
+  it('Given a teacher with a class, Then the hero offers trying it as a student (the student app, whose bar starts the bot round) as the one big secondary under Start', () => {
     render(<TeacherDashboard />);
     const hero = screen.getByTestId('home-hero');
-    expect(within(hero).getByTestId('rehearse-with-bots')).toBeInTheDocument();
-    expect(within(hero).getByTestId('rehearse-with-bots').className).not.toMatch(/bg-neo-lime/);
+    expect(within(hero).getByTestId('try-as-student')).toBeInTheDocument();
+    expect(within(hero).getByTestId('try-as-student').className).not.toMatch(/bg-neo-lime/);
   });
 
   it('Given a teacher with no class yet, Then the first-run card offers the rehearsal too', () => {

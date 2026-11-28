@@ -15329,7 +15329,6 @@ const es = {
   },
   "teacher": {
     "studentView": {
-      "open": "Ver la app del alumno",
       "banner": "Estás viendo lo que ven los alumnos",
       "bannerShort": "Vista de alumno",
       "exit": "Salir",
@@ -15692,7 +15691,6 @@ const es = {
       "weeklyPracticeCta": "Mejora a Teacher Pro — {{price}}/mes",
       "weeklyPracticeHint": "¡Tus estudiantes practicaron esta semana! Mantén el ritmo con clases ilimitadas y analíticas.",
       "classroomWeekTitle": "Esta semana en tu clase",
-      "classroomWeekSubtitle": "Totales de práctica de los alumnos activos en los últimos 7 días.",
       "classroomWeekRegion": "Esta semana en {{classroom}}",
       "classroomWeekStudents": "Alumnos practicando",
       "classroomWeekSessions": "Sesiones de práctica",
@@ -15953,7 +15951,6 @@ const es = {
       "cardRosterTitle": "Alumnos de {{name}}",
       "cardClassReport": "Informe de la clase",
       "assignTitle": "Tareas",
-      "assignBody": "Elige una lista de palabras y una fecha. Los alumnos juegan en su propio móvil.",
       "assignCta": "Asignar tarea",
       "presets": {
         "title": "¿Cómo va a jugar la clase?",
@@ -16170,7 +16167,6 @@ const es = {
     },
     "lesson": {
       "sectionTitle": "Tus lecciones",
-      "sectionHint": "Una lección es una lista de palabras. Juégala en vivo con toda la clase o compártela para que tus alumnos practiquen por su cuenta.",
       "pasteWords": "Pega tu lista de palabras",
       "pasteWordsPlaceholder": "Una palabra por línea o separadas por comas",
       "pasteWordsParsed": "{count} palabras listas",
@@ -16307,7 +16303,6 @@ const es = {
     },
     "reports": {
       "freeOtherClasses": "El plan gratuito incluye tu primera clase. Con Pro ves también estas:",
-      "valueLine": "Después de cada partida, ves qué palabras falló cada clase, quién necesita ayuda y qué practicar a continuación.",
       "homeworkShortcut": "Resultados de las tareas",
       "lockedValue": "Las palabras que falló tu clase aparecen gratis en la pantalla de resultados de cada partida. Los informes añaden quién necesita ayuda, alumno por alumno, en todas tus partidas.",
       "emptyClass": {
@@ -23458,7 +23453,7 @@ const es = {
       "challenge": {
         "title": "El reto de la clase de esta semana",
         "lastTitle": "El reto de la semana pasada: ya hay resultados",
-        "emptyHint": "Deja una lista de palabras abierta toda la semana. Tus alumnos la juegan cuando quieran desde su clase, sin partida en directo.",
+        "emptyHint": "Tus alumnos la juegan cuando quieran esta semana, sin partida en directo.",
         "start": "Abrir \"{list}\" durante 7 días",
         "pick": "Elegir una lista de palabras",
         "untitled": "Lista de palabras",

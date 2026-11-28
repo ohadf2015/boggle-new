@@ -110,7 +110,6 @@ export function ClassAssignCard({ classroomId, language, t }: { classroomId: str
       <CalendarCheck className={cn(ICON_SQUARE, 'bg-neo-yellow')} strokeWidth={2.5} aria-hidden="true" />
       <span className="min-w-0 flex-1">
         <h2 id="class-assign-title" className={TITLE}>{t('teacher.classroom.assignTitle')}</h2>
-        <p className="font-neo-body text-sm text-edu-ink/80">{t('teacher.classroom.assignBody')}</p>
       </span>
       <Link
         href={teacherAssignHref(language, classroomId)}

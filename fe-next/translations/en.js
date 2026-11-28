@@ -13667,7 +13667,6 @@ const en = {
   },
   "teacher": {
     "studentView": {
-      "open": "See the student app",
       "banner": "You're seeing what students see",
       "bannerShort": "Student view",
       "exit": "Exit",
@@ -14041,7 +14040,6 @@ const en = {
       "cardRosterTitle": "Students in {{name}}",
       "cardClassReport": "Class report",
       "assignTitle": "Homework",
-      "assignBody": "Pick a word list and a due date. Students play it on their own phones.",
       "assignCta": "Assign homework",
       "presets": {
         "title": "How should the class play?",
@@ -14258,7 +14256,6 @@ const en = {
     },
     "lesson": {
       "sectionTitle": "Your lessons",
-      "sectionHint": "A lesson is a list of words. Host it live with the whole class, or share it so students practice on their own.",
       "pasteWords": "Paste your word list",
       "pasteWordsPlaceholder": "One word per line, or separated by commas",
       "pasteWordsParsed": "{count} words ready",
@@ -14555,7 +14552,6 @@ const en = {
     },
     "reports": {
       "freeOtherClasses": "The free plan covers your first class. Pro shows these too:",
-      "valueLine": "After every game, see which words each class missed, who needs help, and what to practice next.",
       "homeworkShortcut": "Homework results",
       "lockedValue": "The words your class missed are free on every game's results screen. Reports add who needs help, student by student, across all your games.",
       "emptyClass": {
@@ -14991,7 +14987,6 @@ const en = {
       "weeklyPracticeCta": "Upgrade to Teacher Pro: {{price}}/mo",
       "weeklyPracticeHint": "Your students practiced this week! Keep the momentum with unlimited classes and analytics.",
       "classroomWeekTitle": "This week in your classroom",
-      "classroomWeekSubtitle": "Practice totals for students active in the last 7 days.",
       "classroomWeekRegion": "This week in {{classroom}}",
       "classroomWeekStudents": "Students practicing",
       "classroomWeekSessions": "Practice sessions",
@@ -22467,7 +22462,7 @@ const en = {
       "challenge": {
         "title": "This week's class challenge",
         "lastTitle": "Last week's challenge: results are in",
-        "emptyHint": "Leave a word list open all week. Students play it any time from their class page, no live game needed.",
+        "emptyHint": "Students play it any time this week, no live game needed.",
         "start": "Open \"{list}\" for 7 days",
         "pick": "Pick a word list",
         "untitled": "Word list",

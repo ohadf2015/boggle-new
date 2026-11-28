@@ -6,7 +6,6 @@
  */
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
-import { Stat } from '@/components/ui/Stat';
 import { GAME_CARD } from '@/components/teacher/home/homeStyles';
 import { cn } from '@/lib/utils';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -44,7 +43,6 @@ export function ClassroomWeekSection({
     >
       <header>
         <h2 className="font-neo-display text-xl font-black text-edu-ink">{t('teacher.digest.classroomWeekTitle')}</h2>
-        <p className="mt-1 text-sm font-bold text-edu-ink/75">{t('teacher.digest.classroomWeekSubtitle')}</p>
       </header>
 
       {status === 'loading' ? (
@@ -72,13 +70,13 @@ export function ClassroomWeekSection({
         <>
           <div className="grid grid-cols-3 gap-3">
             <div data-testid="classroom-week-students">
-              <Stat value={digest.studentsPracticed} label={t('teacher.digest.classroomWeekStudents')} size="lg" className="w-full" />
+              <WeekTile value={digest.studentsPracticed} label={t('teacher.digest.classroomWeekStudents')} />
             </div>
             <div data-testid="classroom-week-sessions">
-              <Stat value={digest.practiceSessions} label={t('teacher.digest.classroomWeekSessions')} size="lg" className="w-full" />
+              <WeekTile value={digest.practiceSessions} label={t('teacher.digest.classroomWeekSessions')} />
             </div>
             <div data-testid="classroom-week-awards">
-              <Stat value={digest.awardsEarned} label={t('teacher.digest.classroomWeekAwards')} size="lg" className="w-full" />
+              <WeekTile value={digest.awardsEarned} label={t('teacher.digest.classroomWeekAwards')} />
             </div>
           </div>
           {!digest.practicedThisWeek ? (
@@ -101,5 +99,14 @@ export function ClassroomWeekSection({
         </Link>
       ) : null}
     </section>
+  );
+}
+
+function WeekTile({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="flex h-full flex-col items-center justify-center gap-1 rounded-neo border-2 border-edu-line bg-edu-page px-2 py-3 text-center text-edu-ink">
+      <span className="font-neo-display text-3xl font-black tabular-nums leading-none">{value}</span>
+      <span dir="auto" className="text-xs font-bold uppercase leading-tight tracking-wide text-edu-ink/70">{label}</span>
+    </div>
   );
 }

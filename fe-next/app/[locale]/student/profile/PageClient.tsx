@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Play } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,17 +15,13 @@ import { useTeacherStudentModeLessons } from '@/hooks/useTeacherStudentModeLesso
 import { withOwnProgress } from '@/lib/education/teacherStudentView';
 import { StudentModeError } from '@/components/teacher/classroom/StudentModeError';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { EducationBadgeGrid, type StudentAchievement } from '@/components/education';
 import { AcademyPageFrame, FrameSkeleton } from '@/components/student/pages/AcademyPageFrame';
 import { useStudentSubpageGuard } from '@/components/student/pages/useStudentSubpageGuard';
 import { nextOpenAssignment } from '@/components/student/nextOpenAssignment';
 import { Medallion, toneStyle } from '@/components/student/academy/chrome';
 import { pressClasses } from '@/components/education/motion';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/lib/supabase';
-import logger from '@/utils/logger';
 import { getXpProgress } from '@/backend/modules/xpManager';
-import { transformAchievementRow } from './achievementTransform';
 import { summarizeAwards } from '../achievements/awardsSummary';
 import { useAwardsRecord } from '../achievements/useAwardsRecord';
 import { ProfileXpBar } from './ProfileXpBar';
@@ -43,8 +39,6 @@ export default function StudentProfilePageClient() {
   const t = rawT as unknown as T;
   const { status, user } = useStudentSubpageGuard(language);
   const userId = user?.id ?? null;
-  const [achievements, setAchievements] = useState<StudentAchievement[]>([]);
-  const [isLoadingAchievements, setIsLoadingAchievements] = useState(true);
   const { lessons: ownLessons, progress, isLoading: progressLoading } = useStudentProgress();
   const mode = useTeacherStudentModeLessons();
   const lessons = mode.active ? withOwnProgress(mode.lessons ?? [], progress) : ownLessons;
@@ -60,57 +54,8 @@ export default function StudentProfilePageClient() {
   const currentLevel = xpProgress.currentLevel;
   const nextHref = nextOpenAssignment(lessons, language)?.href ?? `/${language}/student/lessons`;
 
-  useEffect(() => {
-    if (!userId || !supabase) {
-      setIsLoadingAchievements(false);
-      return;
-    }
-    let cancelled = false;
-    (async () => {
-      try {
-        const { data, error } = await supabase
-          .from('student_achievements')
-          .select(`
-            id,
-            student_id,
-            current_tier,
-            progress_value,
-            is_pinned,
-            unlocked_at,
-            achievement_definitions!inner (
-              key,
-              category,
-              icon,
-              is_secret,
-              achievement_tiers (
-                tier,
-                threshold,
-                tier_order
-              )
-            )
-          `)
-          .eq('student_id', userId);
-        if (error) {
-          logger.error('Error fetching achievements:', error);
-        } else if (!cancelled) {
-          setAchievements((data || []).map((row) =>
-            transformAchievementRow({
-              current_tier: row.current_tier,
-              progress_value: row.progress_value || 0,
-              is_pinned: row.is_pinned || false,
-              achievement_definitions: row.achievement_definitions as unknown as Parameters<typeof transformAchievementRow>[0]['achievement_definitions'],
-            }),
-          ));
-        }
-      } catch (error) {
-        logger.error('Error in fetchAchievements:', error);
-      }
-      if (!cancelled) setIsLoadingAchievements(false);
-    })();
-    return () => { cancelled = true; };
-  }, [userId]);
-
-  const next = useMemo(() => (awards ? summarizeAwards(awards).next : null), [awards]);
+  const summary = useMemo(() => (awards ? summarizeAwards(awards) : null), [awards]);
+  const next = summary?.next ?? null;
   const ready = status === 'ready';
   const fresh = isLoadingProgress === false && sessions === 0 && totalXp === 0;
 
@@ -120,7 +65,7 @@ export default function StudentProfilePageClient() {
       art="/images/education/words-mastered.webp"
       regionLabel={t('student.dashboard.title')}
       pending={!ready}
-      busy={ready && (isLoadingProgress || isLoadingAchievements)}
+      busy={ready && isLoadingProgress}
     >
       {!ready ? (
         <FrameSkeleton rows={3} />
@@ -199,24 +144,17 @@ export default function StudentProfilePageClient() {
             </div>
           )}
 
-          {isLoadingAchievements ? (
-            <div className="h-24 rounded-[18px] bg-edu-ink/10 motion-safe:animate-pulse" />
-          ) : achievements.length > 0 ? (
-            <div className={CARD} style={toneStyle('night', { shadow: 3, trim: 2 })}>
-              <EducationBadgeGrid studentId={user!.id} achievements={achievements} />
-              <AllAwardsLink href={`/${language}/student/achievements`} label={t('student.dashboard.viewAll')} />
-            </div>
-          ) : (
-            <div data-testid="profile-awards-teaser" className={cn(CARD, 'flex flex-col gap-3')} style={toneStyle('night', { shadow: 3, trim: 2 })}>
-              <h2 className={cn('font-neo-display text-xl font-black text-edu-ink')}>{t('student.dashboard.achievements')}</h2>
+          <div data-testid="profile-awards-teaser" className={cn(CARD, 'flex flex-col gap-3')} style={toneStyle('night', { shadow: 3, trim: 2 })}>
+            <h2 className={cn('font-neo-display text-xl font-black text-edu-ink')}>{t('student.dashboard.achievements')}</h2>
+            {next || summary?.earned === 0 ? (
               <p dir="auto" className="font-neo-body text-sm font-bold text-edu-ink/85">
                 {next
                   ? t('academy.pages.profileNextAward', 'Closest award: {name}. {how}', { name: t(next.award.nameKey), how: t(next.award.descriptionKey) })
                   : t('academy.pages.profileNoAwardsYet', 'Win your first award by finishing a lesson.')}
               </p>
-              <AllAwardsLink href={`/${language}/student/achievements`} label={t('student.dashboard.viewAll')} />
-            </div>
-          )}
+            ) : null}
+            <AllAwardsLink href={`/${language}/student/achievements`} label={t('student.dashboard.viewAll')} />
+          </div>
         </div>
       )}
     </AcademyPageFrame>

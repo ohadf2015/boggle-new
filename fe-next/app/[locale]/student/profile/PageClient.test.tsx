@@ -107,11 +107,12 @@ describe('StudentProfilePageClient', () => {
     expect(screen.queryByTestId('profile-first-step')).toBeNull();
   });
 
-  test('given earned rows, then the badge grid shows without a second heading from the page', async () => {
+  test('given earned rows, then Me points to Awards with one card instead of repeating the Awards grid', async () => {
     state.lessons = [lesson({ total_xp: 10, total_practice_sessions: 1 })];
     state.earnedRows = [{ current_tier: 'bronze', progress_value: 1, is_pinned: false, achievement_definitions: { key: 'first_lesson', category: 'progress', icon: '📚', is_secret: false, achievement_tiers: [] } }];
     render(<StudentProfilePageClient />);
-    await waitFor(() => expect(screen.getByTestId('badge-grid')).toBeInTheDocument());
-    expect(screen.queryByText('student.dashboard.achievements')).toBeNull();
+    await waitFor(() => expect(screen.getByTestId('profile-awards-teaser')).toBeInTheDocument());
+    expect(screen.queryByTestId('badge-grid')).toBeNull();
+    expect(screen.getByRole('link', { name: /student.dashboard.viewAll/ })).toHaveAttribute('href', '/en/student/achievements');
   });
 });

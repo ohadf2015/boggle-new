@@ -68,7 +68,7 @@ describe('Teacher Home: one primary, chunky blocks', () => {
     const hero = screen.getByTestId('home-hero');
     expect(hero.className).toContain('edu-card');
     expect(hero.className).not.toMatch(/(^|\s)bg-neo-(pink|purple)(\s|$)/);
-    const rehearse = screen.getByTestId('rehearse-with-bots');
+    const rehearse = screen.getByTestId('try-as-student');
     expect(rehearse.className).not.toMatch(/(^|\s)bg-neo-cyan(\s|$)/);
     expect(rehearse.className).toContain('[&>svg]:bg-neo-cyan');
     expect(rehearse.className).toContain('border-[3px]');

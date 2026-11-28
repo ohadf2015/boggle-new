@@ -198,7 +198,6 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
           </button>
         </div>
       </div>
-      <p data-testid="lessons-hint" className="max-w-prose font-neo-body text-base font-semibold text-edu-ink/85 text-pretty max-sm:hidden">{t('teacher.lesson.sectionHint')}</p>
 
       {lessons.length === 0 ? (
         <div className={cn('space-y-4', isCreatingFromPack && 'pointer-events-none opacity-60')}>

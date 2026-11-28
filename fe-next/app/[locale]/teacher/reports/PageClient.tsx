@@ -206,15 +206,12 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   if (!selectedClassroomId) {
     view = (
       <>
-        <div className="mb-3 flex items-center justify-between gap-4">
+        <div className="mb-5 flex items-center justify-between gap-4">
           <h1 data-wipe className="min-w-0 font-neo-display text-4xl font-black leading-none text-edu-ink [overflow-wrap:anywhere] sm:text-6xl">
             {t('teacher.reports.title')}
           </h1>
           <HeadingMascot moment="success" testId="reports-heading-mascot" />
         </div>
-        <p data-testid="reports-value-line" dir="auto" className="mb-5 max-w-prose text-base leading-snug text-edu-ink/85 max-sm:hidden">
-          {t('teacher.reports.valueLine', 'After every game, see which words each class missed, who needs help, and what to practice next.')}
-        </p>
 
         {weekPanel}
 
