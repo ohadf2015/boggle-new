@@ -64,9 +64,9 @@ describe('<ClassroomModeCatalogue>', () => {
     expect(screen.getByTestId('spec-style')).toHaveTextContent('eg2Modes.style.teams');
   });
 
-  it('shows the selected mode cover and opens the three numbered steps behind How it plays', () => {
+  it('shows the selected mode sticker and opens the three numbered steps behind How it plays', () => {
     setup({ selected: 'blast' });
-    expect(screen.getByTestId('spotlight-art').querySelector('img')?.getAttribute('src')).toBe(catalogueEntry('blast')!.cover);
+    expect(screen.getByTestId('spotlight-art').querySelector('img')?.getAttribute('src')).toBe(catalogueEntry('blast')!.sticker);
     expect(screen.queryByTestId('how-it-plays')).not.toBeInTheDocument();
     fireEvent.click(screen.getByTestId('how-it-plays-toggle'));
     const steps = within(screen.getByTestId('how-it-plays')).getAllByRole('listitem');
@@ -115,10 +115,10 @@ describe('<ClassroomModeCatalogue>', () => {
     expect(onPick).toHaveBeenCalledWith('boss-battle');
   });
 
-  it('spotlights Boss Battle with its own name and its own cover', () => {
+  it('spotlights Boss Battle with its own name and its own sticker', () => {
     setup({ selected: 'boss-battle' });
     expect(screen.getByTestId('mode-spotlight')).toHaveTextContent('eg2Modes.boss.name');
-    expect(screen.getByTestId('spotlight-art').querySelector('img')?.getAttribute('src')).toBe(catalogueEntry('boss-battle')!.cover);
+    expect(screen.getByTestId('spotlight-art').querySelector('img')?.getAttribute('src')).toBe(catalogueEntry('boss-battle')!.sticker);
     fireEvent.click(screen.getByTestId('how-it-plays-toggle'));
     expect(screen.getByTestId('spec-style')).toHaveTextContent('eg2Modes.style.class');
   });

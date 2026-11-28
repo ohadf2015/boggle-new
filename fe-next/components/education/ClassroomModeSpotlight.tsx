@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { m } from 'framer-motion';
-import { ChevronDown, ChevronUp, Clock, Gamepad2, Play, Puzzle } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, Gamepad2, MonitorPlay, MonitorSmartphone, Play, Puzzle, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EDU_MOTION, pressClasses, pressMotion, useReducedMotionSafe } from './motion';
 import { ARCADE_BLOCK } from '@/lib/education/arcadeAccent';
 import { modeArcadeAccent } from './lobby/LobbyModeGrid';
-import type { CatalogueMode, CatalogueModeKeys } from './ClassroomModeCatalogueData';
+import { deliveryKey, type CatalogueMode, type CatalogueModeKeys } from './ClassroomModeCatalogueData';
+
+const DELIVERY_ICON = { projector: MonitorPlay, phones: Smartphone, both: MonitorSmartphone } as const;
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -40,7 +42,7 @@ function Spec({ testId, icon: Icon, label, value, className }: { testId: string;
 
 /**
  * The ready panel: the game about to go live, big, and the one Start.
- * Cover art beside the name from a wide lobby, above it on a phone; specs and steps wait behind How it plays.
+ * The mode's sticker on its colour panel beside the name from a wide lobby, a banner above it on a phone; specs and steps wait behind How it plays.
  * While the setup above it is expanded, the panel shrinks to the name and Start.
  */
 export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blockedKey, onGoLive, t }: ClassroomModeSpotlightProps) {
@@ -48,6 +50,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
   const reduced = useReducedMotionSafe();
   const name = t(keys.name);
   const minutesLabel = t('education.modePicker.minutes', { count: minutes });
+  const DeliveryIcon = DELIVERY_ICON[mode.delivery];
   return (
     <section
       data-testid="mode-spotlight"
@@ -58,17 +61,22 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
       <div
         data-testid="spotlight-art"
         data-accent-decor
-        className={cn('relative min-h-24 flex-1 overflow-hidden rounded-neo-lg border-2 border-neo-black', ARCADE_BLOCK[modeArcadeAccent(mode.id)], EXPANDED_HIDE)}
+        className={cn(
+          'relative aspect-[5/2] shrink-0 overflow-hidden rounded-neo-lg border-[3px] border-neo-black shadow-hard',
+          '@4xl/lobby:aspect-auto @4xl/lobby:min-h-0 @4xl/lobby:flex-1',
+          ARCADE_BLOCK[modeArcadeAccent(mode.id)],
+          EXPANDED_HIDE,
+        )}
       >
         <m.img
           key={mode.id}
-          src={mode.cover}
+          src={mode.sticker}
           alt=""
           aria-hidden="true"
-          initial={reduced ? false : { scale: 0.92, rotate: -4 }}
-          animate={{ scale: 1, rotate: -1 }}
+          initial={reduced ? false : { scale: 0.9 }}
+          animate={{ scale: 1 }}
           transition={reduced ? { duration: 0 } : EDU_MOTION.spring.pop}
-          className="absolute inset-2 size-[calc(100%-1rem)] object-contain @4xl/lobby:inset-4 @4xl/lobby:size-[calc(100%-2rem)]"
+          className="absolute inset-[6%] size-[88%] object-contain drop-shadow-[3px_4px_0_rgb(0_0_0/0.18)]"
         />
       </div>
 
@@ -83,6 +91,16 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
         >
           <span data-testid="spotlight-category" className={cn('font-neo-body text-xs font-black uppercase tracking-[0.08em] text-neo-cream/60 edu-sky:text-edu-ink/60 @4xl/lobby:text-sm', EXPANDED_HIDE)}>{t(keys.category)}</span>
           <h2 className="font-neo-display text-2xl font-bold leading-tight text-neo-cream edu-sky:text-edu-ink @4xl/lobby:text-5xl">{name}</h2>
+          <div data-testid="spotlight-facts" className={cn('flex flex-wrap items-center gap-x-3 gap-y-1 font-neo-body text-sm font-bold text-neo-cream/80 edu-sky:text-edu-ink/80 @4xl/lobby:text-base', EXPANDED_HIDE)}>
+            <span className="inline-flex items-center gap-1 whitespace-nowrap">
+              <Clock className="size-4 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+              {minutesLabel}
+            </span>
+            <span data-testid={`delivery-tag-${mode.delivery}`} title={t(deliveryKey(mode.delivery))} className="inline-flex items-center gap-1 whitespace-nowrap">
+              <DeliveryIcon className="size-4 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+              {t(`eduShell.deliveryShort.${mode.delivery}`)}
+            </span>
+          </div>
           <p data-testid="spotlight-how" className={cn('font-neo-body text-sm leading-snug text-neo-cream/80 edu-sky:text-edu-ink/80 @4xl/lobby:text-lg', EXPANDED_HIDE)}>
             <span className="line-clamp-2 @4xl/lobby:line-clamp-none">{t(keys.how)}</span>
           </p>

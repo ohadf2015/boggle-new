@@ -193,17 +193,33 @@ describe('<LobbyModeGrid> — the picker is the page', () => {
     expect(screen.getByTestId('mode-recommended').className).toContain('border-edu-line');
   });
 
-  it('Given a lesson run sheet sits above the grid, When the grid is dense, Then the cover art goes shorter so the page still fits', () => {
+  it('Given a lesson run sheet sits above the grid, When the grid is dense, Then the colour header goes shorter so the page still fits', () => {
     renderGrid({ dense: true });
     const art = screen.getByTestId('mode-tile-classic').querySelector('[data-accent-decor]')!;
-    expect(art.className).toMatch(/aspect-\[3\/1\]/);
-    expect(art.className).toMatch(/(^|\s)size-10(\s|$)/);
+    expect(art.className).toMatch(/(^|\s)h-20(\s|$)/);
+    expect(art.className).toMatch(/@2xl:h-24(\s|$)/);
   });
 
-  it('Given no run sheet, Then the cover art keeps its normal size', () => {
+  it('Given no run sheet, Then every card opens on a full-width colour header with a white body under it, never a banner crop or a tilted frame', () => {
     renderGrid();
-    const art = screen.getByTestId('mode-tile-classic').querySelector('[data-accent-decor]')!;
-    expect(art.className).not.toMatch(/aspect-\[3\/1\]/);
-    expect(art.className).toMatch(/(^|\s)size-12(\s|$)/);
+    for (const tile of within(screen.getByRole('radiogroup')).getAllByRole('radio')) {
+      expect(tile.className).toContain('flex-col');
+      const art = tile.querySelector('[data-accent-decor]')!;
+      expect(art.className).toMatch(/(^|\s)h-24(\s|$)/);
+      expect(art.className).toMatch(/@2xl:h-28(\s|$)/);
+      expect(art.className).toContain('border-b-2');
+      expect(art.className).not.toMatch(/aspect-\[|(^|\s)size-1\d/);
+      expect(art.innerHTML).not.toMatch(/rotate/);
+    }
+  });
+
+  it('Then each header holds the mode’s cube-mascot sticker whole and centred', () => {
+    renderGrid();
+    for (const mode of catalogueModes()) {
+      const img = within(screen.getByTestId(`mode-tile-${mode.id}`)).getByTestId('mode-card-cover');
+      expect(img.getAttribute('src')).toBe(mode.sticker);
+      expect(img.className).toContain('object-contain');
+      expect(img.className).not.toContain('object-cover');
+    }
   });
 });

@@ -33,7 +33,7 @@ describe('<ClassroomModeSpotlight> ready panel', () => {
     const art = screen.getByTestId('spotlight-art');
     expect(art.className).not.toMatch(/(^|\s)hidden(\s|$)/);
     expect(art.className).toContain('group-has-[[data-lobby-expanded]]/lobby:hidden');
-    expect(within(art).getByRole('presentation', { hidden: true }).getAttribute('src')).toBe(catalogueEntry('vocab-quiz')!.cover);
+    expect(within(art).getByRole('presentation', { hidden: true }).getAttribute('src')).toBe(catalogueEntry('vocab-quiz')!.sticker);
     expect(screen.queryByTestId('mode-preview')).toBeNull();
     expect(screen.getByTestId('mode-spotlight').innerHTML).not.toMatch(/animate-avatar-float/);
   });
