@@ -3,12 +3,16 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 vi.mock('../HomeShareSheet', () => ({ HomeShareSheet: () => null }));
+vi.mock('@/components/teacher/ClassLimitUpsellModal', () => ({
+  default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="plan-gate-upgrade">Upgrade</div> : null),
+}));
 
 import { HomeHero } from '../HomeHero';
 
 const t = (k: string) => k;
 const A = { id: 'c1', name: 'Period 3', join_code: 'AB12CD', member_count: 4 };
 const B = { id: 'c2', name: 'Period 5', join_code: 'ZZ99YY', member_count: 2 };
+const C = { id: 'c3', name: 'Period 7', join_code: 'QQ11WW', member_count: 6 };
 const openMenu = () => fireEvent.pointerDown(screen.getByTestId('home-class-switcher'), { button: 0, ctrlKey: false, pointerType: 'mouse' });
 
 describe('<HomeHero> class menu', () => {
@@ -36,6 +40,15 @@ describe('<HomeHero> class menu', () => {
     expect(screen.getByTestId('home-class-page')).toHaveAttribute('href', '/en/teacher/classroom/c1');
     expect(screen.queryByTestId('home-class-option')).toBeNull();
     expect(screen.getAllByTestId('home-start-live')).toHaveLength(1);
+  });
+
+  it('Given a teacher at the free class cap, When they pick New class, Then the upgrade prompt opens instead of the new-class page', () => {
+    render(<HomeHero classrooms={[A, B, C]} selectedId="c1" onSelect={vi.fn()} language="en" t={t} newClassHref="/en/teacher/classroom/new" classLimit={3} />);
+    openMenu();
+    const cta = screen.getByTestId('home-new-class');
+    expect(cta).not.toHaveAttribute('href');
+    fireEvent.click(cta);
+    expect(screen.getByTestId('plan-gate-upgrade')).toBeInTheDocument();
   });
 
   it('Given the class page itself, Then the name is plain text with no menu', () => {

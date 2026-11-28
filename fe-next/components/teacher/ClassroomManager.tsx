@@ -25,6 +25,8 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { ClassGridSkeleton } from '@/components/teacher/routeLoading/TeacherSkeletons';
 import { TEACHER_PRO_CHECKOUT_PATH, teacherProUpgradeCtaLabel } from '@/components/education/TeacherProCheckoutCta';
 import { ClassCapMeter } from '@/components/teacher/ClassCapMeter';
+import ClassLimitUpsellModal from '@/components/teacher/ClassLimitUpsellModal';
+import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { useTeacherReveal } from './motion/useTeacherReveal';
 import { ClassCard } from './classroom/ClassCard';
 import { ClassAvatarStack } from './classroom/ClassAvatarStack';
@@ -66,6 +68,8 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
   const { hasPro, loading: proLoading } = pro;
   const [nowMs] = useState(() => Date.now());
   const insightClassId = !proLoading && pro.known && !hasProAccess(pro, nowMs) ? freeInsightClassId(classrooms) : null;
+  const atClassLimit = !proLoading && !hasProAccess(pro, nowMs) && classrooms.length >= FREE_TIER_LIMITS.classes;
+  const [limitOpen, setLimitOpen] = useState(false);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -185,10 +189,17 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
       ) : null}
       {/* One "New class" entry: the seat card when the row has an empty seat, else this quiet link (lime stays Start a game's). */}
       {classrooms.length > 0 && !seatFree ? (
-        <Link href={newClassHref} data-testid="classroom-create-link" className={cn(NB_SECONDARY, SHORT_LANDSCAPE_BUTTON)}>
-          <Plus className="size-4" aria-hidden="true" />
-          {t('eduShell.home.newClass', 'New class')}
-        </Link>
+        atClassLimit ? (
+          <button type="button" data-testid="classroom-create-link" className={cn(NB_SECONDARY, SHORT_LANDSCAPE_BUTTON)} onClick={() => setLimitOpen(true)}>
+            <Plus className="size-4" aria-hidden="true" />
+            {t('eduShell.home.newClass', 'New class')}
+          </button>
+        ) : (
+          <Link href={newClassHref} data-testid="classroom-create-link" className={cn(NB_SECONDARY, SHORT_LANDSCAPE_BUTTON)}>
+            <Plus className="size-4" aria-hidden="true" />
+            {t('eduShell.home.newClass', 'New class')}
+          </Link>
+        )
       ) : null}
     </div>
   );
@@ -245,7 +256,8 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
             {seatFree ? (
               <li className="flex">
                 <NewClassSeat
-                  href={newClassHref}
+                  href={atClassLimit ? undefined : newClassHref}
+                  onClick={atClassLimit ? () => setLimitOpen(true) : undefined}
                   label={t('eduShell.home.newClass', 'New class')}
                   hint={t('teacher.classroom.newClassHint')}
                   accent={CARD_COLORS[classrooms.length % CARD_COLORS.length]}
@@ -255,6 +267,16 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
           </ul>
         </m.div>
       )}
+
+      {atClassLimit ? (
+        <ClassLimitUpsellModal
+          isOpen={limitOpen}
+          onClose={() => setLimitOpen(false)}
+          currentCount={classrooms.length}
+          limit={FREE_TIER_LIMITS.classes}
+          reason="class_limit"
+        />
+      ) : null}
 
       <ClassroomFormDialog
         open={!!editing}

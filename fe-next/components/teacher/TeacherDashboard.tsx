@@ -351,6 +351,7 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
               newClassHref={newClassHref}
               classesHref={`/${language}/teacher/classroom`}
               capLabel={!proLoading && !hasPro ? t('eduShell.setup.capMeter', { count: classrooms.length, limit: FREE_TIER_LIMITS.classes }) : undefined}
+              classLimit={!proLoading && !hasPro ? FREE_TIER_LIMITS.classes : null}
               meta={selectedClassroom ? (
                 <HomeClassMeta
                   previewIds={studentPreview?.[selectedClassroom.id] ?? []}
