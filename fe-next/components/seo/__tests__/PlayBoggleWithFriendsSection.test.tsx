@@ -41,7 +41,7 @@ describe('friends-query internal links', () => {
   const anchor = 'play Boggle with friends online';
 
   it('homepage English cross-link uses the anchor and the ranking page', () => {
-    expect(read('translations/en.js')).toContain('"crossLink": "Play Boggle with friends online"');
+    expect(read('translations/en.js')).toContain('"crossLink": "Play multiplayer Boggle online with friends"');
     expect(read('components/landing/fresh/FreshCrossLink.tsx')).toContain(
       "en: '/en/play-boggle-online-free'",
     );

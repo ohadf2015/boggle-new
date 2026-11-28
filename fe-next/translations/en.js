@@ -2297,7 +2297,7 @@ const en = {
       "blogAll": "All articles",
       "faqMore": "{count} more questions",
       "faqAll": "All questions",
-      "crossLink": "Play Boggle with friends online",
+      "crossLink": "Play multiplayer Boggle online with friends",
       "readMore": "New here? Learn {howToPlay}, play {withFriends}, pick up tricks in our {guides}, or browse {blog}.",
       "readMoreLinks": {
         "howToPlay": "how to play",
